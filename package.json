@@ -1,0 +1,23 @@
+{
+  "name": "dadong-fe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "format:fix": "biome format --write .",
+    "lint:fix": "biome check --write .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "turbo": "^2.5.8",
+    "@biomejs/biome": "2.2.0"
+  }
+}
