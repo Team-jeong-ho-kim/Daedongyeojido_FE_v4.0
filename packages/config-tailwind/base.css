@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pretendard 폰트 로드 */
+/* biome-ignore lint/correctness/noInvalidPositionAtImportRule: <임시> */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+@layer base {
+  html {
+    font-family: "Pretendard", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  body {
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+}

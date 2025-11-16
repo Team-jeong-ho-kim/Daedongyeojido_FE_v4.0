@@ -1,0 +1,82 @@
+/* 대동여지도 디자인 토큰 */
+
+:root {
+  /* Primary Colors */
+  --primary-50: #fddfdf;
+  --primary-100: #fabdbd;
+  --primary-200: #f9adad;
+  --primary-300: #f89999;
+  --primary-400: #f67f7f;
+  --primary-500: #f45f5f;
+  --primary-600: #c34c4c;
+  --primary-700: #9c3d3d;
+  --primary-800: #7d3131;
+  --primary-900: #642727;
+
+  /* Grayscale Colors */
+  --grayscale-50: #f9f9f9;
+  --grayscale-100: #cac9c9;
+  --grayscale-200: #bdbbbb;
+  --grayscale-300: #adaaaa;
+  --grayscale-400: #999595;
+  --grayscale-500: #7f7a7a;
+  --grayscale-600: #666262;
+  --grayscale-700: #524e4e;
+  --grayscale-800: #423e3e;
+  --grayscale-900: #191818;
+
+  /* Error Colors */
+  --error-50: #ffd2d2;
+  --error-100: #ffa4a4;
+  --error-200: #ff8d8d;
+  --error-300: #ff7070;
+  --error-400: #ff4c4c;
+  --error-500: #ff1f1f;
+  --error-600: #cc1919;
+  --error-700: #a31414;
+  --error-800: #821010;
+  --error-900: #680d0d;
+
+  /* System Colors */
+  --color-white: #ffffff;
+  --color-black: #06070c;
+  --color-yellow: #ffb915;
+  --color-blue: #167bff;
+
+  /* Typography Scale */
+  --font-size-l-headline: 40px;
+  --font-size-m-headline: 36px;
+  --font-size-s-headline: 32px;
+  --font-size-title: 28px;
+  --font-size-s-title: 24px;
+  --font-size-l-body: 20px;
+  --font-size-body: 16px;
+
+  /* Font Weights */
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 100%;
+  --line-height-normal: 26px;
+
+  /* Spacing Scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
