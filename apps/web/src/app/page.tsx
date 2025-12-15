@@ -1,10 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 export default function Home() {
-  const images = ["/mac.png", "/mac.png", "/mac.png"];
+  const images = [
+    { id: "slide-1", src: "/mac.png" },
+    { id: "slide-2", src: "/mac.png" },
+    { id: "slide-3", src: "/mac.png" },
+  ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(
     new Set(),
@@ -39,7 +43,7 @@ export default function Home() {
     }, 3000); // 3초마다 이미지 변경
 
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -122,7 +126,7 @@ export default function Home() {
             <span className="block">동아리의 모든 것</span>
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
-          <button className="bg-[#f0e5e5] px-8 py-4 rounded-[20px] text-[#4a4444] font-bold text-[22px]">
+          <button type="button" className="bg-[#f0e5e5] px-8 py-4 rounded-[20px] text-[#4a4444] font-bold text-[22px]">
             로그인 하기
           </button>
         </div>
@@ -137,12 +141,12 @@ export default function Home() {
             >
               {images.map((image, index) => (
                 <div
-                  key={index}
+                  key={image.id}
                   className="relative flex-shrink-0 flex items-center justify-center px-0.5"
                   style={{ width: "60%" }}
                 >
                   <Image
-                    src={image}
+                    src={image.src}
                     alt={`hero ${index + 1}`}
                     width={1080}
                     height={655}
@@ -162,9 +166,9 @@ export default function Home() {
 
           {/* Image Slide Indicators */}
           <div className="flex items-center gap-[5px] mb-32">
-            {images.map((_, index) => (
+            {images.map((image, index) => (
               <button
-                key={index}
+                key={image.id}
                 type="button"
                 className={`rounded-[100px] transition-all duration-300 cursor-pointer border-none ${
                   index === currentImageIndex
@@ -485,7 +489,7 @@ export default function Home() {
         <p className="mt-4 text-sm text-[#bdbdbd]">@DAEDONGYEOJIDO</p>
 
         <div className="mt-8 flex items-center justify-end">
-          <button className="bg-[#5c6168] flex items-center gap-2 px-6 py-3 rounded-md">
+          <button type="button" className="bg-[#5c6168] flex items-center gap-2 px-6 py-3 rounded-md">
             <Image
               src="/inquire.png"
               alt="문의 아이콘"
