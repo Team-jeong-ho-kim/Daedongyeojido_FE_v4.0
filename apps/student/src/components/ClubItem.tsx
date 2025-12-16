@@ -1,0 +1,42 @@
+import Image from "next/image";
+import type { Club } from "@/types";
+import { rightArrow } from "../../public/images/clubs";
+
+export default function ClubItem(clubProps: Omit<Club, "majors">) {
+  return (
+    <article
+      id={`club-${clubProps.clubId}`}
+      className="relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl"
+    >
+      {/* 상단 이미지 영역 */}
+      <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849]">
+        {clubProps.clubImage && (
+          <Image
+            src={clubProps.clubImage}
+            alt={clubProps.clubName}
+            fill
+            className="object-cover"
+          />
+        )}
+        <button
+          className="absolute top-6 right-4 z-10 h-6 w-6"
+          aria-label="다음으로 이동"
+          type="button"
+        >
+          <Image src={rightArrow} alt="다음" width={12} height={12} />
+        </button>
+      </div>
+
+      {/* 하단 정보 영역 */}
+      <section className="absolute bottom-0 left-0 flex w-full flex-col gap-2 rounded-b-3xl bg-gray-50 px-6 py-4">
+        <h2 className="font-semibold text-2xl text-gray-900">
+          {clubProps.clubName}
+        </h2>
+
+        <p className="line-clamp-1 text-gray-500 text-sm">
+          {clubProps.introduction}
+        </p>
+      </section>
+    </article>
+  );
+}

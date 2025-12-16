@@ -2,10 +2,10 @@ import { Button } from "ui";
 
 export default function StudentPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Student</h1>
-        <p className="text-muted-foreground mb-6">학생</p>
+        <h1 className="mb-4 font-bold text-4xl">Student</h1>
+        <p className="mb-6 text-muted-foreground">학생</p>
         <Button>시작하기</Button>
       </div>
     </div>
