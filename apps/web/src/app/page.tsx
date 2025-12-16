@@ -86,10 +86,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white relative size-full">
+    <div className="relative size-full bg-white">
       {/* Header */}
-      <div className="bg-white h-[70px] left-0 overflow-clip top-0 w-full">
-        <div className="flex items-center justify-between px-4 h-full max-w-7xl mx-auto">
+      <div className="top-0 left-0 h-[70px] w-full overflow-clip bg-white">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Image
               src="/logo.png"
@@ -98,7 +98,7 @@ export default function Home() {
               height={18}
               className="h-[18px] w-[22px]"
             />
-            <p className="font-bold text-lg text-black">대동여지도</p>
+            <p className="font-bold text-black text-lg">대동여지도</p>
           </div>
           <div className="flex items-center gap-8">
             <p className="text-[#4e5968] text-lg">동아리</p>
@@ -109,29 +109,32 @@ export default function Home() {
       </div>
 
       {/* Background gradient */}
-      <div className="absolute h-[1781px] left-0 top-[70px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white" />
+      <div className="absolute top-[70px] left-0 h-[1781px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white" />
 
       {/* Hero Section */}
       <div
         ref={heroRef}
         id={heroId}
-        className={`relative pt-[193px] pb-[50px] flex items-center justify-items-center flex-col gap-80 transition-all duration-1000 ease-out ${
+        className={`relative flex flex-col items-center justify-items-center gap-80 pt-[193px] pb-[50px] transition-all duration-1000 ease-out ${
           visibleSections.has(heroId)
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-10"
+            ? "translate-y-0 opacity-100"
+            : "translate-y-10 opacity-0"
         }`}
       >
         <div className="flex flex-col items-center px-4">
-          <h1 className="text-[70px] font-bold leading-[110px] text-center text-black tracking-[-0.75px] mb-8">
+          <h1 className="mb-8 text-center font-bold text-[70px] text-black leading-[110px] tracking-[-0.75px]">
             <span className="block">동아리의 모든 것</span>
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
-          <button type="button" className="bg-[#f0e5e5] px-8 py-4 rounded-[20px] text-[#4a4444] font-bold text-[22px]">
+          <button
+            type="button"
+            className="rounded-[20px] bg-[#f0e5e5] px-8 py-4 font-bold text-[#4a4444] text-[22px]"
+          >
             로그인 하기
           </button>
         </div>
-        <div className="flex flex-col items-center gap-10 w-full px-4">
-          <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[655px] flex items-center justify-center">
+        <div className="flex w-full flex-col items-center gap-10 px-4">
+          <div className="relative flex h-[400px] w-full items-center justify-center sm:h-[500px] md:h-[600px] lg:h-[655px]">
             <div
               className="flex transition-transform duration-700 ease-in-out"
               style={{
@@ -142,7 +145,7 @@ export default function Home() {
               {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative flex-shrink-0 flex items-center justify-center px-0.5"
+                  className="relative flex flex-shrink-0 items-center justify-center px-0.5"
                   style={{ width: "60%" }}
                 >
                   <Image
@@ -150,7 +153,7 @@ export default function Home() {
                     alt={`hero ${index + 1}`}
                     width={1080}
                     height={655}
-                    className="max-w-full max-h-full object-contain rounded-lg"
+                    className="max-h-full max-w-full rounded-lg object-contain"
                     style={{
                       opacity: index === currentImageIndex ? 1 : 0.6,
                       transform:
@@ -165,15 +168,15 @@ export default function Home() {
           </div>
 
           {/* Image Slide Indicators */}
-          <div className="flex items-center gap-[5px] mb-32">
+          <div className="mb-32 flex items-center gap-[5px]">
             {images.map((image, index) => (
               <button
                 key={image.id}
                 type="button"
-                className={`rounded-[100px] transition-all duration-300 cursor-pointer border-none ${
+                className={`cursor-pointer rounded-[100px] border-none transition-all duration-300 ${
                   index === currentImageIndex
-                    ? "bg-[#f45851] h-2.5 w-[25px]"
-                    : "bg-[#c9c9c9] size-2.5 hover:bg-[#a0a0a0]"
+                    ? "h-2.5 w-[25px] bg-[#f45851]"
+                    : "size-2.5 bg-[#c9c9c9] hover:bg-[#a0a0a0]"
                 }`}
                 onClick={() => setCurrentImageIndex(index)}
                 onKeyDown={(e) => {
@@ -196,14 +199,14 @@ export default function Home() {
       <div
         ref={descriptionRef}
         id={descriptionId}
-        className={`bg-[#fbf9fa] py-[259px] relative transition-all duration-1000 ease-out ${
+        className={`relative bg-[#fbf9fa] py-[259px] transition-all duration-1000 ease-out ${
           visibleSections.has(descriptionId)
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-10"
+            ? "translate-y-0 opacity-100"
+            : "translate-y-10 opacity-0"
         }`}
       >
-        <div className="text-center mx-auto px-4">
-          <p className="text-[40px] font-bold leading-[70px] text-[#28191b] mb-8 whitespace-nowrap w-full">
+        <div className="mx-auto px-4 text-center">
+          <p className="mb-8 w-full whitespace-nowrap font-bold text-[#28191b] text-[40px] leading-[70px]">
             대덕소프트웨어마이스터고등학교의 전공동아리들을
             <br />
             한눈에 조회하고 한 곳에서 관리하세요.
@@ -225,14 +228,14 @@ export default function Home() {
         id={featuresId}
         className={`pt-64 text-center transition-all duration-1000 ease-out ${
           visibleSections.has(featuresId)
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-10"
+            ? "translate-y-0 opacity-100"
+            : "translate-y-10 opacity-0"
         }`}
       >
-        <h2 className="text-[85px] font-bold leading-normal text-center mb-8">
-          <span className="text-[#28191b] block">전공동아리</span>
-          <span className="text-[#ff4d62] block">관리의 모든 것</span>
-          <span className="text-[#28191b] block">하나로 관리하다</span>
+        <h2 className="mb-8 text-center font-bold text-[85px] leading-normal">
+          <span className="block text-[#28191b]">전공동아리</span>
+          <span className="block text-[#ff4d62]">관리의 모든 것</span>
+          <span className="block text-[#28191b]">하나로 관리하다</span>
         </h2>
       </div>
 
@@ -240,66 +243,66 @@ export default function Home() {
       <div
         ref={cardsRef}
         id={cardsId}
-        className={`relative py-[200px] h-[900px] transition-all duration-1200 ease-out ${
+        className={`relative h-[900px] py-[200px] transition-all duration-1200 ease-out ${
           visibleSections.has(cardsId) ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="relative w-full flex justify-center">
+        <div className="relative flex w-full justify-center">
           <div
-            className={`absolute left-[calc(50%-595px)] top-12 transform rotate-[-6deg] transition-all duration-700 ease-out ${
+            className={`absolute top-12 left-[calc(50%-595px)] rotate-[-6deg] transform transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "100ms" }}
           >
             <Image src="/card1.png" alt="동아리카드" width={295} height={396} />
           </div>
           <div
-            className={`absolute left-[calc(50%-450px)] top-0 transform transition-all duration-700 ease-out ${
+            className={`absolute top-0 left-[calc(50%-450px)] transform transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "200ms" }}
           >
             <Image src="/card2.png" alt="지원 카드" width={436} height={501} />
           </div>
           <div
-            className={`absolute left-[calc(50%-147px)] top-0 transition-all duration-700 ease-out ${
+            className={`absolute top-0 left-[calc(50%-147px)] transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "300ms" }}
           >
             <Image src="/card3.png" alt="면접 카드" width={295} height={396} />
           </div>
           <div
-            className={`absolute left-[calc(50%+70px)] top-16 transform rotate-[-5deg] transition-all duration-700 ease-out ${
+            className={`absolute top-16 left-[calc(50%+70px)] rotate-[-5deg] transform transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "400ms" }}
           >
             <Image src="/card4.png" alt="회식 카드" width={360} height={442} />
           </div>
           <div
-            className={`absolute left-[calc(50%+110px)] top-30 transform rotate-[-7deg] transition-all duration-700 ease-out ${
+            className={`absolute top-30 left-[calc(50%+110px)] rotate-[-7deg] transform transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "500ms" }}
           >
             <Image src="/card4_.png" alt="회식 카드" width={233} height={294} />
           </div>
           <div
-            className={`absolute left-[calc(50%+310px)] top-0 transform transition-all duration-700 ease-out ${
+            className={`absolute top-0 left-[calc(50%+310px)] transform transition-all duration-700 ease-out ${
               visibleSections.has(cardsId)
-                ? "opacity-100 scale-100 translate-y-0"
-                : "opacity-0 scale-75 translate-y-8"
+                ? "translate-y-0 scale-100 opacity-100"
+                : "translate-y-8 scale-75 opacity-0"
             }`}
             style={{ transitionDelay: "600ms" }}
           >
@@ -309,20 +312,20 @@ export default function Home() {
       </div>
 
       {/* Content Sections */}
-      <div className="py-[300px] max-w-7xl mx-auto px-4">
+      <div className="mx-auto max-w-7xl px-4 py-[300px]">
         <div
           ref={registerRef}
           id={registerId}
           className={`mb-[300px] transition-all duration-1000 ease-out ${
             visibleSections.has(registerId)
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
+              ? "translate-y-0 opacity-100"
+              : "translate-y-10 opacity-0"
           }`}
         >
-          <p className="text-[35px] font-bold text-[#ff4a50] mb-4">
+          <p className="mb-4 font-bold text-[#ff4a50] text-[35px]">
             등록 · 생성
           </p>
-          <h3 className="text-[70px] font-bold text-black leading-24 mb-28">
+          <h3 className="mb-28 font-bold text-[70px] text-black leading-24">
             <span className="block">동아리 관리,</span>
             <span className="block">등록부터 생성까지</span>
             <span className="block">간편하게</span>
@@ -335,7 +338,7 @@ export default function Home() {
               height={655}
             />
           </div>
-          <p className="text-[30px] text-end font-semibold text-[#6c6768] leading-normal mt-40">
+          <p className="mt-40 text-end font-semibold text-[#6c6768] text-[30px] leading-normal">
             <span className="block">클릭 한 번으로 전공 동아리를</span>
             <span className="block">쉽게 생성할 수 있어요.</span>
           </p>
@@ -344,30 +347,30 @@ export default function Home() {
         <div
           ref={announceRef}
           id={announceId}
-          className={`mb-[300px] relative transition-all duration-1000 ease-out ${
+          className={`relative mb-[300px] transition-all duration-1000 ease-out ${
             visibleSections.has(announceId)
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
+              ? "translate-y-0 opacity-100"
+              : "translate-y-10 opacity-0"
           }`}
         >
-          <div className="flex items-center gap-2 mb-4">
+          <div className="mb-4 flex items-center gap-2">
             <Image src="/question.png" alt="질문 로고" width={20} height={18} />
-            <p className="text-[24px] font-bold text-[#ff4a50]">
+            <p className="font-bold text-[#ff4a50] text-[24px]">
               전공동아리 공고
             </p>
           </div>
-          <h3 className="text-[55px] font-bold text-[#524d4e] leading-[72px] mb-8">
+          <h3 className="mb-8 font-bold text-[#524d4e] text-[55px] leading-[72px]">
             <span className="block">여러 전공동아리 공고를</span>
             <span className="block">한 눈에 확인하세요</span>
           </h3>
-          <p className="text-[30px] font-semibold text-[#6c6768] leading-normal">
+          <p className="font-semibold text-[#6c6768] text-[30px] leading-normal">
             대덕SW고의 전공동아리 공고를
             <br />
             쉽고 빠르게 확인할 수 있어요
           </p>
 
           {/* Absolute positioned images */}
-          <div className="absolute right-[100px] top-[-100px]">
+          <div className="absolute top-[-100px] right-[100px]">
             <Image
               src="/page1.png"
               alt="사이드 이미지 1"
@@ -375,7 +378,7 @@ export default function Home() {
               height={349}
             />
           </div>
-          <div className="absolute right-[-150px] top-16">
+          <div className="absolute top-16 right-[-150px]">
             <Image
               src="/page2.png"
               alt="사이드 이미지 2"
@@ -390,8 +393,8 @@ export default function Home() {
           id={applyId}
           className={`mb-[300px] flex gap-36 transition-all duration-1000 ease-out ${
             visibleSections.has(applyId)
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 -translate-x-10"
+              ? "translate-x-0 opacity-100"
+              : "-translate-x-10 opacity-0"
           }`}
         >
           <div className="">
@@ -403,20 +406,20 @@ export default function Home() {
             />
           </div>
           <div className="flex flex-col justify-center">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="mb-4 flex items-center gap-2">
               <Image
                 src="/article.png"
                 alt="질문 로고"
                 width={20}
                 height={18}
               />
-              <p className="text-[24px] font-bold text-[#ff4a50]">지원 관리</p>
+              <p className="font-bold text-[#ff4a50] text-[24px]">지원 관리</p>
             </div>
-            <h3 className="text-[55px] font-bold text-[#524d4e] leading-[72px] mb-8 whitespace-nowrap">
+            <h3 className="mb-8 whitespace-nowrap font-bold text-[#524d4e] text-[55px] leading-[72px]">
               <span className="block">전공동아리 지원 내역을</span>
               <span className="block">한 눈에 확인해보세요.</span>
             </h3>
-            <p className="text-[30px] font-semibold text-[#6c6768] leading-normal whitespace-nowrap">
+            <p className="whitespace-nowrap font-semibold text-[#6c6768] text-[30px] leading-normal">
               마이페이지에서 자신이 지원한
               <br />
               전공동아리를 쉽고 간편하게 확인할 수 있어요
@@ -427,21 +430,21 @@ export default function Home() {
         <div
           ref={calendarRef}
           id={calendarId}
-          className={`mb-[300px] relative h-[940px] transition-all duration-1000 ease-out ${
+          className={`relative mb-[300px] h-[940px] transition-all duration-1000 ease-out ${
             visibleSections.has(calendarId)
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-10"
+              ? "translate-y-0 opacity-100"
+              : "translate-y-10 opacity-0"
           }`}
         >
           <div className="">
-            <p className="text-[30px] font-bold text-[#ff4a50] mb-8">
+            <p className="mb-8 font-bold text-[#ff4a50] text-[30px]">
               우리의 시간은 소중하니까
             </p>
-            <h3 className="text-[80px] font-bold text-[#524d4e] leading-[84px] mb-8">
+            <h3 className="mb-8 font-bold text-[#524d4e] text-[80px] leading-[84px]">
               <span className="block">복잡하고 귀찮은</span>
               <span className="block">일들과 작별해보세요</span>
             </h3>
-            <p className="text-[30px] font-semibold text-[#6c6768] leading-normal">
+            <p className="font-semibold text-[#6c6768] text-[30px] leading-normal">
               큐알 코드가 붙은 포스터, 동아리 정보들
               <br />
               면접 일정 관리, 공지, 합격 결과 알리기
@@ -450,7 +453,7 @@ export default function Home() {
               대동여지도와 함께라면 더이상 번거롭지 않아요
             </p>
           </div>
-          <div className="absolute right-[-200px] top-0">
+          <div className="absolute top-0 right-[-200px]">
             <Image
               src="/calender.png"
               alt="달력 로고"
@@ -462,7 +465,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="bg-[#303740] py-[50px] px-[220px]">
+      <div className="bg-[#303740] px-[220px] py-[50px]">
         <div className="flex items-center gap-4 text-[#bdbdbd]">
           <Image
             src="/logo.png"
@@ -472,11 +475,11 @@ export default function Home() {
             className="h-[18px] w-[22px]"
           />
           <p className="text-sm">|</p>
-          <p className="text-sm font-bold">대동여지도</p>
+          <p className="font-bold text-sm">대동여지도</p>
           <p className="text-sm">|</p>
-          <p className="text-sm font-bold">DaeDongYeoJiDo</p>
+          <p className="font-bold text-sm">DaeDongYeoJiDo</p>
         </div>
-        <div className="mt-8 text-sm text-[#bdbdbd] leading-normal">
+        <div className="mt-8 text-[#bdbdbd] text-sm leading-normal">
           <p className="mb-0">
             대덕소프트웨어마이스터고등학교를 위한 전공동아리 관리 서비스
             대동여지도 | PM: 박태수
@@ -486,18 +489,21 @@ export default function Home() {
           </p>
           <p>주소 : 대전광역시 유성구 가정북로 76</p>
         </div>
-        <p className="mt-4 text-sm text-[#bdbdbd]">@DAEDONGYEOJIDO</p>
+        <p className="mt-4 text-[#bdbdbd] text-sm">@DAEDONGYEOJIDO</p>
 
         <div className="mt-8 flex items-center justify-end">
-          <button type="button" className="bg-[#5c6168] flex items-center gap-2 px-6 py-3 rounded-md">
+          <button
+            type="button"
+            className="flex items-center gap-2 rounded-md bg-[#5c6168] px-6 py-3"
+          >
             <Image
               src="/inquire.png"
               alt="문의 아이콘"
               width={16}
               height={16}
-              className="w-4 h-4 opacity-70"
+              className="h-4 w-4 opacity-70"
             />
-            <p className="text-white text-sm">문의하기</p>
+            <p className="text-sm text-white">문의하기</p>
           </button>
         </div>
       </div>

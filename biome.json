@@ -13,7 +13,7 @@
       "**/*",
       "!**/.next/*",
       "!**/*.d.ts",
-      "!dist/*",
+      "!**/dist/**",
       "!build/*",
       "!coverage",
       "!out",
@@ -38,6 +38,13 @@
       "recommended": true,
       "suspicious": {
         "noUnknownAtRules": "off"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe",
+          "options": {}
+        }
       }
     }
   },

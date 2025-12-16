@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsup ./src/index.ts --format cjs,esm --dts --external react --external react-dom",
     "dev": "tsup ./src/index.ts --format cjs,esm --dts --external react --external react-dom --watch",
-    "lint": "eslint .",
+    "lint": "biome check .",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
