@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { Button } from "ui";
 import ClubItem from "@/components/ClubItem";
+import CTASection from "@/components/CTASection";
 import Pagination from "@/components/Pagination";
-import { tigerImg } from "../../../public/images/clubs";
 
 export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
@@ -131,7 +130,7 @@ export default function ClubsPage() {
           </Button>
         </div>
 
-        {/* 동아리 */}
+        {/* 동아리 전체 조회 */}
         <div className="mb-10 flex flex-wrap gap-7">
           {clubs.slice((curPage - 1) * limit, curPage * limit).map((club) => (
             <ClubItem key={club.clubId} {...club} />
@@ -149,28 +148,12 @@ export default function ClubsPage() {
         </div>
 
         {/* CTA 섹션 */}
-        <div className="flex items-center justify-between px-22">
-          <div className="flex-1">
-            <h2 className="font-bold text-3xl text-gray-900">
-              발견한 동아리에 지원하고 싶나요?
-            </h2>
-            <p className="mb-3 font-bold text-gray-900 text-xl">
-              아래 버튼을 눌러 바로 지원하는 페이지로 이동해보세요!
-            </p>
-            <p className="mb-14 text-gray-600">
-              아래 버튼을 눌러 지원해보세요!
-            </p>
-            <Button className="primary-500 cursor-pointer rounded-xl bg-primary-50 px-7 py-6 text-[18px] text-primary-500 hover:bg-primary-100">
-              지원하러가기
-            </Button>
-          </div>
-          <div className="ml-8 flex-shrink-0">
-            <div className="flex items-center">
-              {/* 호랑이 이미지*/}
-              <Image src={tigerImg} className="h-auto w-42" alt="🐅" />
-            </div>
-          </div>
-        </div>
+        <CTASection
+          title="발견한 동아리에 지원하고 싶나요?"
+          subtitle="아래 버튼을 눌러 바로 지원하는 페이지로 이동해보세요!"
+          description="아래 버튼을 눌러 지원해보세요!"
+          buttonText="지원하러가기"
+        />
       </div>
     </main>
   );
