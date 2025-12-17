@@ -9,6 +9,15 @@ interface CTASectionProps {
   buttonText: string;
 }
 
+/**
+ * Render a responsive call-to-action section with a title, subtitle, description, button, and accompanying image.
+ *
+ * @param title - Main heading text displayed prominently at the start of the section
+ * @param subtitle - Bolded subheading displayed under the title
+ * @param description - Supporting descriptive text shown below the subtitle
+ * @param buttonText - Label shown inside the CTA button
+ * @returns The CTA section as a JSX element
+ */
 export default function CTASection({
   title,
   subtitle,

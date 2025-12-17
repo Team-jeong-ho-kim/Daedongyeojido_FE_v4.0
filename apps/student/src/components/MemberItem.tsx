@@ -1,5 +1,13 @@
 import type { ClubMember } from "@/types";
 
+/**
+ * Render a styled member card displaying a member's name, introduction, and majors.
+ *
+ * @param userName - Member's display name shown as the card heading
+ * @param majors - Array of major names rendered as hashtagged pill tags
+ * @param introduce - Short introduction text shown beneath the name; truncated by default and expanded on hover
+ * @returns A JSX element representing a styled member card containing the name, introduction, and major tags
+ */
 export default function MemberItem({
   userName,
   majors,

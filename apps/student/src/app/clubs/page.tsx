@@ -6,6 +6,14 @@ import ClubItem from "@/components/ClubItem";
 import CTASection from "@/components/CTASection";
 import Pagination from "@/components/Pagination";
 
+/**
+ * Render the clubs listing page with controls for creating a club, pagination, and a call-to-action.
+ *
+ * Displays a paginated grid of club items, an action button for club creation, pagination controls,
+ * and a CTA section that directs users to an application page.
+ *
+ * @returns The JSX element for the clubs page containing the action button, current page of club items, pagination, and CTA.
+ */
 export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 8;

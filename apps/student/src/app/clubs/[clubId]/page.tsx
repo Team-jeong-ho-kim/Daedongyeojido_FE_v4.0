@@ -39,6 +39,12 @@ const mockClubMembers: ClubMember[] = [
   { userName: "윤서연", majors: ["FE"], introduce: "윤서연입니다." },
 ];
 
+/**
+ * Renders the club detail page for a given club route, including header, one-line intro, tabbed content (introduction and announcement history), member grid with client-side pagination, and a CTA section.
+ *
+ * @param params - Route params object containing `clubId` (string) for the club being displayed
+ * @returns The page JSX containing the club's details, members, and related UI controls
+ */
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId: _clubId } = use(params);
 
