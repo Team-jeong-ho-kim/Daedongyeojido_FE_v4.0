@@ -12,6 +12,26 @@ export interface ClubsResponse {
   clubs: Club[];
 }
 
+export interface ClubDetail {
+  clubName: string;
+  oneLiner: string;
+  introduction: string;
+  clubImage: string;
+  majors: Major[];
+  links: string[];
+}
+
+export interface ClubMember {
+  userName: string;
+  majors: Major[];
+  introduce: string;
+}
+
+export interface ClubDetailResponse {
+  club: ClubDetail;
+  clubMembers: ClubMember[];
+}
+
 export interface PaginationType {
   listLen: number; // 리스트의 전체 길이
   limit: number; // 한 페이지에 표시할 데이터 개수
