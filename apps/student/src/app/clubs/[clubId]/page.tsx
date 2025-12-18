@@ -237,9 +237,9 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           ) : (
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
-                {pagedPostings.map((posting, index) => (
+                {pagedPostings.map((posting) => (
                   <JobPostingItem
-                    key={`${posting.title}-${posting.date}-${index}`}
+                    key={`${posting.title}-${posting.date}`}
                     status={posting.status}
                     title={posting.title}
                     date={posting.date}
