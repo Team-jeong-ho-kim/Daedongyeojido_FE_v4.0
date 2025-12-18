@@ -6,12 +6,12 @@ export default function MemberItem({
   introduce,
 }: ClubMember) {
   return (
-    <article className="group relative z-0 flex w-full select-none flex-col overflow-hidden rounded-[14px] shadow-sm transition-all duration-200 hover:z-50 hover:shadow-lg md:rounded-[16px] lg:w-[240px]">
+    <article className="group relative z-0 h-[250px] w-full select-none overflow-visible rounded-[14px] shadow-sm transition-all duration-200 hover:z-50 md:h-[270px] md:rounded-[16px] lg:h-[285px] lg:w-[240px]">
       {/* 이미지 영역 */}
-      <div className="h-[140px] w-full bg-[#3D5A4C] md:h-[155px] lg:h-[165px]" />
+      <div className="h-[140px] w-full rounded-t-[14px] bg-[#3D5A4C] md:h-[155px] md:rounded-t-[16px] lg:h-[165px]" />
 
       {/* 정보 영역 */}
-      <div className="flex flex-col gap-1.5 bg-gray-50 p-3 md:p-4">
+      <div className="flex flex-col gap-1.5 rounded-b-[14px] bg-gray-50 p-3 transition-shadow duration-200 group-hover:shadow-xl md:rounded-b-[16px] md:p-4">
         <h3 className="font-semibold text-[14px] text-gray-900 md:text-[15px]">
           {userName}
         </h3>

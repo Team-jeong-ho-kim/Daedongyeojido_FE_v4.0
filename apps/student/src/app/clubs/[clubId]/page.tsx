@@ -3,9 +3,10 @@
 import Image from "next/image";
 import { use, useState } from "react";
 import CTASection from "@/components/CTASection";
+import JobPostingItem from "@/components/JobPostingItem";
 import MemberItem from "@/components/MemberItem";
 import Pagination from "@/components/Pagination";
-import type { ClubDetail, ClubMember } from "@/types";
+import type { ClubDetail, ClubMember, JobPosting } from "@/types";
 
 interface ClubDetailPageProps {
   params: Promise<{ clubId: string }>;
@@ -39,20 +40,37 @@ const mockClubMembers: ClubMember[] = [
   { userName: "윤서연", majors: ["FE"], introduce: "윤서연입니다." },
 ];
 
+const mockJobPostings: JobPosting[] = [
+  { status: "진행중", title: "2025년 상반기 신입 모집", date: "2025.03.01" },
+  { status: "종료됨", title: "iOS 추가 모집합니다", date: "2025.12.24" },
+  { status: "종료됨", title: "백엔드 개발자 모집", date: "2025.11.15" },
+  { status: "종료됨", title: "프론트엔드 개발자 모집", date: "2025.10.20" },
+  { status: "종료됨", title: "디자이너 모집", date: "2025.09.10" },
+  { status: "종료됨", title: "PM 모집", date: "2025.08.05" },
+];
+
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId: _clubId } = use(params);
 
   const [activeTab, setActiveTab] = useState<"intro" | "history">("intro");
   const [memberPage, setMemberPage] = useState(1);
+  const [postingPage, setPostingPage] = useState(1);
 
   const memberLimit = 8;
+  const postingLimit = 5;
 
   const club = mockClub;
   const clubMembers = mockClubMembers;
+  const jobPostings = mockJobPostings;
 
   const pagedMembers = clubMembers.slice(
     (memberPage - 1) * memberLimit,
     memberPage * memberLimit,
+  );
+
+  const pagedPostings = jobPostings.slice(
+    (postingPage - 1) * postingLimit,
+    postingPage * postingLimit,
   );
 
   return (
@@ -188,7 +206,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 </h2>
 
                 <div className="flex flex-col gap-6 md:gap-8">
-                  <div className="grid min-h-[300px] grid-cols-1 content-start items-start gap-4 sm:grid-cols-2 md:min-h-[450px] md:gap-5 lg:min-h-[570px] lg:grid-cols-4">
+                  <div className="grid min-h-[590px] grid-cols-4 content-start items-start gap-5">
                     {pagedMembers.map((member) => (
                       <MemberItem
                         key={`${member.userName}-${member.introduce}`}
@@ -209,20 +227,49 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               </section>
             </div>
           </div>
-
-          {/* CTA */}
-          <CTASection
-            title="이 동아리가 마음에 든다면?"
-            subtitle="동아리 가입 신청을 위해 아래 버튼을 눌러주세요!"
-            description="아래 버튼을 눌러 지원해보세요!"
-            buttonText="이 동아리의 공고로 바로가기"
-          />
         </>
       ) : (
-        <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-          공고 이력이 없습니다.
+        <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
+          {jobPostings.length === 0 ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              공고 이력이 없습니다.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
+                {pagedPostings.map((posting) => (
+                  <JobPostingItem
+                    key={`${posting.title}-${posting.date}`}
+                    status={posting.status}
+                    title={posting.title}
+                    date={posting.date}
+                    onClick={() => {
+                      console.log("공고 클릭:", posting.title);
+                    }}
+                  />
+                ))}
+              </div>
+
+              {jobPostings.length > postingLimit && (
+                <Pagination
+                  listLen={jobPostings.length}
+                  limit={postingLimit}
+                  curPage={postingPage}
+                  setCurPage={setPostingPage}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
+
+      {/* CTA */}
+      <CTASection
+        title="이 동아리가 마음에 든다면?"
+        subtitle="동아리 가입 신청을 위해 아래 버튼을 눌러주세요!"
+        description="아래 버튼을 눌러 지원해보세요!"
+        buttonText="이 동아리의 공고로 바로가기"
+      />
     </main>
   );
 }
