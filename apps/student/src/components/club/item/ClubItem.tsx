@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { Club } from "@/types";
-import { rightArrow } from "../../public/images/clubs";
 
 export default function ClubItem(clubProps: Omit<Club, "majors">) {
   return (
@@ -23,7 +22,12 @@ export default function ClubItem(clubProps: Omit<Club, "majors">) {
           aria-label="다음으로 이동"
           type="button"
         >
-          <Image src={rightArrow} alt="다음" width={12} height={12} />
+          <Image
+            src="/images/clubs/rightArrow.svg"
+            alt="다음"
+            width={12}
+            height={12}
+          />
         </button>
       </div>
 
