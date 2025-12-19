@@ -18,15 +18,15 @@ export default function ClubItem(clubProps: Omit<Club, "majors">) {
           />
         )}
         <button
-          className="absolute top-6 right-4 z-10 h-6 w-6"
+          className="absolute top-6 right-3 z-10 h-6 w-6"
           aria-label="다음으로 이동"
           type="button"
         >
           <Image
             src="/images/clubs/rightArrow.svg"
             alt="다음"
-            width={12}
-            height={12}
+            width={10}
+            height={10}
           />
         </button>
       </div>
