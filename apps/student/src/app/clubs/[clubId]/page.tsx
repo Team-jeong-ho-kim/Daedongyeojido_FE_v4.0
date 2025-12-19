@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import { use, useState } from "react";
-import CTASection from "@/components/CTASection";
-import JobPostingItem from "@/components/JobPostingItem";
-import MemberItem from "@/components/MemberItem";
-import Pagination from "@/components/Pagination";
+import {
+  CTASection,
+  JobPostingItem,
+  MemberItem,
+  Pagination,
+} from "@/components";
 import type { ClubDetail, ClubMember, JobPosting } from "@/types";
 
 interface ClubDetailPageProps {

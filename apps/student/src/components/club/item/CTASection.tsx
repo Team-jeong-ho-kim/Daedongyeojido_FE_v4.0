@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Button } from "ui";
-import { tigerImg } from "../../public/images/clubs";
 
 interface CTASectionProps {
   title: string;
@@ -34,7 +33,7 @@ export default function CTASection({
       {/* 이미지 영역 */}
       <div className="flex-shrink-0">
         <Image
-          src={tigerImg}
+          src="/images/clubs/tiger.svg"
           alt="🐅"
           className="h-auto w-40 select-none md:w-48 xl:w-56"
         />

@@ -1,10 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "ui";
-import ClubItem from "@/components/ClubItem";
-import CTASection from "@/components/CTASection";
-import Pagination from "@/components/Pagination";
+import { ClubItem, CTASection, Pagination } from "@/components";
 
 export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
@@ -122,12 +121,14 @@ export default function ClubsPage() {
     <main className="flex min-h-screen justify-center bg-white">
       <div className="container mx-auto max-w-7xl px-6 py-12">
         <div className="mr-10 mb-8 flex justify-end">
-          <Button
-            variant="ghost"
-            className="cursor-pointer rounded-xl bg-gray-50 p-6 text-gray-400 hover:bg-gray-100 hover:text-gray-800"
-          >
-            동아리 개설 신청하기
-          </Button>
+          <Link href="/clubs/create">
+            <Button
+              variant="ghost"
+              className="cursor-pointer rounded-xl bg-gray-50 p-6 text-gray-400 hover:bg-gray-100 hover:text-gray-800"
+            >
+              동아리 개설 신청하기
+            </Button>
+          </Link>
         </div>
 
         {/* 동아리 전체 조회 */}
