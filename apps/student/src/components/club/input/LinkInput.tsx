@@ -70,7 +70,7 @@ export default function LinkInput({
       {error ? (
         <p className="mt-2 text-[12px] text-red-500">{error}</p>
       ) : (
-        <p className="mt-2 text-[#999999] text-[12px]">
+        <p className="mt-2 ml-2 text-[#999999] text-[12px]">
           엔터를 누르면 링크가 추가됩니다
         </p>
       )}
