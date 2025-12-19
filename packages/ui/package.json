@@ -6,19 +6,21 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup ./src/index.ts --format cjs,esm --dts --external react --external react-dom",
-    "dev": "tsup ./src/index.ts --format cjs,esm --dts --external react --external react-dom --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "biome check .",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "next": "^15.0.0",
     "react": "^18.3.1",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
+    "next": "^15.0.0",
     "react": "^18.3.1"
   },
   "dependencies": {

@@ -35,6 +35,8 @@ export default function CTASection({
         <Image
           src="/images/clubs/tiger.svg"
           alt="🐅"
+          width={224}
+          height={224}
           className="h-auto w-40 select-none md:w-48 xl:w-56"
         />
       </div>
