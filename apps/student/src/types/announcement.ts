@@ -1,3 +1,5 @@
+import type { Major } from "./major";
+
 export interface Announcement {
   announcement_id: number;
   title: string;
@@ -8,4 +10,14 @@ export interface Announcement {
 
 export interface AnnouncementsResponse {
   announcements: Announcement[];
+}
+
+export interface AnnouncementDetailResponse {
+  title: string;
+  major: Major[];
+  phoneNumber: string;
+  deadline: string;
+  introduction: string;
+  talent_description: string;
+  assignment: string;
 }

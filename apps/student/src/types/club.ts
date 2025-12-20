@@ -1,4 +1,4 @@
-export type Major = "BE" | "FE" | "iOS";
+import type { Major } from "./major";
 
 export interface Club {
   clubId: number;
