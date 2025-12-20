@@ -13,4 +13,16 @@ declare function Button({ className, variant, size, asChild, ...props }: React.C
     asChild?: boolean;
 }): react_jsx_runtime.JSX.Element;
 
-export { Button, Header, buttonVariants };
+import type { StaticImageData } from 'next/image';
+
+interface IconProps {
+    className?: string;
+}
+declare const NoteIcon: (props: IconProps) => react_jsx_runtime.JSX.Element;
+declare const CheckIcon: (props: IconProps) => react_jsx_runtime.JSX.Element;
+declare const CalendarIcon: (props: IconProps) => react_jsx_runtime.JSX.Element;
+declare const InterviewIcon: (props: IconProps) => react_jsx_runtime.JSX.Element;
+declare const blackLogo: StaticImageData;
+declare const whiteLogo: StaticImageData;
+
+export { Button, Header, buttonVariants, NoteIcon, CheckIcon, CalendarIcon, InterviewIcon, blackLogo, whiteLogo };
