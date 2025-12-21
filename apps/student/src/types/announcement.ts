@@ -21,3 +21,17 @@ export interface AnnouncementDetailResponse {
   talent_description: string;
   assignment: string;
 }
+
+export interface ApplicationQuestion {
+  application_question_id: number;
+  content: string;
+}
+
+export interface ApplicationFormResponse {
+  application_form_title: string;
+  club_name: string;
+  club_image: string;
+  content: ApplicationQuestion[];
+  submission_duration: string;
+  major: string[];
+}

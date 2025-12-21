@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 
 const INPUT_STYLE =
-  "w-full rounded-md bg-white px-4 py-3.5 text-[14px] placeholder-[#AAAAAA] focus:outline-none";
+  "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 
 interface ImageUploadProps {
   onFileChange: (file: File | null, previewUrl: string | null) => void;
@@ -17,6 +17,7 @@ export default function ImageUpload({
 }: ImageUploadProps) {
   const [fileName, setFileName] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const inputId = useId();
   const fileInputId = useId();
@@ -35,6 +36,19 @@ export default function ImageUpload({
       reader.readAsDataURL(file);
     }
   };
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setIsModalOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isModalOpen, handleKeyDown]);
 
   return (
     <>
@@ -67,20 +81,55 @@ export default function ImageUpload({
 
       {previewUrl && (
         <div className="mt-3 flex w-full items-center justify-between rounded-md bg-white px-4 py-3">
-          <div className="relative h-[82px] w-[82px] overflow-hidden rounded-lg bg-gray-100">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="group relative h-[82px] w-[82px] cursor-pointer overflow-hidden rounded-lg bg-gray-100"
+          >
             <Image
               src={previewUrl}
               alt="Preview"
               fill
               className="object-cover"
             />
-          </div>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
+              <span className="text-white text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                크게 보기
+              </span>
+            </div>
+          </button>
           <label
             htmlFor={fileInputId}
             className="cursor-pointer text-[14px] text-gray-700 hover:text-gray-900"
           >
             변경
           </label>
+        </div>
+      )}
+
+      {/* ESC 키 이벤트는 useEffect에서 document에 등록하여 처리 */}
+      {isModalOpen && previewUrl && (
+        <div
+          role="dialog"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+          onClick={() => setIsModalOpen(false)}
+          onKeyDown={() => {}}
+        >
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(false)}
+            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-2xl text-white hover:bg-white/30"
+          >
+            ✕
+          </button>
+          <Image
+            src={previewUrl}
+            alt="Full size preview"
+            width={400}
+            height={400}
+            className="max-h-[70vh] max-w-[80vw] rounded-lg object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </>

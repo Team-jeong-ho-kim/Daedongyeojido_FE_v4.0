@@ -84,7 +84,7 @@ export default function ClubCreationPage() {
         <Button
           type="button"
           onClick={handleSubmit}
-          className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-[#FF6B6B]"
+          className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-primary-700 hover:text-gray-200"
         >
           개설 신청
         </Button>

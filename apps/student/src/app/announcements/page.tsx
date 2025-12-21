@@ -12,7 +12,7 @@ export default function AnnouncementsPage() {
   const announcements: Announcement[] = [
     {
       announcement_id: 1,
-      title: "2025 상반기 신입 동아리원 모집",
+      title: "2025 상반기 신입 동아리원",
       club_name: "대동여지도",
       deadline: "2025-12-12",
       club_image:
@@ -50,9 +50,13 @@ export default function AnnouncementsPage() {
   ];
 
   return (
-    <main className="mt-20 flex min-h-screen justify-center bg-white">
+    <main className="mt-10 flex min-h-screen justify-center bg-white">
       <div className="container mx-auto max-w-7xl px-6 py-12">
-        {/* 공고 전체 조회 */}
+        <h1 className="mb-8 font-bold text-3xl text-gray-900">
+          공고 전체 조회
+        </h1>
+
+        {/* 공고 목록 */}
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
           {announcements
             .slice((curPage - 1) * limit, curPage * limit)

@@ -118,20 +118,21 @@ export default function ClubsPage() {
   ];
 
   return (
-    <main className="flex min-h-screen justify-center bg-white">
+    <main className="mt-10 flex min-h-screen justify-center bg-white">
       <div className="container mx-auto max-w-7xl px-6 py-12">
-        <div className="mr-10 mb-8 flex justify-end">
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="font-bold text-3xl text-gray-900">동아리 전체 조회</h1>
           <Link href="/clubs/create">
             <Button
               variant="ghost"
-              className="cursor-pointer rounded-xl bg-gray-50 p-6 text-gray-400 hover:bg-gray-100 hover:text-gray-800"
+              className="cursor-pointer rounded-xl bg-gray-50 p-6 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
             >
               동아리 개설 신청하기
             </Button>
           </Link>
         </div>
 
-        {/* 동아리 전체 조회 */}
+        {/* 동아리 목록 */}
         <div className="mb-10 flex flex-wrap gap-7">
           {clubs.slice((curPage - 1) * limit, curPage * limit).map((club) => (
             <ClubItem key={club.clubId} {...club} />
