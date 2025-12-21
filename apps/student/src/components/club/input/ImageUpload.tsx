@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 
 const INPUT_STYLE =
   "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
@@ -36,6 +36,19 @@ export default function ImageUpload({
       reader.readAsDataURL(file);
     }
   };
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setIsModalOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isModalOpen, handleKeyDown]);
 
   return (
     <>
@@ -80,7 +93,7 @@ export default function ImageUpload({
               className="object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
-              <span className="text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="text-white text-xs opacity-0 transition-opacity group-hover:opacity-100">
                 크게 보기
               </span>
             </div>
@@ -94,12 +107,13 @@ export default function ImageUpload({
         </div>
       )}
 
+      {/* ESC 키 이벤트는 useEffect에서 document에 등록하여 처리 */}
       {isModalOpen && previewUrl && (
         <div
           role="dialog"
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
           onClick={() => setIsModalOpen(false)}
-          onKeyDown={(e) => e.key === "Escape" && setIsModalOpen(false)}
+          onKeyDown={() => {}}
         >
           <button
             type="button"
