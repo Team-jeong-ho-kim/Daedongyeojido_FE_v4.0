@@ -51,7 +51,7 @@ export default function ClubHeader({
               " {oneLiner} "
             </p>
           </div>
-          {buttonText && (
+          {buttonText && onButtonClick && (
             <button
               type="button"
               onClick={onButtonClick}
