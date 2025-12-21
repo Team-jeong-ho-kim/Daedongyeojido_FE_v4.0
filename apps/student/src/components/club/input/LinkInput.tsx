@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 
 const INPUT_STYLE =
-  "w-full rounded-md bg-white px-4 py-3.5 text-[14px] placeholder-[#AAAAAA] focus:outline-none";
+  "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 
 interface LinkItem {
   id: string;

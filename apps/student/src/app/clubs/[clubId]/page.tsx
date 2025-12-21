@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { use, useState } from "react";
 import {
+  ClubHeader,
   CTASection,
   JobPostingItem,
   MemberItem,
@@ -78,43 +78,13 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   return (
     <main className="flex min-h-screen flex-col bg-white">
       {/* 헤더 */}
-      <div className="flex items-start px-6 pt-8 pb-6 md:px-12 md:pt-10 lg:px-24 lg:pt-12 lg:pb-8">
-        <div className="flex items-start gap-4 md:gap-6 lg:gap-8">
-          <div className="h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-[16px] bg-blue-600 md:h-[88px] md:w-[88px] md:rounded-[18px] lg:h-[104px] lg:w-[104px] lg:rounded-[20px]">
-            <Image
-              src={club.clubImage}
-              alt={club.clubName}
-              width={104}
-              height={104}
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1 pt-2 md:pt-3">
-            <h1 className="font-semibold text-[22px] text-gray-900 md:text-[25px] lg:text-[28px]">
-              {club.clubName}
-            </h1>
-            <p className="text-[13px] text-gray-400 md:text-[14px] lg:text-[15px]">
-              전공동아리
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 한 줄 소개 */}
-      <div className="flex flex-col items-center gap-4 px-6 py-6 md:flex-row md:justify-center md:gap-6 md:px-12 md:py-8 lg:gap-8 lg:px-24 lg:py-10">
-        <div className="flex w-full max-w-[1200px] items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 px-5 py-3 md:rounded-3xl md:px-7 md:py-3.5 lg:px-9">
-          <p className="text-center text-[13px] text-gray-600 md:text-[14px] lg:text-[15px]">
-            " {club.oneLiner} "
-          </p>
-        </div>
-        <button
-          type="button"
-          className="w-full flex-shrink-0 cursor-pointer rounded-[10px] bg-[#FF6B6B] px-8 py-3 font-medium text-[14px] text-white hover:bg-[#FF5252] md:w-auto md:px-12 md:py-3.5 md:text-[15px] lg:px-20"
-        >
-          공고 보러가기
-        </button>
-      </div>
+      <ClubHeader
+        clubImage={club.clubImage}
+        clubName={club.clubName}
+        title={club.clubName}
+        oneLiner={club.oneLiner}
+        buttonText="공고 보러가기"
+      />
 
       {/* 탭 */}
       <div className="px-6 md:px-12 lg:px-24">
