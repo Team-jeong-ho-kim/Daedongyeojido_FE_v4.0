@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { use, useState } from "react";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import { ClubHeader } from "@/components";
@@ -61,7 +61,6 @@ export default function AnnouncementDetailPage({
   params,
 }: AnnouncementDetailPageProps) {
   const { announcementId } = use(params);
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"details" | "apply">("details");
 
   const announcement = mockAnnouncement;
@@ -199,15 +198,12 @@ export default function AnnouncementDetailPage({
 
           {/* 지원서 작성하기 버튼 */}
           <div className="flex justify-center pt-4">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(`/announcements/${announcementId}/apply`)
-              }
-              className="w-full max-w-md cursor-pointer rounded-lg bg-primary-500 py-3 font-medium text-[15px] text-white contain-paint hover:bg-primary-400 md:text-[16px]"
+            <Link
+              href={`/announcements/${announcementId}/apply`}
+              className="w-full max-w-md cursor-pointer rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white contain-paint hover:bg-primary-400 md:text-[16px]"
             >
               지원서 작성하기
-            </button>
+            </Link>
           </div>
         </div>
       </div>
