@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useId, useRef } from "react";
 
 interface ApplicationConfirmModalProps {
   isOpen: boolean;
-  onClose?: () => void;
-  onConfirm?: () => void;
-  onBackdropClick?: () => void;
-  closeHref?: string;
-  confirmHref?: string;
+  onClose: () => void;
+  onConfirm: () => void;
+  onBackdropClick: () => void;
   title: string;
   description: string;
   cancelText: string;
@@ -21,12 +18,10 @@ export function ApplicationConfirmModal({
   onClose,
   onConfirm,
   onBackdropClick,
-  closeHref,
-  confirmHref,
-  title = "title",
-  description = "description",
-  cancelText = "close",
-  confirmText = "confirm",
+  title,
+  description,
+  cancelText,
+  confirmText,
 }: ApplicationConfirmModalProps) {
   const titleId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -46,7 +41,7 @@ export function ApplicationConfirmModal({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onBackdropClick?.();
+        onBackdropClick();
         return;
       }
 
@@ -133,43 +128,21 @@ export function ApplicationConfirmModal({
 
         {/* 버튼 */}
         <div className="flex justify-end gap-3">
-          {/* Cancel Button */}
-          {closeHref ? (
-            <Link
-              href={closeHref}
-              onClick={onClose}
-              className="rounded-[12px] bg-gray-400 px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            >
-              {cancelText}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-[12px] bg-gray-400 px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            >
-              {cancelText}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-[12px] bg-gray-400 px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            {cancelText}
+          </button>
 
-          {/* Confirm Button */}
-          {confirmHref ? (
-            <Link
-              href={confirmHref}
-              onClick={onConfirm}
-              className="rounded-[12px] bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-[#d14d4d] focus:outline-none focus:ring-2 focus:ring-[#E85D5D] focus:ring-offset-2"
-            >
-              {confirmText}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={onConfirm}
-              className="rounded-[12px] bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-[#d14d4d] focus:outline-none focus:ring-2 focus:ring-[#E85D5D] focus:ring-offset-2"
-            >
-              {confirmText}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-[12px] bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-[#d14d4d] focus:outline-none focus:ring-2 focus:ring-[#E85D5D] focus:ring-offset-2"
+          >
+            {confirmText}
+          </button>
         </div>
       </div>
     </div>

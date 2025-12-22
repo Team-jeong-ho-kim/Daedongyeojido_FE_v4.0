@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "ui";
@@ -16,6 +17,7 @@ import { FIELDS } from "@/constants/club";
 import { useModalStore } from "@/stores/useModalStore";
 
 export default function ClubCreationPage() {
+  const router = useRouter();
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
   const [clubIntro, setClubIntro] = useState("");
@@ -29,9 +31,12 @@ export default function ClubCreationPage() {
     const newErrors: Record<string, string> = {};
 
     if (!clubName.trim()) newErrors.clubName = "동아리 명을 입력해주세요";
-    if (!clubIntro.trim()) newErrors.clubIntro = "동아리 한줄 소개를 입력해주세요";
-    if (!clubIntroDetail.trim()) newErrors.clubIntroDetail = "동아리 소개 문구를 입력해주세요";
-    if (selectedFields.length === 0) newErrors.selectedFields = "동아리 전공을 선택해주세요";
+    if (!clubIntro.trim())
+      newErrors.clubIntro = "동아리 한줄 소개를 입력해주세요";
+    if (!clubIntroDetail.trim())
+      newErrors.clubIntroDetail = "동아리 소개 문구를 입력해주세요";
+    if (selectedFields.length === 0)
+      newErrors.selectedFields = "동아리 전공을 선택해주세요";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -54,8 +59,11 @@ export default function ClubCreationPage() {
       clubIntroDetail,
       selectedFields,
     });
-    toast.success("개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다");
+    toast.success(
+      "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
+    );
     toggleShow();
+    router.push("/mypage/alarm");
   };
 
   return (
@@ -126,7 +134,6 @@ export default function ClubCreationPage() {
         onClose={toggleShow}
         onConfirm={handleSubmit}
         onBackdropClick={toggleShow}
-        confirmHref="/mypage/alarm"
         title="정말 개설을 신청하시겠습니까?"
         description="이 작업은 되돌릴 수 없습니다."
         cancelText="닫기"
