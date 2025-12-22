@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import { Header } from "ui";
 import "./globals.css";
 
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <Toaster position="top-right" duration={3000} richColors />
         <Header />
         <main className="pt-14">{children}</main>
       </body>

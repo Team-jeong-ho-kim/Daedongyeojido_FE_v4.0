@@ -1,8 +1,12 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useId, useRef, useState } from "react";
+import { toast } from "sonner";
 import { ClubHeader } from "@/components";
 import { TextArea, TextInput } from "@/components/club/input";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
+import { useModalStore } from "@/stores/useModalStore";
 import type { ApplicationFormResponse } from "@/types/announcement";
 
 // mock data
@@ -29,7 +33,13 @@ const mockApplicationForm: ApplicationFormResponse = {
   major: ["BE", "FE"],
 };
 
-export default function ApplyDetailPage() {
+export default function ApplyDetailPage({
+  params,
+}: {
+  params: Promise<{ announcementId: string }>;
+}) {
+  const { announcementId } = use(params);
+  const router = useRouter();
   const id = useId();
   const applicationForm = mockApplicationForm;
 
@@ -49,6 +59,8 @@ export default function ApplyDetailPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { show, toggleShow } = useModalStore();
+  const isInitialMount = useRef(true);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -102,9 +114,11 @@ export default function ApplyDetailPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
+  const handleSubmit = async (): Promise<boolean> => {
+    if (!validateForm()) {
+      toast.error("필수 항목을 모두 입력해주세요");
+      return false;
+    }
     setIsSubmitting(true);
     try {
       const submitData = {
@@ -118,12 +132,77 @@ export default function ApplyDetailPage() {
         })),
       };
       console.log("제출:", submitData);
+      // TODO: API 호출
+      // 성공 시 임시저장 데이터 삭제
+      localStorage.removeItem(`apply_${announcementId}`);
+      return true;
     } catch (error) {
       console.error("제출 실패:", error);
+      toast.error("제출에 실패했습니다. 다시 시도해주세요.");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleOpenModal = () => {
+    if (validateForm()) {
+      toggleShow();
+    } else {
+      toast.error("필수 항목을 모두 입력해주세요");
+    }
+  };
+
+  const handleTempSave = () => {
+    try {
+      // 명시적으로 현재 상태 저장
+      localStorage.setItem(`apply_${announcementId}`, JSON.stringify(formData));
+      // 이동한 페이지에서 토스트 표시용 플래그
+      localStorage.setItem(`tempSave_${announcementId}`, "true");
+      toggleShow();
+      router.push(`/announcements/${announcementId}`);
+    } catch (error) {
+      console.error("임시저장 실패:", error);
+      toast.error("임시저장에 실패했습니다.");
+    }
+  };
+
+  const handleConfirm = async () => {
+    const success = await handleSubmit();
+    if (success) {
+      toggleShow();
+      router.push("/mypage");
+    }
+  };
+
+  // 임시저장 불러오기
+  useEffect(() => {
+    const saved = localStorage.getItem(`apply_${announcementId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setFormData(parsed);
+      } catch (error) {
+        console.error("임시저장 데이터 파싱 실패:", error);
+        localStorage.removeItem(`apply_${announcementId}`);
+      }
+    }
+  }, [announcementId]);
+
+  // 자동 임시저장 (1500ms debounce, 초기 마운트 제외)
+  useEffect(() => {
+    // 초기 마운트 시에는 저장하지 않음 (기존 임시저장 덮어쓰기 방지)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      localStorage.setItem(`apply_${announcementId}`, JSON.stringify(formData));
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [formData, announcementId]);
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
@@ -133,7 +212,6 @@ export default function ApplyDetailPage() {
         clubName={applicationForm.club_name}
         title={applicationForm.application_form_title}
       />
-
       {/* 인적 사항 섹션 */}
       <div className="mt-7 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="mb-8 font-bold text-gray-900 text-xl">인적 사항</h2>
@@ -202,7 +280,6 @@ export default function ApplyDetailPage() {
           </div>
         </div>
       </div>
-
       {/* 질문 답변 섹션 */}
       <div className="mt-18 flex flex-col gap-8 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="font-bold text-gray-900 text-xl">질문 답변</h2>
@@ -238,18 +315,27 @@ export default function ApplyDetailPage() {
           })}
         </div>
       </div>
-
       {/* 제출 버튼 */}
       <div className="flex justify-center bg-gray-50 px-6 pt-6 pb-12 md:px-12 lg:px-24">
         <button
           type="button"
-          onClick={handleSubmit}
+          onClick={handleOpenModal}
           disabled={isSubmitting}
           className="w-full max-w-md rounded-lg bg-[#FF7575] py-4 font-medium text-base text-white transition-colors hover:bg-[#FF6464] disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           {isSubmitting ? "제출 중..." : "지원하기"}
         </button>
       </div>
+      <ApplicationConfirmModal
+        isOpen={show}
+        onClose={handleTempSave}
+        onConfirm={handleConfirm}
+        onBackdropClick={toggleShow}
+        title="지원서를 생성하시겠습니까?"
+        description="지원서는 마이페이지에서 조회하실 수 있습니다."
+        cancelText="임시저장하고 닫기"
+        confirmText="생성하기"
+      />
     </main>
   );
 }

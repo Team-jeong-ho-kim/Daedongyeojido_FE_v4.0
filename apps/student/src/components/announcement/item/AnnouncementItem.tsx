@@ -33,7 +33,7 @@ export default function AnnouncementItem({
 
         {/* 하단 정보 영역 */}
         <section className="absolute bottom-0 left-0 flex w-full flex-col gap-1 rounded-b-3xl bg-gray-50 px-6 py-4 transition-all duration-300 group-hover:py-5">
-          <h2 className="line-clamp-1 font-semibold text-gray-900 text-base group-hover:line-clamp-none">
+          <h2 className="line-clamp-1 font-semibold text-base text-gray-900 group-hover:line-clamp-none">
             {title}
           </h2>
           <p className="text-gray-600 text-sm">{club_name}</p>

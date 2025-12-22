@@ -1,4 +1,5 @@
 import { useId } from "react";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 interface TextInputProps {
   value: string;
@@ -37,7 +38,7 @@ export default function TextInput({
             : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"
         }`}
       />
-      {error && <p className="mt-1 text-red-500 text-xs">{error}</p>}
+      <ErrorMessage message={error} />
     </div>
   );
 
