@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import { ClubHeader } from "@/components";
 import type { AnnouncementDetailResponse } from "@/types/announcement";
@@ -40,6 +40,9 @@ const mockAnnouncement: AnnouncementDetailResponse = {
   assignment: "TensorFlow 혹은 PyTorch 사용 프로젝트 제출",
 };
 
+// localStorage 키 생성 함수
+const getTempSaveKey = (announcementId: string) => `tempSave_${announcementId}`;
+
 const getStepIcon = (stepName: string) => {
   const iconColor = "text-[#FF6B6B]";
 
@@ -68,11 +71,20 @@ export default function AnnouncementDetailPage({
 
   // 임시저장 성공 토스트
   useEffect(() => {
-    if (localStorage.getItem("tempSaveSuccess")) {
-      toast.success("임시저장이 완료되었습니다.");
-      localStorage.removeItem("tempSaveSuccess");
+    if (typeof window === "undefined") return;
+
+    try {
+      const tempSaveKey = getTempSaveKey(announcementId);
+      const hasTempSave = localStorage.getItem(tempSaveKey);
+
+      if (hasTempSave) {
+        toast.success("임시저장이 완료되었습니다.");
+        localStorage.removeItem(tempSaveKey);
+      }
+    } catch (error) {
+      console.error("localStorage 접근 실패:", error);
     }
-  }, []);
+  }, [announcementId]);
 
   return (
     <main className="flex min-h-screen flex-col bg-white">

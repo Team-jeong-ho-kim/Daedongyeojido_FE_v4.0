@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useEffect, useId, useState } from "react";
-import { toast } from "react-toastify";
+import { use, useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { ClubHeader } from "@/components";
 import { TextArea, TextInput } from "@/components/club/input";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
@@ -38,6 +39,7 @@ export default function ApplyDetailPage({
   params: Promise<{ announcementId: string }>;
 }) {
   const { announcementId } = use(params);
+  const router = useRouter();
   const id = useId();
   const applicationForm = mockApplicationForm;
 
@@ -58,6 +60,7 @@ export default function ApplyDetailPage({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { show, toggleShow } = useModalStore();
+  const isInitialMount = useRef(true);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -111,8 +114,8 @@ export default function ApplyDetailPage({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  const handleSubmit = async (): Promise<boolean> => {
+    if (!validateForm()) return false;
 
     setIsSubmitting(true);
     try {
@@ -127,8 +130,14 @@ export default function ApplyDetailPage({
         })),
       };
       console.log("제출:", submitData);
+      // TODO: API 호출
+      // 성공 시 임시저장 데이터 삭제
+      localStorage.removeItem(`apply_${announcementId}`);
+      return true;
     } catch (error) {
       console.error("제출 실패:", error);
+      toast.error("제출에 실패했습니다. 다시 시도해주세요.");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -143,28 +152,52 @@ export default function ApplyDetailPage({
   };
 
   const handleTempSave = () => {
-    localStorage.setItem("tempSaveSuccess", "true");
-    toggleShow();
+    try {
+      // 명시적으로 현재 상태 저장
+      localStorage.setItem(`apply_${announcementId}`, JSON.stringify(formData));
+      // 이동한 페이지에서 토스트 표시용 플래그
+      localStorage.setItem(`tempSave_${announcementId}`, "true");
+      toggleShow();
+      router.push(`/announcements/${announcementId}`);
+    } catch (error) {
+      console.error("임시저장 실패:", error);
+      toast.error("임시저장에 실패했습니다.");
+    }
   };
 
-  const handleConfirm = () => {
-    handleSubmit();
-    toggleShow();
+  const handleConfirm = async () => {
+    const success = await handleSubmit();
+    if (success) {
+      toggleShow();
+      router.push("/mypage");
+    }
   };
 
   // 임시저장 불러오기
   useEffect(() => {
     const saved = localStorage.getItem(`apply_${announcementId}`);
     if (saved) {
-      setFormData(JSON.parse(saved));
+      try {
+        const parsed = JSON.parse(saved);
+        setFormData(parsed);
+      } catch (error) {
+        console.error("임시저장 데이터 파싱 실패:", error);
+        localStorage.removeItem(`apply_${announcementId}`);
+      }
     }
   }, [announcementId]);
 
-  // 자동 임시저장 (500ms debounce)
+  // 자동 임시저장 (1500ms debounce, 초기 마운트 제외)
   useEffect(() => {
+    // 초기 마운트 시에는 저장하지 않음 (기존 임시저장 덮어쓰기 방지)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     const timer = setTimeout(() => {
       localStorage.setItem(`apply_${announcementId}`, JSON.stringify(formData));
-    }, 500);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [formData, announcementId]);
@@ -293,8 +326,6 @@ export default function ApplyDetailPage({
       </div>
       <ApplicationConfirmModal
         isOpen={show}
-        closeHref={`/announcements/${announcementId}`}
-        confirmHref="/mypage"
         onClose={handleTempSave}
         onConfirm={handleConfirm}
         onBackdropClick={toggleShow}
