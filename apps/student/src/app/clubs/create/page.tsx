@@ -42,6 +42,35 @@ export default function ClubCreationPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const clearError = (key: string) => {
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const newErrors = { ...prev };
+      delete newErrors[key];
+      return newErrors;
+    });
+  };
+
+  const handleClubNameChange = (value: string) => {
+    setClubName(value);
+    if (value.trim()) clearError("clubName");
+  };
+
+  const handleClubIntroChange = (value: string) => {
+    setClubIntro(value);
+    if (value.trim()) clearError("clubIntro");
+  };
+
+  const handleClubIntroDetailChange = (value: string) => {
+    setClubIntroDetail(value);
+    if (value.trim()) clearError("clubIntroDetail");
+  };
+
+  const handleFieldsChange = (fields: string[]) => {
+    setSelectedFields(fields);
+    if (fields.length > 0) clearError("selectedFields");
+  };
+
   const handleOpenModal = () => {
     if (validateForm()) {
       toggleShow();
@@ -75,7 +104,7 @@ export default function ClubCreationPage() {
           <FormField label="동아리 명">
             <TextInput
               value={clubName}
-              onChange={setClubName}
+              onChange={handleClubNameChange}
               placeholder="동아리 명"
               error={errors.clubName}
             />
@@ -88,7 +117,7 @@ export default function ClubCreationPage() {
           <FormField label="동아리 한줄 소개">
             <TextInput
               value={clubIntro}
-              onChange={setClubIntro}
+              onChange={handleClubIntroChange}
               placeholder="동아리 한줄 소개를 작성해주세요."
               error={errors.clubIntro}
             />
@@ -101,7 +130,7 @@ export default function ClubCreationPage() {
           <FormField label="동아리 소개 문구" alignTop>
             <TextArea
               value={clubIntroDetail}
-              onChange={setClubIntroDetail}
+              onChange={handleClubIntroDetailChange}
               placeholder="동아리 소개 문구를 작성해주세요."
               rows={12}
               error={errors.clubIntroDetail}
@@ -112,7 +141,7 @@ export default function ClubCreationPage() {
             <FieldSelector
               fields={FIELDS}
               selectedFields={selectedFields}
-              onSelectionChange={setSelectedFields}
+              onSelectionChange={handleFieldsChange}
               error={errors.selectedFields}
             />
           </FormField>

@@ -115,8 +115,10 @@ export default function ApplyDetailPage({
   };
 
   const handleSubmit = async (): Promise<boolean> => {
-    if (!validateForm()) return false;
-
+    if (!validateForm()) {
+      toast.error("필수 항목을 모두 입력해주세요");
+      return false;
+    }
     setIsSubmitting(true);
     try {
       const submitData = {
