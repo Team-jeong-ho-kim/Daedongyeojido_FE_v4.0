@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { Button } from "ui";
 import {
   FieldSelector,
@@ -10,7 +11,9 @@ import {
   TextArea,
   TextInput,
 } from "@/components";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
+import { useModalStore } from "@/stores/useModalStore";
 
 export default function ClubCreationPage() {
   const [clubName, setClubName] = useState("");
@@ -19,6 +22,28 @@ export default function ClubCreationPage() {
   const [clubLinks, setClubLinks] = useState<{ id: string; url: string }[]>([]);
   const [clubIntroDetail, setClubIntroDetail] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const { show, toggleShow } = useModalStore();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!clubName.trim()) newErrors.clubName = "동아리 명을 입력해주세요";
+    if (!clubIntro.trim()) newErrors.clubIntro = "동아리 한줄 소개를 입력해주세요";
+    if (!clubIntroDetail.trim()) newErrors.clubIntroDetail = "동아리 소개 문구를 입력해주세요";
+    if (selectedFields.length === 0) newErrors.selectedFields = "동아리 전공을 선택해주세요";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleOpenModal = () => {
+    if (validateForm()) {
+      toggleShow();
+    } else {
+      toast.error("필수 항목을 모두 입력해주세요");
+    }
+  };
 
   const handleSubmit = () => {
     console.log({
@@ -29,6 +54,8 @@ export default function ClubCreationPage() {
       clubIntroDetail,
       selectedFields,
     });
+    toast.success("개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다");
+    toggleShow();
   };
 
   return (
@@ -42,6 +69,7 @@ export default function ClubCreationPage() {
               value={clubName}
               onChange={setClubName}
               placeholder="동아리 명"
+              error={errors.clubName}
             />
           </FormField>
 
@@ -54,6 +82,7 @@ export default function ClubCreationPage() {
               value={clubIntro}
               onChange={setClubIntro}
               placeholder="동아리 한줄 소개를 작성해주세요."
+              error={errors.clubIntro}
             />
           </FormField>
 
@@ -67,6 +96,7 @@ export default function ClubCreationPage() {
               onChange={setClubIntroDetail}
               placeholder="동아리 소개 문구를 작성해주세요."
               rows={12}
+              error={errors.clubIntroDetail}
             />
           </FormField>
 
@@ -75,6 +105,7 @@ export default function ClubCreationPage() {
               fields={FIELDS}
               selectedFields={selectedFields}
               onSelectionChange={setSelectedFields}
+              error={errors.selectedFields}
             />
           </FormField>
         </div>
@@ -83,12 +114,24 @@ export default function ClubCreationPage() {
       <div className="flex justify-center py-16">
         <Button
           type="button"
-          onClick={handleSubmit}
+          onClick={handleOpenModal}
           className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-primary-700 hover:text-gray-200"
         >
           개설 신청
         </Button>
       </div>
+
+      <ApplicationConfirmModal
+        isOpen={show}
+        onClose={toggleShow}
+        onConfirm={handleSubmit}
+        onBackdropClick={toggleShow}
+        confirmHref="/mypage/alarm"
+        title="정말 개설을 신청하시겠습니까?"
+        description="이 작업은 되돌릴 수 없습니다."
+        cancelText="닫기"
+        confirmText="신청하기"
+      />
     </div>
   );
 }

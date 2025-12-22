@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import { ClubHeader } from "@/components";
 import type { AnnouncementDetailResponse } from "@/types/announcement";
@@ -64,6 +65,14 @@ export default function AnnouncementDetailPage({
   const [activeTab, setActiveTab] = useState<"details" | "apply">("details");
 
   const announcement = mockAnnouncement;
+
+  // 임시저장 성공 토스트
+  useEffect(() => {
+    if (localStorage.getItem("tempSaveSuccess")) {
+      toast.success("임시저장이 완료되었습니다.");
+      localStorage.removeItem("tempSaveSuccess");
+    }
+  }, []);
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
