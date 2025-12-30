@@ -29,7 +29,7 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 z-50 w-full border-transparent border-b bg-white/30 backdrop-blur-md transition-all duration-300 ${
+      className={`fixed top-0 left-0 z-50 w-full border-transparent border-b bg-white/70 backdrop-blur-sm transition-all duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >

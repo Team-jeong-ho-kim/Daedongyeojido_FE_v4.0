@@ -58,7 +58,7 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${
           isTransparent
-            ? "border-transparent bg-white/30 backdrop-blur-md"
+            ? "border-transparent bg-white/70 backdrop-blur-sm"
             : "border-gray-200 bg-white"
         } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
       >

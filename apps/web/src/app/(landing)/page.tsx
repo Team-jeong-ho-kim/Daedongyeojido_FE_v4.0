@@ -33,15 +33,10 @@ export default function Home() {
   const applyRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const getTransformValue = () => {
-    // 각 이미지가 60% width를 차지하고, 간격을 더 줄여서 포커스 이미지를 중앙에
-    return `translateX(calc(-${currentImageIndex * 60}% + 20%))`;
-  };
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 3000); // 3초마다 이미지 변경
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -49,15 +44,15 @@ export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
+        for (const entry of entries) {
           if (entry.isIntersecting) {
             setVisibleSections((prev) => new Set(prev).add(entry.target.id));
           }
-        });
+        }
       },
       {
         threshold: 0.1,
-        rootMargin: "0px 0px -100px 0px",
+        rootMargin: "0px 0px -50px 0px",
       },
     );
 
@@ -71,276 +66,268 @@ export default function Home() {
       applyRef,
       calendarRef,
     ];
-    refs.forEach((ref) => {
+    for (const ref of refs) {
       if (ref.current) {
         observer.observe(ref.current);
       }
-    });
+    }
 
     return () => {
-      refs.forEach((ref) => {
+      for (const ref of refs) {
         if (ref.current) {
           observer.unobserve(ref.current);
         }
-      });
+      }
     };
   }, []);
 
   return (
-    <div className="relative size-full bg-white">
+    <div className="relative w-full overflow-x-hidden bg-white">
       {/* Background gradient */}
-      <div className="absolute top-[70px] left-0 h-[1781px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white" />
+      <div className="absolute top-[70px] left-0 h-[1000px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white md:h-[1500px]" />
 
       {/* Hero Section */}
-      <div
+      <section
         ref={heroRef}
         id={heroId}
-        className={`relative flex flex-col items-center justify-items-center gap-80 pt-[193px] pb-[50px] transition-all duration-1000 ease-out ${
+        className={`relative flex flex-col items-center gap-12 px-4 pt-24 pb-8 transition-all duration-1000 ease-out md:gap-20 md:pt-32 lg:pt-40 ${
           visibleSections.has(heroId)
             ? "translate-y-0 opacity-100"
             : "translate-y-10 opacity-0"
         }`}
       >
-        <div className="flex flex-col items-center px-4">
-          <h1 className="mb-8 text-center font-bold text-[70px] text-black leading-[110px] tracking-[-0.75px]">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="mb-6 font-bold text-3xl text-black leading-tight tracking-tight md:mb-8 md:text-5xl md:leading-tight lg:text-6xl">
             <span className="block">동아리의 모든 것</span>
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
           <Link
             href="/login"
-            className="rounded-[20px] bg-[#f0e5e5] px-8 py-4 font-bold text-[#4a4444] text-[22px]"
+            className="rounded-2xl bg-[#f0e5e5] px-6 py-3 font-bold text-[#4a4444] text-base transition-colors hover:bg-[#e5d5d5] md:px-8 md:py-4 md:text-lg"
           >
             로그인 하기
           </Link>
         </div>
-        <div className="flex w-full flex-col items-center gap-10 px-4">
-          <div className="relative flex h-[400px] w-full items-center justify-center sm:h-[500px] md:h-[600px] lg:h-[655px]">
-            <div
-              className="flex transition-transform duration-700 ease-in-out"
-              style={{
-                transform: getTransformValue(),
-                width: `${images.length * 60}%`,
-              }}
-            >
-              {images.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="relative flex flex-shrink-0 items-center justify-center px-0.5"
-                  style={{ width: "60%" }}
-                >
-                  <Image
-                    src={image.src}
-                    alt={`hero ${index + 1}`}
-                    width={1080}
-                    height={655}
-                    className="max-h-full max-w-full rounded-lg object-contain"
-                    style={{
-                      opacity: index === currentImageIndex ? 1 : 0.6,
-                      transform:
-                        index === currentImageIndex ? "scale(1)" : "scale(0.9)",
-                      transition:
-                        "opacity 0.7s ease-in-out, transform 0.7s ease-in-out",
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Image Slide Indicators */}
-          <div className="mb-32 flex items-center gap-[5px]">
+        {/* Hero Image Carousel */}
+        <div className="w-full max-w-5xl">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl">
             {images.map((image, index) => (
-              <button
+              <Image
                 key={image.id}
-                type="button"
-                className={`cursor-pointer rounded-[100px] border-none transition-all duration-300 ${
-                  index === currentImageIndex
-                    ? "h-2.5 w-[25px] bg-[#f45851]"
-                    : "size-2.5 bg-[#c9c9c9] hover:bg-[#a0a0a0]"
+                src={image.src}
+                alt={`hero ${index + 1}`}
+                fill
+                className={`object-contain transition-opacity duration-700 ${
+                  index === currentImageIndex ? "opacity-100" : "opacity-0"
                 }`}
-                onClick={() => setCurrentImageIndex(index)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    setCurrentImageIndex(index);
-                  }
-                }}
-                aria-label={`슬라이드 ${index + 1}로 이동`}
               />
             ))}
           </div>
 
-          <div>
-            <Image
-              src="/images/landing/arrow.png"
-              alt="arrow"
-              width={61}
-              height={19}
-            />
+          {/* Indicators */}
+          <div className="mt-4 flex items-center justify-center gap-1.5">
+            {images.map((image, index) => (
+              <button
+                key={image.id}
+                type="button"
+                className={`cursor-pointer rounded-full transition-all duration-300 ${
+                  index === currentImageIndex
+                    ? "h-2 w-5 bg-[#f45851]"
+                    : "size-2 bg-gray-300 hover:bg-gray-400"
+                }`}
+                onClick={() => setCurrentImageIndex(index)}
+                aria-label={`슬라이드 ${index + 1}로 이동`}
+              />
+            ))}
           </div>
         </div>
-      </div>
+
+        <Image
+          src="/images/landing/arrow.png"
+          alt="scroll"
+          width={40}
+          height={12}
+          className="mt-4 animate-bounce opacity-50"
+        />
+      </section>
 
       {/* Description Section */}
-      <div
+      <section
         ref={descriptionRef}
         id={descriptionId}
-        className={`relative bg-[#fbf9fa] py-[259px] transition-all duration-1000 ease-out ${
+        className={`bg-[#fbf9fa] px-4 py-16 transition-all duration-1000 ease-out md:py-24 lg:py-32 ${
           visibleSections.has(descriptionId)
             ? "translate-y-0 opacity-100"
             : "translate-y-10 opacity-0"
         }`}
       >
-        <div className="mx-auto px-4 text-center">
-          <p className="mb-8 w-full whitespace-nowrap font-bold text-[#28191b] text-[40px] leading-[70px]">
-            대덕소프트웨어마이스터고등학교의 전공동아리들을
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="font-bold text-[#28191b] text-lg leading-relaxed md:text-2xl md:leading-relaxed lg:text-3xl lg:leading-relaxed">
+            대덕소프트웨어마이스터고등학교의
+            <br className="sm:hidden" /> 전공동아리들을
             <br />
             한눈에 조회하고 한 곳에서 관리하세요.
             <br />
             <span className="text-[#ff4a50]">
-              이제껏 경험 못 했던 쉽고 편리한 전공동아리 서비스,
+              이제껏 경험 못 했던 쉽고 편리한
+              <br className="sm:hidden" /> 전공동아리 서비스,
             </span>
             <br />
-            대동여지도와 함께라면 당신의 전공동아리가 새로워질 거예요.
+            대동여지도와 함께라면
+            <br className="sm:hidden" /> 당신의 전공동아리가 새로워질 거예요.
           </p>
         </div>
-
-        {/* Vector icon */}
-      </div>
+      </section>
 
       {/* Features Title Section */}
-      <div
+      <section
         ref={featuresRef}
         id={featuresId}
-        className={`pt-64 text-center transition-all duration-1000 ease-out ${
+        className={`px-4 py-16 text-center transition-all duration-1000 ease-out md:py-24 lg:py-32 ${
           visibleSections.has(featuresId)
             ? "translate-y-0 opacity-100"
             : "translate-y-10 opacity-0"
         }`}
       >
-        <h2 className="mb-8 text-center font-bold text-[85px] leading-normal">
+        <h2 className="font-bold text-4xl leading-tight md:text-5xl lg:text-6xl">
           <span className="block text-[#28191b]">전공동아리</span>
           <span className="block text-[#ff4d62]">관리의 모든 것</span>
           <span className="block text-[#28191b]">하나로 관리하다</span>
         </h2>
-      </div>
+      </section>
 
-      {/* Feature Cards Section */}
-      <div
+      {/* Feature Cards Section - Hidden on mobile */}
+      <section
         ref={cardsRef}
         id={cardsId}
-        className={`relative h-[900px] py-[200px] transition-all duration-1200 ease-out ${
+        className={`relative hidden py-12 transition-all duration-1000 ease-out lg:block lg:h-[600px] lg:py-16 ${
           visibleSections.has(cardsId) ? "opacity-100" : "opacity-0"
         }`}
       >
-        <div className="relative flex w-full justify-center">
+        <div className="relative mx-auto flex h-full max-w-6xl items-center justify-center">
           <div
-            className={`absolute top-12 left-[calc(50%-595px)] rotate-[-6deg] transform transition-all duration-700 ease-out ${
+            className={`absolute top-8 left-[5%] rotate-[-6deg] transition-all duration-700 ${
               visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
             style={{ transitionDelay: "100ms" }}
           >
             <Image
               src="/images/landing/card1.png"
               alt="동아리카드"
-              width={295}
-              height={396}
+              width={180}
+              height={240}
+              className="rounded-lg shadow-lg"
             />
           </div>
           <div
-            className={`absolute top-0 left-[calc(50%-450px)] transform transition-all duration-700 ease-out ${
+            className={`absolute top-0 left-[18%] transition-all duration-700 ${
               visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
             style={{ transitionDelay: "200ms" }}
           >
             <Image
               src="/images/landing/card2.png"
               alt="지원 카드"
-              width={436}
-              height={501}
+              width={260}
+              height={300}
+              className="rounded-lg shadow-lg"
             />
           </div>
           <div
-            className={`absolute top-0 left-[calc(50%-147px)] transition-all duration-700 ease-out ${
+            className={`absolute top-4 left-[38%] transition-all duration-700 ${
               visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
             style={{ transitionDelay: "300ms" }}
           >
             <Image
               src="/images/landing/card3.png"
               alt="면접 카드"
-              width={295}
-              height={396}
+              width={180}
+              height={240}
+              className="rounded-lg shadow-lg"
             />
           </div>
           <div
-            className={`absolute top-16 left-[calc(50%+70px)] rotate-[-5deg] transform transition-all duration-700 ease-out ${
+            className={`absolute top-12 left-[55%] rotate-[-5deg] transition-all duration-700 ${
               visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
             style={{ transitionDelay: "400ms" }}
           >
             <Image
               src="/images/landing/card4.png"
               alt="회식 카드"
-              width={360}
-              height={442}
+              width={220}
+              height={270}
+              className="rounded-lg shadow-lg"
             />
           </div>
           <div
-            className={`absolute top-30 left-[calc(50%+110px)] rotate-[-7deg] transform transition-all duration-700 ease-out ${
+            className={`absolute top-0 left-[75%] transition-all duration-700 ${
               visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
             style={{ transitionDelay: "500ms" }}
           >
             <Image
-              src="/images/landing/card4_.png"
-              alt="회식 카드"
-              width={233}
-              height={294}
-            />
-          </div>
-          <div
-            className={`absolute top-0 left-[calc(50%+310px)] transform transition-all duration-700 ease-out ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-8 scale-75 opacity-0"
-            }`}
-            style={{ transitionDelay: "600ms" }}
-          >
-            <Image
               src="/images/landing/card5.png"
               alt="공지 카드"
-              width={358}
-              height={459}
+              width={220}
+              height={280}
+              className="rounded-lg shadow-lg"
             />
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Mobile Cards - Horizontal scroll */}
+      <section className="px-4 py-8 lg:hidden">
+        <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-4">
+          {[
+            { src: "/images/landing/card1.png", alt: "동아리카드" },
+            { src: "/images/landing/card2.png", alt: "지원 카드" },
+            { src: "/images/landing/card3.png", alt: "면접 카드" },
+            { src: "/images/landing/card4.png", alt: "회식 카드" },
+            { src: "/images/landing/card5.png", alt: "공지 카드" },
+          ].map((card) => (
+            <div key={card.alt} className="flex-shrink-0">
+              <Image
+                src={card.src}
+                alt={card.alt}
+                width={150}
+                height={200}
+                className="rounded-lg shadow-md"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Content Sections */}
-      <div className="mx-auto max-w-7xl px-4 py-[300px]">
-        <div
+      <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        {/* Register Section */}
+        <section
           ref={registerRef}
           id={registerId}
-          className={`mb-[300px] transition-all duration-1000 ease-out ${
+          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
             visibleSections.has(registerId)
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
           }`}
         >
-          <p className="mb-4 font-bold text-[#ff4a50] text-[35px]">
+          <p className="mb-2 font-bold text-[#ff4a50] text-xl md:mb-4 md:text-2xl">
             등록 · 생성
           </p>
-          <h3 className="mb-28 font-bold text-[70px] text-black leading-24">
+          <h3 className="mb-8 font-bold text-3xl text-black leading-tight md:mb-12 md:text-4xl lg:text-5xl">
             <span className="block">동아리 관리,</span>
             <span className="block">등록부터 생성까지</span>
             <span className="block">간편하게</span>
@@ -348,185 +335,203 @@ export default function Home() {
           <div className="flex justify-center">
             <Image
               src="/images/landing/mac2.png"
-              alt="동아리 관리, 등록부터 생성까지 간편하게"
-              width={1080}
-              height={655}
+              alt="동아리 관리 화면"
+              width={900}
+              height={545}
+              className="w-full max-w-3xl rounded-lg"
             />
           </div>
-          <p className="mt-40 text-end font-semibold text-[#6c6768] text-[30px] leading-normal">
+          <p className="mt-8 text-end font-medium text-[#6c6768] text-base md:mt-12 md:text-xl">
             <span className="block">클릭 한 번으로 전공 동아리를</span>
             <span className="block">쉽게 생성할 수 있어요.</span>
           </p>
-        </div>
+        </section>
 
-        <div
+        {/* Announce Section */}
+        <section
           ref={announceRef}
           id={announceId}
-          className={`relative mb-[300px] transition-all duration-1000 ease-out ${
+          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
             visibleSections.has(announceId)
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
           }`}
         >
-          <div className="mb-4 flex items-center gap-2">
-            <Image
-              src="/images/icons/question.png"
-              alt="질문 로고"
-              width={20}
-              height={18}
-            />
-            <p className="font-bold text-[#ff4a50] text-[24px]">
-              전공동아리 공고
-            </p>
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div>
+              <div className="mb-2 flex items-center gap-2 md:mb-4">
+                <Image
+                  src="/images/icons/question.png"
+                  alt=""
+                  width={18}
+                  height={16}
+                />
+                <p className="font-bold text-[#ff4a50] text-lg md:text-xl">
+                  전공동아리 공고
+                </p>
+              </div>
+              <h3 className="mb-4 font-bold text-2xl text-[#524d4e] leading-tight md:mb-6 md:text-3xl lg:text-4xl">
+                <span className="block">여러 전공동아리 공고를</span>
+                <span className="block">한 눈에 확인하세요</span>
+              </h3>
+              <p className="font-medium text-[#6c6768] text-base md:text-lg">
+                대덕SW고의 전공동아리 공고를
+                <br />
+                쉽고 빠르게 확인할 수 있어요
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <Image
+                src="/images/landing/page1.png"
+                alt="공고 화면 1"
+                width={500}
+                height={310}
+                className="w-full rounded-lg shadow-md"
+              />
+              <Image
+                src="/images/landing/page2.png"
+                alt="공고 화면 2"
+                width={400}
+                height={280}
+                className="w-full rounded-lg shadow-md"
+              />
+            </div>
           </div>
-          <h3 className="mb-8 font-bold text-[#524d4e] text-[55px] leading-[72px]">
-            <span className="block">여러 전공동아리 공고를</span>
-            <span className="block">한 눈에 확인하세요</span>
-          </h3>
-          <p className="font-semibold text-[#6c6768] text-[30px] leading-normal">
-            대덕SW고의 전공동아리 공고를
-            <br />
-            쉽고 빠르게 확인할 수 있어요
-          </p>
+        </section>
 
-          {/* Absolute positioned images */}
-          <div className="absolute top-[-100px] right-[100px]">
-            <Image
-              src="/images/landing/page1.png"
-              alt="사이드 이미지 1"
-              width={564}
-              height={349}
-            />
-          </div>
-          <div className="absolute top-16 right-[-150px]">
-            <Image
-              src="/images/landing/page2.png"
-              alt="사이드 이미지 2"
-              width={451}
-              height={313}
-            />
-          </div>
-        </div>
-
-        <div
+        {/* Apply Section */}
+        <section
           ref={applyRef}
           id={applyId}
-          className={`mb-[300px] flex gap-36 transition-all duration-1000 ease-out ${
+          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
             visibleSections.has(applyId)
-              ? "translate-x-0 opacity-100"
-              : "-translate-x-10 opacity-0"
+              ? "translate-y-0 opacity-100"
+              : "translate-y-10 opacity-0"
           }`}
         >
-          <div className="">
-            <Image
-              src="/images/landing/page3.png"
-              alt="사이드 이미지 1"
-              width={655}
-              height={488}
-            />
-          </div>
-          <div className="flex flex-col justify-center">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="order-2 lg:order-1">
               <Image
-                src="/images/landing/article.png"
-                alt="질문 로고"
-                width={20}
-                height={18}
+                src="/images/landing/page3.png"
+                alt="지원 관리 화면"
+                width={550}
+                height={410}
+                className="w-full rounded-lg shadow-md"
               />
-              <p className="font-bold text-[#ff4a50] text-[24px]">지원 관리</p>
             </div>
-            <h3 className="mb-8 whitespace-nowrap font-bold text-[#524d4e] text-[55px] leading-[72px]">
-              <span className="block">전공동아리 지원 내역을</span>
-              <span className="block">한 눈에 확인해보세요.</span>
-            </h3>
-            <p className="whitespace-nowrap font-semibold text-[#6c6768] text-[30px] leading-normal">
-              마이페이지에서 자신이 지원한
-              <br />
-              전공동아리를 쉽고 간편하게 확인할 수 있어요
-            </p>
+            <div className="order-1 lg:order-2">
+              <div className="mb-2 flex items-center gap-2 md:mb-4">
+                <Image
+                  src="/images/landing/article.png"
+                  alt=""
+                  width={18}
+                  height={16}
+                />
+                <p className="font-bold text-[#ff4a50] text-lg md:text-xl">
+                  지원 관리
+                </p>
+              </div>
+              <h3 className="mb-4 font-bold text-2xl text-[#524d4e] leading-tight md:mb-6 md:text-3xl lg:text-4xl">
+                <span className="block">전공동아리 지원 내역을</span>
+                <span className="block">한 눈에 확인해보세요.</span>
+              </h3>
+              <p className="font-medium text-[#6c6768] text-base md:text-lg">
+                마이페이지에서 자신이 지원한
+                <br />
+                전공동아리를 쉽고 간편하게 확인할 수 있어요
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div
+        {/* Calendar Section */}
+        <section
           ref={calendarRef}
           id={calendarId}
-          className={`relative mb-[300px] h-[940px] transition-all duration-1000 ease-out ${
+          className={`transition-all duration-1000 ease-out ${
             visibleSections.has(calendarId)
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
           }`}
         >
-          <div className="">
-            <p className="mb-8 font-bold text-[#ff4a50] text-[30px]">
-              우리의 시간은 소중하니까
-            </p>
-            <h3 className="mb-8 font-bold text-[#524d4e] text-[80px] leading-[84px]">
-              <span className="block">복잡하고 귀찮은</span>
-              <span className="block">일들과 작별해보세요</span>
-            </h3>
-            <p className="font-semibold text-[#6c6768] text-[30px] leading-normal">
-              큐알 코드가 붙은 포스터, 동아리 정보들
-              <br />
-              면접 일정 관리, 공지, 합격 결과 알리기
-              <br />
-              <br />
-              대동여지도와 함께라면 더이상 번거롭지 않아요
-            </p>
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div>
+              <p className="mb-2 font-bold text-[#ff4a50] text-lg md:mb-4 md:text-xl">
+                우리의 시간은 소중하니까
+              </p>
+              <h3 className="mb-4 font-bold text-2xl text-[#524d4e] leading-tight md:mb-6 md:text-3xl lg:text-4xl">
+                <span className="block">복잡하고 귀찮은</span>
+                <span className="block">일들과 작별해보세요</span>
+              </h3>
+              <p className="font-medium text-[#6c6768] text-base md:text-lg">
+                큐알 코드가 붙은 포스터, 동아리 정보들
+                <br />
+                면접 일정 관리, 공지, 합격 결과 알리기
+                <br />
+                <br />
+                대동여지도와 함께라면 더이상 번거롭지 않아요
+              </p>
+            </div>
+            <div>
+              <Image
+                src="/images/icons/calender.png"
+                alt="달력"
+                width={500}
+                height={610}
+                className="w-full max-w-md"
+              />
+            </div>
           </div>
-          <div className="absolute top-0 right-[-200px]">
-            <Image
-              src="/images/icons/calender.png"
-              alt="달력 로고"
-              width={767}
-              height={940}
-            />
-          </div>
-        </div>
+        </section>
       </div>
 
       {/* Footer */}
-      <div className="bg-[#303740] px-[220px] py-[50px]">
-        <div className="flex items-center gap-4 text-[#bdbdbd]">
-          <Image
-            src="/images/icons/logo.png"
-            alt="대동여지도 로고"
-            width={22}
-            height={18}
-            className="h-[18px] w-[22px]"
-          />
-          <p className="text-sm">|</p>
-          <p className="font-bold text-sm">대동여지도</p>
-          <p className="text-sm">|</p>
-          <p className="font-bold text-sm">DaeDongYeoJiDo</p>
-        </div>
-        <div className="mt-8 text-[#bdbdbd] text-sm leading-normal">
-          <p className="mb-0">
-            대덕소프트웨어마이스터고등학교를 위한 전공동아리 관리 서비스
-            대동여지도 | PM: 박태수
-          </p>
-          <p className="mb-0">
-            FRONTEND: 지도현, 최민수 | BACKEND: 박태수, 채도훈 | DESIGN: 손희찬
-          </p>
-          <p>주소 : 대전광역시 유성구 가정북로 76</p>
-        </div>
-        <p className="mt-4 text-[#bdbdbd] text-sm">@DAEDONGYEOJIDO</p>
-
-        <div className="mt-8 flex items-center justify-end">
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-md bg-[#5c6168] px-6 py-3"
-          >
+      <footer className="bg-[#303740] px-4 py-8 md:px-12 md:py-12 lg:px-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-center gap-3 text-[#bdbdbd]">
             <Image
-              src="/images/icons/inquire.png"
-              alt="문의 아이콘"
-              width={16}
-              height={16}
-              className="h-4 w-4 opacity-70"
+              src="/images/icons/logo.png"
+              alt="대동여지도"
+              width={22}
+              height={18}
             />
-            <p className="text-sm text-white">문의하기</p>
-          </button>
+            <span className="text-sm">|</span>
+            <span className="font-bold text-sm">대동여지도</span>
+            <span className="text-sm">|</span>
+            <span className="font-bold text-sm">DaeDongYeoJiDo</span>
+          </div>
+          <div className="mt-6 text-[#bdbdbd] text-xs leading-relaxed md:text-sm">
+            <p>
+              대덕소프트웨어마이스터고등학교를 위한 전공동아리 관리 서비스
+              대동여지도 | PM: 박태수
+            </p>
+            <p>
+              FRONTEND: 지도현, 최민수 | BACKEND: 박태수, 채도훈 | DESIGN:
+              손희찬
+            </p>
+            <p>주소 : 대전광역시 유성구 가정북로 76</p>
+          </div>
+          <p className="mt-4 text-[#bdbdbd] text-xs md:text-sm">
+            @DAEDONGYEOJIDO
+          </p>
+
+          <div className="mt-6 flex items-center justify-end">
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-md bg-[#5c6168] px-4 py-2 transition-colors hover:bg-[#6c7178] md:px-6 md:py-3"
+            >
+              <Image
+                src="/images/icons/inquire.png"
+                alt=""
+                width={14}
+                height={14}
+                className="opacity-70"
+              />
+              <span className="text-sm text-white">문의하기</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

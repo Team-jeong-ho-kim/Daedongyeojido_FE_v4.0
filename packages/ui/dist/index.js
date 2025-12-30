@@ -89,7 +89,7 @@ function Header() {
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
       "header",
       {
-        className: `fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${isTransparent ? "border-transparent bg-white/30 backdrop-blur-md" : "border-gray-200 bg-white"} ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
+        className: `fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${isTransparent ? "border-transparent bg-white/70 backdrop-blur-sm" : "border-gray-200 bg-white"} ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
         children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8", children: [
           /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center gap-12", children: [
             /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_link.default, { href: "/", className: "flex items-center", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
