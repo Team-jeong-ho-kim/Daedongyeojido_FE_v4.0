@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
+import { Footer } from "ui";
 
 export default function Home() {
   const images = [
@@ -83,10 +84,8 @@ export default function Home() {
 
   return (
     <div className="relative w-full overflow-x-hidden bg-white">
-      {/* Background gradient */}
       <div className="absolute top-[70px] left-0 h-[1000px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white md:h-[1500px]" />
 
-      {/* Hero Section */}
       <section
         ref={heroRef}
         id={heroId}
@@ -109,9 +108,9 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Hero Image Slider */}
-        <div className="w-full max-w-5xl">
-          <div className="relative overflow-hidden rounded-xl">
+        <div className="relative w-full max-w-2xl lg:max-w-3xl">
+          {/* Slider */}
+          <div className="overflow-hidden rounded-xl">
             <div
               className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -119,7 +118,7 @@ export default function Home() {
               {images.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative aspect-video w-full flex-shrink-0"
+                  className="relative aspect-[16/10] w-full flex-shrink-0"
                 >
                   <Image
                     src={image.src}
@@ -130,57 +129,57 @@ export default function Home() {
                 </div>
               ))}
             </div>
-
-            {/* Navigation Arrows */}
-            <button
-              type="button"
-              onClick={() =>
-                setCurrentImageIndex((prev) =>
-                  prev === 0 ? images.length - 1 : prev - 1,
-                )
-              }
-              className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/30 p-2 text-white transition-colors hover:bg-black/50 md:left-4 md:p-3"
-              aria-label="이전 슬라이드"
-            >
-              <svg
-                className="size-4 md:size-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setCurrentImageIndex((prev) => (prev + 1) % images.length)
-              }
-              className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/30 p-2 text-white transition-colors hover:bg-black/50 md:right-4 md:p-3"
-              aria-label="다음 슬라이드"
-            >
-              <svg
-                className="size-4 md:size-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
           </div>
+
+          {/* Navigation Arrows */}
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentImageIndex((prev) =>
+                prev === 0 ? images.length - 1 : prev - 1,
+              )
+            }
+            className="-translate-y-1/2 -left-10 md:-left-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
+            aria-label="이전 슬라이드"
+          >
+            <svg
+              className="size-5 md:size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setCurrentImageIndex((prev) => (prev + 1) % images.length)
+            }
+            className="-translate-y-1/2 -right-10 md:-right-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
+            aria-label="다음 슬라이드"
+          >
+            <svg
+              className="size-5 md:size-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
 
           {/* Indicators */}
           <div className="mt-4 flex items-center justify-center gap-1.5">
@@ -209,7 +208,6 @@ export default function Home() {
         />
       </section>
 
-      {/* Description Section */}
       <section
         ref={descriptionRef}
         id={descriptionId}
@@ -237,7 +235,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Title Section */}
       <section
         ref={featuresRef}
         id={featuresId}
@@ -368,9 +365,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Content Sections */}
       <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-        {/* Register Section */}
         <section
           ref={registerRef}
           id={registerId}
@@ -403,7 +398,6 @@ export default function Home() {
           </p>
         </section>
 
-        {/* Announce Section */}
         <section
           ref={announceRef}
           id={announceId}
@@ -455,7 +449,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Apply Section */}
         <section
           ref={applyRef}
           id={applyId}
@@ -500,7 +493,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Calendar Section */}
         <section
           ref={calendarRef}
           id={calendarId}
@@ -541,53 +533,7 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#303740] px-4 py-8 md:px-12 md:py-12 lg:px-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex items-center gap-3 text-[#bdbdbd]">
-            <Image
-              src="/images/icons/logo.png"
-              alt="대동여지도"
-              width={22}
-              height={18}
-            />
-            <span className="text-sm">|</span>
-            <span className="font-bold text-sm">대동여지도</span>
-            <span className="text-sm">|</span>
-            <span className="font-bold text-sm">DaeDongYeoJiDo</span>
-          </div>
-          <div className="mt-6 text-[#bdbdbd] text-xs leading-relaxed md:text-sm">
-            <p>
-              대덕소프트웨어마이스터고등학교를 위한 전공동아리 관리 서비스
-              대동여지도 | PM: 박태수
-            </p>
-            <p>
-              FRONTEND: 지도현, 최민수 | BACKEND: 박태수, 채도훈 | DESIGN:
-              손희찬
-            </p>
-            <p>주소 : 대전광역시 유성구 가정북로 76</p>
-          </div>
-          <p className="mt-4 text-[#bdbdbd] text-xs md:text-sm">
-            @DAEDONGYEOJIDO
-          </p>
-
-          <div className="mt-6 flex items-center justify-end">
-            <button
-              type="button"
-              className="flex items-center gap-2 rounded-md bg-[#5c6168] px-4 py-2 transition-colors hover:bg-[#6c7178] md:px-6 md:py-3"
-            >
-              <Image
-                src="/images/icons/inquire.png"
-                alt=""
-                width={14}
-                height={14}
-                className="opacity-70"
-              />
-              <span className="text-sm text-white">문의하기</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -3,6 +3,8 @@ import * as class_variance_authority_types from 'class-variance-authority/types'
 import { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
+declare function Footer(): react_jsx_runtime.JSX.Element;
+
 declare function Header(): react_jsx_runtime.JSX.Element;
 
 declare const buttonVariants: (props?: ({
@@ -24,4 +26,4 @@ declare const InterviewIcon: ({ className }: IconProps) => react_jsx_runtime.JSX
 declare const blackLogo = "/images/logos/blackLogo.svg";
 declare const whiteLogo = "/images/logos/whiteLogo.svg";
 
-export { Button, CalendarIcon, CheckIcon, Header, InterviewIcon, NoteIcon, blackLogo, buttonVariants, whiteLogo };
+export { Button, CalendarIcon, CheckIcon, Footer, Header, InterviewIcon, NoteIcon, blackLogo, buttonVariants, whiteLogo };
