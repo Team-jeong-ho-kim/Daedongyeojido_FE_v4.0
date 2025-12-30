@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const BLACK_LOGO_PAGES = ["/", "/inquiry"];
+const WHITE_LOGO_PAGES = ["/inquiry"];
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -13,7 +13,7 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const isTransparent = BLACK_LOGO_PAGES.includes(pathname);
+  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
   const logoSrc = isTransparent
     ? "/images/logos/blackLogo.svg"
     : "/images/logos/whiteLogo.svg";
@@ -63,7 +63,6 @@ export default function Header() {
         } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-          {/* Logo + Navigation */}
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center">
               <Image
@@ -75,7 +74,6 @@ export default function Header() {
               />
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden items-center gap-10 md:flex">
               <Link
                 href="/clubs"
@@ -110,7 +108,6 @@ export default function Header() {
             </nav>
           </div>
 
-          {/* Desktop Right side buttons */}
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/login"
@@ -127,7 +124,7 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* 모바일 */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -161,7 +158,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <button
           type="button"

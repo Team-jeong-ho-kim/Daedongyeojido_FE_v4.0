@@ -6,13 +6,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-var BLACK_LOGO_PAGES = ["/", "/inquiry"];
+var WHITE_LOGO_PAGES = ["/inquiry"];
 function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isTransparent = BLACK_LOGO_PAGES.includes(pathname);
+  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
   const logoSrc = isTransparent ? "/images/logos/blackLogo.svg" : "/images/logos/whiteLogo.svg";
   useEffect(() => {
     const handleScroll = () => {
@@ -365,11 +365,9 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs2(
   }
 );
 
-// src/components/ui/icons/blackLogo.svg
-var blackLogo_default = "./blackLogo-43BH4TVB.svg";
-
-// src/components/ui/icons/whiteLogo.svg
-var whiteLogo_default = "./whiteLogo-QJKYLOQC.svg";
+// src/components/ui/icons/index.ts
+var blackLogo = "/images/logos/blackLogo.svg";
+var whiteLogo = "/images/logos/whiteLogo.svg";
 export {
   Button,
   CalendarIcon,
@@ -377,7 +375,7 @@ export {
   Header,
   InterviewIcon,
   NoteIcon,
-  blackLogo_default as blackLogo,
+  blackLogo,
   buttonVariants,
-  whiteLogo_default as whiteLogo
+  whiteLogo
 };
