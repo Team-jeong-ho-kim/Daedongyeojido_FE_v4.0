@@ -49,13 +49,13 @@ var import_link = __toESM(require("next/link"));
 var import_navigation = require("next/navigation");
 var import_react = require("react");
 var import_jsx_runtime = require("react/jsx-runtime");
-var BLACK_LOGO_PAGES = ["/", "/inquiry"];
+var WHITE_LOGO_PAGES = ["/inquiry"];
 function Header() {
   const [isVisible, setIsVisible] = (0, import_react.useState)(true);
   const [lastScrollY, setLastScrollY] = (0, import_react.useState)(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
   const pathname = (0, import_navigation.usePathname)();
-  const isTransparent = BLACK_LOGO_PAGES.includes(pathname);
+  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
   const logoSrc = isTransparent ? "/images/logos/blackLogo.svg" : "/images/logos/whiteLogo.svg";
   (0, import_react.useEffect)(() => {
     const handleScroll = () => {

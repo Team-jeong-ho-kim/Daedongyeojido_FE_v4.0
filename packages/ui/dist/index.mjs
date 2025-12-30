@@ -6,13 +6,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-var BLACK_LOGO_PAGES = ["/", "/inquiry"];
+var WHITE_LOGO_PAGES = ["/inquiry"];
 function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isTransparent = BLACK_LOGO_PAGES.includes(pathname);
+  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
   const logoSrc = isTransparent ? "/images/logos/blackLogo.svg" : "/images/logos/whiteLogo.svg";
   useEffect(() => {
     const handleScroll = () => {

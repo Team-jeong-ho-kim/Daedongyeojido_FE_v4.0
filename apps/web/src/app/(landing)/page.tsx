@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
 export default function Home() {
@@ -87,27 +88,6 @@ export default function Home() {
 
   return (
     <div className="relative size-full bg-white">
-      {/* Header */}
-      <div className="top-0 left-0 h-[70px] w-full overflow-clip bg-white">
-        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <Image
-              src="/logo.png"
-              alt="대동여지도 로고"
-              width={22}
-              height={18}
-              className="h-[18px] w-[22px]"
-            />
-            <p className="font-bold text-black text-lg">대동여지도</p>
-          </div>
-          <div className="flex items-center gap-8">
-            <p className="text-[#4e5968] text-lg">동아리</p>
-            <p className="text-[#4e5968] text-lg">공고</p>
-            <p className="text-[#474747] text-lg">로그인</p>
-          </div>
-        </div>
-      </div>
-
       {/* Background gradient */}
       <div className="absolute top-[70px] left-0 h-[1781px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white" />
 
@@ -126,12 +106,12 @@ export default function Home() {
             <span className="block">동아리의 모든 것</span>
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
-          <button
-            type="button"
+          <Link
+            href="/login"
             className="rounded-[20px] bg-[#f0e5e5] px-8 py-4 font-bold text-[#4a4444] text-[22px]"
           >
             로그인 하기
-          </button>
+          </Link>
         </div>
         <div className="flex w-full flex-col items-center gap-10 px-4">
           <div className="relative flex h-[400px] w-full items-center justify-center sm:h-[500px] md:h-[600px] lg:h-[655px]">
