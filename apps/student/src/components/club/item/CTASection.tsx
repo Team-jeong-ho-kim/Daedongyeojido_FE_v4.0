@@ -22,7 +22,7 @@ export default function CTASection({
           {title}
         </h2>
         <p className="mb-3 font-bold text-gray-900 text-lg md:text-xl">
-          ㅇ{subtitle}
+          {subtitle}
         </p>
         <p className="mb-10 text-gray-600 md:mb-14">{description}</p>
         <Button className="rounded-xl bg-primary-50 px-6 py-4 text-base text-primary-500 hover:bg-primary-100 md:px-7 md:py-6 md:text-[18px]">
