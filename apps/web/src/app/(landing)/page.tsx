@@ -109,20 +109,77 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Hero Image Carousel */}
+        {/* Hero Image Slider */}
         <div className="w-full max-w-5xl">
-          <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-            {images.map((image, index) => (
-              <Image
-                key={image.id}
-                src={image.src}
-                alt={`hero ${index + 1}`}
-                fill
-                className={`object-contain transition-opacity duration-700 ${
-                  index === currentImageIndex ? "opacity-100" : "opacity-0"
-                }`}
-              />
-            ))}
+          <div className="relative overflow-hidden rounded-xl">
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+            >
+              {images.map((image, index) => (
+                <div
+                  key={image.id}
+                  className="relative aspect-video w-full flex-shrink-0"
+                >
+                  <Image
+                    src={image.src}
+                    alt={`hero ${index + 1}`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentImageIndex((prev) =>
+                  prev === 0 ? images.length - 1 : prev - 1,
+                )
+              }
+              className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/30 p-2 text-white transition-colors hover:bg-black/50 md:left-4 md:p-3"
+              aria-label="이전 슬라이드"
+            >
+              <svg
+                className="size-4 md:size-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                setCurrentImageIndex((prev) => (prev + 1) % images.length)
+              }
+              className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/30 p-2 text-white transition-colors hover:bg-black/50 md:right-4 md:p-3"
+              aria-label="다음 슬라이드"
+            >
+              <svg
+                className="size-4 md:size-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
 
           {/* Indicators */}
@@ -197,7 +254,6 @@ export default function Home() {
         </h2>
       </section>
 
-      {/* Feature Cards Section - Hidden on mobile */}
       <section
         ref={cardsRef}
         id={cardsId}

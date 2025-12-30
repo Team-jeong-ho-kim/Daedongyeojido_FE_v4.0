@@ -51,13 +51,6 @@ export function LandingHeader() {
           >
             로그인
           </Link>
-          <span className="text-gray-300">|</span>
-          <Link
-            href="/signup"
-            className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
-          >
-            회원가입
-          </Link>
         </div>
       </div>
     </header>

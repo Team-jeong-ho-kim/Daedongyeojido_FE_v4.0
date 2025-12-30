@@ -17,17 +17,16 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-black">
-      {/* 캐러셀 - 모바일에서는 숨김 */}
+      {/* 캐러셀;모바일에서는 숨김 */}
       <div className="hidden flex-1 items-center justify-center p-8 lg:flex lg:p-16">
         <div className="w-full max-w-2xl">
           <Carousel images={carouselImages} />
         </div>
       </div>
 
-      {/* 우측 로그인 */}
+      {/* 우측 로그인폼 */}
       <div className="flex w-full flex-col items-center justify-between rounded-3xl bg-[#1a1a1a] px-6 py-12 sm:px-12 sm:py-16 lg:my-6 lg:mr-6 lg:w-[540px]">
         <div className="flex w-full max-w-md flex-col items-center">
-          {/* 로고 */}
           <div className="mb-12">
             <Image
               src="/images/login/blackLogo.svg"
@@ -45,7 +44,6 @@ export default function LoginPage() {
               나의 동아리를 찾아보세요!
             </p>
 
-            {/* 로그인폼 */}
             <div className="space-y-4">
               <div>
                 <label
@@ -77,7 +75,6 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* 로그인 유지 체크 */}
               <div className="relative flex items-center">
                 <input
                   type="checkbox"
