@@ -37,9 +37,9 @@ __export(index_exports, {
   Header: () => Header,
   InterviewIcon: () => InterviewIcon,
   NoteIcon: () => NoteIcon,
-  blackLogo: () => blackLogo_default,
+  blackLogo: () => blackLogo,
   buttonVariants: () => buttonVariants,
-  whiteLogo: () => whiteLogo_default
+  whiteLogo: () => whiteLogo
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -408,11 +408,9 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ (0, import_jsx_runtime3.j
   }
 );
 
-// src/components/ui/icons/blackLogo.svg
-var blackLogo_default = "./blackLogo-43BH4TVB.svg";
-
-// src/components/ui/icons/whiteLogo.svg
-var whiteLogo_default = "./whiteLogo-QJKYLOQC.svg";
+// src/components/ui/icons/index.ts
+var blackLogo = "/images/logos/blackLogo.svg";
+var whiteLogo = "/images/logos/whiteLogo.svg";
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Button,

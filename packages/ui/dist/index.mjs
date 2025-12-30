@@ -365,11 +365,9 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs2(
   }
 );
 
-// src/components/ui/icons/blackLogo.svg
-var blackLogo_default = "./blackLogo-43BH4TVB.svg";
-
-// src/components/ui/icons/whiteLogo.svg
-var whiteLogo_default = "./whiteLogo-QJKYLOQC.svg";
+// src/components/ui/icons/index.ts
+var blackLogo = "/images/logos/blackLogo.svg";
+var whiteLogo = "/images/logos/whiteLogo.svg";
 export {
   Button,
   CalendarIcon,
@@ -377,7 +375,7 @@ export {
   Header,
   InterviewIcon,
   NoteIcon,
-  blackLogo_default as blackLogo,
+  blackLogo,
   buttonVariants,
-  whiteLogo_default as whiteLogo
+  whiteLogo
 };

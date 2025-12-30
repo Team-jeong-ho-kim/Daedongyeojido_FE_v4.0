@@ -1,3 +1,4 @@
 export * from "./announcements";
-export { default as blackLogo } from "./blackLogo.svg";
-export { default as whiteLogo } from "./whiteLogo.svg";
+
+export const blackLogo = "/images/logos/blackLogo.svg";
+export const whiteLogo = "/images/logos/whiteLogo.svg";
