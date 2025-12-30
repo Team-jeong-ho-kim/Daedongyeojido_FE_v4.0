@@ -6,9 +6,9 @@ import { useEffect, useId, useRef, useState } from "react";
 
 export default function Home() {
   const images = [
-    { id: "slide-1", src: "/mac.png" },
-    { id: "slide-2", src: "/mac.png" },
-    { id: "slide-3", src: "/mac.png" },
+    { id: "slide-1", src: "/images/landing/mac2.png" },
+    { id: "slide-2", src: "/images/landing/mac2.png" },
+    { id: "slide-3", src: "/images/landing/mac2.png" },
   ];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(
@@ -170,7 +170,12 @@ export default function Home() {
           </div>
 
           <div>
-            <Image src="/arrow.png" alt="mac" width={61} height={19} />
+            <Image
+              src="/images/landing/arrow.png"
+              alt="arrow"
+              width={61}
+              height={19}
+            />
           </div>
         </div>
       </div>
@@ -236,7 +241,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "100ms" }}
           >
-            <Image src="/card1.png" alt="동아리카드" width={295} height={396} />
+            <Image
+              src="/images/landing/card1.png"
+              alt="동아리카드"
+              width={295}
+              height={396}
+            />
           </div>
           <div
             className={`absolute top-0 left-[calc(50%-450px)] transform transition-all duration-700 ease-out ${
@@ -246,7 +256,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "200ms" }}
           >
-            <Image src="/card2.png" alt="지원 카드" width={436} height={501} />
+            <Image
+              src="/images/landing/card2.png"
+              alt="지원 카드"
+              width={436}
+              height={501}
+            />
           </div>
           <div
             className={`absolute top-0 left-[calc(50%-147px)] transition-all duration-700 ease-out ${
@@ -256,7 +271,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "300ms" }}
           >
-            <Image src="/card3.png" alt="면접 카드" width={295} height={396} />
+            <Image
+              src="/images/landing/card3.png"
+              alt="면접 카드"
+              width={295}
+              height={396}
+            />
           </div>
           <div
             className={`absolute top-16 left-[calc(50%+70px)] rotate-[-5deg] transform transition-all duration-700 ease-out ${
@@ -266,7 +286,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "400ms" }}
           >
-            <Image src="/card4.png" alt="회식 카드" width={360} height={442} />
+            <Image
+              src="/images/landing/card4.png"
+              alt="회식 카드"
+              width={360}
+              height={442}
+            />
           </div>
           <div
             className={`absolute top-30 left-[calc(50%+110px)] rotate-[-7deg] transform transition-all duration-700 ease-out ${
@@ -276,7 +301,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "500ms" }}
           >
-            <Image src="/card4_.png" alt="회식 카드" width={233} height={294} />
+            <Image
+              src="/images/landing/card4_.png"
+              alt="회식 카드"
+              width={233}
+              height={294}
+            />
           </div>
           <div
             className={`absolute top-0 left-[calc(50%+310px)] transform transition-all duration-700 ease-out ${
@@ -286,7 +316,12 @@ export default function Home() {
             }`}
             style={{ transitionDelay: "600ms" }}
           >
-            <Image src="/card5.png" alt="공지 카드" width={358} height={459} />
+            <Image
+              src="/images/landing/card5.png"
+              alt="공지 카드"
+              width={358}
+              height={459}
+            />
           </div>
         </div>
       </div>
@@ -312,7 +347,7 @@ export default function Home() {
           </h3>
           <div className="flex justify-center">
             <Image
-              src="/mac2.png"
+              src="/images/landing/mac2.png"
               alt="동아리 관리, 등록부터 생성까지 간편하게"
               width={1080}
               height={655}
@@ -334,7 +369,12 @@ export default function Home() {
           }`}
         >
           <div className="mb-4 flex items-center gap-2">
-            <Image src="/question.png" alt="질문 로고" width={20} height={18} />
+            <Image
+              src="/images/icons/question.png"
+              alt="질문 로고"
+              width={20}
+              height={18}
+            />
             <p className="font-bold text-[#ff4a50] text-[24px]">
               전공동아리 공고
             </p>
@@ -352,7 +392,7 @@ export default function Home() {
           {/* Absolute positioned images */}
           <div className="absolute top-[-100px] right-[100px]">
             <Image
-              src="/page1.png"
+              src="/images/landing/page1.png"
               alt="사이드 이미지 1"
               width={564}
               height={349}
@@ -360,7 +400,7 @@ export default function Home() {
           </div>
           <div className="absolute top-16 right-[-150px]">
             <Image
-              src="/page2.png"
+              src="/images/landing/page2.png"
               alt="사이드 이미지 2"
               width={451}
               height={313}
@@ -379,7 +419,7 @@ export default function Home() {
         >
           <div className="">
             <Image
-              src="/page3.png"
+              src="/images/landing/page3.png"
               alt="사이드 이미지 1"
               width={655}
               height={488}
@@ -388,7 +428,7 @@ export default function Home() {
           <div className="flex flex-col justify-center">
             <div className="mb-4 flex items-center gap-2">
               <Image
-                src="/article.png"
+                src="/images/landing/article.png"
                 alt="질문 로고"
                 width={20}
                 height={18}
@@ -435,7 +475,7 @@ export default function Home() {
           </div>
           <div className="absolute top-0 right-[-200px]">
             <Image
-              src="/calender.png"
+              src="/images/icons/calender.png"
               alt="달력 로고"
               width={767}
               height={940}
@@ -448,7 +488,7 @@ export default function Home() {
       <div className="bg-[#303740] px-[220px] py-[50px]">
         <div className="flex items-center gap-4 text-[#bdbdbd]">
           <Image
-            src="/logo.png"
+            src="/images/icons/logo.png"
             alt="대동여지도 로고"
             width={22}
             height={18}
@@ -477,7 +517,7 @@ export default function Home() {
             className="flex items-center gap-2 rounded-md bg-[#5c6168] px-6 py-3"
           >
             <Image
-              src="/inquire.png"
+              src="/images/icons/inquire.png"
               alt="문의 아이콘"
               width={16}
               height={16}
