@@ -2,10 +2,13 @@
 
 import Image from "next/image";
 import { useId } from "react";
-import { blackLogo, school1Img } from "@/assets";
 import { Carousel } from "@/components/login/Carousel";
 
-const carouselImages = [school1Img, school1Img, school1Img];
+const carouselImages = [
+  "/images/login/school.svg",
+  "/images/login/school.svg",
+  "/images/login/school.svg",
+];
 
 export default function LoginPage() {
   const accountId = useId();
@@ -26,7 +29,12 @@ export default function LoginPage() {
         <div className="flex w-full max-w-md flex-col items-center">
           {/* 로고 */}
           <div className="mb-12">
-            <Image src={blackLogo} alt="" />
+            <Image
+              src="/images/login/blackLogo.svg"
+              alt="대동여지도 로고"
+              width={92}
+              height={24}
+            />
           </div>
 
           <div className="w-full">

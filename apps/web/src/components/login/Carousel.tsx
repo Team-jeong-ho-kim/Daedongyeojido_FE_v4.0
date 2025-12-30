@@ -1,10 +1,10 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 interface CarouselProps {
-  images: StaticImageData[];
+  images: string[];
   autoPlayInterval?: number;
 }
 
@@ -34,11 +34,13 @@ export function Carousel({ images, autoPlayInterval = 3000 }: CarouselProps) {
           <Image
             src={images[nextIndex]}
             alt={`슬라이드 ${nextIndex + 1}`}
+            width={800}
+            height={600}
             className="h-full w-full object-cover"
           />
         </div>
 
-        {/* 현재 이미지 (페이드 아웃) */}
+        {/* 현재 이미지 */}
         <div
           className="relative animate-fade-out"
           style={{
@@ -48,6 +50,8 @@ export function Carousel({ images, autoPlayInterval = 3000 }: CarouselProps) {
           <Image
             src={images[currentIndex]}
             alt={`슬라이드 ${currentIndex + 1}`}
+            width={800}
+            height={600}
             className="w-full object-cover"
           />
         </div>
