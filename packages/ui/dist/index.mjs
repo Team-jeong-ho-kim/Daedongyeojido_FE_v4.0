@@ -4,15 +4,15 @@
 import Image from "next/image";
 import { jsx, jsxs } from "react/jsx-runtime";
 function Footer() {
-  return /* @__PURE__ */ jsx("footer", { className: "bg-[#303740] px-4 py-8 md:px-12 md:py-12 lg:px-24", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-6xl", children: [
-    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 text-[#bdbdbd]", children: [
+  return /* @__PURE__ */ jsx("footer", { className: "bg-gray-50 px-4 py-8 md:px-12 md:py-12 lg:px-24", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto max-w-6xl", children: [
+    /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3 text-gray-600", children: [
       /* @__PURE__ */ jsx(
         Image,
         {
-          src: "/images/icons/logo.png",
+          src: "/images/logos/whiteLogo.svg",
           alt: "\uB300\uB3D9\uC5EC\uC9C0\uB3C4",
-          width: 22,
-          height: 18
+          width: 92,
+          height: 24
         }
       ),
       /* @__PURE__ */ jsx("span", { className: "text-sm", children: "|" }),
@@ -20,12 +20,12 @@ function Footer() {
       /* @__PURE__ */ jsx("span", { className: "text-sm", children: "|" }),
       /* @__PURE__ */ jsx("span", { className: "font-bold text-sm", children: "DaeDongYeoJiDo" })
     ] }),
-    /* @__PURE__ */ jsxs("div", { className: "mt-6 text-[#bdbdbd] text-xs leading-relaxed md:text-sm", children: [
-      /* @__PURE__ */ jsx("p", { children: "\uB300\uB355\uC18C\uD504\uD2B8\uC6E8\uC5B4\uB9C8\uC774\uC2A4\uD130\uACE0\uB4F1\uD559\uAD50\uB97C \uC704\uD55C \uC804\uACF5\uB3D9\uC544\uB9AC \uAD00\uB9AC \uC11C\uBE44\uC2A4 \uB300\uB3D9\uC5EC\uC9C0\uB3C4 | PM: \uBC15\uD0DC\uC218" }),
-      /* @__PURE__ */ jsx("p", { children: "FRONTEND: \uC9C0\uB3C4\uD604, \uCD5C\uBBFC\uC218 | BACKEND: \uBC15\uD0DC\uC218, \uCC44\uB3C4\uD6C8 | DESIGN: \uC190\uD76C\uCC2C" }),
+    /* @__PURE__ */ jsxs("div", { className: "mt-6 text-gray-500 text-xs leading-relaxed md:text-sm", children: [
+      /* @__PURE__ */ jsx("p", { className: "mb-4", children: "\uB300\uB355\uC18C\uD504\uD2B8\uC6E8\uC5B4\uB9C8\uC774\uC2A4\uD130\uACE0\uB4F1\uD559\uAD50\uB97C \uC704\uD55C \uC804\uACF5\uB3D9\uC544\uB9AC \uAD00\uB9AC \uC11C\uBE44\uC2A4 \uB300\uB3D9\uC5EC\uC9C0\uB3C4" }),
+      /* @__PURE__ */ jsx("p", { children: "PM: \uBC15\uD0DC\uC218 | FRONTEND: \uC9C0\uB3C4\uD604, \uCD5C\uBBFC\uC218 | BACKEND: \uBC15\uD0DC\uC218, \uCC44\uB3C4\uD6C8 | DESIGN: \uC190\uD76C\uCC2C" }),
       /* @__PURE__ */ jsx("p", { children: "\uC8FC\uC18C : \uB300\uC804\uAD11\uC5ED\uC2DC \uC720\uC131\uAD6C \uAC00\uC815\uBD81\uB85C 76" })
     ] }),
-    /* @__PURE__ */ jsx("p", { className: "mt-4 text-[#bdbdbd] text-xs md:text-sm", children: "@DAEDONGYEOJIDO" })
+    /* @__PURE__ */ jsx("p", { className: "mt-4 text-gray-500 text-xs md:text-sm", children: "@DAEDONGYEOJIDO" })
   ] }) });
 }
 
@@ -397,6 +397,9 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs3(
 // src/components/ui/icons/index.ts
 var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
+
+// src/index.ts
+import { Toaster, toast } from "sonner";
 export {
   Button,
   CalendarIcon,
@@ -405,7 +408,9 @@ export {
   Header,
   InterviewIcon,
   NoteIcon,
+  Toaster,
   blackLogo,
   buttonVariants,
+  toast,
   whiteLogo
 };

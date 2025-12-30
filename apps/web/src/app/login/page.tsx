@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useId } from "react";
+import { useId, useState } from "react";
+import { toast } from "ui";
 import { Carousel } from "@/components/login/Carousel";
 
 const carouselImages = [
@@ -11,6 +12,23 @@ const carouselImages = [
 ];
 
 export default function LoginPage() {
+  const [dsmId, setDsmId] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const handleLogin = () => {
+    if (!dsmId.trim()) {
+      toast.error("DSM 계정 ID를 입력해주세요.");
+      return;
+    }
+
+    if (!password.trim()) {
+      toast.error("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    window.location.href = `${process.env.NEXT_PUBLIC_USER_URL}`;
+  };
+
   const accountId = useId();
   const passwordId = useId();
   const rememberId = useId();
@@ -53,6 +71,10 @@ export default function LoginPage() {
                   DSM 계정 ID
                 </label>
                 <input
+                  value={dsmId}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setDsmId(e.target.value)
+                  }
                   id={accountId}
                   type="text"
                   placeholder="계정 ID를 입력해주세요."
@@ -68,6 +90,10 @@ export default function LoginPage() {
                   비밀번호
                 </label>
                 <input
+                  value={password}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPassword(e.target.value)
+                  }
                   id={passwordId}
                   type="password"
                   placeholder="비밀번호를 입력해주세요."
@@ -101,6 +127,7 @@ export default function LoginPage() {
         </div>
 
         <button
+          onClick={handleLogin}
           type="button"
           className="w-full max-w-md rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80"
         >

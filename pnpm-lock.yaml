@@ -181,6 +181,12 @@ importers:
       lucide-react:
         specifier: ^0.546.0
         version: 0.546.0(react@18.3.1)
+      react-dom:
+        specifier: ^18.3.1
+        version: 19.1.0(react@18.3.1)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.1.0(react@18.3.1))(react@18.3.1)
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
@@ -2356,6 +2362,11 @@ snapshots:
   shebang-regex@3.0.0: {}
 
   signal-exit@4.1.0: {}
+
+  sonner@2.0.7(react-dom@19.1.0(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 19.1.0(react@18.3.1)
 
   sonner@2.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
