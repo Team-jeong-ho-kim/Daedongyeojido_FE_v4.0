@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:prod": "dotenv -e .env.production -- next dev",
     "build": "next build",
     "start": "next start",
     "lint": "../../node_modules/.bin/biome check .",
