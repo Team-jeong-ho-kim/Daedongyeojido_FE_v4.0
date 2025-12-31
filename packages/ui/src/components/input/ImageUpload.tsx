@@ -80,7 +80,7 @@ export default function ImageUpload({
       </label>
 
       {previewUrl && (
-        <div className="mt-3 flex w-full items-center justify-between rounded-md bg-white px-4 py-3">
+        <div className="mt-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
@@ -100,14 +100,13 @@ export default function ImageUpload({
           </button>
           <label
             htmlFor={fileInputId}
-            className="cursor-pointer text-[14px] text-gray-700 hover:text-gray-900"
+            className="cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-[14px] text-gray-700 transition-colors hover:bg-gray-50"
           >
             변경
           </label>
         </div>
       )}
 
-      {/* ESC 키 이벤트는 useEffect에서 document에 등록하여 처리 */}
       {isModalOpen && previewUrl && (
         <div
           role="dialog"

@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
+import { TextArea, TextInput } from "ui";
 import { ClubHeader } from "@/components";
-import { TextArea, TextInput } from "@/components/club/input";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { useModalStore } from "@/stores/useModalStore";
 import type { ApplicationFormResponse } from "@/types/announcement";
@@ -189,9 +189,9 @@ export default function ApplyDetailPage({
     }
   }, [announcementId]);
 
-  // 자동 임시저장 (1500ms debounce, 초기 마운트 제외)
+  // 자동 임시저장
   useEffect(() => {
-    // 초기 마운트 시에는 저장하지 않음 (기존 임시저장 덮어쓰기 방지)
+    // 초기 마운트 시에는 저장하지 않음
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
@@ -206,13 +206,11 @@ export default function ApplyDetailPage({
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
-      {/* 헤더 */}
       <ClubHeader
         clubImage={applicationForm.club_image}
         clubName={applicationForm.club_name}
         title={applicationForm.application_form_title}
       />
-      {/* 인적 사항 섹션 */}
       <div className="mt-7 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="mb-8 font-bold text-gray-900 text-xl">인적 사항</h2>
 
@@ -256,7 +254,6 @@ export default function ApplyDetailPage({
             error={errors.introduction}
           />
 
-          {/* 지원 전공 */}
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:gap-0">
             <div className="w-full font-normal text-base text-gray-900 md:w-32 md:pt-2">
               지원 전공
@@ -280,7 +277,6 @@ export default function ApplyDetailPage({
           </div>
         </div>
       </div>
-      {/* 질문 답변 섹션 */}
       <div className="mt-18 flex flex-col gap-8 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="font-bold text-gray-900 text-xl">질문 답변</h2>
 
@@ -315,7 +311,7 @@ export default function ApplyDetailPage({
           })}
         </div>
       </div>
-      {/* 제출 버튼 */}
+
       <div className="flex justify-center bg-gray-50 px-6 pt-6 pb-12 md:px-12 lg:px-24">
         <button
           type="button"
@@ -326,6 +322,7 @@ export default function ApplyDetailPage({
           {isSubmitting ? "제출 중..." : "지원하기"}
         </button>
       </div>
+
       <ApplicationConfirmModal
         isOpen={show}
         onClose={handleTempSave}
