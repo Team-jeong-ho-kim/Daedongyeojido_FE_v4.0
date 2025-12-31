@@ -1,18 +1,82 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
 import * as class_variance_authority_types from 'class-variance-authority/types';
 import { VariantProps } from 'class-variance-authority';
-import * as React from 'react';
+import * as React$1 from 'react';
 export { Toaster, toast } from 'sonner';
 
 declare function Footer(): react_jsx_runtime.JSX.Element;
 
 declare function Header(): react_jsx_runtime.JSX.Element;
 
+interface ErrorMessageProps {
+    message?: string;
+}
+declare function ErrorMessage({ message }: ErrorMessageProps): react_jsx_runtime.JSX.Element | null;
+
+interface FieldSelectorProps {
+    fields: string[];
+    selectedFields: string[];
+    onSelectionChange: (fields: string[]) => void;
+    error?: string;
+}
+declare function FieldSelector({ fields, selectedFields, onSelectionChange, error, }: FieldSelectorProps): react_jsx_runtime.JSX.Element;
+
+interface FormFieldProps {
+    label: string;
+    htmlFor?: string;
+    alignTop?: boolean;
+    required?: boolean;
+    children: React.ReactNode;
+}
+declare function FormField({ label, htmlFor, alignTop, required, children, }: FormFieldProps): react_jsx_runtime.JSX.Element;
+
+interface ImageUploadProps {
+    onFileChange: (file: File | null, previewUrl: string | null) => void;
+    placeholder?: string;
+}
+declare function ImageUpload({ onFileChange, placeholder, }: ImageUploadProps): react_jsx_runtime.JSX.Element;
+
+interface LinkItem {
+    id: string;
+    url: string;
+}
+interface LinkInputProps {
+    links: LinkItem[];
+    onLinksChange: (links: LinkItem[]) => void;
+    placeholder?: string;
+}
+declare function LinkInput({ links, onLinksChange, placeholder, }: LinkInputProps): react_jsx_runtime.JSX.Element;
+
+interface TextAreaProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    rows?: number;
+    id?: string;
+    name?: string;
+    label?: string;
+    error?: string;
+    autoResize?: boolean;
+    maxHeight?: number;
+}
+declare function TextArea({ value, onChange, placeholder, rows, id, name, label, error, autoResize, maxHeight, }: TextAreaProps): react_jsx_runtime.JSX.Element;
+
+interface TextInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    id?: string;
+    name?: string;
+    label?: string;
+    error?: string;
+}
+declare function TextInput({ value, onChange, placeholder, id, name, label, error, }: TextInputProps): react_jsx_runtime.JSX.Element;
+
 declare const buttonVariants: (props?: ({
     variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
     size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
-declare function Button({ className, variant, size, asChild, ...props }: React.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & {
+declare function Button({ className, variant, size, asChild, ...props }: React$1.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
 }): react_jsx_runtime.JSX.Element;
 
@@ -27,4 +91,4 @@ declare const InterviewIcon: ({ className }: IconProps) => react_jsx_runtime.JSX
 declare const blackLogo = "/images/logos/blackLogo.svg";
 declare const whiteLogo = "/images/logos/whiteLogo.svg";
 
-export { Button, CalendarIcon, CheckIcon, Footer, Header, InterviewIcon, NoteIcon, blackLogo, buttonVariants, whiteLogo };
+export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, Header, ImageUpload, InterviewIcon, LinkInput, NoteIcon, TextArea, TextInput, blackLogo, buttonVariants, whiteLogo };

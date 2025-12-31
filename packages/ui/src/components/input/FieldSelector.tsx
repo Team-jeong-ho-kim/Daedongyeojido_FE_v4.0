@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorMessage from "@/components/common/ErrorMessage";
+import ErrorMessage from "./ErrorMessage";
 
 interface FieldSelectorProps {
   fields: string[];

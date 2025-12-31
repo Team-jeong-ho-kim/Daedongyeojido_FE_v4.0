@@ -36,6 +36,9 @@
     ],
     "rules": {
       "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      },
       "suspicious": {
         "noUnknownAtRules": "off"
       },

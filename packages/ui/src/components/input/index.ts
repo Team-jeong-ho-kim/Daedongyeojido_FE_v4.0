@@ -1,3 +1,4 @@
+export { default as ErrorMessage } from "./ErrorMessage";
 export { default as FieldSelector } from "./FieldSelector";
 export { default as FormField } from "./FormField";
 export { default as ImageUpload } from "./ImageUpload";
