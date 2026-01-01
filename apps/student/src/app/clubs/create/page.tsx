@@ -3,15 +3,15 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "ui";
 import {
+  Button,
   FieldSelector,
   FormField,
   ImageUpload,
   LinkInput,
   TextArea,
   TextInput,
-} from "@/components";
+} from "ui";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
 import { useModalStore } from "@/stores/useModalStore";
