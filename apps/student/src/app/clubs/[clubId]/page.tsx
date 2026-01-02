@@ -10,6 +10,7 @@ import {
   ClubMemberSection,
   CTASection,
   JobPostingItem,
+  NoticeCard,
   Pagination,
 } from "@/components";
 import type { ClubDetail, ClubMember, JobPosting, UserRole } from "@/types";
@@ -55,6 +56,76 @@ const mockJobPostings: JobPosting[] = [
   { status: "종료됨", title: "PM 모집", date: "2025.08.05" },
 ];
 
+interface Notice {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
+}
+
+const mockNotices: Notice[] = [
+  {
+    id: "1",
+    title: "10월 회식 안합니다.",
+    date: "2025.12.24",
+    content:
+      "어떻게 어떻게 과제를 낸 후 난 잘것이야. 진짜 너무 피곤해 어떻게 어떻게 과제를 낸 후 난 잘것이야.",
+  },
+  {
+    id: "2",
+    title: "11월 정기 회의 공지",
+    date: "2025.11.15",
+    content:
+      "11월 정기 회의는 15일 오후 6시에 진행됩니다. 모두 참석 부탁드립니다.",
+  },
+  {
+    id: "3",
+    title: "프로젝트 마감일 연장 안내",
+    date: "2025.11.10",
+    content:
+      "프로젝트 마감일이 일주일 연장되었습니다. 새로운 마감일은 11월 20일입니다.",
+  },
+  {
+    id: "4",
+    title: "신입 부원 환영회",
+    date: "2025.10.28",
+    content:
+      "신입 부원 환영회가 10월 30일에 진행됩니다. 많은 참여 부탁드립니다.",
+  },
+  {
+    id: "5",
+    title: "동아리 방 청소 공지",
+    date: "2025.10.20",
+    content:
+      "이번 주 토요일 동아리 방 청소를 진행합니다. 담당자는 아래와 같습니다.",
+  },
+  {
+    id: "6",
+    title: "해커톤 참가 안내",
+    date: "2025.10.15",
+    content:
+      "교내 해커톤에 동아리 팀으로 참가합니다. 참가 희망자는 신청해주세요.",
+  },
+  {
+    id: "7",
+    title: "동아리 티셔츠 제작 안내",
+    date: "2025.10.10",
+    content: "동아리 티셔츠를 제작합니다. 사이즈 신청은 이번 주까지입니다.",
+  },
+  {
+    id: "8",
+    title: "9월 정기 회의록",
+    date: "2025.09.30",
+    content: "9월 정기 회의록을 공유드립니다. 확인 부탁드립니다.",
+  },
+  {
+    id: "9",
+    title: "외부 강연 안내",
+    date: "2025.09.25",
+    content: "외부 개발자 강연이 예정되어 있습니다. 많은 참여 부탁드립니다.",
+  },
+];
+
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId: _clubId } = use(params);
 
@@ -71,6 +142,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     "posting",
   );
   const [postingPage, setPostingPage] = useState(1);
+  const [noticePage, setNoticePage] = useState(1);
 
   // 팀원 추가 상태
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -268,7 +340,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
             <ClubMemberSection
               clubMembers={clubMembers}
-              isClubMember={isClubMember}
               isLeader={isLeader}
               studentNumber={studentNumber}
               setStudentNumber={setStudentNumber}
@@ -308,9 +379,34 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       {/* 알림 탭 */}
       {activeTab === "notification" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-            알림이 없습니다.
-          </div>
+          {mockNotices.length === 0 ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              알림이 없습니다.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex min-h-[420px] flex-col gap-4">
+                {mockNotices
+                  .slice((noticePage - 1) * 7, noticePage * 7)
+                  .map((notice) => (
+                    <NoticeCard
+                      key={notice.id}
+                      title={notice.title}
+                      date={notice.date}
+                      content={notice.content}
+                    />
+                  ))}
+              </div>
+              {mockNotices.length > 7 && (
+                <Pagination
+                  listLen={mockNotices.length}
+                  limit={7}
+                  curPage={noticePage}
+                  setCurPage={setNoticePage}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
 

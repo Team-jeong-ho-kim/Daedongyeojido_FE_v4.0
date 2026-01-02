@@ -7,7 +7,6 @@ import { AddMemberSection } from "./AddMemberSection";
 
 interface ClubMemberSectionProps {
   clubMembers: ClubMember[];
-  isClubMember: boolean;
   isLeader: boolean;
   studentNumber: string;
   setStudentNumber: (value: string) => void;
@@ -18,7 +17,6 @@ interface ClubMemberSectionProps {
 
 export function ClubMemberSection({
   clubMembers,
-  isClubMember,
   isLeader,
   studentNumber,
   setStudentNumber,
@@ -70,7 +68,7 @@ export function ClubMemberSection({
             <MemberItem
               key={`${member.userName}-${member.introduce}`}
               {...member}
-              canDelete={isClubMember}
+              canDelete={isLeader}
             />
           ))}
         </div>
