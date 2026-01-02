@@ -38,13 +38,19 @@ export default function NoticeCard({ title, date, content }: NoticeCardProps) {
         </div>
       </button>
 
-      {isExpanded && (
-        <div className="px-6 pt-2 pb-5">
-          <p className="break-words text-gray-600 text-sm leading-relaxed">
-            {content}
-          </p>
+      <div
+        className={`grid transition-all duration-300 ease-out ${
+          isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="px-6 pt-2 pb-5">
+            <p className="break-words text-gray-600 text-sm leading-relaxed">
+              {content}
+            </p>
+          </div>
         </div>
-      )}
+      </div>
     </section>
   );
 }
