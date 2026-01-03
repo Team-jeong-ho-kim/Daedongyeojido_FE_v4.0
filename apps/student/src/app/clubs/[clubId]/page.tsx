@@ -48,12 +48,47 @@ const mockClubMembers: ClubMember[] = [
 ];
 
 const mockJobPostings: JobPosting[] = [
-  { status: "진행중", title: "2025년 상반기 신입 모집", date: "2025.03.01" },
-  { status: "종료됨", title: "iOS 추가 모집합니다", date: "2025.12.24" },
-  { status: "종료됨", title: "백엔드 개발자 모집", date: "2025.11.15" },
-  { status: "종료됨", title: "프론트엔드 개발자 모집", date: "2025.10.20" },
-  { status: "종료됨", title: "디자이너 모집", date: "2025.09.10" },
-  { status: "종료됨", title: "PM 모집", date: "2025.08.05" },
+  {
+    status: "진행중",
+    title: "2025년 상반기 신입 모집",
+    date: "2025.03.01",
+    content:
+      "2025년 상반기 신입 부원을 모집합니다. 열정 있는 분들의 많은 지원 바랍니다. 모집 분야: FE, BE, iOS, Android",
+  },
+  {
+    status: "종료됨",
+    title: "iOS 추가 모집합니다",
+    date: "2025.12.24",
+    content:
+      "iOS 개발자를 추가 모집합니다. Swift 경험자 우대, 포트폴리오 필수 제출.",
+  },
+  {
+    status: "종료됨",
+    title: "백엔드 개발자 모집",
+    date: "2025.11.15",
+    content:
+      "백엔드 개발자를 모집합니다. Spring Boot, Node.js 경험자 환영합니다.",
+  },
+  {
+    status: "종료됨",
+    title: "프론트엔드 개발자 모집",
+    date: "2025.10.20",
+    content:
+      "프론트엔드 개발자를 모집합니다. React, Next.js 경험자 우대합니다.",
+  },
+  {
+    status: "종료됨",
+    title: "디자이너 모집",
+    date: "2025.09.10",
+    content: "UI/UX 디자이너를 모집합니다. Figma 사용 가능자 환영합니다.",
+  },
+  {
+    status: "종료됨",
+    title: "PM 모집",
+    date: "2025.08.05",
+    content:
+      "프로젝트 매니저를 모집합니다. 일정 관리 및 팀 커뮤니케이션 능력 필수.",
+  },
 ];
 
 interface Notice {
@@ -446,34 +481,48 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       {/* 공고/지원서 탭 - 소속 */}
       {activeTab === "history" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {historySubTab === "posting" &&
-            (jobPostings.length === 0 ? (
-              <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-                공고가 없습니다.
+          {historySubTab === "posting" && (
+            <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="rounded-lg bg-primary-500 px-4 py-2 font-medium text-[14px] text-white hover:bg-primary-600"
+                  onClick={() => console.log("공고 생성하기")}
+                >
+                  공고 생성하기
+                </button>
               </div>
-            ) : (
-              <div className="flex flex-col gap-6 md:gap-8">
-                <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
-                  {pagedPostings.map((posting) => (
-                    <JobPostingItem
-                      key={`${posting.title}-${posting.date}`}
-                      status={posting.status}
-                      title={posting.title}
-                      date={posting.date}
-                      onClick={() => console.log("공고 클릭:", posting.title)}
-                    />
-                  ))}
+              {jobPostings.length === 0 ? (
+                <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+                  공고가 없습니다.
                 </div>
-                {jobPostings.length > postingLimit && (
-                  <Pagination
-                    listLen={jobPostings.length}
-                    limit={postingLimit}
-                    curPage={postingPage}
-                    setCurPage={setPostingPage}
-                  />
-                )}
-              </div>
-            ))}
+              ) : (
+                <>
+                  <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
+                    {pagedPostings.map((posting) => (
+                      <JobPostingItem
+                        key={`${posting.title}-${posting.date}`}
+                        status={posting.status}
+                        title={posting.title}
+                        date={posting.date}
+                        onClick={() => console.log("공고 클릭:", posting.title)}
+                        isMember={isClubMember}
+                        content={posting.content}
+                      />
+                    ))}
+                  </div>
+                  {jobPostings.length > postingLimit && (
+                    <Pagination
+                      listLen={jobPostings.length}
+                      limit={postingLimit}
+                      curPage={postingPage}
+                      setCurPage={setPostingPage}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          )}
           {historySubTab === "form" && (
             <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
               지원서가 없습니다.

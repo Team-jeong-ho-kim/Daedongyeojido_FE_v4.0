@@ -43,4 +43,5 @@ export interface JobPosting {
   status: "종료됨" | "진행중";
   title: string;
   date: string;
+  content?: string;
 }
