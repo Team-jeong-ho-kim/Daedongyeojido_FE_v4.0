@@ -95,16 +95,6 @@ export default function Header() {
               >
                 공고
               </Link>
-              <Link
-                href="/about"
-                className={`text-[15px] transition-colors hover:text-gray-600 ${
-                  pathname?.startsWith("/about")
-                    ? "font-semibold text-gray-900"
-                    : "font-normal text-gray-400"
-                }`}
-              >
-                소개
-              </Link>
             </nav>
           </div>
 
@@ -114,13 +104,6 @@ export default function Header() {
               className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
             >
               로그인
-            </Link>
-            <span className="text-gray-300">|</span>
-            <Link
-              href="/signup"
-              className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
-            >
-              회원가입
             </Link>
           </div>
 
@@ -194,17 +177,6 @@ export default function Header() {
           >
             공고
           </Link>
-          <Link
-            href="/about"
-            onClick={handleLinkClick}
-            className={`border-gray-100 border-b py-4 text-[15px] transition-colors ${
-              pathname?.startsWith("/about")
-                ? "font-semibold text-gray-900"
-                : "font-normal text-gray-600"
-            }`}
-          >
-            소개
-          </Link>
           <div className="mt-6 flex flex-col gap-3">
             <Link
               href="/login"
@@ -212,13 +184,6 @@ export default function Header() {
               className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200"
             >
               로그인
-            </Link>
-            <Link
-              href="/signup"
-              onClick={handleLinkClick}
-              className="rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white transition-colors hover:bg-primary-600"
-            >
-              회원가입
             </Link>
           </div>
         </nav>

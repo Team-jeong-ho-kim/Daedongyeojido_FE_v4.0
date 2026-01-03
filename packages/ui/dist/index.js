@@ -157,36 +157,17 @@ function Header() {
                   className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
                   children: "\uACF5\uACE0"
                 }
-              ),
-              /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-                import_link.default,
-                {
-                  href: "/about",
-                  className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/about") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
-                  children: "\uC18C\uAC1C"
-                }
               )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "hidden items-center gap-3 md:flex", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              import_link.default,
-              {
-                href: "/login",
-                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
-                children: "\uB85C\uADF8\uC778"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "text-gray-300", children: "|" }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              import_link.default,
-              {
-                href: "/signup",
-                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
-                children: "\uD68C\uC6D0\uAC00\uC785"
-              }
-            )
-          ] }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            import_link.default,
+            {
+              href: "/login",
+              className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
+              children: "\uB85C\uADF8\uC778"
+            }
+          ) }),
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             "button",
             {
@@ -258,35 +239,15 @@ function Header() {
               children: "\uACF5\uACE0"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-6 flex flex-col gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
-              href: "/about",
+              href: "/login",
               onClick: handleLinkClick,
-              className: `border-gray-100 border-b py-4 text-[15px] transition-colors ${pathname?.startsWith("/about") ? "font-semibold text-gray-900" : "font-normal text-gray-600"}`,
-              children: "\uC18C\uAC1C"
+              className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
+              children: "\uB85C\uADF8\uC778"
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mt-6 flex flex-col gap-3", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              import_link.default,
-              {
-                href: "/login",
-                onClick: handleLinkClick,
-                className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
-                children: "\uB85C\uADF8\uC778"
-              }
-            ),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              import_link.default,
-              {
-                href: "/signup",
-                onClick: handleLinkClick,
-                className: "rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white transition-colors hover:bg-primary-600",
-                children: "\uD68C\uC6D0\uAC00\uC785"
-              }
-            )
-          ] })
+          ) })
         ] })
       }
     )

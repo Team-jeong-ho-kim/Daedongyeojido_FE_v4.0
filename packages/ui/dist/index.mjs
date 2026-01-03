@@ -104,36 +104,17 @@ function Header() {
                   className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
                   children: "\uACF5\uACE0"
                 }
-              ),
-              /* @__PURE__ */ jsx2(
-                Link,
-                {
-                  href: "/about",
-                  className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/about") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
-                  children: "\uC18C\uAC1C"
-                }
               )
             ] })
           ] }),
-          /* @__PURE__ */ jsxs2("div", { className: "hidden items-center gap-3 md:flex", children: [
-            /* @__PURE__ */ jsx2(
-              Link,
-              {
-                href: "/login",
-                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
-                children: "\uB85C\uADF8\uC778"
-              }
-            ),
-            /* @__PURE__ */ jsx2("span", { className: "text-gray-300", children: "|" }),
-            /* @__PURE__ */ jsx2(
-              Link,
-              {
-                href: "/signup",
-                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
-                children: "\uD68C\uC6D0\uAC00\uC785"
-              }
-            )
-          ] }),
+          /* @__PURE__ */ jsx2("div", { className: "hidden items-center gap-3 md:flex", children: /* @__PURE__ */ jsx2(
+            Link,
+            {
+              href: "/login",
+              className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
+              children: "\uB85C\uADF8\uC778"
+            }
+          ) }),
           /* @__PURE__ */ jsx2(
             "button",
             {
@@ -205,35 +186,15 @@ function Header() {
               children: "\uACF5\uACE0"
             }
           ),
-          /* @__PURE__ */ jsx2(
+          /* @__PURE__ */ jsx2("div", { className: "mt-6 flex flex-col gap-3", children: /* @__PURE__ */ jsx2(
             Link,
             {
-              href: "/about",
+              href: "/login",
               onClick: handleLinkClick,
-              className: `border-gray-100 border-b py-4 text-[15px] transition-colors ${pathname?.startsWith("/about") ? "font-semibold text-gray-900" : "font-normal text-gray-600"}`,
-              children: "\uC18C\uAC1C"
+              className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
+              children: "\uB85C\uADF8\uC778"
             }
-          ),
-          /* @__PURE__ */ jsxs2("div", { className: "mt-6 flex flex-col gap-3", children: [
-            /* @__PURE__ */ jsx2(
-              Link,
-              {
-                href: "/login",
-                onClick: handleLinkClick,
-                className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
-                children: "\uB85C\uADF8\uC778"
-              }
-            ),
-            /* @__PURE__ */ jsx2(
-              Link,
-              {
-                href: "/signup",
-                onClick: handleLinkClick,
-                className: "rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white transition-colors hover:bg-primary-600",
-                children: "\uD68C\uC6D0\uAC00\uC785"
-              }
-            )
-          ] })
+          ) })
         ] })
       }
     )
