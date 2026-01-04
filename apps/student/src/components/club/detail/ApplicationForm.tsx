@@ -172,7 +172,7 @@ export default function ApplicationForm() {
                 <button
                   type="button"
                   onClick={() => setShowDeadlineModal(true)}
-                  className="rounded-xl bg-gray-900 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-800"
+                  className="rounded-xl bg-gray-900 px-6 py-2 font-medium text-white transition-colors hover:bg-gray-800"
                 >
                   일정 지정하기
                 </button>
