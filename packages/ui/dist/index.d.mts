@@ -69,8 +69,9 @@ interface TextInputProps {
     name?: string;
     label?: string;
     error?: string;
+    bgColor?: string;
 }
-declare function TextInput({ value, onChange, placeholder, id, name, label, error, }: TextInputProps): react_jsx_runtime.JSX.Element;
+declare function TextInput({ value, onChange, placeholder, id, name, label, error, bgColor, }: TextInputProps): react_jsx_runtime.JSX.Element;
 
 declare const buttonVariants: (props?: ({
     variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;

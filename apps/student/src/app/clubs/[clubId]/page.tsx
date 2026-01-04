@@ -537,7 +537,12 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           )}
           {historySubTab === "form" &&
             (showApplicationForm ? (
-              <ApplicationForm />
+              <ApplicationForm
+                onExit={() => {
+                  setShowApplicationForm(false);
+                  window.scroll({ top: 0, behavior: "smooth" });
+                }}
+              />
             ) : (
               <div className="flex flex-col gap-6 md:gap-8">
                 <div className="flex justify-end">

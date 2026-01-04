@@ -617,7 +617,8 @@ function TextInput({
   id,
   name,
   label,
-  error
+  error,
+  bgColor = "bg-white"
 }) {
   const generatedId = (0, import_react5.useId)();
   const inputId = id || generatedId;
@@ -631,7 +632,7 @@ function TextInput({
         placeholder,
         value,
         onChange: (e) => onChange(e.target.value),
-        className: `w-full rounded-lg border-[0.1px] border-gray-200 bg-white px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"}`
+        className: `w-full rounded-lg border-[0.1px] border-gray-200 ${bgColor} px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"}`
       }
     ),
     /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(ErrorMessage, { message: error })

@@ -1,9 +1,13 @@
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { DeadlineModal } from "@/components";
 import { FIELDS } from "@/constants/club";
 
-export default function ApplicationForm() {
+interface ApplicationFormProps {
+  onExit?: () => void;
+}
+
+export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const id = useId();
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [questions, setQuestions] = useState<
@@ -16,6 +20,15 @@ export default function ApplicationForm() {
   } | null>(null);
   const [deadline, setDeadline] = useState("");
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleTextareaChange = (text: string) => {
+    updateEditingQuestionText(text);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  };
 
   const toggleField = (field: string) => {
     if (selectedFields.includes(field)) {
@@ -195,13 +208,15 @@ export default function ApplicationForm() {
               {questions.map((question) => (
                 <div key={question.id} className="pb-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-                      <p className="text-gray-700">{question.text}</p>
+                    <div className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                      <p className="break-words text-gray-700">
+                        {question.text}
+                      </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => deleteQuestion(question.id)}
-                      className="rounded-full bg-red-100 px-3 py-2 text-red-600 text-xs transition-colors hover:bg-red-200"
+                      className="shrink-0 rounded-xl bg-gray-400 px-5 py-3 text-white text-xs transition-colors hover:bg-gray-500"
                     >
                       질문 삭제
                     </button>
@@ -212,12 +227,13 @@ export default function ApplicationForm() {
               {/* 편집 중인 질문 */}
               {editingQuestion && (
                 <div className="border-gray-100 border-b pb-6">
-                  <input
-                    type="text"
+                  <textarea
+                    ref={textareaRef}
                     value={editingQuestion.text}
-                    onChange={(e) => updateEditingQuestionText(e.target.value)}
+                    onChange={(e) => handleTextareaChange(e.target.value)}
                     placeholder="질문을 작성해주세요."
-                    className="mb-4 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 transition-all placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400"
+                    rows={1}
+                    className="mb-4 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 transition-all placeholder:text-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400"
                   />
                   <div className="flex justify-end gap-2">
                     <button
@@ -230,7 +246,7 @@ export default function ApplicationForm() {
                     <button
                       type="button"
                       onClick={completeQuestion}
-                      className="rounded-lg bg-red-500 px-6 py-2 text-white transition-colors hover:bg-red-600"
+                      className="rounded-lg bg-primary-500 px-6 py-1 text-white transition-colors hover:bg-primary-600"
                     >
                       작성 완료
                     </button>
@@ -262,6 +278,7 @@ export default function ApplicationForm() {
           <div className="flex justify-end gap-4">
             <button
               type="button"
+              onClick={onExit}
               className="rounded-xl bg-gray-900 px-8 py-2 font-medium text-white transition-colors hover:bg-gray-800"
             >
               나가기
