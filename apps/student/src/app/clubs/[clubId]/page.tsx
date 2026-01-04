@@ -3,8 +3,11 @@
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "ui";
+import type { Application } from "@/components";
 import {
+  ApplicationCard,
   ApplicationConfirmModal,
+  ApplicationForm,
   ClubHeader,
   ClubInfoEditSection,
   ClubMemberSection,
@@ -161,6 +164,13 @@ const mockNotices: Notice[] = [
   },
 ];
 
+const mockApplications: Application[] = [
+  { id: 1, title: "2025년 상반기 신입 모집 지원서", deadline: "2025.03.15" },
+  { id: 2, title: "iOS 개발자 추가 모집 지원서", deadline: "2025.12.31" },
+  { id: 3, title: "백엔드 개발자 모집 지원서", deadline: "2025.11.30" },
+  { id: 4, title: "프론트엔드 개발자 모집 지원서", deadline: "2025.10.25" },
+];
+
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId: _clubId } = use(params);
 
@@ -178,6 +188,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   );
   const [postingPage, setPostingPage] = useState(1);
   const [noticePage, setNoticePage] = useState(1);
+  const [formPage, setFormPage] = useState(1);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
 
   // 팀원 추가 상태
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -523,11 +535,51 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               )}
             </div>
           )}
-          {historySubTab === "form" && (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원서가 없습니다.
-            </div>
-          )}
+          {historySubTab === "form" &&
+            (showApplicationForm ? (
+              <ApplicationForm />
+            ) : (
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="rounded-lg bg-primary-500 px-4 py-2 font-medium text-[14px] text-white hover:bg-primary-600"
+                    onClick={() => setShowApplicationForm(true)}
+                  >
+                    지원서 생성하기
+                  </button>
+                </div>
+                {mockApplications.length === 0 ? (
+                  <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+                    지원서가 없습니다.
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-10">
+                      {mockApplications
+                        .slice((formPage - 1) * 3, formPage * 3)
+                        .map((application) => (
+                          <ApplicationCard
+                            key={application.id}
+                            application={application}
+                            onClick={() =>
+                              console.log("지원서 조회:", application.title)
+                            }
+                          />
+                        ))}
+                    </div>
+                    {mockApplications.length > 3 && (
+                      <Pagination
+                        listLen={mockApplications.length}
+                        limit={3}
+                        curPage={formPage}
+                        setCurPage={setFormPage}
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
         </div>
       )}
 
