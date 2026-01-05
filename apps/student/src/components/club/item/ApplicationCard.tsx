@@ -16,7 +16,7 @@ export default function ApplicationCard({
   onClick,
 }: ApplicationCardProps) {
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-3xl bg-white px-5 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
       {/* Header with arrow */}
       <div className="mb-6 flex items-center justify-between">
         <h2 className="font-semibold text-gray-900 text-lg">
@@ -40,7 +40,7 @@ export default function ApplicationCard({
       <button
         type="button"
         onClick={() => onClick?.(application)}
-        className="rounded-lg bg-primary-500 px-6 py-3 font-medium text-white transition-colors duration-200 hover:bg-primary-600"
+        className="rounded-lg bg-primary-500 px-5 py-2 font-medium text-white transition-colors duration-200 hover:bg-primary-600"
       >
         조회
       </button>

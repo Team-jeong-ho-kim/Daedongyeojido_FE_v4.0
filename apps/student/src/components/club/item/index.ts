@@ -1,3 +1,4 @@
+export { default as ApplicantCard } from "./ApplicantCard";
 export type { Application } from "./ApplicationCard";
 export { default as ApplicationCard } from "./ApplicationCard";
 export { default as ClubItem } from "./ClubItem";
