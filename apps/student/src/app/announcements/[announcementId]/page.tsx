@@ -4,7 +4,13 @@ import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
-import { ApplicationConfirmModal, ClubHeader } from "@/components";
+import {
+  ApplicantCard,
+  ApplicationConfirmModal,
+  ClubHeader,
+  Pagination,
+} from "@/components";
+import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
 import type { UserRole } from "@/types";
 import type { AnnouncementDetailResponse } from "@/types/announcement";
 
@@ -70,6 +76,7 @@ export default function AnnouncementDetailPage({
     "details",
   );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [applicationPage, setApplicationPage] = useState(1);
 
   const role = "CLUB_MEMBER" as UserRole;
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
@@ -274,9 +281,36 @@ export default function AnnouncementDetailPage({
       {/* 지원내역 탭 */}
       {activeTab === "applications" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          <div className="text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-            지원내역이 없습니다.
-          </div>
+          {MOCK_APPLICANTS.length === 0 ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              지원내역이 없습니다.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex flex-col gap-4">
+                {MOCK_APPLICANTS.slice(
+                  (applicationPage - 1) * 5,
+                  applicationPage * 5,
+                ).map((applicant) => (
+                  <ApplicantCard
+                    key={applicant.studentId}
+                    applicant={applicant}
+                    onClick={() =>
+                      console.log("지원내역 조회:", applicant.name)
+                    }
+                  />
+                ))}
+              </div>
+              {MOCK_APPLICANTS.length > 5 && (
+                <Pagination
+                  listLen={MOCK_APPLICANTS.length}
+                  limit={5}
+                  curPage={applicationPage}
+                  setCurPage={setApplicationPage}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
 
