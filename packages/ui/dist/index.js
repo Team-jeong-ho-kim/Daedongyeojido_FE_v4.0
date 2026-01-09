@@ -166,7 +166,7 @@ function Header() {
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
-              href: "/login",
+              href: `${process.env.NEXT_PUBLIC_WEB_URL}/login`,
               className: `font-normal text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-400 hover:text-gray-600"}`,
               children: "\uB85C\uADF8\uC778"
             }

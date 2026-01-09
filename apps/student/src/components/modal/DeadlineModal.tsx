@@ -5,12 +5,14 @@ interface DeadlineModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (deadline: string) => void;
+  title?: string;
 }
 
 export default function DeadlineModal({
   isOpen,
   onClose,
   onSave,
+  title = "일정 지정",
 }: DeadlineModalProps) {
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
@@ -54,7 +56,7 @@ export default function DeadlineModal({
 
   const handleSave = () => {
     if (year && month && day) {
-      const deadline = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      const deadline = `${year}.${month.padStart(2, "0")}.${day.padStart(2, "0")}`;
       onSave(deadline);
       setYear("");
       setMonth("");
@@ -74,7 +76,7 @@ export default function DeadlineModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
       <div className="relative w-full max-w-[650px] rounded-3xl bg-white p-8 shadow-2xl">
         {/* 제목 */}
-        <h2 className="mb-6 text-gray-700 text-xl">지원서 일정 지정</h2>
+        <h2 className="mb-6 text-gray-700 text-xl">{title}</h2>
 
         {/* 지원 마감일 레이블 */}
         <p className="mb-2 block text-gray-700 text-sm">지원 마감일</p>
