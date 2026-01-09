@@ -121,23 +121,23 @@ export default function AnnouncementSection() {
       {/* 공고 리스트 */}
       <div
         ref={scrollContainerRef}
-        className="scrollbar-hide ml-auto flex w-full max-w-7xl gap-4 overflow-x-auto scroll-smooth pl-4 md:gap-6 md:pl-8"
-        style={{
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
+        className="scrollbar-hide overflow-x-auto"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {announcements.map((announcement) => (
-          <div key={announcement.announcement_id} className="flex-shrink-0">
-            <AnnouncementItem
-              announcement_id={announcement.announcement_id}
-              title={announcement.title}
-              club_name={announcement.club_name}
-              deadline={announcement.deadline}
-              club_image={announcement.club_image}
-            />
-          </div>
-        ))}
+        <div className="flex gap-4 px-4 md:gap-6 md:px-8 lg:pr-8 lg:pl-[calc((100vw-1280px)/2+32px)]">
+          {announcements.map((announcement) => (
+            <div key={announcement.announcement_id} className="flex-shrink-0">
+              <AnnouncementItem
+                announcement_id={announcement.announcement_id}
+                title={announcement.title}
+                club_name={announcement.club_name}
+                deadline={announcement.deadline}
+                club_image={announcement.club_image}
+              />
+            </div>
+          ))}
+          <div className="w-1 flex-shrink-0 pr-4 md:pr-8" />
+        </div>
       </div>
     </section>
   );
