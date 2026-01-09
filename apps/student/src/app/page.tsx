@@ -1,13 +1,17 @@
-import { Button } from "ui";
+import AboutSection from "@/components/main/AboutSection";
+import ActionSection from "@/components/main/ActionSection";
+import AnnouncementSection from "@/components/main/AnnouncementSection";
+import ClubSection from "@/components/main/ClubSection";
+import MainBanner from "@/components/main/MainBanner";
 
 export default function StudentPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="mb-4 font-bold text-4xl">Student</h1>
-        <p className="mb-6 text-muted-foreground">학생</p>
-        <Button>시작하기</Button>
-      </div>
+    <div className="-mt-14 mb-30 min-h-screen">
+      <MainBanner />
+      <AnnouncementSection />
+      <ClubSection />
+      <AboutSection />
+      <ActionSection />
     </div>
   );
 }

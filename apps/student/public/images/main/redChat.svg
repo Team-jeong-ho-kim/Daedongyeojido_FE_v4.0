@@ -1,0 +1,23 @@
+<svg width="327" height="220" viewBox="0 0 327 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_f_1815_21386)">
+<path d="M239.898 23.9C253.153 23.9 263.898 34.6452 263.898 47.9V143.9C263.898 157.155 253.153 167.9 239.898 167.9H233.024L225.35 180.292C222.613 184.71 216.184 184.71 213.447 180.292L205.772 167.9H47.8984C34.6436 167.9 23.8984 157.155 23.8984 143.9V47.9C23.8984 34.6452 34.6436 23.9 47.8984 23.9H239.898Z" fill="#F89999"/>
+</g>
+<path d="M302.898 59.9C316.153 59.9 326.898 70.6452 326.898 83.9V179.9C326.898 193.155 316.153 203.9 302.898 203.9H296.024L288.35 216.292C285.613 220.71 279.184 220.71 276.447 216.292L268.772 203.9H110.898C97.6436 203.9 86.8984 193.155 86.8984 179.9V83.9C86.8984 70.6452 97.6436 59.9 110.898 59.9H302.898Z" fill="url(#paint0_linear_1815_21386)"/>
+<circle cx="150.898" cy="127.9" r="12" fill="white"/>
+<circle cx="206.898" cy="127.9" r="12" fill="white"/>
+<circle cx="262.898" cy="127.9" r="12" fill="white"/>
+<rect x="130.898" y="106.9" width="24" height="24" rx="12" fill="white" fill-opacity="0.1"/>
+<rect x="186.898" y="106.9" width="24" height="24" rx="12" fill="white" fill-opacity="0.1"/>
+<rect x="242.898" y="106.9" width="24" height="24" rx="12" fill="white" fill-opacity="0.1"/>
+<defs>
+<filter id="filter0_f_1815_21386" x="-0.00156212" y="2.47955e-05" width="287.8" height="207.506" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="11.95" result="effect1_foregroundBlur_1815_21386"/>
+</filter>
+<linearGradient id="paint0_linear_1815_21386" x1="86.8984" y1="59.9" x2="326.898" y2="219.9" gradientUnits="userSpaceOnUse">
+<stop stop-color="#F45F5F"/>
+<stop offset="1" stop-color="#BE3232"/>
+</linearGradient>
+</defs>
+</svg>

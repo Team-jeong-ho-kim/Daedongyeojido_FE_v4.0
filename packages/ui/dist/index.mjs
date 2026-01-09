@@ -35,17 +35,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Fragment, jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
-var WHITE_LOGO_PAGES = ["/inquiry"];
+var TRANSPARENT_PAGES = ["/"];
 function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
+  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
+  const isTransparent = isTransparentPage && !isScrolled;
   const logoSrc = isTransparent ? "/images/logos/blackLogo.svg" : "/images/logos/whiteLogo.svg";
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 100);
       if (currentScrollY < 10) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY) {
@@ -75,7 +78,7 @@ function Header() {
     /* @__PURE__ */ jsx2(
       "header",
       {
-        className: `fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${isTransparent ? "border-transparent bg-white/70 backdrop-blur-sm" : "border-gray-200 bg-white"} ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
+        className: `fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${isTransparent ? "border-transparent bg-transparent" : "border-gray-200 bg-white"} ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
         children: /* @__PURE__ */ jsxs2("div", { className: "mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8", children: [
           /* @__PURE__ */ jsxs2("div", { className: "flex items-center gap-12", children: [
             /* @__PURE__ */ jsx2(Link, { href: "/", className: "flex items-center", children: /* @__PURE__ */ jsx2(
@@ -93,7 +96,7 @@ function Header() {
                 Link,
                 {
                   href: "/clubs",
-                  className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/clubs") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
+                  className: `text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : pathname?.startsWith("/clubs") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
                   children: "\uB3D9\uC544\uB9AC"
                 }
               ),
@@ -101,7 +104,7 @@ function Header() {
                 Link,
                 {
                   href: "/announcements",
-                  className: `text-[15px] transition-colors hover:text-gray-600 ${pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400"}`,
+                  className: `text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
                   children: "\uACF5\uACE0"
                 }
               )
@@ -111,7 +114,7 @@ function Header() {
             Link,
             {
               href: "/login",
-              className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
+              className: `font-normal text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-400 hover:text-gray-600"}`,
               children: "\uB85C\uADF8\uC778"
             }
           ) }),
@@ -125,7 +128,7 @@ function Header() {
               children: /* @__PURE__ */ jsx2(
                 "svg",
                 {
-                  className: "h-6 w-6 text-gray-700",
+                  className: `h-6 w-6 ${isTransparent ? "text-white" : "text-gray-700"}`,
                   fill: "none",
                   stroke: "currentColor",
                   viewBox: "0 0 24 24",

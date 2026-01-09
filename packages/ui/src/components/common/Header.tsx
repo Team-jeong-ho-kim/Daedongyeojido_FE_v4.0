@@ -5,15 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const WHITE_LOGO_PAGES = ["/inquiry"];
+const TRANSPARENT_PAGES = ["/"];
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const isTransparent = WHITE_LOGO_PAGES.includes(pathname);
+  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
+  const isTransparent = isTransparentPage && !isScrolled;
   const logoSrc = isTransparent
     ? "/images/logos/blackLogo.svg"
     : "/images/logos/whiteLogo.svg";
@@ -21,6 +23,9 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+
+      // 스크롤 위치에 따라 배경색 변경 (100px 이상 스크롤 시)
+      setIsScrolled(currentScrollY > 100);
 
       if (currentScrollY < 10) {
         setIsVisible(true);
@@ -58,7 +63,7 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${
           isTransparent
-            ? "border-transparent bg-white/70 backdrop-blur-sm"
+            ? "border-transparent bg-transparent"
             : "border-gray-200 bg-white"
         } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
       >
@@ -77,20 +82,24 @@ export default function Header() {
             <nav className="hidden items-center gap-10 md:flex">
               <Link
                 href="/clubs"
-                className={`text-[15px] transition-colors hover:text-gray-600 ${
-                  pathname?.startsWith("/clubs")
-                    ? "font-semibold text-gray-900"
-                    : "font-normal text-gray-400"
+                className={`text-[15px] transition-colors ${
+                  isTransparent
+                    ? "text-white/80 hover:text-white"
+                    : pathname?.startsWith("/clubs")
+                      ? "font-semibold text-gray-900"
+                      : "font-normal text-gray-400 hover:text-gray-600"
                 }`}
               >
                 동아리
               </Link>
               <Link
                 href="/announcements"
-                className={`text-[15px] transition-colors hover:text-gray-600 ${
-                  pathname?.startsWith("/announcements")
-                    ? "font-semibold text-gray-900"
-                    : "font-normal text-gray-400"
+                className={`text-[15px] transition-colors ${
+                  isTransparent
+                    ? "text-white/80 hover:text-white"
+                    : pathname?.startsWith("/announcements")
+                      ? "font-semibold text-gray-900"
+                      : "font-normal text-gray-400 hover:text-gray-600"
                 }`}
               >
                 공고
@@ -101,7 +110,11 @@ export default function Header() {
           <div className="hidden items-center gap-3 md:flex">
             <Link
               href="/login"
-              className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
+              className={`font-normal text-[15px] transition-colors ${
+                isTransparent
+                  ? "text-white/80 hover:text-white"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
             >
               로그인
             </Link>
@@ -115,7 +128,7 @@ export default function Header() {
             aria-label="메뉴 열기"
           >
             <svg
-              className="h-6 w-6 text-gray-700"
+              className={`h-6 w-6 ${isTransparent ? "text-white" : "text-gray-700"}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

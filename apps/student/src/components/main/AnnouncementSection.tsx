@@ -1,0 +1,144 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRef } from "react";
+import AnnouncementItem from "../announcement/item/AnnouncementItem";
+
+export default function AnnouncementSection() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 320; // 카드 너비 + 간격
+      const newScrollLeft =
+        scrollContainerRef.current.scrollLeft +
+        (direction === "left" ? -scrollAmount : scrollAmount);
+
+      scrollContainerRef.current.scrollTo({
+        left: newScrollLeft,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // 예시 데이터 (실제로는 props나 API에서 받아올 데이터)
+  const announcements = [
+    {
+      announcement_id: 1,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+    {
+      announcement_id: 2,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+    {
+      announcement_id: 3,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+    {
+      announcement_id: 4,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+    {
+      announcement_id: 5,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+    {
+      announcement_id: 6,
+      title: "2025년 신입부원 모집",
+      club_name: "동아리명",
+      deadline: "12.14",
+      club_image: "/images/announcements/placeholder.jpg",
+    },
+  ];
+
+  return (
+    <section className="w-full bg-white py-16 md:py-24 lg:py-30">
+      <div className="mx-auto mb-6 flex max-w-7xl items-center justify-between px-4 md:mb-8 md:px-8">
+        <Link
+          href={"/announcements"}
+          className="flex items-center gap-2 hover:underline hover:underline-offset-6 md:gap-3"
+        >
+          <h2 className="font-bold text-gray-900 text-lg md:text-xl lg:text-2xl">
+            동아리 공고 살펴보기
+          </h2>
+          <Image
+            src="/images/clubs/rightArrow.svg"
+            alt="arrow"
+            width={12}
+            height={20}
+          />
+        </Link>
+
+        {/* 네비게이션 버튼 */}
+        <div className="hidden items-center gap-3 md:flex">
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-50 transition-colors hover:bg-gray-200"
+            aria-label="이전"
+          >
+            <Image
+              src="/images/clubs/rightArrow.svg"
+              alt="이전"
+              width={12}
+              height={20}
+              className="rotate-180"
+            />
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-50 transition-colors hover:bg-gray-200"
+            aria-label="다음"
+          >
+            <Image
+              src="/images/clubs/rightArrow.svg"
+              alt="다음"
+              width={12}
+              height={20}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* 공고 리스트 */}
+      <div
+        ref={scrollContainerRef}
+        className="scrollbar-hide ml-auto flex w-full max-w-7xl gap-4 overflow-x-auto scroll-smooth pl-4 md:gap-6 md:pl-8"
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        {announcements.map((announcement) => (
+          <div key={announcement.announcement_id} className="flex-shrink-0">
+            <AnnouncementItem
+              announcement_id={announcement.announcement_id}
+              title={announcement.title}
+              club_name={announcement.club_name}
+              deadline={announcement.deadline}
+              club_image={announcement.club_image}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
