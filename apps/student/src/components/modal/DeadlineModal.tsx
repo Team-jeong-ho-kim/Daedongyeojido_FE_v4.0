@@ -56,7 +56,7 @@ export default function DeadlineModal({
 
   const handleSave = () => {
     if (year && month && day) {
-      const deadline = `${year}.${month.padStart(2, "0")}.${day.padStart(2, "0")}`;
+      const deadline = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
       onSave(deadline);
       setYear("");
       setMonth("");
