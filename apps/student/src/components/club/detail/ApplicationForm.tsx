@@ -307,6 +307,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
           isOpen={showDeadlineModal}
           onClose={() => setShowDeadlineModal(false)}
           onSave={(newDeadline: string) => setDeadline(newDeadline)}
+          title="지원서 일정 지정"
         />
       </div>
     </div>

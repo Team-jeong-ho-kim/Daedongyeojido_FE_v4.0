@@ -24,7 +24,6 @@ export default function Header() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // 스크롤 위치에 따라 배경색 변경 (100px 이상 스크롤 시)
       setIsScrolled(currentScrollY > 100);
 
       if (currentScrollY < 10) {
@@ -109,7 +108,7 @@ export default function Header() {
 
           <div className="hidden items-center gap-3 md:flex">
             <Link
-              href="/login"
+              href={`${process.env.NEXT_PUBLIC_WEB_URL}/login`}
               className={`font-normal text-[15px] transition-colors ${
                 isTransparent
                   ? "text-white/80 hover:text-white"
