@@ -7,6 +7,7 @@ interface Applicant {
   position: string;
   interviewDate: string;
   applicationId: string;
+  announcementId: string;
 }
 
 interface ApplicantCardProps {
@@ -24,7 +25,9 @@ export default function ApplicantCard({
     if (onClick) {
       onClick(applicant);
     }
-    router.push(`${window.location}/${applicant.applicationId}`);
+    router.push(
+      `/announcements/${applicant.announcementId}/${applicant.applicationId}`,
+    );
   };
 
   return (
