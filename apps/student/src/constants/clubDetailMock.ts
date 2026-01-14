@@ -154,6 +154,8 @@ export interface Applicant {
   studentId: string;
   position: string;
   interviewDate: string;
+  announcementId: string;
+  applicationId: string;
 }
 
 export const MOCK_APPLICANTS: Applicant[] = [
@@ -162,35 +164,47 @@ export const MOCK_APPLICANTS: Applicant[] = [
     studentId: "2301",
     position: "FE",
     interviewDate: "2025.03.20",
+    announcementId: "1",
+    applicationId: "101",
   },
   {
     name: "이지영",
     studentId: "2302",
     position: "BE",
     interviewDate: "2025.03.21",
+    announcementId: "1",
+    applicationId: "102",
   },
   {
     name: "박준혁",
     studentId: "2303",
     position: "iOS",
     interviewDate: "2025.03.22",
+    announcementId: "1",
+    applicationId: "103",
   },
   {
     name: "최서연",
     studentId: "2304",
     position: "Android",
     interviewDate: "2025.03.23",
+    announcementId: "1",
+    applicationId: "104",
   },
   {
     name: "정도현",
     studentId: "2305",
     position: "FE",
     interviewDate: "2025.03.24",
+    announcementId: "2",
+    applicationId: "105",
   },
   {
     name: "한소희",
     studentId: "2306",
     position: "BE",
     interviewDate: "2025.03.25",
+    announcementId: "2",
+    applicationId: "106",
   },
 ];

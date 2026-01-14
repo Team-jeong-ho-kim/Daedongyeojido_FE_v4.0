@@ -1,26 +1,40 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Applicant {
   name: string;
   studentId: string;
   position: string;
   interviewDate: string;
+  announcementId: string;
+  applicationId: string;
 }
 
 interface ApplicantCardProps {
   applicant: Applicant;
-  onClick: (applicant: Applicant) => void;
+  onClick?: (applicant: Applicant) => void;
 }
 
 export default function ApplicantCard({
   applicant,
   onClick,
 }: ApplicantCardProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(applicant);
+    }
+    router.push(
+      `/announcements/${applicant.announcementId}/${applicant.applicationId}`,
+    );
+  };
+
   return (
     <button
       type="button"
       className="w-full cursor-pointer rounded-2xl bg-white p-6 text-left shadow-sm transition-shadow duration-200 hover:shadow-md"
-      onClick={() => onClick(applicant)}
+      onClick={handleClick}
     >
       {/* 헤더 */}
 
