@@ -56,7 +56,7 @@ export default function ApplicationDetailPage() {
         {/* 인적 사항 */}
         <section className="rounded-xl bg-white">
           <div className="grid grid-cols-[180px_1fr] gap-x-10 gap-y-8">
-            <div className="font-semibold text-gray-900 text-sm">인적 사항</div>
+            <div className="font-semibold text-gray-900 text-xl">인적 사항</div>
             <div />
 
             {/* 이름 */}
@@ -108,7 +108,7 @@ export default function ApplicationDetailPage() {
 
         {/* 질문 답변 */}
         <section>
-          <h2 className="font-semibold text-gray-900 text-sm">질문 답변</h2>
+          <h2 className="font-semibold text-gray-900 text-xl">질문 답변</h2>
 
           <div className="mt-6 space-y-8">
             {mockData.questions.map((item, index) => (
