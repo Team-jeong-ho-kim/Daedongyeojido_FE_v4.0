@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { InterviewScheduleModal } from "@/components";
+import {
+  ApplicationConfirmModal,
+  InterviewDetailModal,
+  InterviewScheduleModal,
+} from "@/components";
 
 // Mock data - 실제로는 서버에서 받아올 데이터
 const mockData = {
@@ -40,14 +44,53 @@ const mockData = {
 
 export default function ApplicationDetailPage() {
   const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [interviewSchedule, setInterviewSchedule] = useState<{
+    date: string;
+    time: string;
+    location: string;
+  } | null>(null);
+  const [isInterviewCompleted, setIsInterviewCompleted] = useState(false);
 
   const handleSaveInterview = (schedule: {
     date: string;
     time: string;
     location: string;
   }) => {
+    setInterviewSchedule(schedule);
     console.log("면접 일정 저장:", schedule);
     toast.success(`${mockData.name}님의 면접 일정이 설정되었습니다.`);
+    // TODO: API 호출
+  };
+
+  const handleShowDetail = () => {
+    if (interviewSchedule) {
+      setShowDetailModal(true);
+    } else {
+      toast.error("설정된 면접 일정이 없습니다.");
+    }
+  };
+
+  const handleInterviewComplete = () => {
+    setShowDetailModal(false);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmComplete = () => {
+    setIsInterviewCompleted(true);
+    setShowConfirmModal(false);
+    toast.success("면접이 완료되었습니다.");
+    // TODO: API 호출
+  };
+
+  const handleReject = () => {
+    toast.success("지원자를 탈락 처리했습니다.");
+    // TODO: API 호출
+  };
+
+  const handleAccept = () => {
+    toast.success("지원자를 합격 처리했습니다.");
     // TODO: API 호출
   };
   return (
@@ -125,19 +168,41 @@ export default function ApplicationDetailPage() {
 
           {/* 하단 버튼 */}
           <div className="mt-10 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setShowInterviewModal(true)}
-              className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
-            >
-              면접 일정 설정
-            </button>
-            <button
-              type="button"
-              className="h-10 rounded-lg bg-gray-900 px-5 font-semibold text-sm text-white shadow-sm hover:bg-gray-800"
-            >
-              면접 일정 조회
-            </button>
+            {!isInterviewCompleted ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowInterviewModal(true)}
+                  className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
+                >
+                  면접 일정 설정
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShowDetail}
+                  className="h-10 rounded-lg bg-gray-900 px-5 font-semibold text-sm text-white shadow-sm hover:bg-gray-800"
+                >
+                  면접 일정 조회
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleReject}
+                  className="h-10 rounded-lg bg-gray-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-gray-600"
+                >
+                  탈락
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAccept}
+                  className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
+                >
+                  합격
+                </button>
+              </>
+            )}
           </div>
         </section>
       </div>
@@ -147,6 +212,33 @@ export default function ApplicationDetailPage() {
         isOpen={showInterviewModal}
         onClose={() => setShowInterviewModal(false)}
         onSave={handleSaveInterview}
+      />
+
+      {/* 면접 일정 상세 조회 모달 */}
+      {interviewSchedule && (
+        <InterviewDetailModal
+          isOpen={showDetailModal}
+          onClose={() => setShowDetailModal(false)}
+          onComplete={handleInterviewComplete}
+          applicant={{
+            name: mockData.name,
+            studentId: mockData.studentId,
+            major: mockData.selectedMajor,
+          }}
+          interview={interviewSchedule}
+        />
+      )}
+
+      {/* 면접 완료 확인 모달 */}
+      <ApplicationConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmComplete}
+        onBackdropClick={() => setShowConfirmModal(false)}
+        title="정말 면접을 완료하시겠습니까?"
+        description="면접 완료 후 탈락/합격 처리를 진행할 수 있습니다."
+        cancelText="아니요"
+        confirmText="예"
       />
     </main>
   );
