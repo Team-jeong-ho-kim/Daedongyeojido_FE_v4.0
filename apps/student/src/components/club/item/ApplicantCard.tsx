@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Chip from "../../common/Chip";
 
 interface Applicant {
   name: string;
@@ -61,9 +62,7 @@ export default function ApplicantCard({
         {/* 지원 전공 */}
         <div className="flex items-center gap-2">
           <span className="text-gray-600">지원 전공:</span>
-          <span className="rounded-full border border-primary-500 px-3 py-1 font-medium text-primary-500 text-sm">
-            {applicant.position}
-          </span>
+          <Chip active>{applicant.position}</Chip>
         </div>
 
         {/* 면접 일자 */}

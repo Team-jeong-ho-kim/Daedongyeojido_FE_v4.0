@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import {
   ApplicationConfirmModal,
+  Chip,
   InterviewDetailModal,
   InterviewScheduleModal,
 } from "@/components";
@@ -241,26 +242,5 @@ export default function ApplicationDetailPage() {
         confirmText="예"
       />
     </main>
-  );
-}
-
-function Chip({
-  children,
-  active,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-}) {
-  return (
-    <span
-      className={[
-        "inline-flex h-8 items-center rounded-full border px-4 font-normal text-xs",
-        active
-          ? "border-primary-500 bg-primary-50 text-primary-500"
-          : "border-gray-400 bg-white text-gray-500",
-      ].join(" ")}
-    >
-      {children}
-    </span>
   );
 }
