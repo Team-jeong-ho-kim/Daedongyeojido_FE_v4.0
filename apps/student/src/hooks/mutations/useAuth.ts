@@ -9,7 +9,9 @@ export const useLoginMutation = () => {
     mutationFn: ({ account_id, password }) => login({ account_id, password }),
     onSuccess: (data) => {
       toast.success(`${data.userName}님, 환영합니다!`);
-      window.location.href = "/";
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1200);
     },
     onError: (error: any) => {
       console.error("로그인 실패:", error);
@@ -28,17 +30,21 @@ export const useLoginMutation = () => {
   });
 };
 
-export const useLogoutMutation = () => {
+export const useLogoutMutation = (onLogoutSuccess?: () => void) => {
   return useMutation<void, Error>({
     mutationFn: logout,
     onSuccess: () => {
       clearTokens();
+      onLogoutSuccess?.();
       toast.success("로그아웃되었습니다.");
-      window.location.href = "/login";
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 800);
     },
     onError: (error) => {
       console.error("로그아웃 실패:", error);
       clearTokens();
+      onLogoutSuccess?.();
       window.location.href = "/login";
     },
   });

@@ -28,23 +28,50 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (originalRequest.url?.includes("/auth/reissue")) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const refreshToken = localStorage.getItem("refresh_token");
-        const response = await axios.patch(`${BASE_URL}/auth/reissue`, {
-          refresh_token: refreshToken,
-        });
 
-        const { access_token } = response.data;
-        localStorage.setItem("access_token", access_token);
+        if (!refreshToken) {
+          localStorage.removeItem("access_token");
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
+          }
+          return Promise.reject(error);
+        }
 
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        const response = await axios.patch(
+          `${BASE_URL}/auth/reissue`,
+          {},
+          {
+            headers: {
+              "X-Refresh-Token": refreshToken,
+            },
+          },
+        );
+
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+          response.data;
+
+        localStorage.setItem("access_token", newAccessToken);
+        if (newRefreshToken) {
+          localStorage.setItem("refresh_token", newRefreshToken);
+        }
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
         return Promise.reject(refreshError);
       }
     }
