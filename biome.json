@@ -40,7 +40,8 @@
         "useExhaustiveDependencies": "off"
       },
       "suspicious": {
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "noExplicitAny": "off"
       },
       "nursery": {
         "useSortedClasses": {

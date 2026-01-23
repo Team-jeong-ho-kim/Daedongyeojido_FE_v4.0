@@ -3,15 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "dev:prod": "dotenv -e .env.production -- next dev",
-    "build": "next build",
+    "dev": "dotenv -e ../../.env.local -- next dev",
+    "dev:prod": "dotenv -e ../../.env.production -- next dev",
+    "build": "dotenv -e ../../.env.production -- next build",
     "start": "next start",
     "lint": "../../node_modules/.bin/biome check .",
     "format": "../../node_modules/.bin/biome format --write ."
   },
   "dependencies": {
     "ui": "workspace:*",
+    "utils": "workspace:*",
+    "shared": "workspace:*",
+    "@tanstack/react-query": "^5.62.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "config-tailwind": "workspace:*",

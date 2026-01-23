@@ -1,0 +1,22 @@
+{
+  "name": "utils",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome check .",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
+  }
+}

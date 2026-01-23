@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
-    "dev:prod": "dotenv -e .env.production -- next dev --port 3001",
-    "build": "next build",
+    "dev": "dotenv -e ../../.env.local -- next dev --port 3001",
+    "dev:prod": "dotenv -e ../../.env.production -- next dev --port 3001",
+    "build": "dotenv -e ../../.env.production -- next build",
     "start": "next start --port 3001",
     "lint": "../../node_modules/.bin/biome check .",
     "format": "../../node_modules/.bin/biome format --write ."

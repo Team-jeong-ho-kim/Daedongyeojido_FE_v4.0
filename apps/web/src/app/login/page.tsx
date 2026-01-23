@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useId, useState } from "react";
 import { toast } from "ui";
-import { Carousel } from "@/components/login/Carousel";
+import { Carousel } from "@/components";
+import { useLoginMutation } from "@/hooks/useAuth";
 
 const carouselImages = [
   "/images/login/school.svg",
@@ -12,11 +13,12 @@ const carouselImages = [
 ];
 
 export default function LoginPage() {
-  const [dsmId, setDsmId] = useState<string>("");
+  const [account_id, setAccount_id] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const { mutate: login, isPending: loginPending } = useLoginMutation();
 
   const handleLogin = () => {
-    if (!dsmId.trim()) {
+    if (!accountId.trim()) {
       toast.error("DSM 계정 ID를 입력해주세요.");
       return;
     }
@@ -26,7 +28,7 @@ export default function LoginPage() {
       return;
     }
 
-    window.location.href = `${process.env.NEXT_PUBLIC_USER_URL}`;
+    login({ account_id, password });
   };
 
   const accountId = useId();
@@ -35,7 +37,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-black">
-      {/* 캐러셀;모바일에서는 숨김 */}
+      {/* 캐러셀: 모바일에서는 숨김 */}
       <div className="hidden flex-1 items-center justify-center p-8 lg:flex lg:p-16">
         <div className="w-full max-w-2xl">
           <Carousel images={carouselImages} />
@@ -71,9 +73,9 @@ export default function LoginPage() {
                   DSM 계정 ID
                 </label>
                 <input
-                  value={dsmId}
+                  value={account_id}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setDsmId(e.target.value)
+                    setAccount_id(e.target.value)
                   }
                   id={accountId}
                   type="text"
@@ -128,10 +130,11 @@ export default function LoginPage() {
 
         <button
           onClick={handleLogin}
+          disabled={loginPending}
           type="button"
-          className="w-full max-w-md rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80"
+          className="w-full max-w-md rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          로그인
+          {loginPending ? "로그인 중..." : "로그인"}
         </button>
       </div>
     </div>

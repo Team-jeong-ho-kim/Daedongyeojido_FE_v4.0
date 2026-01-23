@@ -1,17 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "ui";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { QueryProvider } from "@/components/providers/QueryProvider";
+import { UserProvider } from "@/components/providers/UserProvider";
 
 export const metadata: Metadata = {
   title: "대동여지도",
@@ -25,11 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <Toaster position="top-right" />
+      <body>
+        <QueryProvider>
+          <UserProvider>
+            {children}
+            <Toaster position="top-right" />
+          </UserProvider>
+        </QueryProvider>
       </body>
     </html>
   );
