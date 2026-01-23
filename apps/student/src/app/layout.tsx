@@ -1,11 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Toaster } from "sonner";
 import { Footer } from "ui";
 import StudentHeaderWrapper from "@/components/layout/StudentHeaderWrapper";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { UserProvider } from "@/components/providers/UserProvider";
-import { usePathname } from "next/navigation";
 import "./globals.css";
 
 export default function RootLayout({
