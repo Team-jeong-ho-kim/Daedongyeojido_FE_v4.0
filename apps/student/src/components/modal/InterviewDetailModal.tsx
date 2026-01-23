@@ -1,4 +1,4 @@
-import Chip from "../common/Chip";
+import { Chip } from "../common";
 
 interface InterviewDetailModalProps {
   isOpen: boolean;
@@ -39,7 +39,8 @@ export default function InterviewDetailModal({
               이름 : <span className="font-semibold">{applicant.name}</span>
             </span>
             <span className="text-gray-900">
-              학번 : <span className="font-semibold">{applicant.studentId}</span>
+              학번 :{" "}
+              <span className="font-semibold">{applicant.studentId}</span>
             </span>
             <span className="text-gray-900">지원 전공:</span>
             <Chip active>{applicant.major}</Chip>

@@ -3,7 +3,7 @@ interface ChipProps {
   active?: boolean;
 }
 
-export default function Chip({ children, active }: ChipProps) {
+export function Chip({ children, active }: ChipProps) {
   return (
     <span
       className={[

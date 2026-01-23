@@ -1,3 +1,3 @@
-export { default as Chip } from "./Chip";
-export { default as ClubHeader } from "./ClubHeader";
-export { default as Pagination } from "./Pagination";
+export * from "./Chip";
+export * from "./ClubHeader";
+export * from "./Pagination";
