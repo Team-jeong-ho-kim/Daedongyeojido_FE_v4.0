@@ -7,7 +7,7 @@ interface UseMyInfoOptions {
   enabled?: boolean;
 }
 
-export const useMyInfo = (options?: UseMyInfoOptions) => {
+export const useMyInfoQuery = (options?: UseMyInfoOptions) => {
   const setUserInfo = useUserStore((state) => state.setUserInfo);
 
   const query = useQuery({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useMyInfo } from "@/hooks/useMyInfo";
+import { useMyInfo } from "@/hooks/querys/useMyInfoQuery";
 import { getAccessToken } from "@/lib/token";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {

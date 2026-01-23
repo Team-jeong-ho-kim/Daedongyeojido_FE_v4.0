@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useId, useState } from "react";
 import { toast } from "ui";
 import { Carousel } from "@/components";
-import { useLoginMutation } from "@/hooks/useAuth";
+import { useLoginMutation } from "@/hooks/mutations/useAuth";
 
 const carouselImages = [
   "/images/login/school.svg",
