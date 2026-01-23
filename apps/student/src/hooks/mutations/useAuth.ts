@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { LoginRequest, LoginResponse } from "utils";
-import { login } from "@/api/auth";
+import { login, logout } from "@/api/auth";
+import { clearTokens } from "@/lib/token";
 
 export const useLoginMutation = () => {
   return useMutation<LoginResponse, Error, LoginRequest>({
@@ -23,6 +24,22 @@ export const useLoginMutation = () => {
       } else {
         toast.error("로그인에 실패했습니다. 다시 시도해주세요.");
       }
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  return useMutation<void, Error>({
+    mutationFn: logout,
+    onSuccess: () => {
+      clearTokens();
+      toast.success("로그아웃되었습니다.");
+      window.location.href = "/login";
+    },
+    onError: (error) => {
+      console.error("로그아웃 실패:", error);
+      clearTokens();
+      window.location.href = "/login";
     },
   });
 };
