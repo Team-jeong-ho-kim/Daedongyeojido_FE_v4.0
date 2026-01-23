@@ -8,7 +8,7 @@ import type { PaginationType } from "@/types";
   paginationArray: 페이지네이션을 사용할 numPages만큼의 배열
 */
 
-export default function Pagination({
+export function Pagination({
   listLen,
   limit,
   curPage,

@@ -1,30 +1,30 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Toaster } from "sonner";
 import { Footer } from "ui";
 import StudentHeaderWrapper from "@/components/layout/StudentHeaderWrapper";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { UserProvider } from "@/components/providers/UserProvider";
+import { usePathname } from "next/navigation";
 import "./globals.css";
-
-export const metadata: Metadata = {
-  title: "Student Portal",
-  description: "Student portal application",
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isAuthPage = pathname?.startsWith("/login");
+
   return (
     <html lang="ko">
       <body>
         <QueryProvider>
           <UserProvider>
             <Toaster position="top-right" duration={3000} richColors />
-            <StudentHeaderWrapper />
-            <main className="pt-14">{children}</main>
-            <Footer />
+            {!isAuthPage && <StudentHeaderWrapper />}
+            <main className={isAuthPage ? "" : "pt-14"}>{children}</main>
+            {!isAuthPage && <Footer />}
           </UserProvider>
         </QueryProvider>
       </body>
