@@ -8,7 +8,7 @@ export const useLoginMutation = () => {
     mutationFn: ({ account_id, password }) => login({ account_id, password }),
     onSuccess: (data) => {
       toast.success(`${data.userName}님, 환영합니다!`);
-      window.location.href = `${process.env.NEXT_PUBLIC_USER_URL}`;
+      window.location.href = "/";
     },
     onError: (error: any) => {
       console.error("로그인 실패:", error);

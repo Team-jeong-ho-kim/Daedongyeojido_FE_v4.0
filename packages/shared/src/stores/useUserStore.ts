@@ -23,7 +23,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
   clearUser: () => set({ userInfo: null }),
 
-  isStudent: () => get().userInfo?.role === "STUDENTS",
+  isStudent: () => get().userInfo?.role === "STUDENT",
 
   isClubMember: () => get().userInfo?.role === "CLUB_MEMBER",
 

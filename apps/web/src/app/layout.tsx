@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "ui";
-import { QueryProvider } from "@/components/providers/QueryProvider";
-import { UserProvider } from "@/components/providers/UserProvider";
 
 export const metadata: Metadata = {
   title: "대동여지도",
@@ -16,14 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
-        <QueryProvider>
-          <UserProvider>
-            {children}
-            <Toaster position="top-right" />
-          </UserProvider>
-        </QueryProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

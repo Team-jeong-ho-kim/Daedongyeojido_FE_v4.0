@@ -1,10 +1,14 @@
 import * as zustand from 'zustand';
 
-type UserRole = "STUDENTS" | "CLUB_MEMBER" | "CLUB_LEADER";
+type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
 interface UserInfo {
-    account_id: string;
-    user_name: string;
-    class_number: string;
+    userName: string;
+    classNumber: string;
+    introduction: string | null;
+    clubName: string | null;
+    major: string[];
+    link: string[];
+    profileImage: string | null;
     role: UserRole;
 }
 

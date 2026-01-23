@@ -4,27 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useUserStore } from "shared";
 
-const TRANSPARENT_PAGES = ["/"];
-
-export default function Header() {
+export function LandingHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
-  const isTransparent = isTransparentPage && !isScrolled;
-  const logoSrc = isTransparent
-    ? "/images/logos/blackLogo.svg"
-    : "/images/logos/whiteLogo.svg";
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      setIsScrolled(currentScrollY > 100);
 
       if (currentScrollY < 10) {
         setIsVisible(true);
@@ -41,7 +29,66 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
-  // 모바일 메뉴 열릴 때 스크롤 방지
+  return (
+    <header
+      className={`fixed top-0 left-0 z-50 w-full border-transparent border-b bg-white/70 backdrop-blur-sm transition-all duration-300 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/logos/whiteLogo.svg"
+            alt="DD4D Logo"
+            width={92}
+            height={24}
+            className="h-6"
+          />
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href={`${process.env.NEXT_PUBLIC_USER_URL}`}
+            className="rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80"
+          >
+            시작하기
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+interface StudentHeaderProps {
+  onLogout: () => void;
+}
+
+export function StudentHeader({ onLogout }: StudentHeaderProps) {
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const userInfo = useUserStore((state) => state.userInfo);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -60,17 +107,15 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${
-          isTransparent
-            ? "border-transparent bg-transparent"
-            : "border-gray-200 bg-white"
-        } ${isVisible ? "translate-y-0" : "-translate-y-full"}`}
+        className={`fixed top-0 left-0 z-50 w-full border-gray-200 border-b bg-white transition-all duration-300 ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-12">
             <Link href="/" className="flex items-center">
               <Image
-                src={logoSrc}
+                src="/images/logos/whiteLogo.svg"
                 alt="DD4D Logo"
                 width={92}
                 height={24}
@@ -82,11 +127,9 @@ export default function Header() {
               <Link
                 href="/clubs"
                 className={`text-[15px] transition-colors ${
-                  isTransparent
-                    ? "text-white/80 hover:text-white"
-                    : pathname?.startsWith("/clubs")
-                      ? "font-semibold text-gray-900"
-                      : "font-normal text-gray-400 hover:text-gray-600"
+                  pathname?.startsWith("/clubs")
+                    ? "font-semibold text-gray-900"
+                    : "font-normal text-gray-400 hover:text-gray-600"
                 }`}
               >
                 동아리
@@ -94,11 +137,9 @@ export default function Header() {
               <Link
                 href="/announcements"
                 className={`text-[15px] transition-colors ${
-                  isTransparent
-                    ? "text-white/80 hover:text-white"
-                    : pathname?.startsWith("/announcements")
-                      ? "font-semibold text-gray-900"
-                      : "font-normal text-gray-400 hover:text-gray-600"
+                  pathname?.startsWith("/announcements")
+                    ? "font-semibold text-gray-900"
+                    : "font-normal text-gray-400 hover:text-gray-600"
                 }`}
               >
                 공고
@@ -107,16 +148,27 @@ export default function Header() {
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Link
-              href={`${process.env.NEXT_PUBLIC_WEB_URL}/login`}
-              className={`font-normal text-[15px] transition-colors ${
-                isTransparent
-                  ? "text-white/80 hover:text-white"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              로그인
-            </Link>
+            {userInfo ? (
+              <>
+                <span className="font-normal text-[15px] text-gray-900">
+                  {userInfo.userName}님
+                </span>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
+              >
+                로그인
+              </Link>
+            )}
           </div>
 
           {/* 모바일 */}
@@ -127,7 +179,7 @@ export default function Header() {
             aria-label="메뉴 열기"
           >
             <svg
-              className={`h-6 w-6 ${isTransparent ? "text-white" : "text-gray-700"}`}
+              className="h-6 w-6 text-gray-700"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -190,13 +242,31 @@ export default function Header() {
             공고
           </Link>
           <div className="mt-6 flex flex-col gap-3">
-            <Link
-              href="/login"
-              onClick={handleLinkClick}
-              className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200"
-            >
-              로그인
-            </Link>
+            {userInfo ? (
+              <>
+                <div className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700">
+                  {userInfo.userName}님
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleLinkClick();
+                    onLogout?.();
+                  }}
+                  className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200"
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={handleLinkClick}
+                className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200"
+              >
+                로그인
+              </Link>
+            )}
           </div>
         </nav>
       </div>

@@ -33,7 +33,7 @@ var useUserStore = (0, import_zustand.create)((set, get) => ({
     userInfo: state.userInfo ? { ...state.userInfo, role } : null
   })),
   clearUser: () => set({ userInfo: null }),
-  isStudent: () => get().userInfo?.role === "STUDENTS",
+  isStudent: () => get().userInfo?.role === "STUDENT",
   isClubMember: () => get().userInfo?.role === "CLUB_MEMBER",
   isClubLeader: () => get().userInfo?.role === "CLUB_LEADER"
 }));

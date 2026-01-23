@@ -1,24 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState } from "react";
-import { toast } from "ui";
-import { Carousel } from "@/components";
+import { useRouter } from "next/navigation";
+import { useEffect, useId, useState } from "react";
+import { toast } from "sonner";
 import { useLoginMutation } from "@/hooks/mutations/useAuth";
-
-const carouselImages = [
-  "/images/login/school.svg",
-  "/images/login/school.svg",
-  "/images/login/school.svg",
-];
+import { getAccessToken } from "@/lib/token";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [account_id, setAccount_id] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { mutate: login, isPending: loginPending } = useLoginMutation();
 
+  useEffect(() => {
+    const token = getAccessToken();
+    if (token) {
+      router.replace("/");
+    }
+  }, [router]);
+
   const handleLogin = () => {
-    if (!accountId.trim()) {
+    if (!account_id.trim()) {
       toast.error("DSM 계정 ID를 입력해주세요.");
       return;
     }
@@ -37,10 +40,31 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-black">
-      {/* 캐러셀: 모바일에서는 숨김 */}
+      {/* 왼쪽 이미지 섹션: 모바일에서는 숨김 */}
       <div className="hidden flex-1 items-center justify-center p-8 lg:flex lg:p-16">
-        <div className="w-full max-w-2xl">
-          <Carousel images={carouselImages} />
+        <div className="relative w-full max-w-2xl">
+          <div className="mb-8 overflow-hidden rounded-3xl">
+            <Image
+              src="/images/login/school.svg"
+              alt="학교 이미지"
+              width={800}
+              height={600}
+              className="w-full object-cover"
+            />
+          </div>
+
+          <div className="text-white">
+            <h1 className="mb-4 font-bold text-3xl lg:text-4xl">
+              나의 동아리를 찾는 지름길,
+              <br />
+              동아리에 가입해서 전공 실력을 길러보세요!
+            </h1>
+            <p className="text-gray-400 text-lg">
+              자신의 전공 분야와 맞는 동아리를 찾고,
+              <br />
+              자신이 가입하고 싶은 동아리를 쉽게 관리 할 수 있습니다.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -49,7 +73,7 @@ export default function LoginPage() {
         <div className="flex w-full max-w-md flex-col items-center">
           <div className="mb-12">
             <Image
-              src="/images/login/blackLogo.svg"
+              src="/images/logos/blackLogo.svg"
               alt="대동여지도 로고"
               width={92}
               height={24}
@@ -96,6 +120,11 @@ export default function LoginPage() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setPassword(e.target.value)
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleLogin();
+                    }
+                  }}
                   id={passwordId}
                   type="password"
                   placeholder="비밀번호를 입력해주세요."

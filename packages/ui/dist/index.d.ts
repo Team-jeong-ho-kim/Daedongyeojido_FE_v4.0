@@ -6,7 +6,11 @@ export { Toaster, toast } from 'sonner';
 
 declare function Footer(): react_jsx_runtime.JSX.Element;
 
-declare function Header(): react_jsx_runtime.JSX.Element;
+declare function LandingHeader(): react_jsx_runtime.JSX.Element;
+interface StudentHeaderProps {
+    onLogout: () => void;
+}
+declare function StudentHeader({ onLogout }: StudentHeaderProps): react_jsx_runtime.JSX.Element;
 
 interface ErrorMessageProps {
     message?: string;
@@ -92,4 +96,4 @@ declare const InterviewIcon: ({ className }: IconProps) => react_jsx_runtime.JSX
 declare const blackLogo = "/images/logos/blackLogo.svg";
 declare const whiteLogo = "/images/logos/whiteLogo.svg";
 
-export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, Header, ImageUpload, InterviewIcon, LinkInput, NoteIcon, TextArea, TextInput, blackLogo, buttonVariants, whiteLogo };
+export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, ImageUpload, InterviewIcon, LandingHeader, LinkInput, NoteIcon, StudentHeader, TextArea, TextInput, blackLogo, buttonVariants, whiteLogo };

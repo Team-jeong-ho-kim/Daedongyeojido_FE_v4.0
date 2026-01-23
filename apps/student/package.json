@@ -13,6 +13,10 @@
   "dependencies": {
     "ui": "workspace:*",
     "config-tailwind": "workspace:*",
+    "shared": "workspace:*",
+    "utils": "workspace:*",
+    "@tanstack/react-query": "^5.62.14",
+    "sonner": "^2.0.7",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "next": "15.5.6"

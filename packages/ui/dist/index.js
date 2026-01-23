@@ -38,11 +38,12 @@ __export(index_exports, {
   FieldSelector: () => FieldSelector,
   Footer: () => Footer,
   FormField: () => FormField,
-  Header: () => Header,
   ImageUpload: () => ImageUpload,
   InterviewIcon: () => InterviewIcon,
+  LandingHeader: () => LandingHeader,
   LinkInput: () => LinkInput,
   NoteIcon: () => NoteIcon,
+  StudentHeader: () => StudentHeader,
   TextArea: () => TextArea,
   TextInput: () => TextInput,
   Toaster: () => import_sonner.Toaster,
@@ -87,21 +88,62 @@ var import_image2 = __toESM(require("next/image"));
 var import_link = __toESM(require("next/link"));
 var import_navigation = require("next/navigation");
 var import_react = require("react");
+var import_shared = require("shared");
 var import_jsx_runtime2 = require("react/jsx-runtime");
-var TRANSPARENT_PAGES = ["/"];
-function Header() {
+function LandingHeader() {
   const [isVisible, setIsVisible] = (0, import_react.useState)(true);
   const [lastScrollY, setLastScrollY] = (0, import_react.useState)(0);
-  const [isScrolled, setIsScrolled] = (0, import_react.useState)(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
-  const pathname = (0, import_navigation.usePathname)();
-  const isTransparentPage = TRANSPARENT_PAGES.includes(pathname);
-  const isTransparent = isTransparentPage && !isScrolled;
-  const logoSrc = isTransparent ? "/images/logos/blackLogo.svg" : "/images/logos/whiteLogo.svg";
   (0, import_react.useEffect)(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 100);
+      if (currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    "header",
+    {
+      className: `fixed top-0 left-0 z-50 w-full border-transparent border-b bg-white/70 backdrop-blur-sm transition-all duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
+      children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_link.default, { href: "/", className: "flex items-center", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          import_image2.default,
+          {
+            src: "/images/logos/whiteLogo.svg",
+            alt: "DD4D Logo",
+            width: 92,
+            height: 24,
+            className: "h-6"
+          }
+        ) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          import_link.default,
+          {
+            href: `${process.env.NEXT_PUBLIC_USER_URL}`,
+            className: "rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80",
+            children: "\uC2DC\uC791\uD558\uAE30"
+          }
+        ) })
+      ] })
+    }
+  );
+}
+function StudentHeader({ onLogout }) {
+  const [isVisible, setIsVisible] = (0, import_react.useState)(true);
+  const [lastScrollY, setLastScrollY] = (0, import_react.useState)(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
+  const pathname = (0, import_navigation.usePathname)();
+  const userInfo = (0, import_shared.useUserStore)((state) => state.userInfo);
+  (0, import_react.useEffect)(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
       if (currentScrollY < 10) {
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY) {
@@ -131,13 +173,13 @@ function Header() {
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
       "header",
       {
-        className: `fixed top-0 left-0 z-50 w-full border-b transition-all duration-300 ${isTransparent ? "border-transparent bg-transparent" : "border-gray-200 bg-white"} ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
+        className: `fixed top-0 left-0 z-50 w-full border-gray-200 border-b bg-white transition-all duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"}`,
         children: /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-12", children: [
             /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_link.default, { href: "/", className: "flex items-center", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
               import_image2.default,
               {
-                src: logoSrc,
+                src: "/images/logos/whiteLogo.svg",
                 alt: "DD4D Logo",
                 width: 92,
                 height: 24,
@@ -149,7 +191,7 @@ function Header() {
                 import_link.default,
                 {
                   href: "/clubs",
-                  className: `text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : pathname?.startsWith("/clubs") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
+                  className: `text-[15px] transition-colors ${pathname?.startsWith("/clubs") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
                   children: "\uB3D9\uC544\uB9AC"
                 }
               ),
@@ -157,17 +199,31 @@ function Header() {
                 import_link.default,
                 {
                   href: "/announcements",
-                  className: `text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
+                  className: `text-[15px] transition-colors ${pathname?.startsWith("/announcements") ? "font-semibold text-gray-900" : "font-normal text-gray-400 hover:text-gray-600"}`,
                   children: "\uACF5\uACE0"
                 }
               )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "font-normal text-[15px] text-gray-900", children: [
+              userInfo.userName,
+              "\uB2D8"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: onLogout,
+                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
+                children: "\uB85C\uADF8\uC544\uC6C3"
+              }
+            )
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
-              href: `${process.env.NEXT_PUBLIC_WEB_URL}/login`,
-              className: `font-normal text-[15px] transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-400 hover:text-gray-600"}`,
+              href: "/login",
+              className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
               children: "\uB85C\uADF8\uC778"
             }
           ) }),
@@ -181,7 +237,7 @@ function Header() {
               children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
                 "svg",
                 {
-                  className: `h-6 w-6 ${isTransparent ? "text-white" : "text-gray-700"}`,
+                  className: "h-6 w-6 text-gray-700",
                   fill: "none",
                   stroke: "currentColor",
                   viewBox: "0 0 24 24",
@@ -242,7 +298,24 @@ function Header() {
               children: "\uACF5\uACE0"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-6 flex flex-col gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-6 flex flex-col gap-3", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700", children: [
+              userInfo.userName,
+              "\uB2D8"
+            ] }),
+            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+              "button",
+              {
+                type: "button",
+                onClick: () => {
+                  handleLinkClick();
+                  onLogout?.();
+                },
+                className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
+                children: "\uB85C\uADF8\uC544\uC6C3"
+              }
+            )
+          ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
               href: "/login",
@@ -823,11 +896,12 @@ var import_sonner = require("sonner");
   FieldSelector,
   Footer,
   FormField,
-  Header,
   ImageUpload,
   InterviewIcon,
+  LandingHeader,
   LinkInput,
   NoteIcon,
+  StudentHeader,
   TextArea,
   TextInput,
   Toaster,

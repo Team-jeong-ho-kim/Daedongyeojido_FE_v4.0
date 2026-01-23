@@ -1,4 +1,4 @@
-import { LandingHeader } from "@/components";
+import { LandingHeader } from "ui";
 
 export default function LandingLayout({
   children,

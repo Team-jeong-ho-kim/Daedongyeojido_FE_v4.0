@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useMyInfo } from "@/hooks/querys/useMyInfoQuery";
+import { useMyInfoQuery } from "@/hooks/querys/useMyInfoQuery";
 import { getAccessToken } from "@/lib/token";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
+  const [hasToken, setHasToken] = useState(false);
 
   useEffect(() => {
     const accessToken = getAccessToken();
-    setToken(accessToken);
+    setHasToken(!!accessToken);
   }, []);
 
-  useMyInfo({
-    enabled: !!token,
+  useMyInfoQuery({
+    enabled: hasToken,
   });
 
   return <>{children}</>;
