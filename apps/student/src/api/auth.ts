@@ -16,6 +16,6 @@ export const login = async ({
   return response.data;
 };
 
-export const logout = async (): Promise<void> => {
+export const logout = async () => {
   await apiClient.delete("/auth/logout");
 };

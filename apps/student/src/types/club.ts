@@ -14,8 +14,8 @@ export interface ClubsResponse {
 
 export interface ClubDetail {
   clubName: string;
-  oneLiner: string;
   introduction: string;
+  oneLiner: string;
   clubImage: string;
   majors: Major[];
   links: string[];

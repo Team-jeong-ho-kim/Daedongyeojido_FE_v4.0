@@ -4,118 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "ui";
 import { ClubItem, CTASection, Pagination } from "@/components";
+import { useGetAllClubsQuery } from "@/hooks/querys/useClubQuery";
 
 export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 8;
 
-  const clubs = [
-    {
-      clubId: 1,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 2,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 3,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 4,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 5,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 6,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 7,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 8,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 9,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 10,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 11,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 12,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 13,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 14,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-    {
-      clubId: 15,
-      clubName: "DMS",
-      clubImage: "",
-      introduction:
-        "전공 동아리 DMS는 기숙사 관리를 보다 편리하게 관리하는 필수적인 DMS 기숙사 관리 시스템입니다.",
-    },
-  ];
+  const { data: clubs } = useGetAllClubsQuery();
 
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">
@@ -133,21 +28,31 @@ export default function ClubsPage() {
         </div>
 
         {/* 동아리 목록 */}
-        <div className="mb-10 flex flex-wrap gap-7">
-          {clubs.slice((curPage - 1) * limit, curPage * limit).map((club) => (
-            <ClubItem key={club.clubId} {...club} />
-          ))}
-        </div>
+        {!clubs || clubs.length === 0 ? (
+          <div className="flex min-h-[400px] items-center justify-center">
+            <p className="text-gray-500 text-lg">등록된 동아리가 없습니다.</p>
+          </div>
+        ) : (
+          <>
+            <div className="mb-10 flex flex-wrap gap-7">
+              {clubs
+                .slice((curPage - 1) * limit, curPage * limit)
+                .map((club) => (
+                  <ClubItem key={club.clubId} {...club} />
+                ))}
+            </div>
 
-        {/* 페이지네이션 */}
-        <div className="mt-30 mb-30">
-          <Pagination
-            listLen={clubs.length}
-            limit={limit}
-            curPage={curPage}
-            setCurPage={setCurPage}
-          />
-        </div>
+            {/* 페이지네이션 */}
+            <div className="mt-30 mb-30">
+              <Pagination
+                listLen={clubs.length}
+                limit={limit}
+                curPage={curPage}
+                setCurPage={setCurPage}
+              />
+            </div>
+          </>
+        )}
 
         {/* CTA 섹션 */}
         <CTASection

@@ -10,7 +10,7 @@ interface ClubHeaderProps {
   onButtonClick?: () => void;
 }
 
-export default function ClubHeader({
+export function ClubHeader({
   clubImage,
   clubName,
   title,
