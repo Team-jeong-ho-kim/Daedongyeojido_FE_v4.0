@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Chip from "../../common/Chip";
+import { Chip } from "../../common/Chip";
 
 interface Applicant {
   name: string;
