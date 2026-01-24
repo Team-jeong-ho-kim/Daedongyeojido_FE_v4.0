@@ -1,7 +1,12 @@
 import { apiClient } from "utils";
-import type { ClubsResponse } from "@/types";
+import type { ClubDetailResponse, ClubsResponse } from "@/types";
 
 export const getAllClubs = async () => {
   const response = await apiClient.get<ClubsResponse>("/clubs");
   return response.data.clubs;
+};
+
+export const getDetailClub = async (clubId: string) => {
+  const response = await apiClient.get<ClubDetailResponse>(`/clubs/${clubId}`);
+  return response.data;
 };

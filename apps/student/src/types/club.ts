@@ -24,7 +24,7 @@ export interface ClubDetail {
 export interface ClubMember {
   userName: string;
   majors: Major[];
-  introduce: string;
+  introduce: string | null;
 }
 
 export interface ClubDetailResponse {

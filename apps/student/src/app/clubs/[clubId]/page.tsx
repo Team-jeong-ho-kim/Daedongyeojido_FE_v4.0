@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { Button } from "ui";
 import {
@@ -19,22 +20,20 @@ import {
 import {
   MOCK_APPLICANTS,
   MOCK_APPLICATIONS,
-  MOCK_CLUB,
-  MOCK_CLUB_MEMBERS,
   MOCK_JOB_POSTINGS,
   MOCK_NOTICES,
 } from "@/constants/clubDetailMock";
-import type { UserRole } from "@/types";
+import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 
 interface ClubDetailPageProps {
   params: Promise<{ clubId: string }>;
 }
 
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
-  const { clubId: _clubId } = use(params);
+  const { clubId } = use(params);
+  const { data: clubData } = useGetDetailClubQuery(clubId);
 
-  // TODO: 서버에서 권한 가져오기
-  const role = "CLUB_MEMBER" as UserRole;
+  const role = useUserStore((state) => state.userInfo?.role);
 
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
   const isLeader = role === "CLUB_LEADER";
@@ -57,34 +56,45 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const [studentName, setStudentName] = useState("");
 
   // 편집 상태
-  const [editClubName, setEditClubName] = useState(MOCK_CLUB.clubName);
-  const [editClubImage, setEditClubImage] = useState(MOCK_CLUB.clubImage);
-  const [editOneLiner, setEditOneLiner] = useState(MOCK_CLUB.oneLiner);
-  const [editIntroduction, setEditIntroduction] = useState(
-    MOCK_CLUB.introduction,
-  );
-  const [editLinks, setEditLinks] = useState(
-    MOCK_CLUB.links.map((url: string, i: number) => ({
-      id: `initial-${i}`,
-      url,
-    })),
-  );
-  const [editMajors, setEditMajors] = useState<string[]>(MOCK_CLUB.majors);
+  const [editClubName, setEditClubName] = useState("");
+  const [editClubImage, setEditClubImage] = useState("");
+  const [editOneLiner, setEditOneLiner] = useState("");
+  const [editIntroduction, setEditIntroduction] = useState("");
+  const [editLinks, setEditLinks] = useState<{ id: string; url: string }[]>([]);
+  const [editMajors, setEditMajors] = useState<string[]>([]);
+
+  // clubData가 로드되면 편집 상태 초기화
+  useEffect(() => {
+    if (clubData) {
+      setEditClubName(clubData.club.clubName);
+      setEditClubImage(clubData.club.clubImage);
+      setEditOneLiner(clubData.club.oneLiner);
+      setEditIntroduction(clubData.club.introduction);
+      setEditLinks(
+        clubData.club.links.map((url: string, i: number) => ({
+          id: `initial-${i}`,
+          url,
+        })),
+      );
+      setEditMajors(clubData.club.majors);
+    }
+  }, [clubData]);
 
   const postingLimit = 5;
-  const club = MOCK_CLUB;
-  const clubMembers = MOCK_CLUB_MEMBERS;
+  const club = clubData;
+  const clubMembers = clubData?.clubMembers || [];
   const jobPostings = MOCK_JOB_POSTINGS;
 
   // 변경 사항 확인
   const editLinksUrls = editLinks.map((l) => l.url);
   const hasChanges =
-    editClubName !== club.clubName ||
-    editClubImage !== club.clubImage ||
-    editOneLiner !== club.oneLiner ||
-    editIntroduction !== club.introduction ||
-    JSON.stringify(editLinksUrls) !== JSON.stringify(club.links) ||
-    JSON.stringify(editMajors.sort()) !== JSON.stringify(club.majors.sort());
+    editClubName !== club?.club.clubName ||
+    editClubImage !== club.club.clubImage ||
+    editOneLiner !== club.club.oneLiner ||
+    editIntroduction !== club.club.introduction ||
+    JSON.stringify(editLinksUrls) !== JSON.stringify(club.club.links) ||
+    JSON.stringify(editMajors.sort()) !==
+      JSON.stringify(club.club.majors.sort());
 
   // 페이지 이탈 시 변경사항 경고
   useEffect(() => {
@@ -134,14 +144,22 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     postingPage * postingLimit,
   );
 
+  if (!club) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">동아리 정보를 불러오는 중...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col bg-white">
       {/* 헤더 */}
       <ClubHeader
-        clubImage={club.clubImage}
-        clubName={club.clubName}
-        title={club.clubName}
-        oneLiner={club.oneLiner}
+        clubImage={club.club.clubImage}
+        clubName={club.club.clubName}
+        title={club.club.clubName}
+        oneLiner={club.club.oneLiner}
         buttonText="공고 보러가기"
       />
 
@@ -232,7 +250,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           <div className="flex flex-col gap-8 md:gap-12 lg:gap-16">
             <ClubInfoEditSection
-              club={club}
+              club={club.club}
               isClubMember={isClubMember}
               editClubImage={editClubImage}
               setEditClubImage={setEditClubImage}
