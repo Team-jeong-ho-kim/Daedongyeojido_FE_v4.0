@@ -25,7 +25,6 @@ export interface ClubUpdate {
   clubName: string;
   introduction: string;
   oneLiner: string;
-  clubImage: string;
   major: string[];
   link: string[];
 }

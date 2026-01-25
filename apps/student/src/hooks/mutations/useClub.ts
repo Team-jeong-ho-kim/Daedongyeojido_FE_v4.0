@@ -8,7 +8,8 @@ export const useUpdateClubMutation = (clubId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: ClubUpdate) => updateClub(clubId, data),
+    mutationFn: ({ data, imageFile }: { data: ClubUpdate; imageFile?: File }) =>
+      updateClub(clubId, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["club", clubId] });
       queryClient.invalidateQueries({ queryKey: ["clubs"] });

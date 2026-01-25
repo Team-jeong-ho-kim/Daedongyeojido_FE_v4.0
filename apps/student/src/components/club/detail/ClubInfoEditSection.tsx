@@ -11,6 +11,7 @@ interface ClubInfoEditSectionProps {
   isClubMember: boolean;
   editClubImage: string;
   setEditClubImage: (value: string) => void;
+  setEditClubImageFile: (value: File | null) => void;
   editClubName: string;
   setEditClubName: (value: string) => void;
   editOneLiner: string;
@@ -28,6 +29,7 @@ export function ClubInfoEditSection({
   isClubMember,
   editClubImage,
   setEditClubImage,
+  setEditClubImageFile,
   editClubName,
   setEditClubName,
   editOneLiner,
@@ -122,6 +124,7 @@ export function ClubInfoEditSection({
                   if (file) {
                     const url = URL.createObjectURL(file);
                     setEditClubImage(url);
+                    setEditClubImageFile(file);
                   }
                 }}
               />

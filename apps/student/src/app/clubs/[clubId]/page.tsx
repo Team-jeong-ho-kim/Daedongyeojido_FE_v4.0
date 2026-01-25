@@ -66,6 +66,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   // 편집 상태
   const [editClubName, setEditClubName] = useState("");
   const [editClubImage, setEditClubImage] = useState("");
+  const [editClubImageFile, setEditClubImageFile] = useState<File | null>(null);
   const [editOneLiner, setEditOneLiner] = useState("");
   const [editIntroduction, setEditIntroduction] = useState("");
   const [editLinks, setEditLinks] = useState<{ id: string; url: string }[]>([]);
@@ -168,7 +169,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
     const updateData = {
       clubName: editClubName.trim(),
-      clubImage: editClubImage,
       oneLiner: editOneLiner.trim(),
       introduction: editIntroduction.trim(),
       major: editMajors,
@@ -176,8 +176,11 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     };
 
     console.log("전송할 데이터:", updateData);
-    console.log("JSON.stringify:", JSON.stringify(updateData));
-    updateClubMutate(updateData);
+    console.log("이미지 파일:", editClubImageFile);
+    updateClubMutate({
+      data: updateData,
+      imageFile: editClubImageFile || undefined,
+    });
   };
 
   // 팀원 추가 요청 핸들러
@@ -308,6 +311,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               isClubMember={isClubMember}
               editClubImage={editClubImage}
               setEditClubImage={setEditClubImage}
+              setEditClubImageFile={setEditClubImageFile}
               editClubName={editClubName}
               setEditClubName={setEditClubName}
               editOneLiner={editOneLiner}
