@@ -1,16 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button, FieldSelector, FormField, TextArea, TextInput } from "ui";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import DeadlineModal from "@/components/modal/DeadlineModal";
 import { FIELDS } from "@/constants/club";
+import { useCreateAnnouncementMutation } from "@/hooks/mutations/useAnnouncement";
 import { useModalStore } from "@/stores/useModalStore";
 
 export default function CreateAnnouncementPage() {
-  const router = useRouter();
   const [title, setTitle] = useState("");
   const [contact, setContact] = useState("");
   const [introduction, setIntroduction] = useState("");
@@ -21,6 +20,8 @@ export default function CreateAnnouncementPage() {
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
   const { show, toggleShow } = useModalStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { mutate: createAnnouncementMutate } = useCreateAnnouncementMutation();
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -68,7 +69,7 @@ export default function CreateAnnouncementPage() {
   };
 
   const handleFieldsChange = (fields: string[]) => {
-    setSelectedFields(fields);
+    setSelectedFields(fields.map((major) => major.toUpperCase()));
     if (fields.length > 0) clearError("selectedFields");
   };
 
@@ -81,18 +82,16 @@ export default function CreateAnnouncementPage() {
   };
 
   const handleSubmit = () => {
-    console.log({
-      title,
-      contact,
-      introduction,
-      idealCandidate,
-      assignment,
-      selectedFields,
+    createAnnouncementMutate({
+      title: title.trim(),
+      introduction: introduction.trim(),
+      phoneNumber: contact.trim(),
+      major: selectedFields,
       deadline,
+      talentDescription: idealCandidate.trim(),
+      assignment: assignment.trim(),
     });
-    toast.success("공고 등록이 완료되었습니다");
     toggleShow();
-    router.push("/announcements");
   };
 
   return (

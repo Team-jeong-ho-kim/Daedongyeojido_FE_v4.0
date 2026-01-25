@@ -1,12 +1,12 @@
 export type Major =
   | "FE"
   | "BE"
-  | "iOS"
-  | "Android"
-  | "Flutter"
-  | "DevOps"
-  | "Game"
-  | "Security"
+  | "IOS"
+  | "ANDROID"
+  | "FLUTTER"
+  | "DEVOPS"
+  | "GAME"
+  | "SECURITY"
   | "AI"
-  | "Design"
-  | "Embedded";
+  | "DESIGN"
+  | "EMBEDDED";

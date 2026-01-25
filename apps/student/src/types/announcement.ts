@@ -35,3 +35,13 @@ export interface ApplicationFormResponse {
   submission_duration: string;
   major: string[];
 }
+
+export interface AnnouncementCreate {
+  title: string;
+  introduction: string;
+  phoneNumber: string;
+  major: string[];
+  deadline: string;
+  talentDescription: string;
+  assignment: string;
+}
