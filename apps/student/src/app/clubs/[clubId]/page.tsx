@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ interface ClubDetailPageProps {
 }
 
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
+  const router = useRouter();
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
   const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
@@ -76,11 +78,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   // clubData가 로드되면 편집 상태 초기화
   useEffect(() => {
     if (clubData) {
-      console.log("=== clubData 로드 ===");
-      console.log("clubData:", clubData);
-      console.log("clubData.club.majors:", clubData.club.majors);
-      console.log("clubData.club.majors type:", typeof clubData.club.majors);
-
       setEditClubName(clubData.club.clubName);
       setEditClubImage(clubData.club.clubImage);
       setEditOneLiner(clubData.club.oneLiner);
@@ -92,8 +89,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         })),
       );
       setEditMajors(clubData.club.majors);
-
-      console.log("editMajors 설정 후:", clubData.club.majors);
     }
   }, [clubData]);
 
@@ -103,21 +98,19 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // ClubAnnouncement를 JobPosting 형태로 변환
   const jobPostings = (announcements || []).map((announcement) => {
-    const deadlineDate = new Date(announcement.deadline);
+    const dateString = `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
+    const deadlineDate = new Date(dateString);
     const today = new Date();
     const status = deadlineDate < today ? "종료됨" : "진행중";
 
     return {
+      id: announcement.announcementId,
       status: status as "종료됨" | "진행중",
       title: announcement.title,
-      date: announcement.deadline,
+      date: dateString,
       content: undefined,
     };
   });
-
-  console.log("=== 공고 데이터 확인 ===");
-  console.log("announcements:", announcements);
-  console.log("jobPostings:", jobPostings);
 
   // 변경 사항 확인
   const editLinksUrls = editLinks.map((l) => l.url);
@@ -153,15 +146,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // 저장 핸들러
   const handleSave = () => {
-    console.log("=== 저장 시작 ===");
-    console.log("clubData:", clubData);
-    console.log("editClubName:", editClubName);
-    console.log("editClubImage:", editClubImage);
-    console.log("editOneLiner:", editOneLiner);
-    console.log("editIntroduction:", editIntroduction);
-    console.log("editMajors:", editMajors);
-    console.log("editLinks:", editLinks);
-
     if (!hasChanges) {
       toast.error("변경 사항이 없습니다");
       return;
@@ -193,8 +177,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       link: editLinks.map((l) => l.url).filter((url) => url.trim() !== ""),
     };
 
-    console.log("전송할 데이터:", updateData);
-    console.log("이미지 파일:", editClubImageFile);
     updateClubMutate({
       data: updateData,
       imageFile: editClubImageFile || undefined,
@@ -437,11 +419,10 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
                 {pagedPostings.map((posting) => (
                   <JobPostingItem
-                    key={`${posting.title}-${posting.date}`}
+                    key={posting.id}
                     status={posting.status}
                     title={posting.title}
                     date={posting.date}
-                    onClick={() => console.log("공고 클릭:", posting.title)}
                   />
                 ))}
               </div>
@@ -467,7 +448,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 <button
                   type="button"
                   className="rounded-lg bg-primary-500 px-4 py-2 font-medium text-[14px] text-white hover:bg-primary-600"
-                  onClick={() => console.log("공고 생성하기")}
+                  onClick={() => router.push("/announcements/create")}
                 >
                   공고 생성하기
                 </button>
@@ -481,11 +462,10 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                   <div className="flex min-h-[400px] flex-col gap-3 md:min-h-[460px] md:gap-4">
                     {pagedPostings.map((posting) => (
                       <JobPostingItem
-                        key={`${posting.title}-${posting.date}`}
+                        key={posting.id}
                         status={posting.status}
                         title={posting.title}
                         date={posting.date}
-                        onClick={() => console.log("공고 클릭:", posting.title)}
                         isMember={isClubMember}
                         content={posting.content}
                       />
@@ -536,9 +516,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                         <ApplicationCard
                           key={application.id}
                           application={application}
-                          onClick={() =>
-                            console.log("지원서 조회:", application.title)
-                          }
+                          onClick={() => {}}
                         />
                       ))}
                     </div>
@@ -574,9 +552,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                   <ApplicantCard
                     key={applicant.studentId}
                     applicant={applicant}
-                    onClick={() =>
-                      console.log("지원내역 조회:", applicant.name)
-                    }
+                    onClick={() => {}}
                   />
                 ))}
               </div>

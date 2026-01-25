@@ -59,11 +59,11 @@ export interface AnnouncementListResponse {
 }
 
 export interface ClubAnnouncement {
-  announcement_id: number;
+  announcementId: number;
   title: string;
-  deadline: string;
+  deadline: [number, number, number];
 }
 
 export interface ClubAnnouncementResponse {
-  club_announcement_responses: ClubAnnouncement[];
+  clubAnnouncements: ClubAnnouncement[];
 }

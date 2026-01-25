@@ -15,7 +15,7 @@ export const getClubAnnouncements = async (clubId: string) => {
   const response = await apiClient.get<ClubAnnouncementResponse>(
     `/announcements/clubs/${clubId}`,
   );
-  return response.data.club_announcement_responses;
+  return response.data.clubAnnouncements || [];
 };
 
 export const createAnnouncement = async (data: AnnouncementCreate) => {

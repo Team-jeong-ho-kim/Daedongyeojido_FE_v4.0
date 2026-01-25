@@ -104,13 +104,19 @@ export function ClubInfoEditSection({
           동아리 이미지
         </h2>
         <div className="flex items-center gap-4">
-          <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200">
-            <Image
-              src={isClubMember ? editClubImage : club.clubImage}
-              alt="동아리 이미지"
-              fill
-              className="object-cover"
-            />
+          <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+            {(isClubMember ? editClubImage : club.clubImage) ? (
+              <Image
+                src={isClubMember ? editClubImage : club.clubImage}
+                alt="동아리 이미지"
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-[12px] text-gray-400">
+                No Image
+              </div>
+            )}
           </div>
           {isClubMember && (
             <label className="cursor-pointer rounded-lg border border-gray-300 px-3 py-1.5 text-[13px] text-gray-600 hover:bg-gray-50">
