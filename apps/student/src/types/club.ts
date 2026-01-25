@@ -17,8 +17,17 @@ export interface ClubDetail {
   introduction: string;
   oneLiner: string;
   clubImage: string;
-  majors: Major[];
+  majors: string[];
   links: string[];
+}
+
+export interface ClubUpdate {
+  clubName: string;
+  introduction: string;
+  oneLiner: string;
+  clubImage: string;
+  major: string[];
+  link: string[];
 }
 
 export interface ClubMember {
