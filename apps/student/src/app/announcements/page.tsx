@@ -2,59 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useUserStore } from "shared";
 import { Button } from "ui";
 import { AnnouncementItem, CTASection, Pagination } from "@/components";
-import type { Announcement, UserRole } from "@/types";
+import { useGetAllAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
+import type { Announcement } from "@/types";
 
 export default function AnnouncementsPage() {
   const router = useRouter();
   const [curPage, setCurPage] = useState(1);
   const limit = 8;
 
-  // 서버에서 권한 가져오기
-  const role = "CLUB_MEMBER" as UserRole;
+  const { data: announcementsData } = useGetAllAnnouncementsQuery();
+
+  const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
-  // 임시 데이터
-  const announcements: Announcement[] = [
-    {
-      announcement_id: 1,
-      title: "2025 상반기 신입 동아리원",
-      club_name: "대동여지도",
-      deadline: "2025-12-12",
-      club_image:
-        "https://daedong-bucket.s3.ap-northeast-2.amazonaws.com/6841828f-6f6b-4670-a4b2-0bb3411274a2.jpg",
-    },
-    {
-      announcement_id: 2,
-      title: "2025 상반기 신입 동아리원 모집",
-      club_name: "대동여지도",
-      deadline: "2025-12-12",
-      club_image:
-        "https://daedong-bucket.s3.ap-northeast-2.amazonaws.com/6841828f-6f6b-4670-a4b2-0bb3411274a2.jpg",
-    },
-    {
-      announcement_id: 3,
-      title: "DMS 백엔드 개발자 모집",
-      club_name: "DMS",
-      deadline: "2025-01-25",
-      club_image: "",
-    },
-    {
-      announcement_id: 4,
-      title: "INFO 디자이너 모집",
-      club_name: "INFO",
-      deadline: "2025-01-20",
-      club_image: "",
-    },
-    {
-      announcement_id: 5,
-      title: "TeamQSS 신입 부원 모집",
-      club_name: "TeamQSS",
-      deadline: "2025-02-28",
-      club_image: "",
-    },
-  ];
+  const announcements: Announcement[] =
+    announcementsData?.map((item) => ({
+      announcement_id: item.announcementId,
+      title: item.title,
+      club_name: item.clubName,
+      deadline: `${item.deadline[0]}-${String(item.deadline[1]).padStart(2, "0")}-${String(item.deadline[2]).padStart(2, "0")}`,
+      club_image: item.clubImage,
+    })) || [];
 
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">

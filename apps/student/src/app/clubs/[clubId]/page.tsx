@@ -20,13 +20,13 @@ import {
 import {
   MOCK_APPLICANTS,
   MOCK_APPLICATIONS,
-  MOCK_JOB_POSTINGS,
   MOCK_NOTICES,
 } from "@/constants/clubDetailMock";
 import {
   useDissolveClubMutation,
   useUpdateClubMutation,
 } from "@/hooks/mutations/useClub";
+import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 
 interface ClubDetailPageProps {
@@ -36,6 +36,7 @@ interface ClubDetailPageProps {
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
+  const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
   const { mutate: updateClubMutate, isPending: isUpdating } =
     useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
@@ -99,7 +100,24 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const postingLimit = 5;
   const club = clubData;
   const clubMembers = clubData?.clubMembers || [];
-  const jobPostings = MOCK_JOB_POSTINGS;
+
+  // ClubAnnouncement를 JobPosting 형태로 변환
+  const jobPostings = (announcements || []).map((announcement) => {
+    const deadlineDate = new Date(announcement.deadline);
+    const today = new Date();
+    const status = deadlineDate < today ? "종료됨" : "진행중";
+
+    return {
+      status: status as "종료됨" | "진행중",
+      title: announcement.title,
+      date: announcement.deadline,
+      content: undefined,
+    };
+  });
+
+  console.log("=== 공고 데이터 확인 ===");
+  console.log("announcements:", announcements);
+  console.log("jobPostings:", jobPostings);
 
   // 변경 사항 확인
   const editLinksUrls = editLinks.map((l) => l.url);

@@ -45,3 +45,25 @@ export interface AnnouncementCreate {
   talentDescription: string;
   assignment: string;
 }
+
+export interface AnnouncementListItem {
+  announcementId: number;
+  title: string;
+  clubName: string;
+  deadline: [number, number, number]; // [year, month, day]
+  clubImage: string;
+}
+
+export interface AnnouncementListResponse {
+  announcements: AnnouncementListItem[];
+}
+
+export interface ClubAnnouncement {
+  announcement_id: number;
+  title: string;
+  deadline: string;
+}
+
+export interface ClubAnnouncementResponse {
+  club_announcement_responses: ClubAnnouncement[];
+}
