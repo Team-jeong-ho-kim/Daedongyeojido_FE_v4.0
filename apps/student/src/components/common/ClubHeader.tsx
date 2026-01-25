@@ -24,13 +24,19 @@ export function ClubHeader({
       <div className="flex items-start px-6 pt-8 pb-6 md:px-12 md:pt-10 lg:px-24 lg:pt-12 lg:pb-8">
         <div className="flex items-start gap-4 md:gap-6 lg:gap-8">
           <div className="h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-[16px] bg-gray-200 md:h-[88px] md:w-[88px] md:rounded-[18px] lg:h-[104px] lg:w-[104px] lg:rounded-[20px]">
-            <Image
-              src={clubImage}
-              alt={clubName}
-              width={104}
-              height={104}
-              className="h-full w-full object-cover"
-            />
+            {clubImage && clubImage.trim() !== "" ? (
+              <Image
+                src={clubImage}
+                alt={clubName}
+                width={104}
+                height={104}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gray-200">
+                <span className="text-gray-400 text-sm">No Image</span>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1 pt-2 md:pt-3">

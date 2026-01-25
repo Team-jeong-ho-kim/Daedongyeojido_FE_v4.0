@@ -23,6 +23,7 @@ import {
   MOCK_JOB_POSTINGS,
   MOCK_NOTICES,
 } from "@/constants/clubDetailMock";
+import { useUpdateClubMutation } from "@/hooks/mutations/useClub";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 import { useDissolveClubMutation } from "@/hooks/mutations/useClub";
 
@@ -33,6 +34,8 @@ interface ClubDetailPageProps {
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
+  const { mutate: updateClubMutate, isPending: isUpdating } =
+    useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
     useDissolveClubMutation();
 
@@ -69,6 +72,11 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   // clubData가 로드되면 편집 상태 초기화
   useEffect(() => {
     if (clubData) {
+      console.log("=== clubData 로드 ===");
+      console.log("clubData:", clubData);
+      console.log("clubData.club.majors:", clubData.club.majors);
+      console.log("clubData.club.majors type:", typeof clubData.club.majors);
+
       setEditClubName(clubData.club.clubName);
       setEditClubImage(clubData.club.clubImage);
       setEditOneLiner(clubData.club.oneLiner);
@@ -80,6 +88,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         })),
       );
       setEditMajors(clubData.club.majors);
+
+      console.log("editMajors 설정 후:", clubData.club.majors);
     }
   }, [clubData]);
 
@@ -122,11 +132,50 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // 저장 핸들러
   const handleSave = () => {
+    console.log("=== 저장 시작 ===");
+    console.log("clubData:", clubData);
+    console.log("editClubName:", editClubName);
+    console.log("editClubImage:", editClubImage);
+    console.log("editOneLiner:", editOneLiner);
+    console.log("editIntroduction:", editIntroduction);
+    console.log("editMajors:", editMajors);
+    console.log("editLinks:", editLinks);
+
     if (!hasChanges) {
       toast.error("변경 사항이 없습니다");
       return;
     }
-    toast.success("변경 사항이 저장되었습니다");
+
+    // 필수 필드 검증
+    if (!editClubName.trim()) {
+      toast.error("동아리 이름을 입력해주세요.");
+      return;
+    }
+    if (!editOneLiner.trim()) {
+      toast.error("한 줄 소개를 입력해주세요.");
+      return;
+    }
+    if (!editIntroduction.trim()) {
+      toast.error("동아리 소개를 입력해주세요.");
+      return;
+    }
+    if (editMajors.length === 0) {
+      toast.error("최소 하나의 전공을 선택해주세요.");
+      return;
+    }
+
+    const updateData = {
+      clubName: editClubName.trim(),
+      clubImage: editClubImage,
+      oneLiner: editOneLiner.trim(),
+      introduction: editIntroduction.trim(),
+      major: editMajors,
+      link: editLinks.map((l) => l.url).filter((url) => url.trim() !== ""),
+    };
+
+    console.log("전송할 데이터:", updateData);
+    console.log("JSON.stringify:", JSON.stringify(updateData));
+    updateClubMutate(updateData);
   };
 
   // 팀원 추가 요청 핸들러
@@ -284,10 +333,11 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               <section className="flex justify-center border-gray-200 border-t px-8 pt-8 md:px-32 lg:px-60">
                 <Button
                   onClick={handleSave}
+                  disabled={isUpdating || !hasChanges}
                   size="lg"
-                  className="flex-1 bg-primary-500 py-2 text-white hover:bg-primary-600"
+                  className="flex-1 bg-primary-500 py-2 text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  변경 사항 저장
+                  {isUpdating ? "저장 중..." : "변경 사항 저장"}
                 </Button>
               </section>
             )}
