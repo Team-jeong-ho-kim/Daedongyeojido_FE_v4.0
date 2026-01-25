@@ -23,8 +23,8 @@ import {
   MOCK_JOB_POSTINGS,
   MOCK_NOTICES,
 } from "@/constants/clubDetailMock";
-import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 import { useDissolveClubMutation } from "@/hooks/mutations/useClub";
+import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 
 interface ClubDetailPageProps {
   params: Promise<{ clubId: string }>;
