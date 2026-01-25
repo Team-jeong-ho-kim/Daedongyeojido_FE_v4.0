@@ -10,3 +10,8 @@ export const getDetailClub = async (clubId: string) => {
   const response = await apiClient.get<ClubDetailResponse>(`/clubs/${clubId}`);
   return response.data;
 };
+
+export const dissolveClub = async () => {
+  const response = await apiClient.post("/clubs/dissolution");
+  return response.data;
+};

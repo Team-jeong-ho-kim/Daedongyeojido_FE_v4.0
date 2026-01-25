@@ -24,6 +24,7 @@ import {
   MOCK_NOTICES,
 } from "@/constants/clubDetailMock";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
+import { useDissolveClubMutation } from "@/hooks/mutations/useClub";
 
 interface ClubDetailPageProps {
   params: Promise<{ clubId: string }>;
@@ -32,6 +33,8 @@ interface ClubDetailPageProps {
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
+  const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
+    useDissolveClubMutation();
 
   const role = useUserStore((state) => state.userInfo?.role);
 
@@ -294,9 +297,19 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
               <section className="flex justify-end pt-4">
                 <button
                   type="button"
-                  className="rounded-lg border border-red-500 px-4 py-2 text-[14px] text-red-500 hover:bg-red-50"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "정말로 동아리 해체를 신청하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+                      )
+                    ) {
+                      dissolveClubMutate();
+                    }
+                  }}
+                  disabled={isDissolvePending}
+                  className="rounded-lg border border-red-500 px-4 py-2 text-[14px] text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  동아리 해체 신청
+                  {isDissolvePending ? "신청 중..." : "동아리 해체 신청"}
                 </button>
               </section>
             )}
