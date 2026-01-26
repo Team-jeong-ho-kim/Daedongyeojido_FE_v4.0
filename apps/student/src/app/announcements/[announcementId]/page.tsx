@@ -11,22 +11,15 @@ import {
   Pagination,
 } from "@/components";
 import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
+import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
+import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 import type { UserRole } from "@/types";
-import type { AnnouncementDetailResponse } from "@/types/announcement";
 
 interface AnnouncementDetailPageProps {
   params: Promise<{ announcementId: string }>;
 }
 
-// 동아리 정보 (전체조회에서 props로 받아올 예정)
-const mockClubInfo = {
-  clubType: "전공동아리",
-  clubName: "떡넷",
-  clubImage: "/logo.png",
-  oneLiner: "대마고의 모든 정보를 한눈에",
-};
-
-// 면접 절차 (정적 데이터)
+// 면접 절차
 const interviewSteps = [
   { id: 1, name: "지원서 접수" },
   { id: 2, name: "과제 제출" },
@@ -35,17 +28,6 @@ const interviewSteps = [
   { id: 5, name: "실습 면접" },
   { id: 6, name: "최종 합격 발표" },
 ];
-
-// mock data (서버 응답 형식)
-const mockAnnouncement: AnnouncementDetailResponse = {
-  title: "대동여지도 동아리 신입모집",
-  major: ["BE", "FE"],
-  phoneNumber: "대표자 연락처",
-  deadline: "2025-12-01",
-  introduction: "AI에 관심 있는 학우들의 많은 지원 바랍니다.",
-  talent_description: "머신러닝 기초지식, 학습 열정",
-  assignment: "TensorFlow 혹은 PyTorch 사용 프로젝트 제출",
-};
 
 // localStorage 키 생성 함수
 const getTempSaveKey = (announcementId: string) => `tempSave_${announcementId}`;
@@ -72,6 +54,11 @@ export default function AnnouncementDetailPage({
   params,
 }: AnnouncementDetailPageProps) {
   const { announcementId } = use(params);
+  const { data: announcementData } = useGetDetailAnnounceQuery(announcementId);
+
+  const clubId = announcementData?.clubId?.toString() || "";
+  const { data: clubData } = useGetDetailClubQuery(clubId);
+
   const [activeTab, setActiveTab] = useState<"details" | "applications">(
     "details",
   );
@@ -81,7 +68,7 @@ export default function AnnouncementDetailPage({
   const role = "CLUB_MEMBER" as UserRole;
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
-  const announcement = mockAnnouncement;
+  const announcement = announcementData;
 
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
@@ -106,15 +93,22 @@ export default function AnnouncementDetailPage({
     }
   }, [announcementId]);
 
+  if (!announcement || !clubData) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">공고 정보를 불러오는 중...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col bg-white">
       {/* 헤더 */}
       <ClubHeader
-        clubImage={mockClubInfo.clubImage}
-        clubName={mockClubInfo.clubName}
-        title={`${mockClubInfo.clubName} - ${announcement.title}`}
-        subtitle={mockClubInfo.clubType}
-        oneLiner={mockClubInfo.oneLiner}
+        clubImage={clubData.club.clubImage}
+        clubName={clubData.club.clubName}
+        title={`${clubData.club.clubName} - ${announcement.title}`}
+        oneLiner={clubData.club.oneLiner}
         buttonText="동아리 소개 보러가기"
       />
 
@@ -168,7 +162,7 @@ export default function AnnouncementDetailPage({
                 동아리명
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {mockClubInfo.clubName}
+                {clubData.club.clubName}
               </p>
             </section>
 
@@ -178,7 +172,7 @@ export default function AnnouncementDetailPage({
                 모집 전공
               </h2>
               <div className="flex flex-wrap gap-2">
-                {announcement.major.map((major) => (
+                {[...new Set(announcement.major)].map((major) => (
                   <span
                     key={major}
                     className="rounded-full border border-red-300 px-3 py-1 text-[12px] text-red-500 md:text-[13px]"
@@ -215,7 +209,7 @@ export default function AnnouncementDetailPage({
                 인재상
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.talent_description}
+                {announcement.talentDescription}
               </p>
             </section>
 

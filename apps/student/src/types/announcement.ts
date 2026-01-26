@@ -13,12 +13,13 @@ export interface AnnouncementsResponse {
 }
 
 export interface AnnouncementDetailResponse {
+  clubId: number;
   title: string;
   major: Major[];
   phoneNumber: string;
   deadline: string;
   introduction: string;
-  talent_description: string;
+  talentDescription: string;
   assignment: string;
 }
 
