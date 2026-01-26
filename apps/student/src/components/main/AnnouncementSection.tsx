@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
+import { useGetAllAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import AnnouncementItem from "../announcement/item/AnnouncementItem";
 
 export default function AnnouncementSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { data: announcements } = useGetAllAnnouncementsQuery();
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -22,51 +24,9 @@ export default function AnnouncementSection() {
     }
   };
 
-  // 예시 데이터 (실제로는 props나 API에서 받아올 데이터)
-  const announcements = [
-    {
-      announcement_id: 1,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-    {
-      announcement_id: 2,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-    {
-      announcement_id: 3,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-    {
-      announcement_id: 4,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-    {
-      announcement_id: 5,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-    {
-      announcement_id: 6,
-      title: "2025년 신입부원 모집",
-      club_name: "동아리명",
-      deadline: "12.14",
-      club_image: "/images/announcements/placeholder.jpg",
-    },
-  ];
+  const daedlineFormat = (deadline: number[]) => {
+    return deadline.join("-");
+  };
 
   return (
     <section className="w-full bg-white py-16 md:py-24 lg:py-30">
@@ -125,14 +85,14 @@ export default function AnnouncementSection() {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         <div className="flex gap-4 px-4 md:gap-6 md:px-8 lg:pr-8 lg:pl-[calc((100vw-1280px)/2+32px)]">
-          {announcements.map((announcement) => (
-            <div key={announcement.announcement_id} className="flex-shrink-0">
+          {announcements?.map((announcement) => (
+            <div key={announcement.announcementId} className="flex-shrink-0">
               <AnnouncementItem
-                announcement_id={announcement.announcement_id}
+                announcement_id={announcement.announcementId}
                 title={announcement.title}
-                club_name={announcement.club_name}
-                deadline={announcement.deadline}
-                club_image={announcement.club_image}
+                club_name={announcement.clubName}
+                deadline={daedlineFormat(announcement.deadline)}
+                club_image={announcement.clubImage}
               />
             </div>
           ))}
