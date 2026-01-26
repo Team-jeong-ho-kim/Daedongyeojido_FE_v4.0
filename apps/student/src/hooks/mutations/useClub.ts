@@ -8,15 +8,21 @@ export const useUpdateClubMutation = (clubId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ data, imageFile }: { data: ClubUpdate; imageFile?: File }) =>
-      updateClub(clubId, data, imageFile),
+    mutationFn: ({
+      data,
+      imageFile,
+      imageChanged,
+    }: {
+      data: ClubUpdate;
+      imageFile: File;
+      imageChanged: boolean;
+    }) => updateClub(clubId, data, imageFile, imageChanged),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["club", clubId] });
       queryClient.invalidateQueries({ queryKey: ["clubs"] });
       toast.success("변경 사항이 저장되었습니다.");
     },
     onError: (error: any) => {
-      console.error("동아리 수정 실패:", error);
       const status = error.response?.status;
 
       if (status === 400) {
@@ -44,7 +50,6 @@ export const useDissolveClubMutation = () => {
       }, 1500);
     },
     onError: (error: any) => {
-      console.error("동아리 해체 신청 실패:", error);
       const status = error.response?.status;
 
       if (status === 400) {

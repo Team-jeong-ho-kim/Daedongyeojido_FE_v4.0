@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FIELDS } from "@/constants/club";
@@ -49,8 +50,6 @@ export function ClubInfoEditSection({
   const nameInputRef = useRef<HTMLInputElement>(null);
   const oneLinerInputRef = useRef<HTMLInputElement>(null);
   const introTextareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const editLinksUrls = editLinks.map((l) => l.url);
 
   // 동아리명 편집 모드 시 포커스
   useEffect(() => {
@@ -123,11 +122,26 @@ export function ClubInfoEditSection({
               이미지 변경
               <input
                 type="file"
-                accept="image/*"
+                accept=".jpg,.jpeg,.png,.webp"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
+                    // 파일 형식 검증
+                    const allowedTypes = [
+                      "image/jpeg",
+                      "image/jpg",
+                      "image/png",
+                      "image/webp",
+                    ];
+                    if (!allowedTypes.includes(file.type)) {
+                      toast.error(
+                        "JPG, JPEG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.",
+                      );
+                      e.target.value = "";
+                      return;
+                    }
+
                     const url = URL.createObjectURL(file);
                     setEditClubImage(url);
                     setEditClubImageFile(file);
@@ -279,7 +293,7 @@ export function ClubInfoEditSection({
                   {field}
                 </button>
               ))
-            : club.majors.map((major) => (
+            : [...new Set(club.majors)].map((major) => (
                 <span
                   key={major}
                   className="rounded-full border border-primary-300 px-3 py-1 text-[12px] text-primary-500 md:text-[13px]"
@@ -424,16 +438,22 @@ export function ClubInfoEditSection({
             </div>
           ) : (
             <div className="flex flex-1 flex-col gap-1">
-              {(isClubMember ? editLinksUrls : club.links).map((link) => (
-                <a
-                  key={link}
-                  href={link}
+              {(isClubMember
+                ? editLinks
+                : club.links.map((link, index) => ({
+                    id: `club-link-${index}`,
+                    url: link,
+                  }))
+              ).map((linkItem) => (
+                <Link
+                  key={linkItem.id}
+                  href={linkItem.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="truncate text-[14px] text-gray-500 underline md:text-[15px]"
                 >
-                  {link}
-                </a>
+                  {linkItem.url}
+                </Link>
               ))}
             </div>
           )}

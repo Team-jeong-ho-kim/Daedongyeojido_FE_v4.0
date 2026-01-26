@@ -39,7 +39,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
   const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
-  const { mutate: updateClubMutate, isPending: isUpdating } =
+  const { mutateAsync: updateClubMutate, isPending: isUpdating } =
     useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
     useDissolveClubMutation();
@@ -82,13 +82,18 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       setEditClubImage(clubData.club.clubImage);
       setEditOneLiner(clubData.club.oneLiner);
       setEditIntroduction(clubData.club.introduction);
+
+      // 중복 제거하여 링크 설정
+      const uniqueLinks = [...new Set(clubData.club.links)];
       setEditLinks(
-        clubData.club.links.map((url: string, i: number) => ({
+        uniqueLinks.map((url: string, i: number) => ({
           id: `initial-${i}`,
           url,
         })),
       );
-      setEditMajors(clubData.club.majors);
+
+      // 중복 제거하여 전공 설정
+      setEditMajors([...new Set(clubData.club.majors)]);
     }
   }, [clubData]);
 
@@ -114,14 +119,23 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // 변경 사항 확인
   const editLinksUrls = editLinks.map((l) => l.url);
+
+  // 중복 제거 및 정렬하여 비교
+  const normalizedEditLinks = [...new Set(editLinksUrls)].sort();
+  const normalizedClubLinks = [...new Set(club?.club.links || [])].sort();
+  const normalizedEditMajors = [...new Set(editMajors)].sort();
+  const normalizedClubMajors = [...new Set(club?.club.majors || [])].sort();
+
   const hasChanges =
     editClubName !== club?.club.clubName ||
-    editClubImage !== club.club.clubImage ||
-    editOneLiner !== club.club.oneLiner ||
-    editIntroduction !== club.club.introduction ||
-    JSON.stringify(editLinksUrls) !== JSON.stringify(club.club.links) ||
-    JSON.stringify(editMajors.sort()) !==
-      JSON.stringify(club.club.majors.sort());
+    editClubImage !== club?.club.clubImage ||
+    editClubImageFile !== null || // 새 이미지 파일이 선택된 경우
+    editOneLiner !== club?.club.oneLiner ||
+    editIntroduction !== club?.club.introduction ||
+    JSON.stringify(normalizedEditLinks) !==
+      JSON.stringify(normalizedClubLinks) ||
+    JSON.stringify(normalizedEditMajors) !==
+      JSON.stringify(normalizedClubMajors);
 
   // 페이지 이탈 시 변경사항 경고
   useEffect(() => {
@@ -144,8 +158,14 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     }
   };
 
+  // 빈 더미 파일 생성 (이미지 변경하지 않은 경우 사용)
+  const createDummyFile = (): File => {
+    const blob = new Blob([], { type: "image/jpeg" });
+    return new File([blob], "dummy.jpg", { type: "image/jpeg" });
+  };
+
   // 저장 핸들러
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!hasChanges) {
       toast.error("변경 사항이 없습니다");
       return;
@@ -169,18 +189,45 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       return;
     }
 
+    // 중복 제거하여 링크 URL 추출
+    const linkUrls = editLinks
+      .map((l) => l.url)
+      .filter((url) => url.trim() !== "");
+    const uniqueLinks = [...new Set(linkUrls)];
+
     const updateData = {
       clubName: editClubName.trim(),
       oneLiner: editOneLiner.trim(),
       introduction: editIntroduction.trim(),
-      major: editMajors,
-      link: editLinks.map((l) => l.url).filter((url) => url.trim() !== ""),
+      major: [...new Set(editMajors)], // 중복 제거
+      link: uniqueLinks, // 중복 제거된 링크
     };
 
-    updateClubMutate({
-      data: updateData,
-      imageFile: editClubImageFile || undefined,
-    });
+    // 이미지 파일 준비 -> 새로 선택한 파일이 있으면 그걸 사용, 없으면 빈 더미 파일 사용
+    let imageFileToSend: File;
+    let imageChanged = false;
+
+    if (editClubImageFile) {
+      // 새 이미지를 선택한 경우
+      imageFileToSend = editClubImageFile;
+      imageChanged = true;
+    } else {
+      // 이미지를 변경하지 않은 경우 -> 빈 더미 파일 사용
+      imageFileToSend = createDummyFile();
+      imageChanged = false;
+    }
+
+    try {
+      await updateClubMutate({
+        data: updateData,
+        imageFile: imageFileToSend,
+        imageChanged,
+      });
+      // 성공 후 이미지 파일 상태 리셋
+      setEditClubImageFile(null);
+    } catch {
+      // 에러는 mutation hook의 onError에서 처리됨
+    }
   };
 
   // 팀원 추가 요청 핸들러

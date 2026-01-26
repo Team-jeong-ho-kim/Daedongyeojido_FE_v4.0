@@ -14,7 +14,8 @@ export const getDetailClub = async (clubId: string) => {
 export const updateClub = async (
   clubId: string,
   data: ClubUpdate,
-  imageFile?: File,
+  imageFile: File,
+  imageChanged: boolean,
 ) => {
   const formData = new FormData();
 
@@ -22,18 +23,21 @@ export const updateClub = async (
   formData.append("oneLiner", data.oneLiner);
   formData.append("introduction", data.introduction);
 
-  data.major.forEach((m) => {
+  // 중복 제거
+  [...new Set(data.major)].forEach((m) => {
     formData.append("major", m);
   });
 
-  data.link.forEach((l) => {
+  // 중복 제거
+  [...new Set(data.link)].forEach((l) => {
     formData.append("link", l);
   });
 
-  // MultipartFile이므로 File 객체일 때만 추가
-  if (imageFile) {
-    formData.append("clubImage", imageFile);
-  }
+  // 이미지는 무조건 포함 (변경되지 않은 경우 빈 더미 파일)
+  formData.append("clubImage", imageFile);
+
+  // 이미지 변경 여부 플래그
+  formData.append("imageChanged", imageChanged.toString());
 
   const response = await apiClient.patch(`/clubs/${clubId}`, formData, {
     headers: {
