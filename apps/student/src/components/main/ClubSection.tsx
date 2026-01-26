@@ -1,28 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-
-interface Club {
-  club_id: number;
-  name: string;
-  image: string;
-}
+import { useGetAllClubsQuery } from "@/hooks/querys/useClubQuery";
 
 export default function ClubSection() {
-  // 예시 데이터 (실제로는 props나 API에서 받아올 데이터)
-  const clubs: Club[] = [
-    { club_id: 1, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 2, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 3, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 4, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 5, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 6, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 7, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 8, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 9, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 10, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 11, name: "동아리명", image: "/images/clubs/placeholder.png" },
-    { club_id: 12, name: "동아리명", image: "/images/clubs/placeholder.png" },
-  ];
+  const { data: clubs } = useGetAllClubsQuery();
 
   return (
     <section className="w-full bg-gray-100 py-12 md:py-16 lg:py-20">
@@ -46,24 +29,24 @@ export default function ClubSection() {
         </Link>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4">
-          {clubs.map((club) => (
+          {clubs?.map((club) => (
             <Link
-              key={club.club_id}
-              href={`/clubs/${club.club_id}`}
+              key={club.clubId}
+              href={`/clubs/${club.clubId}`}
               className="flex items-center justify-between rounded-lg bg-white px-4 py-3 transition-shadow hover:shadow-md md:px-6 md:py-4"
             >
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-stone-800 md:h-12 md:w-12">
                   <Image
-                    src={club.image}
-                    alt={club.name}
+                    src={club.clubImage}
+                    alt={club.clubName}
                     width={48}
                     height={48}
                     className="h-full w-full object-cover"
                   />
                 </div>
                 <span className="font-medium text-gray-900 text-sm md:text-base">
-                  {club.name}
+                  {club.clubName}
                 </span>
               </div>
               <Image
