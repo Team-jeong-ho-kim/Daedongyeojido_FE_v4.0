@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import {
@@ -14,7 +15,6 @@ import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
 import { useDeleteAnnouncementMutation } from "@/hooks/mutations/useAnnouncement";
 import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
-import type { UserRole } from "@/types";
 
 interface AnnouncementDetailPageProps {
   params: Promise<{ announcementId: string }>;
@@ -67,7 +67,7 @@ export default function AnnouncementDetailPage({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [applicationPage, setApplicationPage] = useState(1);
 
-  const role = "CLUB_MEMBER" as UserRole;
+  const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const announcement = announcementData;
