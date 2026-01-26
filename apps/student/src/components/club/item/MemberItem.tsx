@@ -48,17 +48,23 @@ export default function MemberItem({
           {userName}
         </h3>
         <p className="mt-1 line-clamp-1 text-[12px] text-gray-600 leading-relaxed transition-all duration-200 group-hover:line-clamp-none md:text-[13px]">
-          {introduce}
+          {introduce || "소개가 없습니다."}
         </p>
         <div className="flex max-h-7 flex-wrap gap-1 overflow-hidden text-[11px] text-gray-500 transition-all duration-200 group-hover:max-h-none md:text-[12px]">
-          {majors.map((major) => (
-            <span
-              key={major}
-              className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px]"
-            >
-              # {major}
+          {majors && majors.length > 0 ? (
+            majors.map((major) => (
+              <span
+                key={major}
+                className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px]"
+              >
+                # {major}
+              </span>
+            ))
+          ) : (
+            <span className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px] text-gray-400">
+              전공 정보 없음
             </span>
-          ))}
+          )}
         </div>
       </div>
     </article>
