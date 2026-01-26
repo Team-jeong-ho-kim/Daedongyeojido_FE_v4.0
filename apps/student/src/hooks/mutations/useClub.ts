@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { dissolveClub, updateClub } from "@/api/club";
+import { createClubApplication, dissolveClub, updateClub } from "@/api/club";
 import type { ClubUpdate } from "@/types";
 
 export const useUpdateClubMutation = (clubId: string) => {
@@ -60,6 +60,59 @@ export const useDissolveClubMutation = () => {
         toast.error("동아리를 찾을 수 없습니다.");
       } else {
         toast.error("동아리 해체 신청에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+  });
+};
+
+export const useCreateClubApplicationMutation = () => {
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: ({
+      clubName,
+      oneLiner,
+      introduction,
+      major,
+      link,
+      clubImage,
+    }: {
+      clubName: string;
+      oneLiner: string;
+      introduction: string;
+      major: string[];
+      link: string[];
+      clubImage: File;
+    }) =>
+      createClubApplication(
+        clubName,
+        oneLiner,
+        introduction,
+        major,
+        link,
+        clubImage,
+      ),
+    onSuccess: () => {
+      toast.success(
+        "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
+      );
+      setTimeout(() => {
+        router.push("/mypage/alarm");
+      }, 1500);
+    },
+    onError: (error: any) => {
+      const status = error.response?.status;
+
+      if (status === 400) {
+        toast.error("요청 형식이 잘못되었습니다.");
+      } else if (status === 403) {
+        toast.error("동아리 개설 권한이 없습니다.");
+      } else if (status === 409) {
+        toast.error(
+          "이미 동아리 개설 신청이 존재하거나 중복된 동아리명입니다.",
+        );
+      } else {
+        toast.error("동아리 개설 신청에 실패했습니다. 다시 시도해주세요.");
       }
     },
   });

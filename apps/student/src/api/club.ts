@@ -51,3 +51,35 @@ export const dissolveClub = async () => {
   const response = await apiClient.post("/clubs/dissolution");
   return response.data;
 };
+
+export const createClubApplication = async (
+  clubName: string,
+  oneLiner: string,
+  introduction: string,
+  major: string[],
+  link: string[],
+  clubImage: File,
+) => {
+  const formData = new FormData();
+
+  formData.append("clubName", clubName);
+  formData.append("oneLiner", oneLiner);
+  formData.append("introduction", introduction);
+
+  major.forEach((m) => {
+    formData.append("major", m);
+  });
+
+  link.forEach((l) => {
+    formData.append("link", l);
+  });
+
+  formData.append("clubImage", clubImage);
+
+  const response = await apiClient.post("/clubs/applications", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};

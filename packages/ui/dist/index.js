@@ -46,10 +46,10 @@ __export(index_exports, {
   StudentHeader: () => StudentHeader,
   TextArea: () => TextArea,
   TextInput: () => TextInput,
-  Toaster: () => import_sonner.Toaster,
+  Toaster: () => import_sonner2.Toaster,
   blackLogo: () => blackLogo,
   buttonVariants: () => buttonVariants,
-  toast: () => import_sonner.toast,
+  toast: () => import_sonner2.toast,
   whiteLogo: () => whiteLogo
 });
 module.exports = __toCommonJS(index_exports);
@@ -401,6 +401,7 @@ function FormField({
 // src/components/input/ImageUpload.tsx
 var import_image3 = __toESM(require("next/image"));
 var import_react2 = require("react");
+var import_sonner = require("sonner");
 var import_jsx_runtime6 = require("react/jsx-runtime");
 var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function ImageUpload({
@@ -415,6 +416,17 @@ function ImageUpload({
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp"
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        import_sonner.toast.error("JPG, JPEG, PNG, WEBP \uD615\uC2DD\uC758 \uC774\uBBF8\uC9C0\uB9CC \uC5C5\uB85C\uB4DC \uAC00\uB2A5\uD569\uB2C8\uB2E4.");
+        e.target.value = "";
+        return;
+      }
       setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -464,7 +476,7 @@ function ImageUpload({
         {
           id: fileInputId,
           type: "file",
-          accept: "image/*",
+          accept: ".jpg,.jpeg,.png,.webp",
           onChange: handleFileUpload,
           className: "hidden"
         }
@@ -886,7 +898,7 @@ var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
 
 // src/index.ts
-var import_sonner = require("sonner");
+var import_sonner2 = require("sonner");
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Button,

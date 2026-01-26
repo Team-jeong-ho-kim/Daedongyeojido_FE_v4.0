@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -14,10 +13,11 @@ import {
 } from "ui";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
+import { useCreateClubApplicationMutation } from "@/hooks/mutations/useClub";
 import { useModalStore } from "@/stores/useModalStore";
 
 export default function ClubCreationPage() {
-  const router = useRouter();
+  const { mutate: createClubMutate } = useCreateClubApplicationMutation();
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
   const [clubIntro, setClubIntro] = useState("");
@@ -80,19 +80,23 @@ export default function ClubCreationPage() {
   };
 
   const handleSubmit = () => {
-    console.log({
-      clubName,
-      clubLogo,
-      clubIntro,
-      clubLinks: clubLinks.map((link) => link.url),
-      clubIntroDetail,
-      selectedFields,
+    if (!clubLogo) {
+      toast.error("동아리 로고를 업로드해주세요.");
+      toggleShow();
+      return;
+    }
+
+    const links = clubLinks.map((link) => link.url).filter((url) => url.trim());
+
+    createClubMutate({
+      clubName: clubName.trim(),
+      oneLiner: clubIntro.trim(),
+      introduction: clubIntroDetail.trim(),
+      major: selectedFields,
+      link: links,
+      clubImage: clubLogo,
     });
-    toast.success(
-      "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
-    );
     toggleShow();
-    router.push("/mypage/alarm");
   };
 
   return (

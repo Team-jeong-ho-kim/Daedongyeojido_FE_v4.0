@@ -347,6 +347,7 @@ function FormField({
 // src/components/input/ImageUpload.tsx
 import Image3 from "next/image";
 import { useCallback, useEffect as useEffect2, useId, useState as useState2 } from "react";
+import { toast } from "sonner";
 import { Fragment as Fragment2, jsx as jsx6, jsxs as jsxs5 } from "react/jsx-runtime";
 var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function ImageUpload({
@@ -361,6 +362,17 @@ function ImageUpload({
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp"
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("JPG, JPEG, PNG, WEBP \uD615\uC2DD\uC758 \uC774\uBBF8\uC9C0\uB9CC \uC5C5\uB85C\uB4DC \uAC00\uB2A5\uD569\uB2C8\uB2E4.");
+        e.target.value = "";
+        return;
+      }
       setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -410,7 +422,7 @@ function ImageUpload({
         {
           id: fileInputId,
           type: "file",
-          accept: "image/*",
+          accept: ".jpg,.jpeg,.png,.webp",
           onChange: handleFileUpload,
           className: "hidden"
         }
@@ -832,7 +844,7 @@ var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
 
 // src/index.ts
-import { Toaster, toast } from "sonner";
+import { Toaster, toast as toast2 } from "sonner";
 export {
   Button,
   CalendarIcon,
@@ -852,6 +864,6 @@ export {
   Toaster,
   blackLogo,
   buttonVariants,
-  toast,
+  toast2 as toast,
   whiteLogo
 };

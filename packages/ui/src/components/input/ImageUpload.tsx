@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
+import { toast } from "sonner";
 
 const INPUT_STYLE =
   "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
@@ -25,6 +26,19 @@ export default function ImageUpload({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 파일 형식 검증
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("JPG, JPEG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.");
+        e.target.value = "";
+        return;
+      }
+
       setFileName(file.name);
 
       const reader = new FileReader();
@@ -73,7 +87,7 @@ export default function ImageUpload({
         <input
           id={fileInputId}
           type="file"
-          accept="image/*"
+          accept=".jpg,.jpeg,.png,.webp"
           onChange={handleFileUpload}
           className="hidden"
         />
