@@ -26,6 +26,11 @@ export const getClubAnnouncements = async (clubId: number) => {
   return response.data.clubAnnouncements || [];
 };
 
+export const deleteAnnouncement = async (announcementId: string) => {
+  const response = await apiClient.delete(`/announcements/${announcementId}`);
+  return response.data;
+};
+
 export const createAnnouncement = async (data: AnnouncementCreate) => {
   const response = await apiClient.post("/announcements", data);
   return response.data;

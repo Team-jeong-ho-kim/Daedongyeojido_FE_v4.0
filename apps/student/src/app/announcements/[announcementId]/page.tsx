@@ -11,6 +11,7 @@ import {
   Pagination,
 } from "@/components";
 import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
+import { useDeleteAnnouncementMutation } from "@/hooks/mutations/useAnnouncement";
 import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 import type { UserRole } from "@/types";
@@ -55,6 +56,7 @@ export default function AnnouncementDetailPage({
 }: AnnouncementDetailPageProps) {
   const { announcementId } = use(params);
   const { data: announcementData } = useGetDetailAnnounceQuery(announcementId);
+  const { mutate: deleteAnnouncementMutate } = useDeleteAnnouncementMutation();
 
   const clubId = announcementData?.clubId?.toString() || "";
   const { data: clubData } = useGetDetailClubQuery(clubId);
@@ -72,9 +74,8 @@ export default function AnnouncementDetailPage({
 
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
-    toast.success("공고가 삭제되었습니다");
+    deleteAnnouncementMutate(announcementId);
     setShowDeleteModal(false);
-    // TODO: 공고 삭제 API 호출 후 목록 페이지로 이동
   };
 
   useEffect(() => {

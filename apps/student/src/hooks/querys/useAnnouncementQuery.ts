@@ -22,6 +22,7 @@ export const useGetDetailAnnounceQuery = (announcementId: string) => {
 export const useGetClubAnnouncementsQuery = (clubId: string) => {
   return useQuery({
     queryKey: ["announcements", "club", clubId],
-    queryFn: () => getClubAnnouncements(clubId),
+    queryFn: () => getClubAnnouncements(Number(clubId)),
+    enabled: !!clubId,
   });
 };
