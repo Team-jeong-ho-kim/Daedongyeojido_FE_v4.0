@@ -115,7 +115,9 @@ export default function ClubCreationPage() {
           </FormField>
 
           <FormField label="동아리 로고">
-            <ImageUpload onFileChange={(file) => setClubLogo(file)} />
+            <ImageUpload
+              onFileChange={(file, _previewUrl) => setClubLogo(file)}
+            />
           </FormField>
 
           <FormField label="동아리 한줄 소개">

@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { MemberItem, Pagination } from "@/components";
+import { useDeleteClubMemberMutation } from "@/hooks/mutations/useClub";
 import type { ClubMember } from "@/types";
 import { AddMemberSection } from "./AddMemberSection";
 
 interface ClubMemberSectionProps {
+  clubId: string;
   clubMembers: ClubMember[];
   isLeader: boolean;
   studentNumber: string;
@@ -16,6 +18,7 @@ interface ClubMemberSectionProps {
 }
 
 export function ClubMemberSection({
+  clubId,
   clubMembers,
   isLeader,
   studentNumber,
@@ -26,6 +29,8 @@ export function ClubMemberSection({
 }: ClubMemberSectionProps) {
   const [memberPage, setMemberPage] = useState(1);
   const memberLimit = 8;
+  const { mutate: deleteClubMemberMutate } =
+    useDeleteClubMemberMutation(clubId);
 
   const pagedMembers = clubMembers.slice(
     (memberPage - 1) * memberLimit,
@@ -43,7 +48,7 @@ export function ClubMemberSection({
         <div className="flex flex-wrap gap-2">
           {clubMembers.map((member, index) => (
             <span
-              key={`name-${member.userName}-${member.introduce}`}
+              key={`name-${member.userId}`}
               className="text-[14px] text-gray-700 md:text-[15px]"
             >
               {member.userName}
@@ -66,9 +71,10 @@ export function ClubMemberSection({
         <div className="grid min-h-[590px] grid-cols-4 content-start items-start gap-5">
           {pagedMembers.map((member) => (
             <MemberItem
-              key={`${member.userName}-${member.introduce}`}
+              key={`${member.userId}-${member.userName}`}
               {...member}
               canDelete={isLeader}
+              onDelete={() => deleteClubMemberMutate(member.userId)}
             />
           ))}
         </div>

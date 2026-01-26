@@ -30,6 +30,7 @@ export interface ClubUpdate {
 }
 
 export interface ClubMember {
+  userId: number;
   userName: string;
   majors: Major[];
   introduce: string | null;

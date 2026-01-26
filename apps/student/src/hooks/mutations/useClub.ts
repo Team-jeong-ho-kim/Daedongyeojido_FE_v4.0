@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createClubApplication, dissolveClub, updateClub } from "@/api/club";
+import {
+  createClubApplication,
+  deleteClubMember,
+  dissolveClub,
+  updateClub,
+} from "@/api/club";
 import type { ClubUpdate } from "@/types";
 
 export const useUpdateClubMutation = (clubId: string) => {
@@ -113,6 +118,29 @@ export const useCreateClubApplicationMutation = () => {
         );
       } else {
         toast.error("동아리 개설 신청에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+  });
+};
+
+export const useDeleteClubMemberMutation = (clubId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: number) => deleteClubMember(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+      toast.success("팀원이 삭제되었습니다.");
+    },
+    onError: (error: any) => {
+      const status = error.response?.status;
+
+      if (status === 403) {
+        toast.error("팀원 삭제 권한이 없습니다.");
+      } else if (status === 404) {
+        toast.error("존재하지 않는 팀원입니다.");
+      } else {
+        toast.error("팀원 삭제에 실패했습니다. 다시 시도해주세요.");
       }
     },
   });

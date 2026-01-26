@@ -372,6 +372,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
             />
 
             <ClubMemberSection
+              clubId={clubId}
               clubMembers={clubMembers}
               isLeader={isLeader}
               studentNumber={studentNumber}
