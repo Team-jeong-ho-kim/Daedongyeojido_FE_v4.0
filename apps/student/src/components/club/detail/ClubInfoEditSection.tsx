@@ -440,7 +440,7 @@ export function ClubInfoEditSection({
             <div className="flex flex-1 flex-col gap-1">
               {(isClubMember
                 ? editLinks
-                : club.links.map((link, index) => ({
+                : [...new Set(club.links)].map((link, index) => ({
                     id: `club-link-${index}`,
                     url: link,
                   }))
