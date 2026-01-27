@@ -13,19 +13,36 @@ export const MOCK_CLUB: ClubDetail = {
 
 export const MOCK_CLUB_MEMBERS: ClubMember[] = [
   {
+    userId: 1212,
     userName: "김경민",
     majors: ["BE", "FE"],
     introduce:
       "김경민입니다.ㅁㄴㅇㄹㄴㅁㄹㄴㅁㄹㅁㄴㅁㄴㄹㅁㄴㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹ",
   },
-  { userName: "지도현", majors: ["BE"], introduce: "지도현입니다." },
-  { userName: "박민수", majors: ["FE"], introduce: "박민수입니다." },
-  { userName: "이준호", majors: ["BE"], introduce: "이준호입니다." },
-  { userName: "최유진", majors: ["FE"], introduce: "최유진입니다." },
-  { userName: "정수빈", majors: ["BE"], introduce: "정수빈입니다." },
-  { userName: "한지민", majors: ["FE"], introduce: "한지민입니다." },
-  { userName: "김도윤", majors: ["BE"], introduce: "김도윤입니다." },
-  { userName: "윤서연", majors: ["FE"], introduce: "윤서연입니다." },
+  {
+    userId: 12122,
+    userName: "지도현",
+    majors: ["BE"],
+    introduce: "지도현입니다.",
+  },
+  {
+    userId: 1212312,
+    userName: "박민수",
+    majors: ["FE"],
+    introduce: "박민수입니다.",
+  },
+  {
+    userId: 12132,
+    userName: "이준호",
+    majors: ["BE"],
+    introduce: "이준호입니다.",
+  },
+  {
+    userId: 121342,
+    userName: "최유진",
+    majors: ["FE"],
+    introduce: "최유진입니다.",
+  },
 ];
 
 export const MOCK_JOB_POSTINGS: JobPosting[] = [
