@@ -7,10 +7,7 @@ export { Toaster, toast } from 'sonner';
 declare function Footer(): react_jsx_runtime.JSX.Element;
 
 declare function LandingHeader(): react_jsx_runtime.JSX.Element;
-interface StudentHeaderProps {
-    onLogout: () => void;
-}
-declare function StudentHeader({ onLogout }: StudentHeaderProps): react_jsx_runtime.JSX.Element;
+declare function StudentHeader(): react_jsx_runtime.JSX.Element;
 
 interface ErrorMessageProps {
     message?: string;

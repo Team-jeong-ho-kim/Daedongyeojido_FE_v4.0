@@ -135,7 +135,7 @@ function LandingHeader() {
     }
   );
 }
-function StudentHeader({ onLogout }) {
+function StudentHeader() {
   const [isVisible, setIsVisible] = (0, import_react.useState)(true);
   const [lastScrollY, setLastScrollY] = (0, import_react.useState)(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
@@ -205,21 +205,26 @@ function StudentHeader({ onLogout }) {
               )
             ] })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "font-normal text-[15px] text-gray-900", children: [
-              userInfo.userName,
-              "\uB2D8"
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              "button",
-              {
-                type: "button",
-                onClick: onLogout,
-                className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
-                children: "\uB85C\uADF8\uC544\uC6C3"
-              }
-            )
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "hidden items-center gap-3 md:flex", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            import_link.default,
+            {
+              href: "/mypage",
+              className: "flex items-center gap-5 transition-opacity",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-normal text-[15px] text-gray-400 hover:text-gray-600", children: "\uB9C8\uC774\uD398\uC774\uC9C0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "relative h-7 w-7 overflow-hidden rounded-full bg-gray-200", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  import_image2.default,
+                  {
+                    src: userInfo.profileImage || "/images/icons/profile.svg",
+                    alt: "\uD504\uB85C\uD544",
+                    width: 28,
+                    height: 28,
+                    className: "h-full w-full object-cover"
+                  }
+                ) })
+              ]
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
               href: "/login",
@@ -298,24 +303,27 @@ function StudentHeader({ onLogout }) {
               children: "\uACF5\uACE0"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-6 flex flex-col gap-3", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700", children: [
-              userInfo.userName,
-              "\uB2D8"
-            ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-              "button",
-              {
-                type: "button",
-                onClick: () => {
-                  handleLinkClick();
-                  onLogout?.();
-                },
-                className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
-                children: "\uB85C\uADF8\uC544\uC6C3"
-              }
-            )
-          ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mt-6 flex flex-col gap-3", children: userInfo ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            import_link.default,
+            {
+              href: "/mypage",
+              onClick: handleLinkClick,
+              className: "flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-3 transition-colors hover:bg-gray-200",
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "font-medium text-[15px] text-gray-400 hover:text-gray-600", children: "\uB9C8\uC774\uD398\uC774\uC9C0" }),
+                /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "relative h-7 w-7 overflow-hidden rounded-full bg-gray-200", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+                  import_image2.default,
+                  {
+                    src: userInfo.profileImage || "/images/icons/profile.svg",
+                    alt: "\uD504\uB85C\uD544",
+                    width: 28,
+                    height: 28,
+                    className: "h-full w-full object-cover"
+                  }
+                ) })
+              ]
+            }
+          ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
               href: "/login",

@@ -59,11 +59,7 @@ export function LandingHeader() {
   );
 }
 
-interface StudentHeaderProps {
-  onLogout: () => void;
-}
-
-export function StudentHeader({ onLogout }: StudentHeaderProps) {
+export function StudentHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -149,18 +145,23 @@ export function StudentHeader({ onLogout }: StudentHeaderProps) {
 
           <div className="hidden items-center gap-3 md:flex">
             {userInfo ? (
-              <>
-                <span className="font-normal text-[15px] text-gray-900">
-                  {userInfo.userName}님
+              <Link
+                href="/mypage"
+                className="flex items-center gap-5 transition-opacity"
+              >
+                <span className="font-normal text-[15px] text-gray-400 hover:text-gray-600">
+                  마이페이지
                 </span>
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600"
-                >
-                  로그아웃
-                </button>
-              </>
+                <div className="relative h-7 w-7 overflow-hidden rounded-full bg-gray-200">
+                  <Image
+                    src={userInfo.profileImage || "/images/icons/profile.svg"}
+                    alt="프로필"
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </Link>
             ) : (
               <Link
                 href="/login"
@@ -243,21 +244,24 @@ export function StudentHeader({ onLogout }: StudentHeaderProps) {
           </Link>
           <div className="mt-6 flex flex-col gap-3">
             {userInfo ? (
-              <>
-                <div className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700">
-                  {userInfo.userName}님
+              <Link
+                href="/mypage"
+                onClick={handleLinkClick}
+                className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-3 transition-colors hover:bg-gray-200"
+              >
+                <span className="font-medium text-[15px] text-gray-400 hover:text-gray-600">
+                  마이페이지
+                </span>
+                <div className="relative h-7 w-7 overflow-hidden rounded-full bg-gray-200">
+                  <Image
+                    src={userInfo.profileImage || "/images/icons/profile.svg"}
+                    alt="프로필"
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleLinkClick();
-                    onLogout?.();
-                  }}
-                  className="rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200"
-                >
-                  로그아웃
-                </button>
-              </>
+              </Link>
             ) : (
               <Link
                 href="/login"
