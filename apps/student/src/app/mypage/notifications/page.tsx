@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Pagination } from "@/components/common/Pagination";
 
@@ -78,9 +79,14 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
       <div className="mx-auto max-w-[1000px] px-6 py-16">
-        <h1 className="mb-12 font-extrabold text-3xl tracking-tight">
-          마이페이지
-        </h1>
+        <div className="mb-8 flex items-center gap-2 text-gray-400 text-sm">
+          <Link href="/mypage" className="hover:text-gray-600">
+            마이페이지
+          </Link>
+          <span>&gt;</span>
+          <span className="text-gray-600">알림함</span>
+        </div>
+        <h1 className="mb-12 font-extrabold text-3xl tracking-tight">알림함</h1>
 
         <div className="space-y-4">
           {currentNotifications.map((notification) => {
