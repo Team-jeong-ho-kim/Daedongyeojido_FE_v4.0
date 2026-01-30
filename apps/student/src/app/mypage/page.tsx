@@ -90,12 +90,12 @@ export default function MyPage() {
               <h4 className="font-bold text-gray-800 text-lg">
                 나의 지원서 바로가기
               </h4>
-              <button
-                type="button"
+              <Link
+                href="/mypage/applications"
                 className="w-fit rounded-xl bg-primary-500 px-5 py-2.5 font-semibold text-sm text-white shadow-sm transition-all hover:bg-[#F96464] hover:shadow-md active:scale-95"
               >
                 나의 지원서 보기
-              </button>
+              </Link>
             </div>
             <div className="flex h-[180px] flex-col justify-between rounded-2xl bg-gray-50 p-7 transition-colors hover:border-gray-200">
               <h4 className="font-bold text-gray-800 text-lg">
