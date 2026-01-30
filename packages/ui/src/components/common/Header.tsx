@@ -63,6 +63,7 @@ export function StudentHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const userInfo = useUserStore((state) => state.userInfo);
 
@@ -143,25 +144,82 @@ export function StudentHeader() {
             </nav>
           </div>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="relative hidden items-center gap-3 md:flex">
             {userInfo ? (
-              <Link
-                href="/mypage"
-                className="flex items-center gap-5 transition-opacity"
-              >
-                <span className="font-normal text-[15px] text-gray-400 hover:text-gray-600">
-                  마이페이지
-                </span>
-                <div className="relative h-7 w-7 overflow-hidden rounded-full bg-gray-200">
-                  <Image
-                    src={userInfo.profileImage || "/images/icons/profile.svg"}
-                    alt="프로필"
-                    width={28}
-                    height={28}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </Link>
+              <div className="relative flex items-center gap-3">
+                <Link
+                  href="/mypage"
+                  className="flex items-center gap-3 transition-opacity"
+                >
+                  <span className="font-normal text-[15px] text-gray-400 hover:text-gray-600">
+                    마이페이지
+                  </span>
+                  <div className="relative h-7 w-7 overflow-hidden rounded-full bg-gray-200">
+                    <Image
+                      src={userInfo.profileImage || "/images/icons/profile.svg"}
+                      alt="프로필"
+                      width={28}
+                      height={28}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="transition-opacity"
+                  aria-label="드롭다운 메뉴 열기"
+                >
+                  <svg
+                    className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isDropdownOpen && (
+                  <>
+                    <button
+                      type="button"
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsDropdownOpen(false)}
+                      aria-label="드롭다운 닫기"
+                    />
+                    <div className="absolute top-full right-0 z-20 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg">
+                      <Link
+                        href="/mypage/history"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50"
+                      >
+                        지원 내역
+                      </Link>
+                      <Link
+                        href="/mypage/applications"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50"
+                      >
+                        나의 지원서
+                      </Link>
+                      <Link
+                        href="/mypage/notifications"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50"
+                      >
+                        알림함
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
             ) : (
               <Link
                 href="/login"

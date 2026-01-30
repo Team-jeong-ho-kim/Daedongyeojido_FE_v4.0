@@ -133,7 +133,7 @@ export default function MyApplicationsPage() {
 
                   <Image
                     src="/images/clubs/rightArrow.svg"
-                    alt="arrow"
+                    alt="상세보기"
                     width={10}
                     height={18}
                   />

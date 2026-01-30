@@ -85,6 +85,7 @@ function StudentHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const userInfo = useUserStore((state) => state.userInfo);
   useEffect(() => {
@@ -151,26 +152,96 @@ function StudentHeader() {
               )
             ] })
           ] }),
-          /* @__PURE__ */ jsx2("div", { className: "hidden items-center gap-3 md:flex", children: userInfo ? /* @__PURE__ */ jsxs2(
-            Link,
-            {
-              href: "/mypage",
-              className: "flex items-center gap-5 transition-opacity",
-              children: [
-                /* @__PURE__ */ jsx2("span", { className: "font-normal text-[15px] text-gray-400 hover:text-gray-600", children: "\uB9C8\uC774\uD398\uC774\uC9C0" }),
-                /* @__PURE__ */ jsx2("div", { className: "relative h-7 w-7 overflow-hidden rounded-full bg-gray-200", children: /* @__PURE__ */ jsx2(
-                  Image2,
+          /* @__PURE__ */ jsx2("div", { className: "relative hidden items-center gap-3 md:flex", children: userInfo ? /* @__PURE__ */ jsxs2("div", { className: "relative flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxs2(
+              Link,
+              {
+                href: "/mypage",
+                className: "flex items-center gap-3 transition-opacity",
+                children: [
+                  /* @__PURE__ */ jsx2("span", { className: "font-normal text-[15px] text-gray-400 hover:text-gray-600", children: "\uB9C8\uC774\uD398\uC774\uC9C0" }),
+                  /* @__PURE__ */ jsx2("div", { className: "relative h-7 w-7 overflow-hidden rounded-full bg-gray-200", children: /* @__PURE__ */ jsx2(
+                    Image2,
+                    {
+                      src: userInfo.profileImage || "/images/icons/profile.svg",
+                      alt: "\uD504\uB85C\uD544",
+                      width: 28,
+                      height: 28,
+                      className: "h-full w-full object-cover"
+                    }
+                  ) })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsx2(
+              "button",
+              {
+                type: "button",
+                onClick: () => setIsDropdownOpen(!isDropdownOpen),
+                className: "transition-opacity",
+                "aria-label": "\uB4DC\uB86D\uB2E4\uC6B4 \uBA54\uB274 \uC5F4\uAE30",
+                children: /* @__PURE__ */ jsx2(
+                  "svg",
                   {
-                    src: userInfo.profileImage || "/images/icons/profile.svg",
-                    alt: "\uD504\uB85C\uD544",
-                    width: 28,
-                    height: 28,
-                    className: "h-full w-full object-cover"
+                    className: `h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`,
+                    fill: "none",
+                    stroke: "currentColor",
+                    viewBox: "0 0 24 24",
+                    "aria-hidden": "true",
+                    children: /* @__PURE__ */ jsx2(
+                      "path",
+                      {
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round",
+                        strokeWidth: 2,
+                        d: "M19 9l-7 7-7-7"
+                      }
+                    )
                   }
-                ) })
-              ]
-            }
-          ) : /* @__PURE__ */ jsx2(
+                )
+              }
+            ),
+            isDropdownOpen && /* @__PURE__ */ jsxs2(Fragment, { children: [
+              /* @__PURE__ */ jsx2(
+                "button",
+                {
+                  type: "button",
+                  className: "fixed inset-0 z-10",
+                  onClick: () => setIsDropdownOpen(false),
+                  "aria-label": "\uB4DC\uB86D\uB2E4\uC6B4 \uB2EB\uAE30"
+                }
+              ),
+              /* @__PURE__ */ jsxs2("div", { className: "absolute top-full right-0 z-20 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg", children: [
+                /* @__PURE__ */ jsx2(
+                  Link,
+                  {
+                    href: "/mypage/history",
+                    onClick: () => setIsDropdownOpen(false),
+                    className: "block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50",
+                    children: "\uC9C0\uC6D0 \uB0B4\uC5ED"
+                  }
+                ),
+                /* @__PURE__ */ jsx2(
+                  Link,
+                  {
+                    href: "/mypage/applications",
+                    onClick: () => setIsDropdownOpen(false),
+                    className: "block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50",
+                    children: "\uB098\uC758 \uC9C0\uC6D0\uC11C"
+                  }
+                ),
+                /* @__PURE__ */ jsx2(
+                  Link,
+                  {
+                    href: "/mypage/notifications",
+                    onClick: () => setIsDropdownOpen(false),
+                    className: "block px-6 py-3 text-center text-gray-600 text-sm transition-colors hover:bg-gray-50",
+                    children: "\uC54C\uB9BC\uD568"
+                  }
+                )
+              ] })
+            ] })
+          ] }) : /* @__PURE__ */ jsx2(
             Link,
             {
               href: "/login",
@@ -847,6 +918,9 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs9(
   }
 );
 
+// src/components/ui/icons/rightArrow.svg
+var rightArrow_default = "./rightArrow-VZS2TU3F.svg";
+
 // src/components/ui/icons/index.ts
 var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
@@ -872,6 +946,7 @@ export {
   Toaster,
   blackLogo,
   buttonVariants,
+  rightArrow_default as rightArrowIcon,
   toast2 as toast,
   whiteLogo
 };
