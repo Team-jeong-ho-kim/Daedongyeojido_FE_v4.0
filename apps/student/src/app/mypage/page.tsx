@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useUserStore } from "shared";
 import { useLogoutMutation } from "@/hooks/mutations/useAuth";
 
@@ -103,12 +104,12 @@ export default function MyPage() {
 
         {/* Footer Actions */}
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
+          <Link
+            href="/mypage/edit"
             className="rounded-xl bg-primary-500 px-8 py-2.5 font-semibold text-sm text-white shadow-sm transition-all hover:bg-[#F96464] hover:shadow-md active:scale-95"
           >
             수정하기
-          </button>
+          </Link>
           <button
             type="button"
             className="rounded-xl bg-[#1F2937] px-8 py-2.5 font-semibold text-sm text-white shadow-sm transition-all hover:bg-black hover:shadow-md active:scale-95"
