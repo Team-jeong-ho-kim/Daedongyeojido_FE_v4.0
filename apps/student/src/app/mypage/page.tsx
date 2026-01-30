@@ -101,12 +101,12 @@ export default function MyPage() {
               <h4 className="font-bold text-gray-800 text-lg">
                 지원 이력 보기 바로가기
               </h4>
-              <button
-                type="button"
+              <Link
+                href="/mypage/history"
                 className="w-fit rounded-xl bg-primary-500 px-5 py-2.5 font-semibold text-sm text-white shadow-sm transition-all hover:bg-[#F96464] hover:shadow-md active:scale-95"
               >
                 지원 이력 조회
-              </button>
+              </Link>
             </div>
           </div>
         </div>
