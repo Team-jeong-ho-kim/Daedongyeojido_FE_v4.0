@@ -17,12 +17,56 @@ export interface ApplicationForm {
   updatedAt: string;
 }
 
+export interface ApplicationFormListItem {
+  applicationFormId: number;
+  applicationFormTitle: string;
+  clubName: string;
+  clubImage: string;
+  submissionDuration: [number, number, number];
+}
+
+export interface ApplicationFormsResponse {
+  applicationForms: ApplicationFormListItem[];
+}
+
+export interface ApplicationQuestion {
+  applicationQuestionId: number;
+  content: string;
+}
+
+export interface ApplicationFormDetail {
+  applicationFormTitle: string;
+  clubName: string;
+  clubImage: string;
+  content: ApplicationQuestion[];
+  submissionDuration: [number, number, number];
+  major: string[];
+}
+
 export const createApplicationForm = async (
   data: CreateApplicationFormRequest,
 ): Promise<ApplicationForm> => {
   const response = await apiClient.post<ApplicationForm>(
     "/application-forms",
     data,
+  );
+  return response.data;
+};
+
+export const getClubApplicationForms = async (
+  clubId: string,
+): Promise<ApplicationFormListItem[]> => {
+  const response = await apiClient.get<ApplicationFormsResponse>(
+    `/application-forms/clubs/${clubId}`,
+  );
+  return response.data.applicationForms;
+};
+
+export const getApplicationFormDetail = async (
+  applicationFormId: string,
+): Promise<ApplicationFormDetail> => {
+  const response = await apiClient.get<ApplicationFormDetail>(
+    `/application-forms/${applicationFormId}`,
   );
   return response.data;
 };

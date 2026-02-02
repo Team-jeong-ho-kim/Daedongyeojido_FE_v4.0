@@ -18,16 +18,13 @@ import {
   NoticeCard,
   Pagination,
 } from "@/components";
-import {
-  MOCK_APPLICANTS,
-  MOCK_APPLICATIONS,
-  MOCK_NOTICES,
-} from "@/constants/clubDetailMock";
+import { MOCK_APPLICANTS, MOCK_NOTICES } from "@/constants/clubDetailMock";
 import {
   useDissolveClubMutation,
   useUpdateClubMutation,
 } from "@/hooks/mutations/useClub";
 import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
+import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 
 interface ClubDetailPageProps {
@@ -39,6 +36,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
   const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
+  const { data: applicationForms } = useGetClubApplicationFormsQuery(clubId);
   const { mutateAsync: updateClubMutate, isPending: isUpdating } =
     useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
@@ -550,27 +548,42 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                     지원서 폼 생성하기
                   </button>
                 </div>
-                {MOCK_APPLICATIONS.length === 0 ? (
+                {!applicationForms || applicationForms.length === 0 ? (
                   <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-                    지원서가 없습니다.
+                    지원서 폼이 없습니다.
                   </div>
                 ) : (
                   <>
                     <div className="flex flex-col gap-10">
-                      {MOCK_APPLICATIONS.slice(
-                        (formPage - 1) * 3,
-                        formPage * 3,
-                      ).map((application) => (
-                        <ApplicationCard
-                          key={application.id}
-                          application={application}
-                          onClick={() => {}}
-                        />
-                      ))}
+                      {[...applicationForms]
+                        .sort(
+                          (a, b) => b.applicationFormId - a.applicationFormId,
+                        )
+                        .slice((formPage - 1) * 3, formPage * 3)
+                        .map((form) => {
+                          const [year, month, day] = form.submissionDuration;
+                          const dateString = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+                          return (
+                            <ApplicationCard
+                              key={form.applicationFormId}
+                              application={{
+                                id: form.applicationFormId,
+                                title: form.applicationFormTitle,
+                                deadline: dateString,
+                              }}
+                              onClick={() =>
+                                router.push(
+                                  `/application-forms/${form.applicationFormId}`,
+                                )
+                              }
+                            />
+                          );
+                        })}
                     </div>
-                    {MOCK_APPLICATIONS.length > 3 && (
+                    {applicationForms.length > 3 && (
                       <Pagination
-                        listLen={MOCK_APPLICATIONS.length}
+                        listLen={applicationForms.length}
                         limit={3}
                         curPage={formPage}
                         setCurPage={setFormPage}
