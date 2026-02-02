@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
@@ -33,6 +33,7 @@ interface ClubDetailPageProps {
 
 export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { clubId } = use(params);
   const { data: clubData } = useGetDetailClubQuery(clubId);
   const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
@@ -47,11 +48,20 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
   const isLeader = role === "CLUB_LEADER";
 
+  // URL 쿼리 파라미터에서 탭 상태 읽기
+  const tabFromUrl = searchParams.get("tab") as
+    | "intro"
+    | "history"
+    | "notification"
+    | "application"
+    | null;
+  const subtabFromUrl = searchParams.get("subtab") as "posting" | "form" | null;
+
   const [activeTab, setActiveTab] = useState<
     "intro" | "history" | "notification" | "application"
-  >("intro");
+  >(tabFromUrl || "intro");
   const [historySubTab, setHistorySubTab] = useState<"posting" | "form">(
-    "posting",
+    subtabFromUrl || "posting",
   );
   const [postingPage, setPostingPage] = useState(1);
   const [noticePage, setNoticePage] = useState(1);
@@ -72,6 +82,40 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const [editIntroduction, setEditIntroduction] = useState("");
   const [editLinks, setEditLinks] = useState<{ id: string; url: string }[]>([]);
   const [editMajors, setEditMajors] = useState<string[]>([]);
+
+  // URL 쿼리 파라미터 변경 시 탭 상태 동기화
+  useEffect(() => {
+    if (tabFromUrl) {
+      setActiveTab(tabFromUrl);
+    }
+    if (subtabFromUrl) {
+      setHistorySubTab(subtabFromUrl);
+    }
+  }, [tabFromUrl, subtabFromUrl]);
+
+  // 탭 변경 핸들러
+  const handleTabChange = (
+    tab: "intro" | "history" | "notification" | "application",
+  ) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    if (tab === "history") {
+      params.set("subtab", historySubTab);
+    } else {
+      params.delete("subtab");
+    }
+    router.push(`/clubs/${clubId}?${params.toString()}`, { scroll: false });
+  };
+
+  // 서브탭 변경 핸들러
+  const handleSubTabChange = (subtab: "posting" | "form") => {
+    setHistorySubTab(subtab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "history");
+    params.set("subtab", subtab);
+    router.push(`/clubs/${clubId}?${params.toString()}`, { scroll: false });
+  };
 
   // clubData가 로드되면 편집 상태 초기화
   useEffect(() => {
@@ -270,7 +314,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         <nav className="flex">
           <button
             type="button"
-            onClick={() => setActiveTab("intro")}
+            onClick={() => handleTabChange("intro")}
             className={`flex-1 pt-4 pb-3 text-[14px] md:pt-5 md:pb-4 md:text-[15px] lg:pt-6 ${
               activeTab === "intro"
                 ? "border-gray-900 border-b-2 font-semibold text-gray-900"
@@ -282,7 +326,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           {isClubMember && (
             <button
               type="button"
-              onClick={() => setActiveTab("notification")}
+              onClick={() => handleTabChange("notification")}
               className={`flex-1 pt-4 pb-3 text-[14px] md:pt-5 md:pb-4 md:text-[15px] lg:pt-6 ${
                 activeTab === "notification"
                   ? "border-gray-900 border-b-2 font-semibold text-gray-900"
@@ -294,7 +338,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           )}
           <button
             type="button"
-            onClick={() => setActiveTab("history")}
+            onClick={() => handleTabChange("history")}
             className={`flex-1 pt-4 pb-3 text-[14px] md:pt-5 md:pb-4 md:text-[15px] lg:pt-6 ${
               activeTab === "history"
                 ? "border-gray-900 border-b-2 font-semibold text-gray-900"
@@ -306,7 +350,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           {isClubMember && (
             <button
               type="button"
-              onClick={() => setActiveTab("application")}
+              onClick={() => handleTabChange("application")}
               className={`flex-1 pt-4 pb-3 text-[14px] md:pt-5 md:pb-4 md:text-[15px] lg:pt-6 ${
                 activeTab === "application"
                   ? "border-gray-900 border-b-2 font-semibold text-gray-900"
@@ -324,7 +368,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         <nav className="flex">
           <button
             type="button"
-            onClick={() => setHistorySubTab("posting")}
+            onClick={() => handleSubTabChange("posting")}
             className={`flex-1 pt-3 pb-2.5 text-[13px] md:pt-4 md:pb-3 md:text-[14px] ${
               historySubTab === "posting"
                 ? "border-primary-500 border-b-2 font-semibold text-gray-900"
@@ -335,7 +379,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           </button>
           <button
             type="button"
-            onClick={() => setHistorySubTab("form")}
+            onClick={() => handleSubTabChange("form")}
             className={`flex-1 pt-3 pb-2.5 text-[13px] md:pt-4 md:pb-3 md:text-[14px] ${
               historySubTab === "form"
                 ? "border-primary-500 border-b-2 font-semibold text-gray-900"
@@ -574,7 +618,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                               }}
                               onClick={() =>
                                 router.push(
-                                  `/application-forms/${form.applicationFormId}`,
+                                  `/application-forms/${form.applicationFormId}?clubId=${clubId}`,
                                 )
                               }
                             />

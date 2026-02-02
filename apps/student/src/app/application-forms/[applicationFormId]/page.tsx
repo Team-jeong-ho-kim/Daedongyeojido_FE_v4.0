@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { use } from "react";
 import { Button } from "ui";
 import { useGetApplicationFormDetailQuery } from "@/hooks/querys/useApplicationFormQuery";
@@ -14,7 +14,9 @@ export default function ApplicationFormDetailPage({
   params,
 }: ApplicationFormDetailPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { applicationFormId } = use(params);
+  const clubId = searchParams.get("clubId");
   const { data: formDetail, isLoading } =
     useGetApplicationFormDetailQuery(applicationFormId);
 
@@ -111,7 +113,13 @@ export default function ApplicationFormDetailPage({
           <div className="flex gap-4 border-gray-200 border-t pt-10">
             <Button
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() => {
+                if (clubId) {
+                  router.push(`/clubs/${clubId}?tab=history&subtab=form`);
+                } else {
+                  router.back();
+                }
+              }}
               className="w-full"
             >
               목록으로
