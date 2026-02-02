@@ -731,7 +731,9 @@ function TextInput({
   name,
   label,
   error,
-  bgColor = "bg-white"
+  bgColor = "bg-white",
+  disabled = false,
+  ...restProps
 }) {
   const generatedId = useId4();
   const inputId = id || generatedId;
@@ -745,7 +747,9 @@ function TextInput({
         placeholder,
         value,
         onChange: (e) => onChange(e.target.value),
-        className: `w-full rounded-lg border-[0.1px] border-gray-200 ${bgColor} px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"}`
+        disabled,
+        ...restProps,
+        className: `w-full rounded-lg border-[0.1px] border-gray-200 ${bgColor} px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"} ${disabled ? "cursor-not-allowed bg-gray-100 text-gray-500" : ""}`
       }
     ),
     /* @__PURE__ */ jsx9(ErrorMessage, { message: error })
@@ -918,12 +922,10 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs9(
   }
 );
 
-// src/components/ui/icons/rightArrow.svg
-var rightArrow_default = "./rightArrow-VZS2TU3F.svg";
-
 // src/components/ui/icons/index.ts
 var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
+var rightArrowIcon = "/images/icons/rightArrow.svg";
 
 // src/index.ts
 import { Toaster, toast as toast2 } from "sonner";
@@ -946,7 +948,7 @@ export {
   Toaster,
   blackLogo,
   buttonVariants,
-  rightArrow_default as rightArrowIcon,
+  rightArrowIcon,
   toast2 as toast,
   whiteLogo
 };

@@ -1,14 +1,14 @@
 "use client";
 
+import type { InputHTMLAttributes } from "react";
 import { useId } from "react";
 import ErrorMessage from "./ErrorMessage";
 
-interface TextInputProps {
+interface TextInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  id?: string;
-  name?: string;
   label?: string;
   error?: string;
   bgColor?: string;
@@ -23,6 +23,8 @@ export default function TextInput({
   label,
   error,
   bgColor = "bg-white",
+  disabled = false,
+  ...restProps
 }: TextInputProps) {
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -36,11 +38,13 @@ export default function TextInput({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        {...restProps}
         className={`w-full rounded-lg border-[0.1px] border-gray-200 ${bgColor} px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${
           error
             ? "border-red-300 focus:border-red-500 focus:ring-red-500"
             : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"
-        }`}
+        } ${disabled ? "cursor-not-allowed bg-gray-100 text-gray-500" : ""}`}
       />
       <ErrorMessage message={error} />
     </div>

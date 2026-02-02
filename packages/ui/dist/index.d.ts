@@ -1,7 +1,8 @@
 import * as react_jsx_runtime from 'react/jsx-runtime';
+import * as React$1 from 'react';
+import { InputHTMLAttributes } from 'react';
 import * as class_variance_authority_types from 'class-variance-authority/types';
 import { VariantProps } from 'class-variance-authority';
-import * as React$1 from 'react';
 export { Toaster, toast } from 'sonner';
 
 declare function Footer(): react_jsx_runtime.JSX.Element;
@@ -62,17 +63,15 @@ interface TextAreaProps {
 }
 declare function TextArea({ value, onChange, placeholder, rows, id, name, label, error, autoResize, maxHeight, }: TextAreaProps): react_jsx_runtime.JSX.Element;
 
-interface TextInputProps {
+interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
-    id?: string;
-    name?: string;
     label?: string;
     error?: string;
     bgColor?: string;
 }
-declare function TextInput({ value, onChange, placeholder, id, name, label, error, bgColor, }: TextInputProps): react_jsx_runtime.JSX.Element;
+declare function TextInput({ value, onChange, placeholder, id, name, label, error, bgColor, disabled, ...restProps }: TextInputProps): react_jsx_runtime.JSX.Element;
 
 declare const buttonVariants: (props?: ({
     variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
@@ -92,5 +91,6 @@ declare const InterviewIcon: ({ className }: IconProps) => react_jsx_runtime.JSX
 
 declare const blackLogo = "/images/logos/blackLogo.svg";
 declare const whiteLogo = "/images/logos/whiteLogo.svg";
+declare const rightArrowIcon = "/images/icons/rightArrow.svg";
 
-export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, ImageUpload, InterviewIcon, LandingHeader, LinkInput, NoteIcon, StudentHeader, TextArea, TextInput, blackLogo, buttonVariants, whiteLogo };
+export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, ImageUpload, InterviewIcon, LandingHeader, LinkInput, NoteIcon, StudentHeader, TextArea, TextInput, blackLogo, buttonVariants, rightArrowIcon, whiteLogo };

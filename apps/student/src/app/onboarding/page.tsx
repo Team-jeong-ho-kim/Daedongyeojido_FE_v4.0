@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import {
   FieldSelector,
@@ -11,6 +12,7 @@ import {
   TextInput,
 } from "ui";
 import { FIELDS } from "@/constants/club";
+import { useUpdateMyInfoMutation } from "@/hooks/mutations/useUser";
 
 interface LinkItem {
   id: string;
@@ -18,9 +20,10 @@ interface LinkItem {
 }
 
 export default function OnboardingPage() {
+  const userInfo = useUserStore((state) => state.userInfo);
+  const updateMyInfoMutation = useUpdateMyInfoMutation();
+
   const [profileFile, setProfileFile] = useState<File | null>(null);
-  const [name, setName] = useState("");
-  const [studentId, setStudentId] = useState("");
   const [phone, setPhone] = useState("");
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -91,17 +94,15 @@ export default function OnboardingPage() {
       return;
     }
 
-    const formData = {
-      profileFile,
-      name,
-      studentId,
-      phone,
-      links,
-      selectedFields,
+    const cleanedPhone = phone.replace(/-/g, "");
+
+    updateMyInfoMutation.mutate({
       introduction,
-    };
-    console.log("제출:", formData);
-    toast.success("저장되었습니다");
+      phoneNumber: cleanedPhone || undefined,
+      majors: selectedFields,
+      links: links.map((link) => link.url),
+      profileImage: profileFile,
+    });
   };
 
   return (
@@ -119,17 +120,19 @@ export default function OnboardingPage() {
 
           <FormField label="이름">
             <TextInput
-              value={name}
-              onChange={setName}
+              value={userInfo?.userName || ""}
+              onChange={() => {}}
               placeholder="이름을 입력해주세요."
+              disabled
             />
           </FormField>
 
           <FormField label="학번">
             <TextInput
-              value={studentId}
-              onChange={setStudentId}
+              value={userInfo?.classNumber || ""}
+              onChange={() => {}}
               placeholder="학번을 입력해주세요."
+              disabled
             />
           </FormField>
 
