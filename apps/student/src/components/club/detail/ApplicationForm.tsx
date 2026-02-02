@@ -1,5 +1,11 @@
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
+import { toast } from "sonner";
+import {
+  type CreateApplicationFormRequest,
+  createApplicationForm,
+} from "@/api/applicationForm";
 import { DeadlineModal } from "@/components";
 import { FIELDS } from "@/constants/club";
 
@@ -9,6 +15,7 @@ interface ApplicationFormProps {
 
 export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const id = useId();
+  const [applicationTitle, setApplicationTitle] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [questions, setQuestions] = useState<
     { id: number; text: string; isCompleted: boolean }[]
@@ -21,6 +28,21 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const [deadline, setDeadline] = useState("");
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const createMutation = useMutation({
+    mutationFn: createApplicationForm,
+    onSuccess: () => {
+      toast.success("지원서가 성공적으로 생성되었습니다.");
+      // 폼 초기화
+      setApplicationTitle("");
+      setSelectedFields([]);
+      setQuestions([]);
+      setDeadline("");
+    },
+    onError: (error) => {
+      toast.error(`지원서 생성에 실패했습니다: ${error.message}`);
+    },
+  });
 
   const handleTextareaChange = (text: string) => {
     updateEditingQuestionText(text);
@@ -64,10 +86,45 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 유효성 검사
+    if (!applicationTitle.trim()) {
+      toast.error("공고 제목을 입력해주세요.");
+      return;
+    }
+
+    if (selectedFields.length === 0) {
+      toast.error("전공을 하나 이상 선택해주세요.");
+      return;
+    }
+
+    if (!deadline) {
+      toast.error("지원 기한을 선택해주세요.");
+      return;
+    }
+
+    if (questions.length === 0) {
+      toast.error("최소 하나 이상의 질문을 추가해주세요.");
+      return;
+    }
+
+    // API 요청 데이터 구성
+    const formData: CreateApplicationFormRequest = {
+      applicationFormTitle: applicationTitle,
+      content: questions.map((q) => q.text),
+      submissionDuration: deadline,
+      majors: selectedFields,
+    };
+
+    createMutation.mutate(formData);
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="mx-auto max-w-4xl">
-        <form className="space-y-6 md:space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
           {/* 필수 정보 섹션 */}
           <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:rounded-3xl md:p-8">
             <h2 className="mb-6 font-bold text-gray-900 text-xl md:mb-8 md:text-2xl">
@@ -87,38 +144,8 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
                   id={`${id}-posting-title`}
                   type="text"
                   placeholder="필수 입력"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition-all placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400 md:rounded-xl md:px-4 md:py-3 md:text-base"
-                />
-              </div>
-
-              {/* 이름 */}
-              <div>
-                <label
-                  htmlFor={`${id}-name`}
-                  className="mb-1.5 block font-medium text-gray-700 text-sm md:mb-2"
-                >
-                  이름<span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`${id}-name`}
-                  type="text"
-                  placeholder="필수 입력"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition-all placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400 md:rounded-xl md:px-4 md:py-3 md:text-base"
-                />
-              </div>
-
-              {/* 학번 */}
-              <div>
-                <label
-                  htmlFor={`${id}-student-id`}
-                  className="mb-1.5 block font-medium text-gray-700 text-sm md:mb-2"
-                >
-                  학번<span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`${id}-student-id`}
-                  type="text"
-                  placeholder="필수 입력"
+                  value={applicationTitle}
+                  onChange={(e) => setApplicationTitle(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition-all placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400 md:rounded-xl md:px-4 md:py-3 md:text-base"
                 />
               </div>
@@ -144,22 +171,6 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* 지기소개 */}
-              <div>
-                <label
-                  htmlFor={`${id}-introduction`}
-                  className="mb-1.5 block font-medium text-gray-700 text-sm md:mb-2"
-                >
-                  지기소개<span className="text-red-500">*</span>
-                </label>
-                <input
-                  id={`${id}-introduction`}
-                  type="text"
-                  placeholder="필수 입력"
-                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition-all placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-red-400 md:rounded-xl md:px-4 md:py-3 md:text-base"
-                />
               </div>
 
               {/* 지원 기한 */}
@@ -289,16 +300,11 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
               나가기
             </button>
             <button
-              type="button"
-              className="rounded-lg bg-gray-900 px-6 py-2.5 font-medium text-sm text-white transition-colors hover:bg-gray-800 md:rounded-xl md:px-8 md:text-base"
-            >
-              지원서 수정하기
-            </button>
-            <button
               type="submit"
-              className="rounded-lg bg-gray-400 px-6 py-2.5 font-medium text-sm text-white transition-colors hover:bg-gray-500 md:rounded-xl md:px-8 md:text-base"
+              disabled={createMutation.isPending}
+              className="rounded-lg bg-primary-500 px-6 py-2.5 font-medium text-sm text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-gray-400 md:rounded-xl md:px-8 md:text-base"
             >
-              지원서 삭제하기
+              {createMutation.isPending ? "생성 중..." : "지원서 생성하기"}
             </button>
           </div>
         </form>

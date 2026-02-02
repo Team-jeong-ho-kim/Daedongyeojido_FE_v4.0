@@ -547,7 +547,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                     className="rounded-lg bg-primary-500 px-4 py-2 font-medium text-[14px] text-white hover:bg-primary-600"
                     onClick={() => setShowApplicationForm(true)}
                   >
-                    지원서 생성하기
+                    지원서 폼 생성하기
                   </button>
                 </div>
                 {MOCK_APPLICATIONS.length === 0 ? (
