@@ -486,10 +486,13 @@ var import_jsx_runtime6 = require("react/jsx-runtime");
 var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function ImageUpload({
   onFileChange,
-  placeholder = "\uD30C\uC77C\uC744 \uC5C5\uB85C\uB4DC \uD574\uC8FC\uC138\uC694."
+  placeholder = "\uD30C\uC77C\uC744 \uC5C5\uB85C\uB4DC \uD574\uC8FC\uC138\uC694.",
+  defaultImageUrl
 }) {
   const [fileName, setFileName] = (0, import_react2.useState)("");
-  const [previewUrl, setPreviewUrl] = (0, import_react2.useState)(null);
+  const [previewUrl, setPreviewUrl] = (0, import_react2.useState)(
+    defaultImageUrl || null
+  );
   const [isModalOpen, setIsModalOpen] = (0, import_react2.useState)(false);
   const inputId = (0, import_react2.useId)();
   const fileInputId = (0, import_react2.useId)();

@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useUserStore } from "shared";
-import { ImageUpload, LinkInput, TextInput } from "ui";
+import { FieldSelector, ImageUpload, LinkInput, TextInput } from "ui";
+import { FIELDS } from "@/constants/club";
+import { useUpdateProfileMutation } from "@/hooks/mutations/useUser";
 
 interface LinkItem {
   id: string;
@@ -12,11 +14,21 @@ interface LinkItem {
 
 export default function MyPageEdit() {
   const userInfo = useUserStore((state) => state.userInfo);
+  const updateProfileMutation = useUpdateProfileMutation();
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [links, setLinks] = useState<LinkItem[]>(
-    userInfo?.link?.map((url) => ({ id: crypto.randomUUID(), url })) || [],
-  );
+  const [links, setLinks] = useState<LinkItem[]>(() => {
+    if (Array.isArray(userInfo?.link)) {
+      return userInfo.link.map((url) => ({ id: crypto.randomUUID(), url }));
+    }
+    return [];
+  });
+  const [selectedFields, setSelectedFields] = useState<string[]>(() => {
+    if (Array.isArray(userInfo?.major)) {
+      return userInfo.major;
+    }
+    return [];
+  });
   const [introduction, setIntroduction] = useState(
     userInfo?.introduction || "",
   );
@@ -27,11 +39,13 @@ export default function MyPageEdit() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API 연동
-    console.log({
-      profileImage,
-      links: links.map((link) => link.url),
+
+    updateProfileMutation.mutate({
       introduction,
+      majors: selectedFields,
+      links: links.map((link) => link.url),
+      profileImage,
+      existingImageUrl: userInfo?.profileImage || undefined,
     });
   };
 
@@ -85,6 +99,18 @@ export default function MyPageEdit() {
               links={links}
               onLinksChange={setLinks}
               placeholder="링크 추가하기"
+            />
+          </div>
+
+          <div className="h-px w-full bg-gray-200"></div>
+
+          {/* 전공 */}
+          <div>
+            <h2 className="mb-4 font-bold text-xl tracking-tight">전공</h2>
+            <FieldSelector
+              fields={FIELDS}
+              selectedFields={selectedFields}
+              onSelectionChange={setSelectedFields}
             />
           </div>
 

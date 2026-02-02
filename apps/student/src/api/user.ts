@@ -43,3 +43,36 @@ export const updateMyInfo = async (data: UpdateMyInfoRequest) => {
 
   return response.data;
 };
+
+export interface UpdateProfileRequest {
+  introduction: string;
+  majors: string[];
+  links: string[];
+  profileImage?: File | null;
+  existingImageUrl?: string;
+}
+
+export const updateProfile = async (data: UpdateProfileRequest) => {
+  const formData = new FormData();
+
+  formData.append("introduction", data.introduction);
+
+  for (const major of data.majors) {
+    formData.append("majors", major);
+  }
+
+  for (const link of data.links) {
+    formData.append("links", link);
+  }
+
+  if (data.profileImage) {
+    formData.append("profileImage", data.profileImage);
+  }
+
+  const response = await apiClient.patch<UserInfo>("/users", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};

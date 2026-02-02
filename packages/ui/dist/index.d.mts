@@ -35,8 +35,9 @@ declare function FormField({ label, htmlFor, alignTop, required, children, }: Fo
 interface ImageUploadProps {
     onFileChange: (file: File | null, previewUrl: string | null) => void;
     placeholder?: string;
+    defaultImageUrl?: string | null;
 }
-declare function ImageUpload({ onFileChange, placeholder, }: ImageUploadProps): react_jsx_runtime.JSX.Element;
+declare function ImageUpload({ onFileChange, placeholder, defaultImageUrl, }: ImageUploadProps): react_jsx_runtime.JSX.Element;
 
 interface LinkItem {
     id: string;

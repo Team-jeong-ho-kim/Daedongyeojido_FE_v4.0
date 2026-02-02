@@ -10,14 +10,18 @@ const INPUT_STYLE =
 interface ImageUploadProps {
   onFileChange: (file: File | null, previewUrl: string | null) => void;
   placeholder?: string;
+  defaultImageUrl?: string | null;
 }
 
 export default function ImageUpload({
   onFileChange,
   placeholder = "파일을 업로드 해주세요.",
+  defaultImageUrl,
 }: ImageUploadProps) {
   const [fileName, setFileName] = useState("");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    defaultImageUrl || null,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const inputId = useId();

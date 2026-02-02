@@ -431,10 +431,13 @@ import { Fragment as Fragment2, jsx as jsx6, jsxs as jsxs5 } from "react/jsx-run
 var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function ImageUpload({
   onFileChange,
-  placeholder = "\uD30C\uC77C\uC744 \uC5C5\uB85C\uB4DC \uD574\uC8FC\uC138\uC694."
+  placeholder = "\uD30C\uC77C\uC744 \uC5C5\uB85C\uB4DC \uD574\uC8FC\uC138\uC694.",
+  defaultImageUrl
 }) {
   const [fileName, setFileName] = useState2("");
-  const [previewUrl, setPreviewUrl] = useState2(null);
+  const [previewUrl, setPreviewUrl] = useState2(
+    defaultImageUrl || null
+  );
   const [isModalOpen, setIsModalOpen] = useState2(false);
   const inputId = useId();
   const fileInputId = useId();
