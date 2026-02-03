@@ -147,20 +147,36 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const clubMembers = clubData?.clubMembers || [];
 
   // ClubAnnouncement를 JobPosting 형태로 변환
-  const jobPostings = (announcements || []).map((announcement) => {
-    const dateString = `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
+  const allJobPostings = (announcements || []).map((announcement) => {
+    const dateString =
+      typeof announcement.deadline === "string"
+        ? announcement.deadline
+        : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
     const deadlineDate = new Date(dateString);
     const today = new Date();
-    const status = deadlineDate < today ? "종료됨" : "진행중";
+
+    // 서버의 status가 CLOSED면 "준비중", OPEN이면 마감일 기준으로 "진행중"/"종료됨"
+    let status: "준비중" | "진행중" | "종료됨";
+    if (announcement.status === "CLOSED") {
+      status = "준비중";
+    } else {
+      status = deadlineDate < today ? "종료됨" : "진행중";
+    }
 
     return {
       id: announcement.announcementId,
-      status: status as "종료됨" | "진행중",
+      status,
       title: announcement.title,
       date: dateString,
       content: undefined,
+      serverStatus: announcement.status,
     };
   });
+
+  // 비회원일 때는 OPEN 상태(게시된 공고)만 표시
+  const jobPostings = isClubMember
+    ? allJobPostings
+    : allJobPostings.filter((posting) => posting.serverStatus === "OPEN");
 
   // 변경 사항 확인
   const editLinksUrls = editLinks.map((l) => l.url);
@@ -622,8 +638,12 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                         )
                         .slice((formPage - 1) * 3, formPage * 3)
                         .map((form) => {
-                          const [year, month, day] = form.submissionDuration;
-                          const dateString = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                          const [year, month, day] =
+                            form.submissionDuration || [0, 0, 0];
+                          const dateString =
+                            year && month && day
+                              ? `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                              : "미정";
 
                           return (
                             <ApplicationCard

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface JobPostingItemProps {
-  status: "종료됨" | "진행중";
+  status: "종료됨" | "진행중" | "준비중";
   title: string;
   date: string;
   content?: string;
@@ -34,7 +34,9 @@ export default function JobPostingItem({
             className={`rounded-md px-2.5 py-1 font-medium text-[12px] md:text-[13px] ${
               status === "종료됨"
                 ? "bg-red-50 text-red-500"
-                : "bg-blue-50 text-blue-500"
+                : status === "진행중"
+                  ? "bg-blue-50 text-blue-500"
+                  : "bg-gray-50 text-gray-500"
             }`}
           >
             {status}

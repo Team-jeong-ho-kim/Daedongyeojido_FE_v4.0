@@ -1,5 +1,5 @@
 export interface LoginRequest {
-  account_id: string;
+  accountId: string;
   password: string;
 }
 

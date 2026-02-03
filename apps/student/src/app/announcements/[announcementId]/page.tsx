@@ -12,9 +12,14 @@ import {
   ClubHeader,
   Pagination,
 } from "@/components";
+import { ApplicationFormSelectModal } from "@/components/modal/ApplicationFormSelectModal";
 import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
-import { useDeleteAnnouncementMutation } from "@/hooks/mutations/useAnnouncement";
+import {
+  useDeleteAnnouncementMutation,
+  usePublishAnnouncementMutation,
+} from "@/hooks/mutations/useAnnouncement";
 import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
+import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
 
 interface AnnouncementDetailPageProps {
@@ -92,16 +97,21 @@ export default function AnnouncementDetailPage({
 }: AnnouncementDetailPageProps) {
   const router = useRouter();
   const { announcementId } = use(params);
-  const { data: announcementData } = useGetDetailAnnounceQuery(announcementId);
+  const { data: announcementData, refetch: refetchAnnouncement } =
+    useGetDetailAnnounceQuery(announcementId);
   const { mutate: deleteAnnouncementMutate } = useDeleteAnnouncementMutation();
+  const { mutate: publishAnnouncementMutate } =
+    usePublishAnnouncementMutation(announcementId);
 
   const clubId = announcementData?.clubId?.toString() || "";
   const { data: clubData } = useGetDetailClubQuery(clubId);
+  const { data: applicationForms } = useGetClubApplicationFormsQuery(clubId);
 
   const [activeTab, setActiveTab] = useState<"details" | "applications">(
     "details",
   );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const [applicationPage, setApplicationPage] = useState(1);
 
   const role = useUserStore((state) => state.userInfo?.role);
@@ -113,10 +123,24 @@ export default function AnnouncementDetailPage({
     announcement?.phoneNumber ?? "",
   );
 
+  // 디버깅용
+  console.log("announcement.status:", announcement?.status);
+  console.log("isClubMember:", isClubMember);
+
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
     deleteAnnouncementMutate(announcementId);
     setShowDeleteModal(false);
+  };
+
+  // 공고 게시 핸들러
+  const handlePublishAnnouncement = (applicationFormId: number) => {
+    publishAnnouncementMutate(applicationFormId, {
+      onSuccess: () => {
+        refetchAnnouncement();
+        setShowPublishModal(false);
+      },
+    });
   };
 
   useEffect(() => {
@@ -193,9 +217,22 @@ export default function AnnouncementDetailPage({
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
                 공고 제목
               </h2>
-              <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.title}
-              </p>
+              <div className="flex items-center gap-3">
+                <p className="text-[14px] text-gray-700 md:text-[15px]">
+                  {announcement.title}
+                </p>
+                {isClubMember && announcement.status && (
+                  <span
+                    className={`rounded-md border px-2.5 py-1 font-medium text-[12px] md:text-[13px] ${
+                      announcement.status === "CLOSED"
+                        ? "border-red-500 bg-red-50 text-red-500"
+                        : "border-blue-500 bg-blue-50 text-blue-500"
+                    }`}
+                  >
+                    {announcement.status}
+                  </span>
+                )}
+              </div>
             </section>
 
             {/* 동아리명 */}
@@ -299,6 +336,15 @@ export default function AnnouncementDetailPage({
 
             {isClubMember && activeTab === "details" && (
               <div className="flex justify-end gap-3 pt-6">
+                {announcement.status === "CLOSED" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPublishModal(true)}
+                    className="rounded-md bg-[#E85D5D] px-4 py-2 font-medium text-[12px] text-white hover:bg-[#d14d4d]"
+                  >
+                    공고 게시하기
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() =>
@@ -379,6 +425,14 @@ export default function AnnouncementDetailPage({
         description="이 작업은 되돌릴 수 없습니다."
         cancelText="취소"
         confirmText="삭제"
+      />
+
+      {/* 폼 선택 모달 */}
+      <ApplicationFormSelectModal
+        isOpen={showPublishModal}
+        onClose={() => setShowPublishModal(false)}
+        onConfirm={handlePublishAnnouncement}
+        applicationForms={applicationForms || []}
       />
     </main>
   );

@@ -46,3 +46,14 @@ export const updateAnnouncement = async (
   );
   return response.data;
 };
+
+export const publishAnnouncement = async (
+  announcementId: string,
+  applicationFormId: number,
+) => {
+  const response = await apiClient.patch(
+    `/announcements/open/${announcementId}`,
+    { applicationFormId },
+  );
+  return response.data;
+};

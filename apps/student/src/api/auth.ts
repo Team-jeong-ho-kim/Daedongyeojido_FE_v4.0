@@ -3,11 +3,11 @@ import { apiClient } from "utils";
 import { saveTokens } from "@/lib/token";
 
 export const login = async ({
-  account_id,
+  accountId,
   password,
 }: LoginRequest): Promise<LoginResponse> => {
   const response = await apiClient.post<LoginResponse>("/auth/login", {
-    account_id,
+    accountId,
     password,
   });
 

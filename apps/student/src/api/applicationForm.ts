@@ -21,8 +21,8 @@ export interface ApplicationFormListItem {
   applicationFormId: number;
   applicationFormTitle: string;
   clubName: string;
-  clubImage: string;
-  submissionDuration: [number, number, number];
+  clubImage?: string;
+  submissionDuration?: [number, number, number] | string;
 }
 
 export interface ApplicationFormsResponse {
@@ -37,10 +37,10 @@ export interface ApplicationQuestion {
 export interface ApplicationFormDetail {
   applicationFormTitle: string;
   clubName: string;
-  clubImage: string;
+  clubImage?: string;
   content: ApplicationQuestion[];
-  submissionDuration: [number, number, number];
-  major: string[];
+  submissionDuration?: [number, number, number] | string;
+  major?: string[];
 }
 
 export const createApplicationForm = async (

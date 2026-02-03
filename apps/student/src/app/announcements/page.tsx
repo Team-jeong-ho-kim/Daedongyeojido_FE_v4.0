@@ -23,7 +23,10 @@ export default function AnnouncementsPage() {
       announcement_id: item.announcementId,
       title: item.title,
       club_name: item.clubName,
-      deadline: `${item.deadline[0]}-${String(item.deadline[1]).padStart(2, "0")}-${String(item.deadline[2]).padStart(2, "0")}`,
+      deadline:
+        typeof item.deadline === "string"
+          ? item.deadline
+          : `${item.deadline[0]}-${String(item.deadline[1]).padStart(2, "0")}-${String(item.deadline[2]).padStart(2, "0")}`,
       club_image: item.clubImage,
     })) || [];
 

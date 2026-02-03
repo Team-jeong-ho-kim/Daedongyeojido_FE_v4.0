@@ -6,7 +6,7 @@ import { clearTokens } from "@/lib/token";
 
 export const useLoginMutation = () => {
   return useMutation<LoginResponse, Error, LoginRequest>({
-    mutationFn: ({ account_id, password }) => login({ account_id, password }),
+    mutationFn: ({ accountId, password }) => login({ accountId, password }),
     onSuccess: (data) => {
       toast.success(`${data.userName}님, 환영합니다!`);
       setTimeout(() => {

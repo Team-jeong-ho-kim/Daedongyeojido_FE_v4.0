@@ -9,7 +9,7 @@ import { getAccessToken } from "@/lib/token";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [account_id, setAccount_id] = useState<string>("");
+  const [accountId, setAccountId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { mutate: login, isPending: loginPending } = useLoginMutation();
 
@@ -21,7 +21,7 @@ export default function LoginPage() {
   }, [router]);
 
   const handleLogin = () => {
-    if (!account_id.trim()) {
+    if (!accountId.trim()) {
       toast.error("DSM 계정 ID를 입력해주세요.");
       return;
     }
@@ -31,10 +31,10 @@ export default function LoginPage() {
       return;
     }
 
-    login({ account_id, password });
+    login({ accountId, password });
   };
 
-  const accountId = useId();
+  const accountInputId = useId();
   const passwordId = useId();
   const rememberId = useId();
 
@@ -91,17 +91,17 @@ export default function LoginPage() {
             <div className="space-y-4">
               <div>
                 <label
-                  htmlFor={accountId}
+                  htmlFor={accountInputId}
                   className="mb-2 block text-gray-400 text-sm"
                 >
                   DSM 계정 ID
                 </label>
                 <input
-                  value={account_id}
+                  value={accountId}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setAccount_id(e.target.value)
+                    setAccountId(e.target.value)
                   }
-                  id={accountId}
+                  id={accountInputId}
                   type="text"
                   placeholder="계정 ID를 입력해주세요."
                   className="w-full rounded-lg border border-transparent bg-[#2a2a2a] px-4 py-3.5 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"

@@ -21,6 +21,8 @@ export interface AnnouncementDetailResponse {
   introduction: string;
   talentDescription: string;
   assignment: string;
+  status?: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
 }
 
 export interface ApplicationQuestion {
@@ -51,8 +53,10 @@ export interface AnnouncementListItem {
   announcementId: number;
   title: string;
   clubName: string;
-  deadline: [number, number, number]; // [year, month, day]
+  deadline: [number, number, number] | string; // [year, month, day] or string
   clubImage: string;
+  status?: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
 }
 
 export interface AnnouncementListResponse {
@@ -62,7 +66,9 @@ export interface AnnouncementListResponse {
 export interface ClubAnnouncement {
   announcementId: number;
   title: string;
-  deadline: [number, number, number];
+  deadline: [number, number, number] | string;
+  status: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
 }
 
 export interface ClubAnnouncementResponse {

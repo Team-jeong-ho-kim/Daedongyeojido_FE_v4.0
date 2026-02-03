@@ -24,8 +24,11 @@ export default function AnnouncementSection() {
     }
   };
 
-  const daedlineFormat = (deadline: number[]) => {
-    return deadline.join("-");
+  const daedlineFormat = (deadline: number[] | string) => {
+    if (Array.isArray(deadline)) {
+      return deadline.map((n) => String(n).padStart(2, "0")).join("-");
+    }
+    return String(deadline);
   };
 
   return (

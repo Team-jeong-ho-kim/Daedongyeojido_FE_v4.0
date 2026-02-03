@@ -37,8 +37,11 @@ export default function ApplicationFormDetailPage({
     );
   }
 
-  const [year, month, day] = formDetail.submissionDuration;
-  const dateString = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const [year, month, day] = formDetail.submissionDuration || [0, 0, 0];
+  const dateString =
+    year && month && day
+      ? `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+      : "마감일 미정";
 
   const handleDelete = () => {
     deleteApplicationFormMutate(applicationFormId, {
@@ -59,14 +62,22 @@ export default function ApplicationFormDetailPage({
         <div className="mx-auto max-w-4xl">
           {/* Club Info */}
           <div className="mb-10 flex items-center gap-5">
-            <div className="relative h-16 w-16 overflow-hidden rounded-full md:h-20 md:w-20">
-              <Image
-                src={formDetail.clubImage}
-                alt={formDetail.clubName}
-                fill
-                className="object-cover"
-              />
-            </div>
+            {formDetail.clubImage ? (
+              <div className="relative h-16 w-16 overflow-hidden rounded-full md:h-20 md:w-20">
+                <Image
+                  src={formDetail.clubImage}
+                  alt={`${formDetail.clubName} 로고`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 md:h-20 md:w-20">
+                <span className="font-bold text-gray-500 text-xl">
+                  {formDetail.clubName?.[0]}
+                </span>
+              </div>
+            )}
             <div>
               <h2 className="font-semibold text-gray-900 text-xl md:text-2xl">
                 {formDetail.clubName}
@@ -97,9 +108,9 @@ export default function ApplicationFormDetailPage({
               모집 분야
             </h3>
             <div className="flex flex-wrap gap-3">
-              {formDetail.major.map((major) => (
+              {formDetail.major?.map((major, index) => (
                 <span
-                  key={major}
+                  key={`${major}-${index}`}
                   className="rounded-full border border-primary-500 bg-primary-50 px-4 py-1.5 font-medium text-primary-500 text-sm"
                 >
                   {major}

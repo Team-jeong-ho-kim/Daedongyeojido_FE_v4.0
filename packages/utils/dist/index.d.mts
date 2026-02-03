@@ -3,7 +3,7 @@ import * as axios from 'axios';
 declare const apiClient: axios.AxiosInstance;
 
 interface LoginRequest {
-    account_id: string;
+    accountId: string;
     password: string;
 }
 interface LoginResponse {
