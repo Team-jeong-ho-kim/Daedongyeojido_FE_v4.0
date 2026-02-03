@@ -72,6 +72,20 @@ const formatDeadline = (deadline: string | [number, number, number]) => {
   return deadline;
 };
 
+const formatPhoneNumber = (phoneNumber: string) => {
+  if (!phoneNumber) return phoneNumber;
+  const digits = phoneNumber.replace(/\D/g, "");
+
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+
+  return phoneNumber;
+};
+
 export default function AnnouncementDetailPage({
   params,
 }: AnnouncementDetailPageProps) {
@@ -93,6 +107,9 @@ export default function AnnouncementDetailPage({
 
   const announcement = announcementData;
   const formattedDeadline = formatDeadline(announcement?.deadline ?? "");
+  const formattedPhoneNumber = formatPhoneNumber(
+    announcement?.phoneNumber ?? "",
+  );
 
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
@@ -274,7 +291,7 @@ export default function AnnouncementDetailPage({
                 대표자 연락처
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.phoneNumber}
+                {formattedPhoneNumber}
               </p>
             </section>
 
