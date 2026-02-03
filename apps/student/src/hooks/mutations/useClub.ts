@@ -151,8 +151,13 @@ export const useRequestAddClubMemberMutation = (clubId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (studentNumberName: string) =>
-      requestAddClubMember(studentNumberName),
+    mutationFn: ({
+      userName,
+      classNumber,
+    }: {
+      userName: string;
+      classNumber: string;
+    }) => requestAddClubMember(userName, classNumber),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["club", clubId] });
       toast.success("팀원 추가 신청이 완료되었습니다");

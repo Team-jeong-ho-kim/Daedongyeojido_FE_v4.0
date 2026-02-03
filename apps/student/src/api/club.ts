@@ -89,9 +89,13 @@ export const deleteClubMember = async (userId: number) => {
   return response.data;
 };
 
-export const requestAddClubMember = async (studentNumberName: string) => {
+export const requestAddClubMember = async (
+  userName: string,
+  classNumber: string,
+) => {
   const response = await apiClient.post("/clubs/members", {
-    StudentNumberName: studentNumberName,
+    userName,
+    classNumber,
   });
   return response.data;
 };

@@ -286,15 +286,16 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // 팀원 추가 확인 핸들러
   const handleConfirmAddMember = () => {
-    const studentNumberName = `${studentNumber}${studentName}`.trim();
-
-    requestAddMemberMutate(studentNumberName, {
-      onSuccess: () => {
-        setShowConfirmModal(false);
-        setStudentNumber("");
-        setStudentName("");
+    requestAddMemberMutate(
+      { userName: studentName.trim(), classNumber: studentNumber.trim() },
+      {
+        onSuccess: () => {
+          setShowConfirmModal(false);
+          setStudentNumber("");
+          setStudentName("");
+        },
       },
-    });
+    );
   };
 
   const pagedPostings = jobPostings.slice(
