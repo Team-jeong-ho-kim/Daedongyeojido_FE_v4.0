@@ -513,6 +513,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                     status={posting.status}
                     title={posting.title}
                     date={posting.date}
+                    onClick={() => router.push(`/announcements/${posting.id}`)}
                   />
                 ))}
               </div>
@@ -558,6 +559,9 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                         date={posting.date}
                         isMember={isClubMember}
                         content={posting.content}
+                        onClick={() =>
+                          router.push(`/announcements/${posting.id}`)
+                        }
                       />
                     ))}
                   </div>
