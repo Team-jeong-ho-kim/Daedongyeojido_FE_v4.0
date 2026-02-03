@@ -108,9 +108,9 @@ export default function ApplicationFormDetailPage({
               모집 분야
             </h3>
             <div className="flex flex-wrap gap-3">
-              {formDetail.major?.map((major, index) => (
+              {formDetail.major?.map((major) => (
                 <span
-                  key={`${major}-${index}`}
+                  key={major}
                   className="rounded-full border border-primary-500 bg-primary-50 px-4 py-1.5 font-medium text-primary-500 text-sm"
                 >
                   {major}
