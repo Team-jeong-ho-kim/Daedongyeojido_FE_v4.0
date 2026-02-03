@@ -51,6 +51,27 @@ const getStepIcon = (stepName: string) => {
   return <NoteIcon className={iconColor} />;
 };
 
+const formatDeadline = (deadline: string | [number, number, number]) => {
+  if (!deadline) return deadline;
+
+  if (Array.isArray(deadline) && deadline.length === 3) {
+    const [year, month, day] = deadline;
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  if (typeof deadline === "string") {
+    if (/^\d{8}$/.test(deadline)) {
+      return `${deadline.slice(0, 4)}-${deadline.slice(4, 6)}-${deadline.slice(6)}`;
+    }
+
+    if (deadline.includes(".")) {
+      return deadline.split(".").join("-");
+    }
+  }
+
+  return deadline;
+};
+
 export default function AnnouncementDetailPage({
   params,
 }: AnnouncementDetailPageProps) {
@@ -71,6 +92,7 @@ export default function AnnouncementDetailPage({
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const announcement = announcementData;
+  const formattedDeadline = formatDeadline(announcement?.deadline ?? "");
 
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
@@ -200,7 +222,7 @@ export default function AnnouncementDetailPage({
                 지원 마감일
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.deadline}
+                {formattedDeadline}
               </p>
             </section>
 
@@ -211,6 +233,16 @@ export default function AnnouncementDetailPage({
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
                 {announcement.talentDescription}
+              </p>
+            </section>
+
+            {/* 과제 */}
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                과제
+              </h2>
+              <p className="text-[14px] text-gray-700 md:text-[15px]">
+                {announcement.assignment}
               </p>
             </section>
 
@@ -236,13 +268,13 @@ export default function AnnouncementDetailPage({
               </div>
             </section>
 
-            {/* 과제 */}
+            {/* 대표자 연락처 */}
             <section className="flex flex-col gap-2 md:flex-row md:gap-0">
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-                과제
+                대표자 연락처
               </h2>
               <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.assignment}
+                {announcement.phoneNumber}
               </p>
             </section>
 

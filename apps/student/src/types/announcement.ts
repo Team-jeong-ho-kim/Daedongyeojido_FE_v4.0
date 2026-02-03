@@ -17,7 +17,7 @@ export interface AnnouncementDetailResponse {
   title: string;
   major: Major[];
   phoneNumber: string;
-  deadline: string;
+  deadline: string | [number, number, number];
   introduction: string;
   talentDescription: string;
   assignment: string;
