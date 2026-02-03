@@ -31,7 +31,7 @@ export function AddMemberSection({
             placeholder="학번"
             value={studentNumber}
             onChange={(e) => setStudentNumber(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 pr-10 text-[14px] focus:border-gray-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 pr-10 text-[14px] placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
           />
           <svg
             width="20"
@@ -52,7 +52,7 @@ export function AddMemberSection({
             placeholder="이름"
             value={studentName}
             onChange={(e) => setStudentName(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 pr-10 text-[14px] focus:border-gray-400 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 pr-10 text-[14px] placeholder:text-gray-300 focus:border-gray-400 focus:outline-none"
           />
           <svg
             width="20"
