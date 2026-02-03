@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { use } from "react";
+import { use, useState } from "react";
+import { useUserStore } from "shared";
 import { Button } from "ui";
+import { useDeleteApplicationFormMutation } from "@/hooks/mutations/useApplicationForm";
 import { useGetApplicationFormDetailQuery } from "@/hooks/querys/useApplicationFormQuery";
 
 interface ApplicationFormDetailPageProps {
@@ -19,6 +21,13 @@ export default function ApplicationFormDetailPage({
   const clubId = searchParams.get("clubId");
   const { data: formDetail, isLoading } =
     useGetApplicationFormDetailQuery(applicationFormId);
+  const { mutate: deleteApplicationFormMutate, isPending: isDeleting } =
+    useDeleteApplicationFormMutation();
+
+  const role = useUserStore((state) => state.userInfo?.role);
+  const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (isLoading || !formDetail) {
     return (
@@ -30,6 +39,18 @@ export default function ApplicationFormDetailPage({
 
   const [year, month, day] = formDetail.submissionDuration;
   const dateString = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+  const handleDelete = () => {
+    deleteApplicationFormMutate(applicationFormId, {
+      onSuccess: () => {
+        if (clubId) {
+          router.push(`/clubs/${clubId}?tab=history&subtab=form`);
+        } else {
+          router.back();
+        }
+      },
+    });
+  };
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -110,20 +131,59 @@ export default function ApplicationFormDetailPage({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4 border-gray-200 border-t pt-10">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (clubId) {
-                  router.push(`/clubs/${clubId}?tab=history&subtab=form`);
-                } else {
-                  router.back();
-                }
-              }}
-              className="w-full"
-            >
-              목록으로
-            </Button>
+          <div className="flex flex-col gap-6 border-gray-200 border-t pt-10">
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (clubId) {
+                    router.push(`/clubs/${clubId}?tab=history&subtab=form`);
+                  } else {
+                    router.back();
+                  }
+                }}
+                className="flex-1"
+              >
+                목록으로
+              </Button>
+            </div>
+
+            {/* 삭제 버튼 - 동아리 멤버/리더만 표시 */}
+            {isClubMember && (
+              <div className="flex justify-end">
+                {showDeleteConfirm ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-600 text-sm">
+                      정말 삭제하시겠습니까?
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      {isDeleting ? "삭제 중..." : "삭제"}
+                    </Button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="rounded-lg border border-red-500 px-4 py-2 text-red-500 text-sm hover:bg-red-50"
+                  >
+                    지원서 폼 삭제
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

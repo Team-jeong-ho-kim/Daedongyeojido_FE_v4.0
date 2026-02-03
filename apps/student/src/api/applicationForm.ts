@@ -70,3 +70,9 @@ export const getApplicationFormDetail = async (
   );
   return response.data;
 };
+
+export const deleteApplicationForm = async (
+  applicationFormId: string,
+): Promise<void> => {
+  await apiClient.delete(`/application-forms/${applicationFormId}`);
+};
