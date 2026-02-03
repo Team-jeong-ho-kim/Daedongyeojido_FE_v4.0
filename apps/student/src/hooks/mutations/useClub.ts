@@ -5,6 +5,7 @@ import {
   createClubApplication,
   deleteClubMember,
   dissolveClub,
+  requestAddClubMember,
   updateClub,
 } from "@/api/club";
 import type { ClubUpdate } from "@/types";
@@ -141,6 +142,34 @@ export const useDeleteClubMemberMutation = (clubId: string) => {
         toast.error("존재하지 않는 팀원입니다.");
       } else {
         toast.error("팀원 삭제에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+  });
+};
+
+export const useRequestAddClubMemberMutation = (clubId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (studentNumberName: string) =>
+      requestAddClubMember(studentNumberName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+      toast.success("팀원 추가 신청이 완료되었습니다");
+    },
+    onError: (error: any) => {
+      const status = error.response?.status;
+
+      if (status === 400) {
+        toast.error("요청 형식이 잘못되었습니다.");
+      } else if (status === 403) {
+        toast.error("팀원 추가 권한이 없습니다.");
+      } else if (status === 404) {
+        toast.error("존재하지 않는 팀원입니다.");
+      } else if (status === 409) {
+        toast.error("이미 추가 요청이 존재합니다.");
+      } else {
+        toast.error("팀원 추가 신청에 실패했습니다. 다시 시도해주세요.");
       }
     },
   });

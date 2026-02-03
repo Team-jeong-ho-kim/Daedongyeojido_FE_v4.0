@@ -21,6 +21,7 @@ import {
 import { MOCK_APPLICANTS, MOCK_NOTICES } from "@/constants/clubDetailMock";
 import {
   useDissolveClubMutation,
+  useRequestAddClubMemberMutation,
   useUpdateClubMutation,
 } from "@/hooks/mutations/useClub";
 import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
@@ -42,6 +43,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
     useDissolveClubMutation();
+  const { mutate: requestAddMemberMutate, isPending: isAddMemberPending } =
+    useRequestAddClubMemberMutation(clubId);
 
   const role = useUserStore((state) => state.userInfo?.role);
 
@@ -274,15 +277,24 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
 
   // 팀원 추가 요청 핸들러
   const handleAddMemberRequest = () => {
+    if (!studentNumber.trim() || !studentName.trim()) {
+      toast.error("학번과 이름을 모두 입력해주세요.");
+      return;
+    }
     setShowConfirmModal(true);
   };
 
   // 팀원 추가 확인 핸들러
   const handleConfirmAddMember = () => {
-    toast.success("팀원 추가 신청이 완료되었습니다");
-    setShowConfirmModal(false);
-    setStudentNumber("");
-    setStudentName("");
+    const studentNumberName = `${studentNumber}${studentName}`.trim();
+
+    requestAddMemberMutate(studentNumberName, {
+      onSuccess: () => {
+        setShowConfirmModal(false);
+        setStudentNumber("");
+        setStudentName("");
+      },
+    });
   };
 
   const pagedPostings = jobPostings.slice(
@@ -694,10 +706,10 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         onClose={() => setShowConfirmModal(false)}
         onConfirm={handleConfirmAddMember}
         onBackdropClick={() => setShowConfirmModal(false)}
-        title="2306 손희찬님에게 팀원 추가 신청을 하시겠습니까?"
+        title={`${studentNumber} ${studentName}님에게 팀원 추가 신청을 하시겠습니까?`}
         description="이 작업은 되돌릴 수 없습니다."
         cancelText="닫기"
-        confirmText="신청하기"
+        confirmText={isAddMemberPending ? "신청 중..." : "신청하기"}
       />
     </main>
   );

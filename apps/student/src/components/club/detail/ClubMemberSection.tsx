@@ -68,7 +68,7 @@ export function ClubMemberSection({
           />
         )}
 
-        <div className="grid min-h-[590px] grid-cols-4 content-start items-start gap-5">
+        <div className="grid min-h-[590px] grid-cols-2 content-start items-start gap-5 md:grid-cols-3 lg:grid-cols-4">
           {pagedMembers.map((member) => (
             <MemberItem
               key={`${member.userId}-${member.userName}`}

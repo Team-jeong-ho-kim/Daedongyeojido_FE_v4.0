@@ -12,8 +12,13 @@ export default function MemberItem({
   canDelete = false,
   onDelete,
 }: MemberItemProps) {
+  const MAX_VISIBLE_MAJORS = 2;
+  const hasMoreMajors = majors && majors.length > MAX_VISIBLE_MAJORS;
+  const visibleMajors = majors?.slice(0, MAX_VISIBLE_MAJORS);
+  const remainingCount = majors ? majors.length - MAX_VISIBLE_MAJORS : 0;
+
   return (
-    <article className="group relative z-0 h-[250px] w-full select-none overflow-visible rounded-[14px] shadow-sm transition-all duration-200 hover:z-50 md:h-[270px] md:rounded-[16px] lg:h-[285px] lg:w-[240px]">
+    <article className="group relative z-0 h-[250px] w-full select-none overflow-visible rounded-[14px] shadow-sm transition-all duration-300 hover:z-50 hover:shadow-xl md:h-[270px] md:rounded-[16px] lg:h-[285px] lg:w-[240px]">
       {/* 삭제 버튼 */}
       {canDelete && (
         <button
@@ -43,27 +48,51 @@ export default function MemberItem({
       <div className="h-[140px] w-full rounded-t-[14px] bg-[#3D5A4C] md:h-[155px] md:rounded-t-[16px] lg:h-[165px]" />
 
       {/* 정보 영역 */}
-      <div className="flex flex-col gap-1.5 rounded-b-[14px] bg-gray-50 p-3 transition-shadow duration-200 group-hover:shadow-xl md:rounded-b-[16px] md:p-4">
-        <h3 className="font-semibold text-[14px] text-gray-900 md:text-[15px]">
+      <div className="flex h-[110px] flex-col gap-1.5 rounded-b-[14px] bg-gray-50 p-3 transition-shadow duration-200 group-hover:shadow-xl md:h-[115px] md:rounded-b-[16px] md:p-4 lg:h-[120px]">
+        <h3 className="flex-shrink-0 font-semibold text-[14px] text-gray-900 md:text-[15px]">
           {userName}
         </h3>
-        <p className="mt-1 line-clamp-1 text-[12px] text-gray-600 leading-relaxed transition-all duration-200 group-hover:line-clamp-none md:text-[13px]">
+        <p className="mt-1 line-clamp-2 flex-shrink-0 overflow-hidden text-[12px] text-gray-600 leading-relaxed md:text-[13px]">
           {introduce || "소개가 없습니다."}
         </p>
-        <div className="flex max-h-7 flex-wrap gap-1 overflow-hidden text-[11px] text-gray-500 transition-all duration-200 group-hover:max-h-none md:text-[12px]">
-          {majors && majors.length > 0 ? (
-            majors.map((major) => (
-              <span
-                key={major}
-                className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px]"
-              >
-                # {major}
+        <div className="relative flex min-h-7 flex-shrink-0 flex-wrap gap-1 overflow-visible text-[11px] text-gray-500 md:text-[12px]">
+          {/* 기본 표시 (항상 보임) */}
+          <div className="flex flex-wrap gap-1">
+            {majors && majors.length > 0 ? (
+              <>
+                {visibleMajors?.map((major) => (
+                  <span
+                    key={major}
+                    className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px]"
+                  >
+                    # {major}
+                  </span>
+                ))}
+                {hasMoreMajors && (
+                  <span className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] border-gray-300 bg-gray-50 px-[10px] font-medium text-gray-500 text-xs transition-colors group-hover:border-primary-300 group-hover:bg-primary-50 group-hover:text-primary-600">
+                    +{remainingCount}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px] text-gray-400">
+                전공 정보 없음
               </span>
-            ))
-          ) : (
-            <span className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px] text-gray-400">
-              전공 정보 없음
-            </span>
+            )}
+          </div>
+
+          {/* 호버 시 전체 전공 표시 (팝업) */}
+          {hasMoreMajors && (
+            <div className="pointer-events-none absolute top-0 left-0 z-10 hidden w-full min-w-max flex-wrap gap-1.5 rounded-xl border border-gray-200 bg-white/95 p-3 opacity-0 shadow-2xl backdrop-blur-sm transition-all duration-300 ease-out group-hover:flex group-hover:scale-100 group-hover:opacity-100 md:scale-95">
+              {majors?.map((major) => (
+                <span
+                  key={major}
+                  className="flex h-7 w-auto items-center rounded-full border border-primary-200 bg-primary-50 px-3 font-medium text-primary-600 text-xs shadow-sm"
+                >
+                  # {major}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
