@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
@@ -89,6 +90,7 @@ const formatPhoneNumber = (phoneNumber: string) => {
 export default function AnnouncementDetailPage({
   params,
 }: AnnouncementDetailPageProps) {
+  const router = useRouter();
   const { announcementId } = use(params);
   const { data: announcementData } = useGetDetailAnnounceQuery(announcementId);
   const { mutate: deleteAnnouncementMutate } = useDeleteAnnouncementMutation();
@@ -296,7 +298,16 @@ export default function AnnouncementDetailPage({
             </section>
 
             {isClubMember && activeTab === "details" && (
-              <div className="flex justify-end pt-6">
+              <div className="flex justify-end gap-3 pt-6">
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push(`/announcements/${announcementId}/edit`)
+                  }
+                  className="rounded-md bg-primary-500 px-4 py-2 font-medium text-[12px] text-white hover:bg-primary-600"
+                >
+                  공고 수정하기
+                </button>
                 <button
                   type="button"
                   onClick={() => setShowDeleteModal(true)}

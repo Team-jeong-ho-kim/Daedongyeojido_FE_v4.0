@@ -35,3 +35,14 @@ export const createAnnouncement = async (data: AnnouncementCreate) => {
   const response = await apiClient.post("/announcements", data);
   return response.data;
 };
+
+export const updateAnnouncement = async (
+  announcementId: string,
+  data: AnnouncementCreate,
+) => {
+  const response = await apiClient.patch(
+    `/announcements/${announcementId}`,
+    data,
+  );
+  return response.data;
+};
