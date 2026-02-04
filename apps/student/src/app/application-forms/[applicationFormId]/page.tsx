@@ -37,11 +37,13 @@ export default function ApplicationFormDetailPage({
     );
   }
 
-  const [year, month, day] = formDetail.submissionDuration || [0, 0, 0];
-  const dateString =
-    year && month && day
-      ? `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-      : "마감일 미정";
+  const dateString = formDetail.submissionDuration
+    ? typeof formDetail.submissionDuration === "string"
+      ? formDetail.submissionDuration
+      : formDetail.submissionDuration
+          .map((n) => String(n).padStart(2, "0"))
+          .join("-")
+    : "마감일 미정";
 
   const handleDelete = () => {
     deleteApplicationFormMutate(applicationFormId, {

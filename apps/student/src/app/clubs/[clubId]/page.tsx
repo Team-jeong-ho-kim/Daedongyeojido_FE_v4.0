@@ -689,12 +689,13 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                         )
                         .slice((formPage - 1) * 3, formPage * 3)
                         .map((form) => {
-                          const [year, month, day] =
-                            form.submissionDuration || [0, 0, 0];
-                          const dateString =
-                            year && month && day
-                              ? `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                              : "미정";
+                          const dateString = form.submissionDuration
+                            ? typeof form.submissionDuration === "string"
+                              ? form.submissionDuration
+                              : form.submissionDuration
+                                  .map((n) => String(n).padStart(2, "0"))
+                                  .join("-")
+                            : "미정";
 
                           return (
                             <ApplicationCard
