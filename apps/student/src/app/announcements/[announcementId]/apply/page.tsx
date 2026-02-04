@@ -4,15 +4,14 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
+import { getDetailAnnouncement } from "@/api/announcement";
 import {
   getApplicationFormDetail,
   submitApplication,
 } from "@/api/applicationForm";
-import { getDetailAnnouncement } from "@/api/announcement";
 import { ClubHeader } from "@/components";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { useModalStore } from "@/stores/useModalStore";
-import type { ApplicationFormResponse } from "@/types/announcement";
 
 export default function ApplyDetailPage({
   params,
@@ -24,7 +23,9 @@ export default function ApplyDetailPage({
   const id = useId();
 
   const [applicationForm, setApplicationForm] = useState<any>(null);
-  const [applicationFormId, setApplicationFormId] = useState<string | null>(null);
+  const [applicationFormId, setApplicationFormId] = useState<string | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<{
@@ -196,7 +197,7 @@ export default function ApplyDetailPage({
 
         // 3. major 기본값 설정
         if (form.major && form.major.length > 0) {
-          setFormData((prev) => ({ ...prev, major: form.major![0] }));
+          setFormData((prev) => ({ ...prev, major: form.major?.[0] || "" }));
         }
       } catch (error) {
         console.error("데이터 조회 실패:", error);
@@ -245,7 +246,9 @@ export default function ApplyDetailPage({
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
         <p className="text-gray-500 text-lg">
-          {isLoading ? "지원서 폼을 불러오는 중..." : "지원서 폼을 찾을 수 없습니다."}
+          {isLoading
+            ? "지원서 폼을 불러오는 중..."
+            : "지원서 폼을 찾을 수 없습니다."}
         </p>
       </main>
     );
