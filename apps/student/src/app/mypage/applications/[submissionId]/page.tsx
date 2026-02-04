@@ -167,6 +167,15 @@ export default function MySubmissionDetailPage({
         <div className="flex justify-center gap-4">
           <button
             type="button"
+            onClick={() =>
+              router.push(`/mypage/applications/${submissionId}/edit`)
+            }
+            className="rounded-xl bg-primary-500 px-8 py-3 font-medium text-white transition-colors hover:bg-primary-600"
+          >
+            수정하기
+          </button>
+          <button
+            type="button"
             onClick={() => router.push("/mypage/applications")}
             className="rounded-xl border border-gray-300 bg-white px-8 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"
           >

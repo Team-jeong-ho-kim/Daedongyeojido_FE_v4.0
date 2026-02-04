@@ -185,3 +185,21 @@ export const getMySubmissionDetail = async (
   );
   return response.data;
 };
+
+export interface UpdateMySubmissionRequest {
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  answer: {
+    applicationQuestionId: number;
+    answer: string;
+  }[];
+}
+
+export const updateMySubmission = async (
+  submissionId: string,
+  data: UpdateMySubmissionRequest,
+): Promise<void> => {
+  await apiClient.patch(`/applications/${submissionId}`, data);
+};
