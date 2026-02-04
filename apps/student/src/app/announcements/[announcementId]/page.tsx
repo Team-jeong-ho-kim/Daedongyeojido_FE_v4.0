@@ -123,10 +123,6 @@ export default function AnnouncementDetailPage({
     announcement?.phoneNumber ?? "",
   );
 
-  // 디버깅용
-  console.log("announcement.status:", announcement?.status);
-  console.log("isClubMember:", isClubMember);
-
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
     deleteAnnouncementMutate(announcementId);

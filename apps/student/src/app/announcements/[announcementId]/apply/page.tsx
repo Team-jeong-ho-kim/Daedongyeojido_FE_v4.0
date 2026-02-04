@@ -4,34 +4,15 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
+import {
+  getApplicationFormDetail,
+  submitApplication,
+} from "@/api/applicationForm";
+import { getDetailAnnouncement } from "@/api/announcement";
 import { ClubHeader } from "@/components";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { useModalStore } from "@/stores/useModalStore";
 import type { ApplicationFormResponse } from "@/types/announcement";
-
-// mock data
-const mockApplicationForm: ApplicationFormResponse = {
-  application_form_title: "2026 대동여지도 지원서 폼",
-  club_name: "대동여지도",
-  club_image:
-    "https://daedong-bucket.s3.ap-northeast-2.amazonaws.com/07e88aba-cc99-4cc6-ae04-62088006eeeb.jpg",
-  content: [
-    {
-      application_question_id: 1,
-      content: "지원 동기를 작성해주세요.",
-    },
-    {
-      application_question_id: 2,
-      content: "본인의 강점을 설명해주세요.",
-    },
-    {
-      application_question_id: 3,
-      content: "동아리에서 어떤 활동을 하고 싶은가요?",
-    },
-  ],
-  submission_duration: "2026-03-15",
-  major: ["BE", "FE"],
-};
 
 export default function ApplyDetailPage({
   params,
@@ -41,7 +22,10 @@ export default function ApplyDetailPage({
   const { announcementId } = use(params);
   const router = useRouter();
   const id = useId();
-  const applicationForm = mockApplicationForm;
+
+  const [applicationForm, setApplicationForm] = useState<any>(null);
+  const [applicationFormId, setApplicationFormId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -53,7 +37,7 @@ export default function ApplyDetailPage({
     name: "",
     studentId: "",
     introduction: "",
-    major: applicationForm.major[0] || "",
+    major: "",
     answers: {},
   });
 
@@ -103,9 +87,9 @@ export default function ApplyDetailPage({
     if (!formData.introduction.trim())
       newErrors.introduction = "자기소개를 입력해주세요";
 
-    applicationForm.content.forEach((question, index) => {
-      if (!formData.answers[question.application_question_id]?.trim()) {
-        newErrors[`answer_${question.application_question_id}`] =
+    applicationForm.content.forEach((question: any, index: number) => {
+      if (!formData.answers[question.applicationQuestionId]?.trim()) {
+        newErrors[`answer_${question.applicationQuestionId}`] =
           `질문 ${index + 1}의 답변을 입력해주세요`;
       }
     });
@@ -119,20 +103,26 @@ export default function ApplyDetailPage({
       toast.error("필수 항목을 모두 입력해주세요");
       return false;
     }
+    if (!applicationFormId) {
+      toast.error("지원서 폼 정보를 불러올 수 없습니다.");
+      return false;
+    }
     setIsSubmitting(true);
     try {
       const submitData = {
-        name: formData.name,
-        studentId: formData.studentId,
+        userName: formData.name,
+        classNumber: formData.studentId,
         introduction: formData.introduction,
         major: formData.major,
-        answers: applicationForm.content.map((question) => ({
-          application_question_id: question.application_question_id,
-          answer: formData.answers[question.application_question_id] || "",
-        })),
+        answer: applicationForm.content.map(
+          (question: { applicationQuestionId: number }) => ({
+            applicationQuestionId: question.applicationQuestionId,
+            answer: formData.answers[question.applicationQuestionId] || "",
+          }),
+        ),
       };
-      console.log("제출:", submitData);
-      // TODO: API 호출
+      await submitApplication(applicationFormId, submitData);
+      toast.success("지원서가 제출되었습니다.");
       // 성공 시 임시저장 데이터 삭제
       localStorage.removeItem(`apply_${announcementId}`);
       return true;
@@ -175,8 +165,55 @@ export default function ApplyDetailPage({
     }
   };
 
+  // 공고 및 지원서 폼 조회
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // 1. 공고 조회하여 applicationFormId 가져오기
+        const announcement = await getDetailAnnouncement(announcementId);
+
+        // CLOSED 상태 체크
+        if (announcement.status === "CLOSED") {
+          toast.error("아직 게시되지 않은 공고입니다.");
+          router.push("/announcements");
+          return;
+        }
+
+        if (!announcement.applicationFormId) {
+          toast.error("이 공고에 연결된 지원서 폼이 없습니다.");
+          router.push(`/announcements/${announcementId}`);
+          return;
+        }
+
+        setApplicationFormId(String(announcement.applicationFormId));
+
+        // 2. 지원서 폼 조회
+        const form = await getApplicationFormDetail(
+          String(announcement.applicationFormId),
+        );
+        setApplicationForm(form);
+
+        // 3. major 기본값 설정
+        if (form.major && form.major.length > 0) {
+          setFormData((prev) => ({ ...prev, major: form.major![0] }));
+        }
+      } catch (error) {
+        console.error("데이터 조회 실패:", error);
+        toast.error("데이터를 불러올 수 없습니다.");
+        router.push(`/announcements/${announcementId}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [announcementId, router]);
+
   // 임시저장 불러오기
   useEffect(() => {
+    if (isLoading || !applicationForm) return;
+
     const saved = localStorage.getItem(`apply_${announcementId}`);
     if (saved) {
       try {
@@ -187,7 +224,7 @@ export default function ApplyDetailPage({
         localStorage.removeItem(`apply_${announcementId}`);
       }
     }
-  }, [announcementId]);
+  }, [announcementId, isLoading, applicationForm]);
 
   // 자동 임시저장
   useEffect(() => {
@@ -204,12 +241,22 @@ export default function ApplyDetailPage({
     return () => clearTimeout(timer);
   }, [formData, announcementId]);
 
+  if (isLoading || !applicationForm) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">
+          {isLoading ? "지원서 폼을 불러오는 중..." : "지원서 폼을 찾을 수 없습니다."}
+        </p>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col bg-white">
       <ClubHeader
-        clubImage={applicationForm.club_image}
-        clubName={applicationForm.club_name}
-        title={applicationForm.application_form_title}
+        clubImage={applicationForm.clubImage}
+        clubName={applicationForm.clubName}
+        title={applicationForm.applicationFormTitle}
       />
       <div className="mt-7 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="mb-8 font-bold text-gray-900 text-xl">인적 사항</h2>
@@ -259,7 +306,7 @@ export default function ApplyDetailPage({
               지원 전공
             </div>
             <div className="flex flex-1 flex-wrap gap-2">
-              {applicationForm.major.map((major) => (
+              {applicationForm.major?.map((major: string) => (
                 <button
                   key={major}
                   type="button"
@@ -281,12 +328,12 @@ export default function ApplyDetailPage({
         <h2 className="font-bold text-gray-900 text-xl">질문 답변</h2>
 
         <div className="flex flex-col gap-10">
-          {applicationForm.content.map((question, index) => {
-            const questionId = `${id}-answer-${question.application_question_id}`;
-            const errorKey = `answer_${question.application_question_id}`;
+          {applicationForm.content.map((question: any, index: number) => {
+            const questionId = `${id}-answer-${question.applicationQuestionId}`;
+            const errorKey = `answer_${question.applicationQuestionId}`;
             return (
               <div
-                key={question.application_question_id}
+                key={question.applicationQuestionId}
                 className="flex flex-col gap-3"
               >
                 <label
@@ -298,11 +345,9 @@ export default function ApplyDetailPage({
                 <TextArea
                   id={questionId}
                   placeholder="질문의 답변을 작성해주세요."
-                  value={
-                    formData.answers[question.application_question_id] || ""
-                  }
+                  value={formData.answers[question.applicationQuestionId] || ""}
                   onChange={(value) =>
-                    handleAnswerChange(question.application_question_id, value)
+                    handleAnswerChange(question.applicationQuestionId, value)
                   }
                   error={errors[errorKey]}
                 />

@@ -76,3 +76,25 @@ export const deleteApplicationForm = async (
 ): Promise<void> => {
   await apiClient.delete(`/application-forms/${applicationFormId}`);
 };
+
+export interface SubmitApplicationRequest {
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  answer: {
+    applicationQuestionId: number;
+    answer: string;
+  }[];
+}
+
+export const submitApplication = async (
+  applicationFormId: string,
+  data: SubmitApplicationRequest,
+): Promise<void> => {
+  const response = await apiClient.post(
+    `/applications/${applicationFormId}`,
+    data,
+  );
+  return response.data;
+};
