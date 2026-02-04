@@ -48,86 +48,106 @@ export default function SubmissionDetailPage({
     );
   }
 
-  return (
-    <main className="flex min-h-screen flex-col bg-white">
-      {/* 헤더 */}
-      <div className="border-gray-200 border-b bg-white px-6 py-6 md:px-12 lg:px-24">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="mb-4 text-gray-600 text-sm hover:text-gray-900"
-        >
-          ← 뒤로 가기
-        </button>
-        <h1 className="font-bold text-2xl text-gray-900 md:text-3xl">
-          지원내역 상세
-        </h1>
-      </div>
+  // major를 배열로 변환 (쉼표로 구분된 경우 처리)
+  const majorArray =
+    typeof submission.major === "string"
+      ? submission.major.split(",").map((m) => m.trim())
+      : [submission.major];
 
-      {/* 지원자 정보 */}
-      <div className="bg-gray-50 px-6 py-8 md:px-12 md:py-12 lg:px-24 lg:py-16">
-        <div className="flex flex-col gap-8 md:gap-12 lg:gap-16">
+  return (
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-4xl px-8 py-16 md:px-16 md:py-20">
+        {/* 헤더 - 동아리 로고 + 제목 */}
+        <div className="mb-16 flex items-start gap-6">
+          {/* 동아리 로고 (placeholder) */}
+          <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-500">
+            <span className="font-bold text-4xl text-white">D</span>
+          </div>
+          {/* 제목 */}
+          <div className="flex-1">
+            <h1 className="mb-2 font-bold text-2xl text-gray-900 md:text-3xl">
+              지원서 상세
+            </h1>
+            <p className="text-gray-400 text-sm md:text-base">전공동아리</p>
+          </div>
+        </div>
+
+        {/* 인적 사항 */}
+        <section className="mb-16">
+          <h2 className="mb-6 font-bold text-gray-900 text-xl">인적 사항</h2>
+
           {/* 이름 */}
-          <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-            <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-              이름
-            </h2>
-            <p className="text-[14px] text-gray-700 md:text-[15px]">
+          <div className="mb-6">
+            <p className="mb-3 text-gray-900 text-sm">이름</p>
+            <div className="rounded-lg bg-gray-100 px-5 py-4 text-base text-gray-900">
               {submission.userName}
-            </p>
-          </section>
+            </div>
+          </div>
 
           {/* 학번 */}
-          <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-            <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-              학번
-            </h2>
-            <p className="text-[14px] text-gray-700 md:text-[15px]">
+          <div className="mb-6">
+            <p className="mb-3 text-gray-900 text-sm">학번</p>
+            <div className="rounded-lg bg-gray-100 px-5 py-4 text-base text-gray-900">
               {submission.classNumber}
-            </p>
-          </section>
-
-          {/* 지원 전공 */}
-          <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-            <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-              지원 전공
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full border border-red-300 px-3 py-1 text-[12px] text-red-500 md:text-[13px]">
-                {submission.major}
-              </span>
             </div>
-          </section>
+          </div>
 
           {/* 자기소개 */}
-          <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-            <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-              자기소개
-            </h2>
-            <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
+          <div>
+            <p className="mb-3 text-gray-900 text-sm">자기소개</p>
+            <div className="min-h-48 rounded-lg bg-gray-100 px-5 py-4 text-base text-gray-900 leading-relaxed">
               {submission.introduction}
-            </p>
-          </section>
+            </div>
+          </div>
+        </section>
 
-          {/* 질문 답변 */}
-          {submission.answers.map((answer, index) => (
-            <section
-              key={answer.questionId}
-              className="flex flex-col gap-2 md:flex-row md:gap-0"
-            >
-              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-                질문 {index + 1}
-              </h2>
-              <div className="flex flex-col gap-2">
-                <p className="rounded-md border border-gray-300 bg-gray-200 px-3 py-2 font-semibold text-[13px] text-gray-900 md:text-[14px]">
-                  Q. {answer.questionContent}
+        {/* 지원 전공 */}
+        <section className="mb-16">
+          <h2 className="mb-6 font-bold text-gray-900 text-xl">지원 전공</h2>
+          <div className="flex flex-wrap gap-3">
+            {majorArray.map((major, index) => (
+              <span
+                key={major}
+                className={`rounded-full px-5 py-2 font-medium text-sm ${
+                  index === 0
+                    ? "border border-primary-500 bg-primary-50 text-primary-500"
+                    : "border border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                {major}
+              </span>
+            ))}
+          </div>
+        </section>
+
+        {/* 질문 답변 */}
+        <section className="mb-16">
+          <h2 className="mb-6 font-bold text-gray-900 text-xl">질문 답변</h2>
+          <div className="space-y-8">
+            {submission.answers.map((answer, index) => (
+              <div key={answer.questionId}>
+                {/* 질문 */}
+                <p className="mb-3 text-base text-gray-900">
+                  Q{index + 1}. {answer.questionContent}
                 </p>
-                <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
+                {/* 답변 */}
+                <div className="min-h-32 rounded-lg bg-gray-100 px-5 py-4 text-base text-gray-900 leading-relaxed">
                   {answer.content}
-                </p>
+                </div>
               </div>
-            </section>
-          ))}
+            ))}
+          </div>
+        </section>
+
+        {/* 하단 버튼 */}
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+          >
+            면접 일정 설정
+          </button>
         </div>
       </div>
     </main>
