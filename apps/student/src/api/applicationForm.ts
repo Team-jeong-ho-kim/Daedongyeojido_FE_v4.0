@@ -230,3 +230,9 @@ export const submitMySubmission = async (
 ): Promise<void> => {
   await apiClient.patch(`/applications/submit/${submissionId}`);
 };
+
+export const deleteMySubmission = async (
+  submissionId: string,
+): Promise<void> => {
+  await apiClient.delete(`/applications/${submissionId}`);
+};

@@ -7,6 +7,7 @@ import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { MySubmissionDetail } from "@/api/applicationForm";
 import {
+  deleteMySubmission,
   getMySubmissionDetail,
   submitMySubmission,
 } from "@/api/applicationForm";
@@ -25,7 +26,9 @@ export default function MySubmissionDetailPage({
   const [submission, setSubmission] = useState<MySubmissionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -72,6 +75,21 @@ export default function MySubmissionDetailPage({
       toast.error("지원서 제출에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteApplication = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteMySubmission(submissionId);
+      toast.success("지원서가 삭제되었습니다.");
+      setShowDeleteModal(false);
+      router.push("/mypage/applications");
+    } catch (error) {
+      console.error("지원서 삭제 실패:", error);
+      toast.error("지원서 삭제에 실패했습니다.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -215,6 +233,14 @@ export default function MySubmissionDetailPage({
               >
                 {isSubmitting ? "제출 중..." : "제출하기"}
               </button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+                className="rounded-xl border border-red-500 bg-white px-8 py-3 font-medium text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
+              >
+                {isDeleting ? "삭제 중..." : "삭제하기"}
+              </button>
             </>
           )}
           <button
@@ -242,6 +268,17 @@ export default function MySubmissionDetailPage({
         description="제출 후에는 수정이 제한될 수 있습니다."
         cancelText="취소"
         confirmText="제출하기"
+      />
+
+      <ApplicationConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteApplication}
+        onBackdropClick={() => setShowDeleteModal(false)}
+        title="지원서를 삭제하시겠습니까?"
+        description="삭제된 지원서는 복구할 수 없습니다."
+        cancelText="취소"
+        confirmText="삭제하기"
       />
     </div>
   );
