@@ -158,31 +158,33 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const clubMembers = clubData?.clubMembers || [];
 
   // ClubAnnouncement를 JobPosting 형태로 변환
-  const allJobPostings = (announcements || []).map((announcement) => {
-    const dateString =
-      typeof announcement.deadline === "string"
-        ? announcement.deadline
-        : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
-    const deadlineDate = new Date(dateString);
-    const today = new Date();
+  const allJobPostings = (announcements || [])
+    .map((announcement) => {
+      const dateString =
+        typeof announcement.deadline === "string"
+          ? announcement.deadline
+          : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
+      const deadlineDate = new Date(dateString);
+      const today = new Date();
 
-    // 서버의 status가 CLOSED면 "준비중", OPEN이면 마감일 기준으로 "진행중"/"종료됨"
-    let status: "준비중" | "진행중" | "종료됨";
-    if (announcement.status === "CLOSED") {
-      status = "준비중";
-    } else {
-      status = deadlineDate < today ? "종료됨" : "진행중";
-    }
+      // 서버의 status가 CLOSED면 "준비중", OPEN이면 마감일 기준으로 "진행중"/"종료됨"
+      let status: "준비중" | "진행중" | "종료됨";
+      if (announcement.status === "CLOSED") {
+        status = "준비중";
+      } else {
+        status = deadlineDate < today ? "종료됨" : "진행중";
+      }
 
-    return {
-      id: announcement.announcementId,
-      status,
-      title: announcement.title,
-      date: dateString,
-      content: undefined,
-      serverStatus: announcement.status,
-    };
-  });
+      return {
+        id: announcement.announcementId,
+        status,
+        title: announcement.title,
+        date: dateString,
+        content: undefined,
+        serverStatus: announcement.status,
+      };
+    })
+    .sort((a, b) => b.id - a.id); // 최신순 정렬
 
   // 비회원일 때는 OPEN 상태(게시된 공고)만 표시
   const jobPostings = isClubMember
@@ -744,14 +746,16 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 onChange={(e) => setSelectedApplicationFormId(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none md:w-auto"
               >
-                {applicationForms.map((form) => (
-                  <option
-                    key={form.applicationFormId}
-                    value={form.applicationFormId}
-                  >
-                    {form.applicationFormTitle}
-                  </option>
-                ))}
+                {[...applicationForms]
+                  .sort((a, b) => b.applicationFormId - a.applicationFormId)
+                  .map((form) => (
+                    <option
+                      key={form.applicationFormId}
+                      value={form.applicationFormId}
+                    >
+                      {form.applicationFormTitle}
+                    </option>
+                  ))}
               </select>
             </div>
           )}
@@ -772,7 +776,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           ) : (
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex flex-col gap-4">
-                {submissions
+                {[...submissions]
+                  .sort((a, b) => b.submissionId - a.submissionId)
                   .slice((applicationPage - 1) * 5, applicationPage * 5)
                   .map((applicant) => (
                     <ApplicantCard

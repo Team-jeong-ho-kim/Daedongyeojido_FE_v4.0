@@ -19,16 +19,18 @@ export default function AnnouncementsPage() {
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const announcements: Announcement[] =
-    announcementsData?.map((item) => ({
-      announcement_id: item.announcementId,
-      title: item.title,
-      club_name: item.clubName,
-      deadline:
-        typeof item.deadline === "string"
-          ? item.deadline
-          : `${item.deadline[0]}-${String(item.deadline[1]).padStart(2, "0")}-${String(item.deadline[2]).padStart(2, "0")}`,
-      club_image: item.clubImage,
-    })) || [];
+    announcementsData
+      ?.map((item) => ({
+        announcement_id: item.announcementId,
+        title: item.title,
+        club_name: item.clubName,
+        deadline:
+          typeof item.deadline === "string"
+            ? item.deadline
+            : `${item.deadline[0]}-${String(item.deadline[1]).padStart(2, "0")}-${String(item.deadline[2]).padStart(2, "0")}`,
+        club_image: item.clubImage,
+      }))
+      .sort((a, b) => b.announcement_id - a.announcement_id) || []; // 최신순 정렬
 
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">
