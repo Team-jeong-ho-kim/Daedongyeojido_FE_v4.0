@@ -6,6 +6,8 @@ import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
+import type { ApplicationSubmission } from "@/api/applicationForm";
+import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
   ApplicationConfirmModal,
@@ -13,7 +15,6 @@ import {
   Pagination,
 } from "@/components";
 import { ApplicationFormSelectModal } from "@/components/modal/ApplicationFormSelectModal";
-import { MOCK_APPLICANTS } from "@/constants/clubDetailMock";
 import {
   useDeleteAnnouncementMutation,
   usePublishAnnouncementMutation,
@@ -113,6 +114,8 @@ export default function AnnouncementDetailPage({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [applicationPage, setApplicationPage] = useState(1);
+  const [applicants, setApplicants] = useState<ApplicationSubmission[]>([]);
+  const [isLoadingApplicants, setIsLoadingApplicants] = useState(false);
 
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
@@ -154,6 +157,30 @@ export default function AnnouncementDetailPage({
       console.error("localStorage 접근 실패:", error);
     }
   }, [announcementId]);
+
+  // 지원내역 불러오기
+  useEffect(() => {
+    const fetchApplicants = async () => {
+      if (!announcement?.applicationFormId) return;
+
+      try {
+        setIsLoadingApplicants(true);
+        const data = await getApplicationSubmissions(
+          announcement.applicationFormId.toString(),
+        );
+        setApplicants(data);
+      } catch (error) {
+        console.error("지원내역 조회 실패:", error);
+        toast.error("지원내역을 불러올 수 없습니다.");
+      } finally {
+        setIsLoadingApplicants(false);
+      }
+    };
+
+    if (activeTab === "applications" && isClubMember) {
+      fetchApplicants();
+    }
+  }, [activeTab, announcement?.applicationFormId, isClubMember]);
 
   if (!announcement || !clubData) {
     return (
@@ -378,29 +405,29 @@ export default function AnnouncementDetailPage({
       {/* 지원내역 탭 */}
       {activeTab === "applications" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {MOCK_APPLICANTS.length === 0 ? (
+          {isLoadingApplicants ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              지원내역을 불러오는 중...
+            </div>
+          ) : applicants.length === 0 ? (
             <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
               지원내역이 없습니다.
             </div>
           ) : (
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex flex-col gap-4">
-                {MOCK_APPLICANTS.slice(
-                  (applicationPage - 1) * 5,
-                  applicationPage * 5,
-                ).map((applicant) => (
-                  <ApplicantCard
-                    key={applicant.studentId}
-                    applicant={applicant}
-                    onClick={() =>
-                      console.log("지원내역 조회:", applicant.name)
-                    }
-                  />
-                ))}
+                {applicants
+                  .slice((applicationPage - 1) * 5, applicationPage * 5)
+                  .map((applicant) => (
+                    <ApplicantCard
+                      key={applicant.submissionId}
+                      applicant={applicant}
+                    />
+                  ))}
               </div>
-              {MOCK_APPLICANTS.length > 5 && (
+              {applicants.length > 5 && (
                 <Pagination
-                  listLen={MOCK_APPLICANTS.length}
+                  listLen={applicants.length}
                   limit={5}
                   curPage={applicationPage}
                   setCurPage={setApplicationPage}

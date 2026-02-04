@@ -15,7 +15,7 @@ const actionItems = [
     description:
       "동아리에 가입하고 싶으신가요? 이제 대동여지도 안에서 쉽고 신속하게 버튼을 눌러 동아리 공고를 확인해보세요!",
     buttonText: "동아리 가입하기",
-    href: "/clubs/join",
+    href: "/clubs",
   },
   {
     id: 3,
