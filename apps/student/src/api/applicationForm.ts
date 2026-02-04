@@ -158,3 +158,30 @@ export const getMyApplications = async (): Promise<MyApplication[]> => {
   const response = await apiClient.get<MyApplicationsResponse>("/applications");
   return response.data.applications;
 };
+
+export interface MySubmissionAnswer {
+  applicationQuestionId: number;
+  question: string;
+  applicationAnswerId: number;
+  answer: string;
+}
+
+export interface MySubmissionDetail {
+  clubName: string;
+  clubImage?: string;
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  contents: MySubmissionAnswer[];
+  submissionDuration: string | [number, number, number];
+}
+
+export const getMySubmissionDetail = async (
+  submissionId: string,
+): Promise<MySubmissionDetail> => {
+  const response = await apiClient.get<MySubmissionDetail>(
+    `/applications/${submissionId}`,
+  );
+  return response.data;
+};

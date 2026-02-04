@@ -22,7 +22,7 @@ export default function MyApplicationsPage() {
   const currentApplications = applications.slice(offset, offset + limit);
 
   const handleApplicationClick = (submissionId: number) => {
-    router.push(`/clubs/submissions/${submissionId}`);
+    router.push(`/mypage/applications/${submissionId}`);
   };
 
   const formatDeadline = (
