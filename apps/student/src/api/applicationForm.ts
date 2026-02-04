@@ -141,3 +141,20 @@ export const getSubmissionDetail = async (
   );
   return response.data;
 };
+
+export interface MyApplication {
+  submissionId: number;
+  clubName: string;
+  clubImage?: string;
+  applicationStatus: "WRITING" | "SUBMITTED";
+  submissionDuration: string | [number, number, number];
+}
+
+export interface MyApplicationsResponse {
+  applications: MyApplication[];
+}
+
+export const getMyApplications = async (): Promise<MyApplication[]> => {
+  const response = await apiClient.get<MyApplicationsResponse>("/applications");
+  return response.data.applications;
+};

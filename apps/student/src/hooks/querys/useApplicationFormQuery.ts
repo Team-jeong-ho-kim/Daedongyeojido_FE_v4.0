@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getApplicationFormDetail,
   getClubApplicationForms,
+  getMyApplications,
 } from "@/api/applicationForm";
 
 export const useGetClubApplicationFormsQuery = (clubId: string) => {
@@ -19,5 +20,12 @@ export const useGetApplicationFormDetailQuery = (applicationFormId: string) => {
     queryKey: ["applicationForm", applicationFormId],
     queryFn: () => getApplicationFormDetail(applicationFormId),
     enabled: !!applicationFormId,
+  });
+};
+
+export const useGetMyApplicationsQuery = () => {
+  return useQuery({
+    queryKey: ["myApplications"],
+    queryFn: () => getMyApplications(),
   });
 };
