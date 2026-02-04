@@ -98,3 +98,46 @@ export const submitApplication = async (
   );
   return response.data;
 };
+
+export interface ApplicationSubmission {
+  submissionId: number;
+  userName: string;
+  classNumber: string;
+  major: string[] | string;
+}
+
+export interface ApplicationSubmissionsResponse {
+  applicants: ApplicationSubmission[];
+}
+
+export const getApplicationSubmissions = async (
+  applicationFormId: string,
+): Promise<ApplicationSubmission[]> => {
+  const response = await apiClient.get<ApplicationSubmissionsResponse>(
+    `/clubs/submissions/all/${applicationFormId}`,
+  );
+  return response.data.applicants;
+};
+
+export interface SubmissionAnswer {
+  questionId: number;
+  questionContent: string;
+  content: string;
+}
+
+export interface SubmissionDetail {
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  answers: SubmissionAnswer[];
+}
+
+export const getSubmissionDetail = async (
+  submissionId: string,
+): Promise<SubmissionDetail> => {
+  const response = await apiClient.get<SubmissionDetail>(
+    `/clubs/submissions/${submissionId}`,
+  );
+  return response.data;
+};

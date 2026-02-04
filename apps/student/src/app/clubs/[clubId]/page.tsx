@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useId, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { Button } from "ui";
+import type { ApplicationSubmission } from "@/api/applicationForm";
+import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
   ApplicationCard,
@@ -18,7 +20,7 @@ import {
   NoticeCard,
   Pagination,
 } from "@/components";
-import { MOCK_APPLICANTS, MOCK_NOTICES } from "@/constants/clubDetailMock";
+import { MOCK_NOTICES } from "@/constants/clubDetailMock";
 import {
   useDissolveClubMutation,
   useRequestAddClubMemberMutation,
@@ -71,6 +73,15 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const [formPage, setFormPage] = useState(1);
   const [applicationPage, setApplicationPage] = useState(1);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+
+  // 지원내역 관련 상태
+  const [selectedApplicationFormId, setSelectedApplicationFormId] = useState<
+    string | null
+  >(null);
+  const [submissions, setSubmissions] = useState<ApplicationSubmission[]>([]);
+  const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
+
+  const applicationFormSelectId = useId();
 
   // 팀원 추가 상태
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -209,6 +220,44 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasChanges]);
+
+  // 지원내역 조회
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      if (!selectedApplicationFormId) {
+        setSubmissions([]);
+        return;
+      }
+
+      try {
+        setIsLoadingSubmissions(true);
+        const data = await getApplicationSubmissions(selectedApplicationFormId);
+        setSubmissions(data);
+      } catch (error) {
+        console.error("지원내역 조회 실패:", error);
+        toast.error("지원내역을 불러올 수 없습니다.");
+        setSubmissions([]);
+      } finally {
+        setIsLoadingSubmissions(false);
+      }
+    };
+
+    fetchSubmissions();
+  }, [selectedApplicationFormId]);
+
+  // 지원내역 탭 활성화 시 첫 번째 폼 자동 선택
+  useEffect(() => {
+    if (
+      activeTab === "application" &&
+      applicationForms &&
+      applicationForms.length > 0 &&
+      !selectedApplicationFormId
+    ) {
+      setSelectedApplicationFormId(
+        String(applicationForms[0].applicationFormId),
+      );
+    }
+  }, [activeTab, applicationForms, selectedApplicationFormId]);
 
   // 전공 토글 핸들러
   const toggleMajor = (major: string) => {
@@ -680,27 +729,62 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       {/* 지원내역 탭 */}
       {activeTab === "application" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {MOCK_APPLICANTS.length === 0 ? (
+          {/* 지원서 폼 선택 */}
+          {applicationForms && applicationForms.length > 0 && (
+            <div className="mb-6">
+              <label
+                htmlFor={applicationFormSelectId}
+                className="mb-2 block font-medium text-gray-900 text-sm"
+              >
+                지원서 폼 선택
+              </label>
+              <select
+                id={applicationFormSelectId}
+                value={selectedApplicationFormId || ""}
+                onChange={(e) => setSelectedApplicationFormId(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-primary-500 focus:outline-none md:w-auto"
+              >
+                {applicationForms.map((form) => (
+                  <option
+                    key={form.applicationFormId}
+                    value={form.applicationFormId}
+                  >
+                    {form.applicationFormTitle}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* 지원내역 목록 */}
+          {isLoadingSubmissions ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              지원내역을 불러오는 중...
+            </div>
+          ) : !selectedApplicationFormId ? (
+            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+              지원서 폼을 선택해주세요.
+            </div>
+          ) : submissions.length === 0 ? (
             <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
               지원내역이 없습니다.
             </div>
           ) : (
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex flex-col gap-4">
-                {MOCK_APPLICANTS.slice(
-                  (applicationPage - 1) * 5,
-                  applicationPage * 5,
-                ).map((applicant) => (
-                  <ApplicantCard
-                    key={applicant.studentId}
-                    applicant={applicant}
-                    onClick={() => {}}
-                  />
-                ))}
+                {submissions
+                  .slice((applicationPage - 1) * 5, applicationPage * 5)
+                  .map((applicant) => (
+                    <ApplicantCard
+                      key={applicant.submissionId}
+                      applicant={applicant}
+                      onClick={() => {}}
+                    />
+                  ))}
               </div>
-              {MOCK_APPLICANTS.length > 5 && (
+              {submissions.length > 5 && (
                 <Pagination
-                  listLen={MOCK_APPLICANTS.length}
+                  listLen={submissions.length}
                   limit={5}
                   curPage={applicationPage}
                   setCurPage={setApplicationPage}
