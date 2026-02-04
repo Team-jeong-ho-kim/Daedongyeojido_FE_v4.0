@@ -5,6 +5,7 @@ import {
   getApplicationFormDetail,
   getClubApplicationForms,
   getMyApplications,
+  getMySubmissionHistory,
 } from "@/api/applicationForm";
 
 export const useGetClubApplicationFormsQuery = (clubId: string) => {
@@ -27,5 +28,12 @@ export const useGetMyApplicationsQuery = () => {
   return useQuery({
     queryKey: ["myApplications"],
     queryFn: () => getMyApplications(),
+  });
+};
+
+export const useGetMySubmissionHistoryQuery = () => {
+  return useQuery({
+    queryKey: ["mySubmissionHistory"],
+    queryFn: () => getMySubmissionHistory(),
   });
 };

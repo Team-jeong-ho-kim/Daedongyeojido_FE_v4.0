@@ -2,11 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { MySubmissionDetail } from "@/api/applicationForm";
-import { getMySubmissionDetail } from "@/api/applicationForm";
+import {
+  getMySubmissionDetail,
+  submitMySubmission,
+} from "@/api/applicationForm";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 
 interface MySubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
@@ -16,9 +20,12 @@ export default function MySubmissionDetailPage({
   params,
 }: MySubmissionDetailPageProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { submissionId } = use(params);
   const [submission, setSubmission] = useState<MySubmissionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -47,6 +54,27 @@ export default function MySubmissionDetailPage({
     return submissionDuration.map((n) => String(n).padStart(2, "0")).join("-");
   };
 
+  const fromHistory = searchParams.get("from") === "history";
+  const statusParam = searchParams.get("status");
+  const isSubmitted =
+    statusParam === "SUBMITTED" ||
+    submission?.applicationStatus === "SUBMITTED";
+
+  const handleSubmitApplication = async () => {
+    setIsSubmitting(true);
+    try {
+      await submitMySubmission(submissionId);
+      toast.success("지원서가 제출되었습니다.");
+      setShowSubmitModal(false);
+      router.push("/mypage/history");
+    } catch (error) {
+      console.error("지원서 제출 실패:", error);
+      toast.error("지원서 제출에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isLoading || !submission) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
@@ -68,8 +96,11 @@ export default function MySubmissionDetailPage({
             마이페이지
           </Link>
           <span>&gt;</span>
-          <Link href="/mypage/applications" className="hover:text-gray-600">
-            나의 지원서
+          <Link
+            href={fromHistory ? "/mypage/history" : "/mypage/applications"}
+            className="hover:text-gray-600"
+          >
+            {fromHistory ? "지원 내역" : "나의 지원서"}
           </Link>
           <span>&gt;</span>
           <span className="text-gray-600">지원서 상세</span>
@@ -165,24 +196,53 @@ export default function MySubmissionDetailPage({
 
         {/* 하단 버튼 */}
         <div className="flex justify-center gap-4">
+          {!isSubmitted && !fromHistory && (
+            <>
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(`/mypage/applications/${submissionId}/edit`)
+                }
+                className="rounded-xl bg-primary-500 px-8 py-3 font-medium text-white transition-colors hover:bg-primary-600"
+              >
+                수정하기
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSubmitModal(true)}
+                disabled={isSubmitting}
+                className="rounded-xl bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors hover:bg-[#d14d4d] disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                {isSubmitting ? "제출 중..." : "제출하기"}
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() =>
-              router.push(`/mypage/applications/${submissionId}/edit`)
+              router.push(
+                fromHistory || isSubmitted
+                  ? "/mypage/history"
+                  : "/mypage/applications",
+              )
             }
-            className="rounded-xl bg-primary-500 px-8 py-3 font-medium text-white transition-colors hover:bg-primary-600"
-          >
-            수정하기
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/mypage/applications")}
             className="rounded-xl border border-gray-300 bg-white px-8 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"
           >
             목록으로
           </button>
         </div>
       </div>
+
+      <ApplicationConfirmModal
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        onConfirm={handleSubmitApplication}
+        onBackdropClick={() => setShowSubmitModal(false)}
+        title="지원서를 제출하시겠습니까?"
+        description="제출 후에는 수정이 제한될 수 있습니다."
+        cancelText="취소"
+        confirmText="제출하기"
+      />
     </div>
   );
 }

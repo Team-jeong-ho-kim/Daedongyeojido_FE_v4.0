@@ -159,6 +159,26 @@ export const getMyApplications = async (): Promise<MyApplication[]> => {
   return response.data.applications;
 };
 
+export interface MySubmissionHistoryItem {
+  submissionId: number;
+  clubName: string;
+  clubImage?: string;
+  applicationStatus: string;
+  submissionDuration: string | [number, number, number];
+}
+
+export interface MySubmissionHistoryResponse {
+  submissions: MySubmissionHistoryItem[];
+}
+
+export const getMySubmissionHistory = async (): Promise<
+  MySubmissionHistoryItem[]
+> => {
+  const response =
+    await apiClient.get<MySubmissionHistoryResponse>("/users/submissions");
+  return response.data.submissions;
+};
+
 export interface MySubmissionAnswer {
   applicationQuestionId: number;
   question: string;
@@ -175,6 +195,7 @@ export interface MySubmissionDetail {
   major: string;
   contents: MySubmissionAnswer[];
   submissionDuration: string | [number, number, number];
+  applicationStatus?: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";
 }
 
 export const getMySubmissionDetail = async (
@@ -202,4 +223,10 @@ export const updateMySubmission = async (
   data: UpdateMySubmissionRequest,
 ): Promise<void> => {
   await apiClient.patch(`/applications/${submissionId}`, data);
+};
+
+export const submitMySubmission = async (
+  submissionId: string,
+): Promise<void> => {
+  await apiClient.patch(`/applications/submit/${submissionId}`);
 };

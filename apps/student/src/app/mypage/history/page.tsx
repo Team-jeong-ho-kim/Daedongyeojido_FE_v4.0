@@ -2,33 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Pagination } from "@/components/common/Pagination";
+import { useGetMySubmissionHistoryQuery } from "@/hooks/querys/useApplicationFormQuery";
 
-type ApplicationStatus = "합격" | "제출됨" | "불합격";
+type ApplicationStatusLabel = "합격" | "제출됨" | "불합격" | "작성중";
 
-interface ApplicationHistory {
-  id: number;
-  clubName: string;
-  clubLogo?: string;
-  status: ApplicationStatus;
-}
-
-// TODO: API 연동 후 실제 데이터로 교체
-const mockHistory: ApplicationHistory[] = [
-  { id: 1, clubName: "DMS", status: "합격" },
-  { id: 2, clubName: "DMS", status: "제출됨" },
-  { id: 3, clubName: "DMS", status: "불합격" },
-  { id: 4, clubName: "DMS", status: "제출됨" },
-  { id: 5, clubName: "DMS", status: "제출됨" },
-];
-
-const getStatusStyle = (status: ApplicationStatus) => {
+const getStatusStyle = (status: ApplicationStatusLabel) => {
   switch (status) {
     case "합격":
       return "border-blue-500 text-blue-500";
     case "불합격":
       return "border-red-500 text-red-500";
+    case "작성중":
+      return "border-yellow-500 text-yellow-600";
     case "제출됨":
       return "border-gray-800 text-gray-800";
     default:
@@ -36,17 +24,51 @@ const getStatusStyle = (status: ApplicationStatus) => {
   }
 };
 
+const getStatusLabel = (status: string): ApplicationStatusLabel => {
+  switch (status) {
+    case "SUBMITTED":
+      return "제출됨";
+    case "WRITING":
+      return "작성중";
+    case "ACCEPTED":
+      return "합격";
+    case "REJECTED":
+      return "불합격";
+    default:
+      return "제출됨";
+  }
+};
+
 export default function ApplicationHistoryPage() {
+  const router = useRouter();
   const [curPage, setCurPage] = useState(1);
   const limit = 5;
 
-  const offset = (curPage - 1) * limit;
-  const currentHistory = mockHistory.slice(offset, offset + limit);
+  const { data: submissionsData, isLoading } = useGetMySubmissionHistoryQuery();
 
-  const handleHistoryClick = (id: number) => {
-    // TODO: 지원 내역 상세 페이지로 이동
-    console.log("History clicked:", id);
+  const submissions = (submissionsData || []).sort(
+    (a, b) => b.submissionId - a.submissionId,
+  );
+
+  const offset = (curPage - 1) * limit;
+  const currentHistory = submissions.slice(offset, offset + limit);
+
+  const handleHistoryClick = (
+    submissionId: number,
+    applicationStatus: string,
+  ) => {
+    router.push(
+      `/mypage/applications/${submissionId}?from=history&status=${applicationStatus}`,
+    );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">지원 내역을 불러오는 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
@@ -62,7 +84,7 @@ export default function ApplicationHistoryPage() {
           지원 내역
         </h1>
 
-        {mockHistory.length === 0 ? (
+        {submissions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Image
               src="/images/icons/redTiger.svg"
@@ -78,55 +100,66 @@ export default function ApplicationHistoryPage() {
         ) : (
           <>
             <div className="space-y-4">
-              {currentHistory.map((history) => (
-                <button
-                  key={history.id}
-                  type="button"
-                  onClick={() => handleHistoryClick(history.id)}
-                  className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"
-                >
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-[#7D5C5C]">
-                    {history.clubLogo ? (
-                      <Image
-                        src={history.clubLogo}
-                        alt={history.clubName}
-                        width={64}
-                        height={64}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full rounded-xl bg-[#7D5C5C]" />
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 items-center gap-4">
-                    <span className="font-semibold text-base text-primary-500">
-                      {history.clubName}
-                    </span>
-                    <div className="flex items-center gap-2 text-gray-600 text-sm">
-                      <span className="font-normal">지원서 상태 :</span>
-                      <span
-                        className={`rounded-full border px-3 py-1 text-xs ${getStatusStyle(history.status)}`}
-                      >
-                        {history.status}
-                      </span>
+              {currentHistory.map((history) => {
+                const statusLabel = getStatusLabel(history.applicationStatus);
+                return (
+                  <button
+                    key={history.submissionId}
+                    type="button"
+                    onClick={() =>
+                      handleHistoryClick(
+                        history.submissionId,
+                        history.applicationStatus,
+                      )
+                    }
+                    className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"
+                  >
+                    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                      {history.clubImage ? (
+                        <Image
+                          src={history.clubImage}
+                          alt={history.clubName}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#7D5C5C]">
+                          <span className="font-bold text-white text-xl">
+                            {history.clubName[0]}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  </div>
 
-                  <Image
-                    src="/images/clubs/rightArrow.svg"
-                    alt="상세보기"
-                    width={10}
-                    height={18}
-                  />
-                </button>
-              ))}
+                    <div className="flex flex-1 items-center gap-4">
+                      <span className="font-semibold text-base text-primary-500">
+                        {history.clubName}
+                      </span>
+                      <div className="flex items-center gap-2 text-gray-600 text-sm">
+                        <span className="font-normal">지원서 상태 :</span>
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs ${getStatusStyle(statusLabel)}`}
+                        >
+                          {statusLabel}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Image
+                      src="/images/clubs/rightArrow.svg"
+                      alt="상세보기"
+                      width={10}
+                      height={18}
+                    />
+                  </button>
+                );
+              })}
             </div>
 
-            {mockHistory.length > limit && (
+            {submissions.length > limit && (
               <div className="mt-12">
                 <Pagination
-                  listLen={mockHistory.length}
+                  listLen={submissions.length}
                   limit={limit}
                   curPage={curPage}
                   setCurPage={setCurPage}
