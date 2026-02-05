@@ -61,7 +61,7 @@ export default function MySubmissionDetailPage({
   const statusParam = searchParams.get("status");
   const isSubmitted =
     statusParam === "SUBMITTED" ||
-    submission?.applicationStatus === "SUBMITTED";
+    submission?.user_application_status === "SUBMITTED";
 
   const handleSubmitApplication = async () => {
     setIsSubmitting(true);

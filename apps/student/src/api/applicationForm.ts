@@ -104,6 +104,7 @@ export interface ApplicationSubmission {
   userName: string;
   classNumber: string;
   major: string[] | string;
+  clubApplicationStatus?: "SUBMITTED" | "WRITING" | "ACCEPTED" | "REJECTED";
 }
 
 export interface ApplicationSubmissionsResponse {
@@ -133,6 +134,7 @@ export interface SubmissionDetail {
   major: string;
   answers: SubmissionAnswer[];
   hasInterviewSchedule: boolean;
+  clubApplicationStatus?: "SUBMITTED" | "WRITING" | "ACCEPTED" | "REJECTED";
 }
 
 export const getSubmissionDetail = async (
@@ -148,7 +150,7 @@ export interface MyApplication {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  applicationStatus: "WRITING" | "SUBMITTED";
+  user_application_status: "WRITING" | "SUBMITTED";
   submissionDuration: string | [number, number, number];
 }
 
@@ -165,7 +167,7 @@ export interface MySubmissionHistoryItem {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  applicationStatus: string;
+  user_application_status: string;
   submissionDuration: string | [number, number, number];
 }
 
@@ -197,7 +199,7 @@ export interface MySubmissionDetail {
   major: string;
   contents: MySubmissionAnswer[];
   submissionDuration: string | [number, number, number];
-  applicationStatus?: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";
+  user_application_status?: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";
 }
 
 export const getMySubmissionDetail = async (

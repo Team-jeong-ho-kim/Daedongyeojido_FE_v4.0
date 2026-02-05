@@ -55,10 +55,10 @@ export default function ApplicationHistoryPage() {
 
   const handleHistoryClick = (
     submissionId: number,
-    applicationStatus: string,
+    user_application_status: string,
   ) => {
     router.push(
-      `/mypage/applications/${submissionId}?from=history&status=${applicationStatus}`,
+      `/mypage/applications/${submissionId}?from=history&status=${user_application_status}`,
     );
   };
 
@@ -101,7 +101,9 @@ export default function ApplicationHistoryPage() {
           <>
             <div className="space-y-4">
               {currentHistory.map((history) => {
-                const statusLabel = getStatusLabel(history.applicationStatus);
+                const statusLabel = getStatusLabel(
+                  history.user_application_status,
+                );
                 return (
                   <button
                     key={history.submissionId}
@@ -109,7 +111,7 @@ export default function ApplicationHistoryPage() {
                     onClick={() =>
                       handleHistoryClick(
                         history.submissionId,
-                        history.applicationStatus,
+                        history.user_application_status,
                       )
                     }
                     className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"

@@ -34,6 +34,9 @@ export default function SubmissionDetailPage({
   const [scheduleDetail, setScheduleDetail] =
     useState<InterviewScheduleDetail | null>(null);
   const [isInterviewCompleted, setIsInterviewCompleted] = useState(false);
+  const [localPassStatus, setLocalPassStatus] = useState<
+    "ACCEPTED" | "REJECTED" | null
+  >(null);
 
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
@@ -142,7 +145,7 @@ export default function SubmissionDetailPage({
     try {
       await decidePass(submissionId, { isPassed });
       toast.success(isPassed ? "합격 처리되었습니다." : "탈락 처리되었습니다.");
-      router.back();
+      setLocalPassStatus(isPassed ? "ACCEPTED" : "REJECTED");
     } catch (error) {
       console.error("합격/탈락 처리 실패:", error);
       toast.error("처리에 실패했습니다. 다시 시도해주세요.");
@@ -254,44 +257,72 @@ export default function SubmissionDetailPage({
 
         {/* 하단 버튼 */}
         {isClubMember && (
-          <div className="flex justify-end gap-4">
-            {isInterviewCompleted && isClubLeader ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => handleDecidePass(false)}
-                  className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-gray-500"
+          <div className="flex flex-col gap-6">
+            {/* 합격/불합격 상태 표시 */}
+            {(submission.clubApplicationStatus === "ACCEPTED" ||
+              submission.clubApplicationStatus === "REJECTED" ||
+              localPassStatus) && (
+              <div className="flex justify-center">
+                <div
+                  className={`rounded-lg px-8 py-4 font-semibold text-xl ${
+                    submission.clubApplicationStatus === "ACCEPTED" ||
+                    localPassStatus === "ACCEPTED"
+                      ? "bg-primary-50 text-primary-500"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
                 >
-                  탈락
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDecidePass(true)}
-                  className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
-                >
-                  합격
-                </button>
-              </>
-            ) : (
-              <>
-                {hasSchedule && (
-                  <button
-                    type="button"
-                    onClick={handleViewSchedule}
-                    className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
-                  >
-                    면접 일정 조회
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setShowSetScheduleModal(true)}
-                  className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
-                >
-                  면접 일정 설정
-                </button>
-              </>
+                  {submission.clubApplicationStatus === "ACCEPTED" ||
+                  localPassStatus === "ACCEPTED"
+                    ? "✓ 합격"
+                    : "✗ 불합격"}
+                </div>
+              </div>
             )}
+
+            {/* 버튼 */}
+            {submission.clubApplicationStatus !== "ACCEPTED" &&
+              submission.clubApplicationStatus !== "REJECTED" &&
+              !localPassStatus && (
+                <div className="flex justify-end gap-4">
+                  {isInterviewCompleted && isClubLeader ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleDecidePass(false)}
+                        className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-gray-500"
+                      >
+                        탈락
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDecidePass(true)}
+                        className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                      >
+                        합격
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {hasSchedule && (
+                        <button
+                          type="button"
+                          onClick={handleViewSchedule}
+                          className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
+                        >
+                          면접 일정 조회
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowSetScheduleModal(true)}
+                        className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                      >
+                        면접 일정 설정
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
           </div>
         )}
       </div>
