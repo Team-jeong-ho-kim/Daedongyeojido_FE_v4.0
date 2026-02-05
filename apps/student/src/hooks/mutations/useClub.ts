@@ -30,13 +30,15 @@ export const useUpdateClubMutation = (clubId: string) => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
+      const message =
+        error.response?.data?.message || error.response?.data?.description;
 
       if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
+        toast.error(message || "요청 형식이 잘못되었습니다.");
       } else if (status === 403) {
-        toast.error("수정 권한이 없습니다.");
+        toast.error(message || "수정 권한이 없습니다.");
       } else if (status === 404) {
-        toast.error("존재하지 않는 동아리입니다.");
+        toast.error(message || "존재하지 않는 동아리입니다.");
       } else {
         toast.error("동아리 수정에 실패했습니다. 다시 시도해주세요.");
       }
@@ -57,13 +59,15 @@ export const useDissolveClubMutation = () => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
+      const message =
+        error.response?.data?.message || error.response?.data?.description;
 
       if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
+        toast.error(message || "요청 형식이 잘못되었습니다.");
       } else if (status === 403) {
-        toast.error("해체 신청 권한이 없습니다.");
+        toast.error(message || "해체 신청 권한이 없습니다.");
       } else if (status === 404) {
-        toast.error("동아리를 찾을 수 없습니다.");
+        toast.error(message || "동아리를 찾을 수 없습니다.");
       } else {
         toast.error("동아리 해체 신청에 실패했습니다. 다시 시도해주세요.");
       }
@@ -108,15 +112,15 @@ export const useCreateClubApplicationMutation = () => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
+      const message =
+        error.response?.data?.message || error.response?.data?.description;
 
       if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
+        toast.error(message || "요청 형식이 잘못되었습니다.");
       } else if (status === 403) {
-        toast.error("동아리 개설 권한이 없습니다.");
+        toast.error(message || "동아리 개설 권한이 없습니다.");
       } else if (status === 409) {
-        toast.error(
-          "이미 동아리 개설 신청이 존재하거나 중복된 동아리명입니다.",
-        );
+        toast.error(message || "중복된 요청입니다.");
       } else {
         toast.error("동아리 개설 신청에 실패했습니다. 다시 시도해주세요.");
       }
@@ -135,11 +139,13 @@ export const useDeleteClubMemberMutation = (clubId: string) => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
+      const message =
+        error.response?.data?.message || error.response?.data?.description;
 
       if (status === 403) {
-        toast.error("팀원 삭제 권한이 없습니다.");
+        toast.error(message || "팀원 삭제 권한이 없습니다.");
       } else if (status === 404) {
-        toast.error("존재하지 않는 팀원입니다.");
+        toast.error(message || "존재하지 않는 팀원입니다.");
       } else {
         toast.error("팀원 삭제에 실패했습니다. 다시 시도해주세요.");
       }
@@ -164,15 +170,17 @@ export const useRequestAddClubMemberMutation = (clubId: string) => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
+      const message =
+        error.response?.data?.message || error.response?.data?.description;
 
       if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
+        toast.error(message || "요청 형식이 잘못되었습니다.");
       } else if (status === 403) {
-        toast.error("팀원 추가 권한이 없습니다.");
+        toast.error(message || "팀원 추가 권한이 없습니다.");
       } else if (status === 404) {
-        toast.error("존재하지 않는 팀원입니다.");
+        toast.error(message || "존재하지 않는 팀원입니다.");
       } else if (status === 409) {
-        toast.error("이미 추가 요청이 존재합니다.");
+        toast.error(message || "중복된 요청입니다.");
       } else {
         toast.error("팀원 추가 신청에 실패했습니다. 다시 시도해주세요.");
       }
