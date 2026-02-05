@@ -210,8 +210,18 @@ export default function MySubmissionEditPage({
         <div className="mb-12 rounded-2xl bg-gray-50 p-8">
           <h2 className="mb-6 font-bold text-xl">지원자 정보</h2>
           <div className="space-y-6">
-            <TextInput label="이름" value={submission.userName} disabled />
-            <TextInput label="학번" value={submission.classNumber} disabled />
+            <TextInput
+              label="이름"
+              value={submission.userName}
+              onChange={() => {}}
+              disabled
+            />
+            <TextInput
+              label="학번"
+              value={submission.classNumber}
+              onChange={() => {}}
+              disabled
+            />
           </div>
         </div>
 

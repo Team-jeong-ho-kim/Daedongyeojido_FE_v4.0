@@ -20,12 +20,12 @@ import {
   NoticeCard,
   Pagination,
 } from "@/components";
-import { MOCK_NOTICES } from "@/constants/clubDetailMock";
 import {
   useDissolveClubMutation,
   useRequestAddClubMemberMutation,
   useUpdateClubMutation,
 } from "@/hooks/mutations/useClub";
+import { useGetClubAlarmsQuery } from "@/hooks/querys/useAlarmQuery";
 import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
@@ -41,6 +41,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { data: clubData } = useGetDetailClubQuery(clubId);
   const { data: announcements } = useGetClubAnnouncementsQuery(clubId);
   const { data: applicationForms } = useGetClubApplicationFormsQuery(clubId);
+  const { data: clubAlarms } = useGetClubAlarmsQuery();
   const { mutateAsync: updateClubMutate, isPending: isUpdating } =
     useUpdateClubMutation(clubId);
   const { mutate: dissolveClubMutate, isPending: isDissolvePending } =
@@ -546,27 +547,27 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       {/* 알림 탭 */}
       {activeTab === "notification" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {MOCK_NOTICES.length === 0 ? (
+          {!clubAlarms || clubAlarms.length === 0 ? (
             <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
               알림이 없습니다.
             </div>
           ) : (
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex min-h-[420px] flex-col gap-4">
-                {MOCK_NOTICES.slice((noticePage - 1) * 7, noticePage * 7).map(
-                  (notice) => (
+                {clubAlarms
+                  .slice((noticePage - 1) * 7, noticePage * 7)
+                  .map((alarm) => (
                     <NoticeCard
-                      key={notice.id}
-                      title={notice.title}
-                      date={notice.date}
-                      content={notice.content}
+                      key={alarm.id}
+                      title={alarm.title}
+                      date=""
+                      content={alarm.content}
                     />
-                  ),
-                )}
+                  ))}
               </div>
-              {MOCK_NOTICES.length > 7 && (
+              {clubAlarms.length > 7 && (
                 <Pagination
-                  listLen={MOCK_NOTICES.length}
+                  listLen={clubAlarms.length}
                   limit={7}
                   curPage={noticePage}
                   setCurPage={setNoticePage}
