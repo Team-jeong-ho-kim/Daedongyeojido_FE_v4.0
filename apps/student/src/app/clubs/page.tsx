@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "ui";
+import { Button, SkeletonClubCard, useDeferredLoading } from "ui";
 import { ClubItem, CTASection, Pagination } from "@/components";
 import { useGetAllClubsQuery } from "@/hooks/querys/useClubQuery";
 
@@ -10,7 +10,8 @@ export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 8;
 
-  const { data: clubs } = useGetAllClubsQuery();
+  const { data: clubs, isPending } = useGetAllClubsQuery();
+  const showSkeleton = useDeferredLoading(isPending);
 
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">
@@ -28,7 +29,13 @@ export default function ClubsPage() {
         </div>
 
         {/* 동아리 목록 */}
-        {!clubs || clubs.length === 0 ? (
+        {showSkeleton ? (
+          <div className="mb-10 flex flex-wrap gap-7">
+            {Array.from({ length: limit }, () => (
+              <SkeletonClubCard key={crypto.randomUUID()} />
+            ))}
+          </div>
+        ) : !clubs || clubs.length === 0 ? (
           <div className="flex min-h-[400px] items-center justify-center">
             <p className="text-gray-500 text-lg">등록된 동아리가 없습니다.</p>
           </div>

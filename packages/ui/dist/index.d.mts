@@ -10,6 +10,31 @@ declare function Footer(): react_jsx_runtime.JSX.Element;
 declare function LandingHeader(): react_jsx_runtime.JSX.Element;
 declare function StudentHeader(): react_jsx_runtime.JSX.Element;
 
+interface LoadingOverlayProps {
+    isLoading: boolean;
+    message?: string;
+}
+declare function LoadingOverlay({ isLoading, message, }: LoadingOverlayProps): react_jsx_runtime.JSX.Element | null;
+
+interface SkeletonProps {
+    className?: string;
+}
+declare function Skeleton({ className }: SkeletonProps): react_jsx_runtime.JSX.Element;
+declare function SkeletonCard(): react_jsx_runtime.JSX.Element;
+declare function SkeletonListItem(): react_jsx_runtime.JSX.Element;
+declare function SkeletonAnnouncementCard(): react_jsx_runtime.JSX.Element;
+declare function SkeletonClubCard(): react_jsx_runtime.JSX.Element;
+declare function SkeletonTableRow(): react_jsx_runtime.JSX.Element;
+
+interface SpinnerProps {
+    size?: "sm" | "md" | "lg";
+    className?: string;
+}
+declare function Spinner({ size, className }: SpinnerProps): react_jsx_runtime.JSX.Element;
+declare function SpinnerCenter({ size }: SpinnerProps): react_jsx_runtime.JSX.Element;
+declare function SpinnerFullPage(): react_jsx_runtime.JSX.Element;
+declare function SpinnerButton(): react_jsx_runtime.JSX.Element;
+
 interface ErrorMessageProps {
     message?: string;
 }
@@ -76,7 +101,7 @@ declare function TextInput({ value, onChange, placeholder, id, name, label, erro
 
 declare const buttonVariants: (props?: ({
     variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
-    size?: "default" | "sm" | "lg" | "icon" | "icon-sm" | "icon-lg" | null | undefined;
+    size?: "sm" | "lg" | "default" | "icon" | "icon-sm" | "icon-lg" | null | undefined;
 } & class_variance_authority_types.ClassProp) | undefined) => string;
 declare function Button({ className, variant, size, asChild, ...props }: React$1.ComponentProps<"button"> & VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
@@ -94,4 +119,14 @@ declare const blackLogo = "/images/logos/blackLogo.svg";
 declare const whiteLogo = "/images/logos/whiteLogo.svg";
 declare const rightArrowIcon = "/images/icons/rightArrow.svg";
 
-export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, ImageUpload, InterviewIcon, LandingHeader, LinkInput, NoteIcon, StudentHeader, TextArea, TextInput, blackLogo, buttonVariants, rightArrowIcon, whiteLogo };
+/**
+ * 200ms 미만의 빠른 로딩에서는 스켈레톤을 보여주지 않아
+ * 불필요한 깜빡임을 방지하는 훅
+ *
+ * @param isLoading - 로딩 상태
+ * @param delay - 스켈레톤을 표시하기 전 대기 시간 (기본값: 200ms)
+ * @returns 지연된 로딩 상태
+ */
+declare function useDeferredLoading(isLoading: boolean, delay?: number): boolean;
+
+export { Button, CalendarIcon, CheckIcon, ErrorMessage, FieldSelector, Footer, FormField, ImageUpload, InterviewIcon, LandingHeader, LinkInput, LoadingOverlay, NoteIcon, Skeleton, SkeletonAnnouncementCard, SkeletonCard, SkeletonClubCard, SkeletonListItem, SkeletonTableRow, Spinner, SpinnerButton, SpinnerCenter, SpinnerFullPage, StudentHeader, TextArea, TextInput, blackLogo, buttonVariants, rightArrowIcon, useDeferredLoading, whiteLogo };

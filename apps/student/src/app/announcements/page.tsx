@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useUserStore } from "shared";
-import { Button } from "ui";
+import { Button, SkeletonAnnouncementCard, useDeferredLoading } from "ui";
 import { AnnouncementItem, CTASection, Pagination } from "@/components";
 import { useGetAllAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import type { Announcement } from "@/types";
@@ -13,7 +13,8 @@ export default function AnnouncementsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 8;
 
-  const { data: announcementsData } = useGetAllAnnouncementsQuery();
+  const { data: announcementsData, isPending } = useGetAllAnnouncementsQuery();
+  const showSkeleton = useDeferredLoading(isPending);
 
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
@@ -50,14 +51,24 @@ export default function AnnouncementsPage() {
 
         {/* 공고 목록 */}
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
-          {announcements
-            .slice((curPage - 1) * limit, curPage * limit)
-            .map((announcement) => (
-              <AnnouncementItem
-                key={announcement.announcement_id}
-                {...announcement}
-              />
-            ))}
+          {showSkeleton ? (
+            Array.from({ length: limit }, () => (
+              <SkeletonAnnouncementCard key={crypto.randomUUID()} />
+            ))
+          ) : announcements.length === 0 ? (
+            <div className="flex w-full items-center justify-center py-20">
+              <p className="text-gray-400 text-lg">공고가 없습니다.</p>
+            </div>
+          ) : (
+            announcements
+              .slice((curPage - 1) * limit, curPage * limit)
+              .map((announcement) => (
+                <AnnouncementItem
+                  key={announcement.announcement_id}
+                  {...announcement}
+                />
+              ))
+          )}
         </div>
 
         {/* 페이지네이션 */}

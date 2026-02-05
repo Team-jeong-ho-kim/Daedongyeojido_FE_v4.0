@@ -355,15 +355,137 @@ function StudentHeader() {
   ] });
 }
 
+// src/lib/utils.ts
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
+
+// src/components/common/Spinner.tsx
+import { jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
+function Spinner({ size = "md", className }) {
+  const sizeClasses = {
+    sm: "h-4 w-4 border-2",
+    md: "h-8 w-8 border-2",
+    lg: "h-12 w-12 border-3"
+  };
+  return /* @__PURE__ */ jsx3(
+    "output",
+    {
+      className: cn(
+        "inline-block animate-spin rounded-full border-gray-300 border-t-primary-500",
+        sizeClasses[size],
+        className
+      ),
+      "aria-label": "\uB85C\uB529 \uC911",
+      children: /* @__PURE__ */ jsx3("span", { className: "sr-only", children: "\uB85C\uB529 \uC911..." })
+    }
+  );
+}
+function SpinnerCenter({ size = "md" }) {
+  return /* @__PURE__ */ jsx3("div", { className: "flex min-h-[200px] items-center justify-center", children: /* @__PURE__ */ jsx3(Spinner, { size }) });
+}
+function SpinnerFullPage() {
+  return /* @__PURE__ */ jsx3("div", { className: "flex min-h-screen items-center justify-center bg-white", children: /* @__PURE__ */ jsxs3("div", { className: "text-center", children: [
+    /* @__PURE__ */ jsx3(Spinner, { size: "lg" }),
+    /* @__PURE__ */ jsx3("p", { className: "mt-4 text-gray-500 text-lg", children: "\uBD88\uB7EC\uC624\uB294 \uC911..." })
+  ] }) });
+}
+function SpinnerButton() {
+  return /* @__PURE__ */ jsx3(Spinner, { size: "sm", className: "mr-2" });
+}
+
+// src/components/common/LoadingOverlay.tsx
+import { jsx as jsx4, jsxs as jsxs4 } from "react/jsx-runtime";
+function LoadingOverlay({
+  isLoading,
+  message = "\uCC98\uB9AC \uC911..."
+}) {
+  if (!isLoading) return null;
+  return /* @__PURE__ */ jsx4("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm", children: /* @__PURE__ */ jsx4("div", { className: "rounded-2xl bg-white p-8 shadow-2xl", children: /* @__PURE__ */ jsxs4("div", { className: "flex flex-col items-center gap-4", children: [
+    /* @__PURE__ */ jsx4(Spinner, { size: "lg" }),
+    /* @__PURE__ */ jsx4("p", { className: "font-medium text-gray-900 text-lg", children: message })
+  ] }) }) });
+}
+
+// src/components/common/Skeleton.tsx
+import { jsx as jsx5, jsxs as jsxs5 } from "react/jsx-runtime";
+function Skeleton({ className }) {
+  return /* @__PURE__ */ jsx5("div", { className: cn("animate-pulse rounded-md bg-gray-200", className) });
+}
+function SkeletonCard() {
+  return /* @__PURE__ */ jsx5("div", { className: "rounded-2xl border border-gray-200 bg-white p-6", children: /* @__PURE__ */ jsxs5("div", { className: "flex items-start gap-4", children: [
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-16 w-16 rounded-full" }),
+    /* @__PURE__ */ jsxs5("div", { className: "flex-1 space-y-3", children: [
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-5 w-3/4" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-1/2" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" })
+    ] })
+  ] }) });
+}
+function SkeletonListItem() {
+  return /* @__PURE__ */ jsxs5("div", { className: "flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4", children: [
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-12 w-12 rounded-full" }),
+    /* @__PURE__ */ jsxs5("div", { className: "flex-1 space-y-2", children: [
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-2/3" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-3 w-1/2" })
+    ] }),
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-8 w-20 rounded-md" })
+  ] });
+}
+function SkeletonAnnouncementCard() {
+  return /* @__PURE__ */ jsxs5("div", { className: "rounded-2xl border border-gray-200 bg-white p-6", children: [
+    /* @__PURE__ */ jsxs5("div", { className: "mb-4 flex items-start justify-between", children: [
+      /* @__PURE__ */ jsxs5("div", { className: "flex-1 space-y-2", children: [
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-3/4" }),
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-1/2" })
+      ] }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-8 w-16 rounded-full" })
+    ] }),
+    /* @__PURE__ */ jsxs5("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-5/6" }),
+      /* @__PURE__ */ jsxs5("div", { className: "flex gap-2 pt-2", children: [
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-16 rounded-full" }),
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-16 rounded-full" }),
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-16 rounded-full" })
+      ] })
+    ] })
+  ] });
+}
+function SkeletonClubCard() {
+  return /* @__PURE__ */ jsxs5("div", { className: "overflow-hidden rounded-2xl border border-gray-200 bg-white", children: [
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-48 w-full" }),
+    /* @__PURE__ */ jsxs5("div", { className: "space-y-4 p-6", children: [
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-2/3" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" }),
+      /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-5/6" }),
+      /* @__PURE__ */ jsxs5("div", { className: "flex gap-2 pt-2", children: [
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-20 rounded-full" }),
+        /* @__PURE__ */ jsx5(Skeleton, { className: "h-6 w-20 rounded-full" })
+      ] })
+    ] })
+  ] });
+}
+function SkeletonTableRow() {
+  return /* @__PURE__ */ jsxs5("div", { className: "grid grid-cols-4 gap-4 border-gray-200 border-b py-4", children: [
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" }),
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" }),
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-full" }),
+    /* @__PURE__ */ jsx5(Skeleton, { className: "h-4 w-20" })
+  ] });
+}
+
 // src/components/input/ErrorMessage.tsx
-import { jsx as jsx3 } from "react/jsx-runtime";
+import { jsx as jsx6 } from "react/jsx-runtime";
 function ErrorMessage({ message }) {
   if (!message) return null;
-  return /* @__PURE__ */ jsx3("p", { className: "mt-1 text-red-500 text-xs", children: message });
+  return /* @__PURE__ */ jsx6("p", { className: "mt-1 text-red-500 text-xs", children: message });
 }
 
 // src/components/input/FieldSelector.tsx
-import { jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
+import { jsx as jsx7, jsxs as jsxs6 } from "react/jsx-runtime";
 function FieldSelector({
   fields,
   selectedFields,
@@ -377,8 +499,8 @@ function FieldSelector({
       onSelectionChange([...selectedFields, field]);
     }
   };
-  return /* @__PURE__ */ jsxs3("div", { children: [
-    /* @__PURE__ */ jsx4("div", { className: "flex flex-wrap gap-2.5", children: fields.map((field) => /* @__PURE__ */ jsx4(
+  return /* @__PURE__ */ jsxs6("div", { children: [
+    /* @__PURE__ */ jsx7("div", { className: "flex flex-wrap gap-2.5", children: fields.map((field) => /* @__PURE__ */ jsx7(
       "button",
       {
         type: "button",
@@ -388,12 +510,12 @@ function FieldSelector({
       },
       field
     )) }),
-    /* @__PURE__ */ jsx4(ErrorMessage, { message: error })
+    /* @__PURE__ */ jsx7(ErrorMessage, { message: error })
   ] });
 }
 
 // src/components/input/FormField.tsx
-import { jsx as jsx5, jsxs as jsxs4 } from "react/jsx-runtime";
+import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
 function FormField({
   label,
   htmlFor,
@@ -401,23 +523,23 @@ function FormField({
   required,
   children
 }) {
-  return /* @__PURE__ */ jsxs4(
+  return /* @__PURE__ */ jsxs7(
     "div",
     {
       className: `grid grid-cols-[200px_1fr] py-6 ${alignTop ? "" : "items-center"}`,
       children: [
-        /* @__PURE__ */ jsxs4(
+        /* @__PURE__ */ jsxs7(
           "label",
           {
             htmlFor,
             className: `pl-8 font-medium text-[15px] ${alignTop ? "pt-3" : ""}`,
             children: [
               label,
-              required && /* @__PURE__ */ jsx5("span", { className: "ml-1 text-red-500", children: "*" })
+              required && /* @__PURE__ */ jsx8("span", { className: "ml-1 text-red-500", children: "*" })
             ]
           }
         ),
-        /* @__PURE__ */ jsx5("div", { className: "mr-8", children })
+        /* @__PURE__ */ jsx8("div", { className: "mr-8", children })
       ]
     }
   );
@@ -427,7 +549,7 @@ function FormField({
 import Image3 from "next/image";
 import { useCallback, useEffect as useEffect2, useId, useState as useState2 } from "react";
 import { toast } from "sonner";
-import { Fragment as Fragment2, jsx as jsx6, jsxs as jsxs5 } from "react/jsx-runtime";
+import { Fragment as Fragment2, jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
 var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function ImageUpload({
   onFileChange,
@@ -476,9 +598,9 @@ function ImageUpload({
       return () => document.removeEventListener("keydown", handleKeyDown);
     }
   }, [isModalOpen, handleKeyDown]);
-  return /* @__PURE__ */ jsxs5(Fragment2, { children: [
-    /* @__PURE__ */ jsxs5("label", { htmlFor: fileInputId, className: "relative block cursor-pointer", children: [
-      /* @__PURE__ */ jsx6(
+  return /* @__PURE__ */ jsxs8(Fragment2, { children: [
+    /* @__PURE__ */ jsxs8("label", { htmlFor: fileInputId, className: "relative block cursor-pointer", children: [
+      /* @__PURE__ */ jsx9(
         "input",
         {
           id: inputId,
@@ -489,7 +611,7 @@ function ImageUpload({
           className: `${INPUT_STYLE} pointer-events-none cursor-pointer pr-12`
         }
       ),
-      /* @__PURE__ */ jsx6("span", { className: "-translate-y-1/2 absolute top-1/2 right-4", children: /* @__PURE__ */ jsx6(
+      /* @__PURE__ */ jsx9("span", { className: "-translate-y-1/2 absolute top-1/2 right-4", children: /* @__PURE__ */ jsx9(
         Image3,
         {
           src: "/images/icons/upload.svg",
@@ -499,7 +621,7 @@ function ImageUpload({
           "aria-hidden": "true"
         }
       ) }),
-      /* @__PURE__ */ jsx6(
+      /* @__PURE__ */ jsx9(
         "input",
         {
           id: fileInputId,
@@ -510,15 +632,15 @@ function ImageUpload({
         }
       )
     ] }),
-    previewUrl && /* @__PURE__ */ jsxs5("div", { className: "mt-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3", children: [
-      /* @__PURE__ */ jsxs5(
+    previewUrl && /* @__PURE__ */ jsxs8("div", { className: "mt-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3", children: [
+      /* @__PURE__ */ jsxs8(
         "button",
         {
           type: "button",
           onClick: () => setIsModalOpen(true),
           className: "group relative h-[82px] w-[82px] cursor-pointer overflow-hidden rounded-lg bg-gray-100",
           children: [
-            /* @__PURE__ */ jsx6(
+            /* @__PURE__ */ jsx9(
               Image3,
               {
                 src: previewUrl,
@@ -527,11 +649,11 @@ function ImageUpload({
                 className: "object-cover"
               }
             ),
-            /* @__PURE__ */ jsx6("div", { className: "absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40", children: /* @__PURE__ */ jsx6("span", { className: "text-white text-xs opacity-0 transition-opacity group-hover:opacity-100", children: "\uD06C\uAC8C \uBCF4\uAE30" }) })
+            /* @__PURE__ */ jsx9("div", { className: "absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40", children: /* @__PURE__ */ jsx9("span", { className: "text-white text-xs opacity-0 transition-opacity group-hover:opacity-100", children: "\uD06C\uAC8C \uBCF4\uAE30" }) })
           ]
         }
       ),
-      /* @__PURE__ */ jsx6(
+      /* @__PURE__ */ jsx9(
         "label",
         {
           htmlFor: fileInputId,
@@ -540,7 +662,7 @@ function ImageUpload({
         }
       )
     ] }),
-    isModalOpen && previewUrl && /* @__PURE__ */ jsxs5(
+    isModalOpen && previewUrl && /* @__PURE__ */ jsxs8(
       "div",
       {
         role: "dialog",
@@ -549,7 +671,7 @@ function ImageUpload({
         onKeyDown: () => {
         },
         children: [
-          /* @__PURE__ */ jsx6(
+          /* @__PURE__ */ jsx9(
             "button",
             {
               type: "button",
@@ -558,7 +680,7 @@ function ImageUpload({
               children: "\u2715"
             }
           ),
-          /* @__PURE__ */ jsx6(
+          /* @__PURE__ */ jsx9(
             Image3,
             {
               src: previewUrl,
@@ -577,7 +699,7 @@ function ImageUpload({
 
 // src/components/input/LinkInput.tsx
 import { useId as useId2, useState as useState3 } from "react";
-import { Fragment as Fragment3, jsx as jsx7, jsxs as jsxs6 } from "react/jsx-runtime";
+import { Fragment as Fragment3, jsx as jsx10, jsxs as jsxs9 } from "react/jsx-runtime";
 var INPUT_STYLE2 = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
 function LinkInput({
   links,
@@ -612,8 +734,8 @@ function LinkInput({
   const removeLink = (idToRemove) => {
     onLinksChange(links.filter((link) => link.id !== idToRemove));
   };
-  return /* @__PURE__ */ jsxs6(Fragment3, { children: [
-    /* @__PURE__ */ jsx7(
+  return /* @__PURE__ */ jsxs9(Fragment3, { children: [
+    /* @__PURE__ */ jsx10(
       "input",
       {
         id: inputId,
@@ -625,21 +747,21 @@ function LinkInput({
         className: INPUT_STYLE2
       }
     ),
-    error ? /* @__PURE__ */ jsx7("p", { className: "mt-2 text-[12px] text-red-500", children: error }) : /* @__PURE__ */ jsx7("p", { className: "mt-2 ml-2 text-[#999999] text-[12px]", children: "\uC5D4\uD130\uB97C \uB204\uB974\uBA74 \uB9C1\uD06C\uAC00 \uCD94\uAC00\uB429\uB2C8\uB2E4" }),
-    links.length > 0 && /* @__PURE__ */ jsx7("div", { className: "mt-3 flex flex-wrap gap-2", children: links.map((link) => /* @__PURE__ */ jsxs6(
+    error ? /* @__PURE__ */ jsx10("p", { className: "mt-2 text-[12px] text-red-500", children: error }) : /* @__PURE__ */ jsx10("p", { className: "mt-2 ml-2 text-[#999999] text-[12px]", children: "\uC5D4\uD130\uB97C \uB204\uB974\uBA74 \uB9C1\uD06C\uAC00 \uCD94\uAC00\uB429\uB2C8\uB2E4" }),
+    links.length > 0 && /* @__PURE__ */ jsx10("div", { className: "mt-3 flex flex-wrap gap-2", children: links.map((link) => /* @__PURE__ */ jsxs9(
       "div",
       {
         className: "flex items-center gap-2 rounded-full border border-[#D5D5D5] bg-white px-4 py-2",
         children: [
-          /* @__PURE__ */ jsx7("span", { className: "whitespace-nowrap text-[#666666] text-[13px]", children: link.url }),
-          /* @__PURE__ */ jsx7(
+          /* @__PURE__ */ jsx10("span", { className: "whitespace-nowrap text-[#666666] text-[13px]", children: link.url }),
+          /* @__PURE__ */ jsx10(
             "button",
             {
               type: "button",
               onClick: () => removeLink(link.id),
               className: "text-[#999999] hover:text-[#666666]",
               "aria-label": "\uB9C1\uD06C \uC0AD\uC81C",
-              children: /* @__PURE__ */ jsx7(
+              children: /* @__PURE__ */ jsx10(
                 "svg",
                 {
                   className: "h-4 w-4",
@@ -647,7 +769,7 @@ function LinkInput({
                   stroke: "currentColor",
                   viewBox: "0 0 24 24",
                   "aria-hidden": "true",
-                  children: /* @__PURE__ */ jsx7(
+                  children: /* @__PURE__ */ jsx10(
                     "path",
                     {
                       strokeLinecap: "round",
@@ -669,7 +791,7 @@ function LinkInput({
 
 // src/components/input/TextArea.tsx
 import { useEffect as useEffect3, useId as useId3, useRef } from "react";
-import { jsx as jsx8, jsxs as jsxs7 } from "react/jsx-runtime";
+import { jsx as jsx11, jsxs as jsxs10 } from "react/jsx-runtime";
 function TextArea({
   value,
   onChange,
@@ -693,8 +815,8 @@ function TextArea({
     textarea2.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
     textarea2.style.overflowY = scrollHeight > maxHeight ? "auto" : "hidden";
   }, [value, autoResize, maxHeight]);
-  const textarea = /* @__PURE__ */ jsxs7("div", { className: label ? "flex-1" : void 0, children: [
-    /* @__PURE__ */ jsx8(
+  const textarea = /* @__PURE__ */ jsxs10("div", { className: label ? "flex-1" : void 0, children: [
+    /* @__PURE__ */ jsx11(
       "textarea",
       {
         ref: textareaRef,
@@ -707,11 +829,11 @@ function TextArea({
         className: `w-full resize-none rounded-lg border-[0.1px] border-gray-200 bg-white px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"}`
       }
     ),
-    /* @__PURE__ */ jsx8(ErrorMessage, { message: error })
+    /* @__PURE__ */ jsx11(ErrorMessage, { message: error })
   ] });
   if (!label) return textarea;
-  return /* @__PURE__ */ jsxs7("div", { className: "flex flex-col gap-2 md:flex-row md:items-start md:gap-0", children: [
-    /* @__PURE__ */ jsx8(
+  return /* @__PURE__ */ jsxs10("div", { className: "flex flex-col gap-2 md:flex-row md:items-start md:gap-0", children: [
+    /* @__PURE__ */ jsx11(
       "label",
       {
         htmlFor: textareaId,
@@ -725,7 +847,7 @@ function TextArea({
 
 // src/components/input/TextInput.tsx
 import { useId as useId4 } from "react";
-import { jsx as jsx9, jsxs as jsxs8 } from "react/jsx-runtime";
+import { jsx as jsx12, jsxs as jsxs11 } from "react/jsx-runtime";
 function TextInput({
   value,
   onChange,
@@ -740,8 +862,8 @@ function TextInput({
 }) {
   const generatedId = useId4();
   const inputId = id || generatedId;
-  const input = /* @__PURE__ */ jsxs8("div", { className: label ? "flex-1" : void 0, children: [
-    /* @__PURE__ */ jsx9(
+  const input = /* @__PURE__ */ jsxs11("div", { className: label ? "flex-1" : void 0, children: [
+    /* @__PURE__ */ jsx12(
       "input",
       {
         id: inputId,
@@ -755,11 +877,11 @@ function TextInput({
         className: `w-full rounded-lg border-[0.1px] border-gray-200 ${bgColor} px-4 py-3.5 text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"} ${disabled ? "cursor-not-allowed bg-gray-100 text-gray-500" : ""}`
       }
     ),
-    /* @__PURE__ */ jsx9(ErrorMessage, { message: error })
+    /* @__PURE__ */ jsx12(ErrorMessage, { message: error })
   ] });
   if (!label) return input;
-  return /* @__PURE__ */ jsxs8("div", { className: "flex flex-col gap-2 md:flex-row md:items-start md:gap-0", children: [
-    /* @__PURE__ */ jsx9(
+  return /* @__PURE__ */ jsxs11("div", { className: "flex flex-col gap-2 md:flex-row md:items-start md:gap-0", children: [
+    /* @__PURE__ */ jsx12(
       "label",
       {
         htmlFor: inputId,
@@ -774,16 +896,7 @@ function TextInput({
 // src/components/ui/button.tsx
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-
-// src/lib/utils.ts
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
-
-// src/components/ui/button.tsx
-import { jsx as jsx10 } from "react/jsx-runtime";
+import { jsx as jsx13 } from "react/jsx-runtime";
 var buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
@@ -819,7 +932,7 @@ function Button({
   ...props
 }) {
   const Comp = asChild ? Slot : "button";
-  return /* @__PURE__ */ jsx10(
+  return /* @__PURE__ */ jsx13(
     Comp,
     {
       "data-slot": "button",
@@ -830,8 +943,8 @@ function Button({
 }
 
 // src/components/ui/icons/announcements/index.tsx
-import { jsx as jsx11, jsxs as jsxs9 } from "react/jsx-runtime";
-var NoteIcon = ({ className }) => /* @__PURE__ */ jsxs9(
+import { jsx as jsx14, jsxs as jsxs12 } from "react/jsx-runtime";
+var NoteIcon = ({ className }) => /* @__PURE__ */ jsxs12(
   "svg",
   {
     width: "24",
@@ -841,15 +954,15 @@ var NoteIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     xmlns: "http://www.w3.org/2000/svg",
     className,
     children: [
-      /* @__PURE__ */ jsx11("title", { children: "Note" }),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx14("title", { children: "Note" }),
+      /* @__PURE__ */ jsx14(
         "path",
         {
           d: "M7.5 24H19.5V27H7.5V24ZM7.5 16.5H25.5V19.5H7.5V16.5ZM7.5 31.5H15V34.5H7.5V31.5Z",
           fill: "currentColor"
         }
       ),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx14(
         "path",
         {
           d: "M30 4.5H25.5V3C25.5 2.20435 25.1839 1.44129 24.6213 0.87868C24.0587 0.31607 23.2956 0 22.5 0H10.5C9.70435 0 8.94129 0.31607 8.37868 0.87868C7.81607 1.44129 7.5 2.20435 7.5 3V4.5H3C2.20435 4.5 1.44129 4.81607 0.87868 5.37868C0.31607 5.94129 0 6.70435 0 7.5V39C0 39.7957 0.31607 40.5587 0.87868 41.1213C1.44129 41.6839 2.20435 42 3 42H30C30.7956 42 31.5587 41.6839 32.1213 41.1213C32.6839 40.5587 33 39.7957 33 39V7.5C33 6.70435 32.6839 5.94129 32.1213 5.37868C31.5587 4.81607 30.7956 4.5 30 4.5ZM10.5 3H22.5V9H10.5V3ZM30 39H3V7.5H7.5V12H25.5V7.5H30V39Z",
@@ -859,7 +972,7 @@ var NoteIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     ]
   }
 );
-var CheckIcon = ({ className }) => /* @__PURE__ */ jsxs9(
+var CheckIcon = ({ className }) => /* @__PURE__ */ jsxs12(
   "svg",
   {
     width: "24",
@@ -869,8 +982,8 @@ var CheckIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     xmlns: "http://www.w3.org/2000/svg",
     className,
     children: [
-      /* @__PURE__ */ jsx11("title", { children: "Check" }),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx14("title", { children: "Check" }),
+      /* @__PURE__ */ jsx14(
         "path",
         {
           fillRule: "evenodd",
@@ -882,7 +995,7 @@ var CheckIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     ]
   }
 );
-var CalendarIcon = ({ className }) => /* @__PURE__ */ jsxs9(
+var CalendarIcon = ({ className }) => /* @__PURE__ */ jsxs12(
   "svg",
   {
     width: "24",
@@ -892,8 +1005,8 @@ var CalendarIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     xmlns: "http://www.w3.org/2000/svg",
     className,
     children: [
-      /* @__PURE__ */ jsx11("title", { children: "Calendar" }),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx14("title", { children: "Calendar" }),
+      /* @__PURE__ */ jsx14(
         "path",
         {
           d: "M30.6 4H27V2C27 1.46957 26.8104 0.960859 26.4728 0.585786C26.1352 0.210714 25.6774 0 25.2 0C24.7226 0 24.2648 0.210714 23.9272 0.585786C23.5896 0.960859 23.4 1.46957 23.4 2V4H12.6V2C12.6 1.46957 12.4104 0.960859 12.0728 0.585786C11.7352 0.210714 11.2774 0 10.8 0C10.3226 0 9.86477 0.210714 9.52721 0.585786C9.18964 0.960859 9 1.46957 9 2V4H5.4C3.96783 4 2.59432 4.63214 1.58162 5.75736C0.568927 6.88258 0 8.4087 0 10V34C0 35.5913 0.568927 37.1174 1.58162 38.2426C2.59432 39.3679 3.96783 40 5.4 40H30.6C32.0322 40 33.4057 39.3679 34.4184 38.2426C35.4311 37.1174 36 35.5913 36 34V10C36 8.4087 35.4311 6.88258 34.4184 5.75736C33.4057 4.63214 32.0322 4 30.6 4ZM32.4 34C32.4 34.5304 32.2104 35.0391 31.8728 35.4142C31.5352 35.7893 31.0774 36 30.6 36H5.4C4.92261 36 4.46477 35.7893 4.12721 35.4142C3.78964 35.0391 3.6 34.5304 3.6 34V20H32.4V34ZM32.4 16H3.6V10C3.6 9.46957 3.78964 8.96086 4.12721 8.58579C4.46477 8.21071 4.92261 8 5.4 8H9V10C9 10.5304 9.18964 11.0391 9.52721 11.4142C9.86477 11.7893 10.3226 12 10.8 12C11.2774 12 11.7352 11.7893 12.0728 11.4142C12.4104 11.0391 12.6 10.5304 12.6 10V8H23.4V10C23.4 10.5304 23.5896 11.0391 23.9272 11.4142C24.2648 11.7893 24.7226 12 25.2 12C25.6774 12 26.1352 11.7893 26.4728 11.4142C26.8104 11.0391 27 10.5304 27 10V8H30.6C31.0774 8 31.5352 8.21071 31.8728 8.58579C32.2104 8.96086 32.4 9.46957 32.4 10V16Z",
@@ -903,7 +1016,7 @@ var CalendarIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     ]
   }
 );
-var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs9(
+var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs12(
   "svg",
   {
     width: "24",
@@ -913,8 +1026,8 @@ var InterviewIcon = ({ className }) => /* @__PURE__ */ jsxs9(
     xmlns: "http://www.w3.org/2000/svg",
     className,
     children: [
-      /* @__PURE__ */ jsx11("title", { children: "Interview" }),
-      /* @__PURE__ */ jsx11(
+      /* @__PURE__ */ jsx14("title", { children: "Interview" }),
+      /* @__PURE__ */ jsx14(
         "path",
         {
           d: "M31.512 6.72C35.552 11.12 35.552 17.22 31.512 21.26L28.152 17.88C29.832 15.52 29.832 12.46 28.152 10.1L31.512 6.72ZM38.132 0C46.012 8.1 45.932 20.22 38.132 28L34.872 24.74C40.412 18.38 40.412 9.3 34.872 3.26L38.132 0ZM16.012 6C20.412 6 24.012 9.58 24.012 14C24.012 18.42 20.412 22 16.012 22C11.612 22 8.012 18.42 8.012 14C8.012 9.58 11.592 6 16.012 6ZM24.012 27.08C24.012 29.2 23.432 34.14 19.612 39.66L18.012 30L19.872 26.24C18.632 26.1 17.332 26 16.012 26C14.692 26 13.352 26.1 12.112 26.24L14.012 30L12.372 39.66C8.552 34.14 8.012 29.2 8.012 27.08C3.212 28.48 0 31 0 34V42H32.012V34C32.012 31 28.792 28.48 24.012 27.08Z",
@@ -930,6 +1043,25 @@ var blackLogo = "/images/logos/blackLogo.svg";
 var whiteLogo = "/images/logos/whiteLogo.svg";
 var rightArrowIcon = "/images/icons/rightArrow.svg";
 
+// src/hooks/useDeferredLoading.ts
+import { useEffect as useEffect4, useState as useState4 } from "react";
+function useDeferredLoading(isLoading, delay = 200) {
+  const [showLoading, setShowLoading] = useState4(false);
+  useEffect4(() => {
+    if (!isLoading) {
+      setShowLoading(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setShowLoading(true);
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isLoading, delay]);
+  return showLoading;
+}
+
 // src/index.ts
 import { Toaster, toast as toast2 } from "sonner";
 export {
@@ -944,7 +1076,18 @@ export {
   InterviewIcon,
   LandingHeader,
   LinkInput,
+  LoadingOverlay,
   NoteIcon,
+  Skeleton,
+  SkeletonAnnouncementCard,
+  SkeletonCard,
+  SkeletonClubCard,
+  SkeletonListItem,
+  SkeletonTableRow,
+  Spinner,
+  SpinnerButton,
+  SpinnerCenter,
+  SpinnerFullPage,
   StudentHeader,
   TextArea,
   TextInput,
@@ -953,5 +1096,6 @@ export {
   buttonVariants,
   rightArrowIcon,
   toast2 as toast,
+  useDeferredLoading,
   whiteLogo
 };

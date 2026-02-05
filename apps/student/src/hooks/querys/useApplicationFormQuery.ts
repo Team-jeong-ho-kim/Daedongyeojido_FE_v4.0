@@ -6,6 +6,7 @@ import {
   getClubApplicationForms,
   getMyApplications,
   getMySubmissionHistory,
+  getUserAlarms,
 } from "@/api/applicationForm";
 
 export const useGetClubApplicationFormsQuery = (clubId: string) => {
@@ -35,5 +36,12 @@ export const useGetMySubmissionHistoryQuery = () => {
   return useQuery({
     queryKey: ["mySubmissionHistory"],
     queryFn: () => getMySubmissionHistory(),
+  });
+};
+
+export const useGetUserAlarmsQuery = () => {
+  return useQuery({
+    queryKey: ["userAlarms"],
+    queryFn: () => getUserAlarms(),
   });
 };

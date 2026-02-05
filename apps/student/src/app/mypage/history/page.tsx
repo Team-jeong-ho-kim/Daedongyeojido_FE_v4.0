@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SkeletonListItem, useDeferredLoading } from "ui";
 import { Pagination } from "@/components/common/Pagination";
 import { useGetMySubmissionHistoryQuery } from "@/hooks/querys/useApplicationFormQuery";
 
@@ -44,7 +45,8 @@ export default function ApplicationHistoryPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 5;
 
-  const { data: submissionsData, isLoading } = useGetMySubmissionHistoryQuery();
+  const { data: submissionsData, isPending } = useGetMySubmissionHistoryQuery();
+  const showSkeleton = useDeferredLoading(isPending);
 
   const submissions = (submissionsData || []).sort(
     (a, b) => b.submissionId - a.submissionId,
@@ -62,14 +64,6 @@ export default function ApplicationHistoryPage() {
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500 text-lg">지원 내역을 불러오는 중...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
       <div className="mx-auto max-w-[1000px] px-6 py-16">
@@ -84,7 +78,13 @@ export default function ApplicationHistoryPage() {
           지원 내역
         </h1>
 
-        {submissions.length === 0 ? (
+        {showSkeleton ? (
+          <div className="space-y-4">
+            {Array.from({ length: limit }, () => (
+              <SkeletonListItem key={crypto.randomUUID()} />
+            ))}
+          </div>
+        ) : submissions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Image
               src="/images/icons/redTiger.svg"

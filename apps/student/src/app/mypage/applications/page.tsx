@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SkeletonListItem, useDeferredLoading } from "ui";
 import { Pagination } from "@/components/common/Pagination";
 import { useGetMyApplicationsQuery } from "@/hooks/querys/useApplicationFormQuery";
 
@@ -12,7 +13,8 @@ export default function MyApplicationsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 5;
 
-  const { data: applicationsData, isLoading } = useGetMyApplicationsQuery();
+  const { data: applicationsData, isPending } = useGetMyApplicationsQuery();
+  const showSkeleton = useDeferredLoading(isPending);
 
   const applications = (applicationsData || []).sort(
     (a, b) => b.submissionId - a.submissionId,
@@ -44,14 +46,6 @@ export default function MyApplicationsPage() {
       : "border-green-500 bg-green-50 text-green-600";
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500 text-lg">지원서 목록을 불러오는 중...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
       <div className="mx-auto max-w-[1000px] px-6 py-16">
@@ -66,7 +60,13 @@ export default function MyApplicationsPage() {
           나의 지원서
         </h1>
 
-        {applications.length === 0 ? (
+        {showSkeleton ? (
+          <div className="space-y-4">
+            {Array.from({ length: limit }, () => (
+              <SkeletonListItem key={crypto.randomUUID()} />
+            ))}
+          </div>
+        ) : applications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Image
               src="/images/icons/redTiger.svg"

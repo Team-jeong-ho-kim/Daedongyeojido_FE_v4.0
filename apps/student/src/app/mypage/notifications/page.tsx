@@ -2,37 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { getUserAlarms } from "@/api/applicationForm";
+import { useState } from "react";
+import { SkeletonListItem, useDeferredLoading } from "ui";
 import { Pagination } from "@/components/common/Pagination";
-import type { Alarm } from "@/types";
+import { useGetUserAlarmsQuery } from "@/hooks/querys/useApplicationFormQuery";
 
 export default function NotificationsPage() {
   const [curPage, setCurPage] = useState(1);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [alarms, setAlarms] = useState<Alarm[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const limit = 5;
 
-  useEffect(() => {
-    const fetchAlarms = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getUserAlarms();
-        // 최신순 정렬 (ID 내림차순)
-        const sortedData = data.sort((a, b) => b.id - a.id);
-        setAlarms(sortedData);
-      } catch (error) {
-        console.error("알림 조회 실패:", error);
-        toast.error("알림을 불러올 수 없습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data: alarmsData, isPending } = useGetUserAlarmsQuery();
+  const showSkeleton = useDeferredLoading(isPending);
 
-    fetchAlarms();
-  }, []);
+  // 최신순 정렬 (ID 내림차순)
+  const alarms = (alarmsData || []).sort((a, b) => b.id - a.id);
 
   const offset = (curPage - 1) * limit;
   const currentAlarms = alarms.slice(offset, offset + limit);
@@ -40,14 +24,6 @@ export default function NotificationsPage() {
   const handleNotificationClick = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500 text-lg">알림을 불러오는 중...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
@@ -61,7 +37,13 @@ export default function NotificationsPage() {
         </div>
         <h1 className="mb-12 font-extrabold text-3xl tracking-tight">알림함</h1>
 
-        {alarms.length === 0 ? (
+        {showSkeleton ? (
+          <div className="space-y-4">
+            {Array.from({ length: limit }, () => (
+              <SkeletonListItem key={crypto.randomUUID()} />
+            ))}
+          </div>
+        ) : alarms.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Image
               src="/images/icons/redTiger.svg"
