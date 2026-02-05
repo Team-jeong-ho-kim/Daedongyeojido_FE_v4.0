@@ -2,79 +2,52 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Alarm } from "@/api/applicationForm";
+import { getUserAlarms } from "@/api/applicationForm";
 import { Pagination } from "@/components/common/Pagination";
-
-interface Notification {
-  id: number;
-  title: string;
-  date: string;
-  content: string;
-}
-
-// TODO: API 연동 후 실제 데이터로 교체
-const mockNotifications: Notification[] = [
-  {
-    id: 1,
-    title: "대동여지도 면접 결과",
-    date: "2025.12.24",
-    content: "면접에 합격하셨습니다. 축하드립니다!",
-  },
-  {
-    id: 2,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 3,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 4,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 5,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 6,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 7,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-  {
-    id: 8,
-    title: "결과",
-    date: "2025.12.24",
-    content: "알림 내용입니다.",
-  },
-];
 
 export default function NotificationsPage() {
   const [curPage, setCurPage] = useState(1);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const limit = 5;
 
+  useEffect(() => {
+    const fetchAlarms = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getUserAlarms();
+        // 최신순 정렬 (ID 내림차순)
+        const sortedData = data.sort((a, b) => b.id - a.id);
+        setAlarms(sortedData);
+      } catch (error) {
+        console.error("알림 조회 실패:", error);
+        toast.error("알림을 불러올 수 없습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAlarms();
+  }, []);
+
   const offset = (curPage - 1) * limit;
-  const currentNotifications = mockNotifications.slice(offset, offset + limit);
+  const currentAlarms = alarms.slice(offset, offset + limit);
 
   const handleNotificationClick = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">알림을 불러오는 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
@@ -88,7 +61,7 @@ export default function NotificationsPage() {
         </div>
         <h1 className="mb-12 font-extrabold text-3xl tracking-tight">알림함</h1>
 
-        {mockNotifications.length === 0 ? (
+        {alarms.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Image
               src="/images/icons/redTiger.svg"
@@ -104,25 +77,22 @@ export default function NotificationsPage() {
         ) : (
           <>
             <div className="space-y-4">
-              {currentNotifications.map((notification) => {
-                const isExpanded = expandedId === notification.id;
+              {currentAlarms.map((alarm) => {
+                const isExpanded = expandedId === alarm.id;
                 return (
                   <div
-                    key={notification.id}
+                    key={alarm.id}
                     className="overflow-hidden rounded-2xl bg-gray-50 transition-colors hover:bg-gray-100"
                   >
                     <button
                       type="button"
-                      onClick={() => handleNotificationClick(notification.id)}
+                      onClick={() => handleNotificationClick(alarm.id)}
                       className="flex w-full items-center justify-between px-8 py-6"
                     >
                       <span className="font-medium text-base text-gray-900">
-                        {notification.title}
+                        {alarm.title}
                       </span>
                       <div className="flex items-center gap-6">
-                        <span className="font-normal text-gray-500 text-sm">
-                          {notification.date}
-                        </span>
                         <div
                           className="transition-transform duration-300"
                           style={{
@@ -149,7 +119,7 @@ export default function NotificationsPage() {
                     >
                       <div className="border-gray-200 border-t px-8 py-6">
                         <p className="text-gray-700 text-sm leading-relaxed">
-                          {notification.content}
+                          {alarm.content}
                         </p>
                       </div>
                     </div>
@@ -158,10 +128,10 @@ export default function NotificationsPage() {
               })}
             </div>
 
-            {mockNotifications.length > limit && (
+            {alarms.length > limit && (
               <div className="mt-12">
                 <Pagination
-                  listLen={mockNotifications.length}
+                  listLen={alarms.length}
                   limit={limit}
                   curPage={curPage}
                   setCurPage={setCurPage}

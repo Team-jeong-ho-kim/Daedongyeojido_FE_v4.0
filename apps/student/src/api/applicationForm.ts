@@ -311,3 +311,18 @@ export const getResultDuration =
       return null;
     }
   };
+
+export interface Alarm {
+  id: number;
+  title: string;
+  content: string;
+}
+
+export interface AlarmsResponse {
+  alarms: Alarm[];
+}
+
+export const getUserAlarms = async (): Promise<Alarm[]> => {
+  const response = await apiClient.get<AlarmsResponse>("/alarms/users");
+  return response.data.alarms;
+};
