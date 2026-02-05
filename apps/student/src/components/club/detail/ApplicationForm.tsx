@@ -2,12 +2,10 @@ import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  type CreateApplicationFormRequest,
-  createApplicationForm,
-} from "@/api/applicationForm";
+import { createApplicationForm } from "@/api/applicationForm";
 import { DeadlineModal } from "@/components";
 import { FIELDS } from "@/constants/club";
+import type { CreateApplicationFormRequest } from "@/types";
 
 interface ApplicationFormProps {
   onExit?: () => void;

@@ -1,18 +1,11 @@
 import type { UserInfo } from "shared";
 import { apiClient } from "utils";
+import type { UpdateMyInfoRequest, UpdateProfileRequest } from "@/types";
 
 export const getMyInfo = async () => {
   const response = await apiClient.get<UserInfo>("/users");
   return response.data;
 };
-
-export interface UpdateMyInfoRequest {
-  introduction: string;
-  phoneNumber?: string;
-  majors: string[];
-  links: string[];
-  profileImage?: File | null;
-}
 
 export const updateMyInfo = async (data: UpdateMyInfoRequest) => {
   const formData = new FormData();
@@ -43,14 +36,6 @@ export const updateMyInfo = async (data: UpdateMyInfoRequest) => {
 
   return response.data;
 };
-
-export interface UpdateProfileRequest {
-  introduction: string;
-  majors: string[];
-  links: string[];
-  profileImage?: File | null;
-  existingImageUrl?: string;
-}
 
 export const updateProfile = async (data: UpdateProfileRequest) => {
   const formData = new FormData();

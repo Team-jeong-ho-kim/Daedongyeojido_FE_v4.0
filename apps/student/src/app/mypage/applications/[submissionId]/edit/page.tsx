@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
-import type { MySubmissionDetail } from "@/api/applicationForm";
 import {
   getMySubmissionDetail,
   updateMySubmission,
 } from "@/api/applicationForm";
+import type { MySubmissionDetail } from "@/types";
 
 interface MySubmissionEditPageProps {
   params: Promise<{ submissionId: string }>;

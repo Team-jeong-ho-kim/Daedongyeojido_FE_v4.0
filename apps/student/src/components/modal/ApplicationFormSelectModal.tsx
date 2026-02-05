@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import type { ApplicationFormListItem } from "@/api/applicationForm";
+import type { ApplicationFormListItem } from "@/types";
 
 interface ApplicationFormSelectModalProps {
   isOpen: boolean;

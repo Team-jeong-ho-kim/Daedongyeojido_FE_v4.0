@@ -5,7 +5,6 @@ import { use, useEffect, useId, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { Button } from "ui";
-import type { ApplicationSubmission } from "@/api/applicationForm";
 import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
@@ -29,6 +28,7 @@ import { useGetClubAlarmsQuery } from "@/hooks/querys/useAlarmQuery";
 import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
+import type { ApplicationSubmission } from "@/types";
 
 interface ClubDetailPageProps {
   params: Promise<{ clubId: string }>;

@@ -6,7 +6,6 @@ import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
-import type { ApplicationSubmission } from "@/api/applicationForm";
 import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
@@ -22,6 +21,7 @@ import {
 import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
+import type { ApplicationSubmission } from "@/types";
 
 interface AnnouncementDetailPageProps {
   params: Promise<{ announcementId: string }>;

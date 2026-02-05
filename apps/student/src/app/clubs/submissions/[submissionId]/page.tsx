@@ -4,10 +4,6 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
-import type {
-  InterviewScheduleDetail,
-  SubmissionDetail,
-} from "@/api/applicationForm";
 import {
   createInterviewSchedule,
   decidePass,
@@ -16,6 +12,7 @@ import {
 } from "@/api/applicationForm";
 import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
 import { InterviewScheduleViewModal } from "@/components/modal/InterviewScheduleViewModal";
+import type { InterviewScheduleDetail, SubmissionDetail } from "@/types";
 
 interface SubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;

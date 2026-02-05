@@ -5,13 +5,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
-import type { MySubmissionDetail } from "@/api/applicationForm";
 import {
   deleteMySubmission,
   getMySubmissionDetail,
   submitMySubmission,
 } from "@/api/applicationForm";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
+import type { MySubmissionDetail } from "@/types";
 
 interface MySubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;

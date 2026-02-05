@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import type { Alarm } from "@/api/applicationForm";
 import { getUserAlarms } from "@/api/applicationForm";
 import { Pagination } from "@/components/common/Pagination";
+import type { Alarm } from "@/types";
 
 export default function NotificationsPage() {
   const [curPage, setCurPage] = useState(1);

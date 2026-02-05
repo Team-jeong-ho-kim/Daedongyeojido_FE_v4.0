@@ -2,8 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { InterviewScheduleDetail } from "@/api/applicationForm";
 import { updateInterviewSchedule } from "@/api/applicationForm";
+import type { InterviewScheduleDetail } from "@/types";
 
 interface InterviewScheduleViewModalProps {
   isOpen: boolean;
