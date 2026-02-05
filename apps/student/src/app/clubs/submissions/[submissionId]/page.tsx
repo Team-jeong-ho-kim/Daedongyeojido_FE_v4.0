@@ -2,9 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import type { SubmissionDetail } from "@/api/applicationForm";
-import { getSubmissionDetail } from "@/api/applicationForm";
+import {
+  createInterviewSchedule,
+  getSubmissionDetail,
+} from "@/api/applicationForm";
+import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
 
 interface SubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
@@ -17,6 +22,11 @@ export default function SubmissionDetailPage({
   const { submissionId } = use(params);
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSetScheduleModal, setShowSetScheduleModal] = useState(false);
+  const [hasSchedule, setHasSchedule] = useState(false);
+
+  const role = useUserStore((state) => state.userInfo?.role);
+  const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -24,6 +34,7 @@ export default function SubmissionDetailPage({
         setIsLoading(true);
         const data = await getSubmissionDetail(submissionId);
         setSubmission(data);
+        setHasSchedule(data.hasInterviewSchedule);
       } catch (error) {
         console.error("지원내역 조회 실패:", error);
         toast.error("지원내역을 불러올 수 없습니다.");
@@ -35,6 +46,51 @@ export default function SubmissionDetailPage({
 
     fetchSubmission();
   }, [submissionId, router]);
+
+  const handleSetSchedule = async (data: {
+    interviewSchedule: string;
+    place: string;
+    interviewTime: string;
+  }) => {
+    if (!submission?.applicantId) {
+      toast.error("지원자 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    try {
+      await createInterviewSchedule(submission.applicantId.toString(), data);
+      toast.success("면접 일정이 설정되었습니다.");
+      setHasSchedule(true);
+      setShowSetScheduleModal(false);
+    } catch (error) {
+      console.error("면접 일정 설정 실패:", error);
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { status: number; data?: { description?: string } };
+        };
+
+        // 400 에러 (유효성 검증 실패) 처리
+        if (axiosError.response?.status === 400) {
+          const errorMessage =
+            axiosError.response.data?.description ||
+            "입력값이 올바르지 않습니다.";
+          toast.error(errorMessage);
+          return;
+        }
+
+        // 409 에러 (이미 존재) 처리
+        if (axiosError.response?.status === 409) {
+          toast.error("이미 면접 일정이 존재합니다.");
+          setHasSchedule(true);
+          setShowSetScheduleModal(false);
+          return;
+        }
+      }
+
+      toast.error("면접 일정 설정에 실패했습니다.");
+    }
+  };
 
   if (isLoading || !submission) {
     return (
@@ -140,16 +196,37 @@ export default function SubmissionDetailPage({
         </section>
 
         {/* 하단 버튼 */}
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
-          >
-            면접 일정 설정
-          </button>
-        </div>
+        {isClubMember && (
+          <div className="flex justify-end gap-4">
+            {hasSchedule && (
+              <button
+                type="button"
+                onClick={() => {
+                  // 동작 안 함
+                }}
+                className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
+              >
+                면접 일정 조회
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowSetScheduleModal(true)}
+              className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+            >
+              면접 일정 설정
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* 면접 일정 설정 모달 */}
+      <InterviewScheduleSetModal
+        isOpen={showSetScheduleModal}
+        onClose={() => setShowSetScheduleModal(false)}
+        onConfirm={handleSetSchedule}
+        onBackdropClick={() => setShowSetScheduleModal(false)}
+      />
     </main>
   );
 }

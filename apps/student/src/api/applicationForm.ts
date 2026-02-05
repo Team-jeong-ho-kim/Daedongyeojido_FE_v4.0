@@ -126,11 +126,13 @@ export interface SubmissionAnswer {
 }
 
 export interface SubmissionDetail {
+  applicantId: number;
   userName: string;
   classNumber: string;
   introduction: string;
   major: string;
   answers: SubmissionAnswer[];
+  hasInterviewSchedule: boolean;
 }
 
 export const getSubmissionDetail = async (
@@ -235,4 +237,17 @@ export const deleteMySubmission = async (
   submissionId: string,
 ): Promise<void> => {
   await apiClient.delete(`/applications/${submissionId}`);
+};
+
+export interface CreateInterviewScheduleRequest {
+  interviewSchedule: string;
+  place: string;
+  interviewTime: string;
+}
+
+export const createInterviewSchedule = async (
+  userId: string,
+  data: CreateInterviewScheduleRequest,
+): Promise<void> => {
+  await apiClient.post(`/schedules/${userId}`, data);
 };
