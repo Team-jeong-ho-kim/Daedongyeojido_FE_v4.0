@@ -253,6 +253,7 @@ export const createInterviewSchedule = async (
 };
 
 export interface InterviewScheduleDetail {
+  scheduleId: number;
   userName: string;
   classNumber: string;
   major: string;
@@ -268,4 +269,17 @@ export const getInterviewSchedule = async (
     `/schedules/${applicantId}`,
   );
   return response.data;
+};
+
+export interface UpdateInterviewScheduleRequest {
+  interviewSchedule: string;
+  place: string;
+  interviewTime: string;
+}
+
+export const updateInterviewSchedule = async (
+  scheduleId: string,
+  data: UpdateInterviewScheduleRequest,
+): Promise<void> => {
+  await apiClient.patch(`/schedules/${scheduleId}`, data);
 };

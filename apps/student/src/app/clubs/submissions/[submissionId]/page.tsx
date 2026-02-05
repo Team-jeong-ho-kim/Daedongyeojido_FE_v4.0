@@ -118,6 +118,19 @@ export default function SubmissionDetailPage({
     }
   };
 
+  const handleScheduleUpdate = async () => {
+    if (!submission?.applicantId) return;
+
+    try {
+      const data = await getInterviewSchedule(
+        submission.applicantId.toString(),
+      );
+      setScheduleDetail(data);
+    } catch (error) {
+      console.error("면접 일정 재조회 실패:", error);
+    }
+  };
+
   if (isLoading || !submission) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
@@ -258,6 +271,7 @@ export default function SubmissionDetailPage({
         onClose={() => setShowViewScheduleModal(false)}
         onBackdropClick={() => setShowViewScheduleModal(false)}
         schedule={scheduleDetail}
+        onUpdate={handleScheduleUpdate}
       />
     </main>
   );
