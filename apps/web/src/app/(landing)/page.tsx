@@ -101,7 +101,7 @@ export default function Home() {
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
           <Link
-            href="/login"
+            href={`${process.env.NEXT_PUBLIC_USER_URL}/login`}
             className="rounded-2xl bg-[#f0e5e5] px-6 py-3 font-bold text-[#4a4444] text-base transition-colors hover:bg-[#e5d5d5] md:px-8 md:py-4 md:text-lg"
           >
             로그인 하기
