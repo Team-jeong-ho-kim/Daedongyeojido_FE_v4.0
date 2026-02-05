@@ -129,6 +129,26 @@ export default function ApplyDetailPage({
       return true;
     } catch (error) {
       console.error("제출 실패:", error);
+
+      // 중복 지원 및 유효성 검증 에러 처리
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { status: number; data?: { description?: string } };
+        };
+
+        // 400 또는 409 에러 (중복 지원, 유효성 검증 실패)
+        if (
+          axiosError.response?.status === 400 ||
+          axiosError.response?.status === 409
+        ) {
+          const errorMessage =
+            axiosError.response.data?.description ||
+            "이미 지원하셨거나 입력값이 올바르지 않습니다.";
+          toast.error(errorMessage);
+          return false;
+        }
+      }
+
       toast.error("제출에 실패했습니다. 다시 시도해주세요.");
       return false;
     } finally {

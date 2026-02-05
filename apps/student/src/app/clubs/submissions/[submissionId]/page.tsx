@@ -4,12 +4,17 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
-import type { SubmissionDetail } from "@/api/applicationForm";
+import type {
+  InterviewScheduleDetail,
+  SubmissionDetail,
+} from "@/api/applicationForm";
 import {
   createInterviewSchedule,
+  getInterviewSchedule,
   getSubmissionDetail,
 } from "@/api/applicationForm";
 import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
+import { InterviewScheduleViewModal } from "@/components/modal/InterviewScheduleViewModal";
 
 interface SubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
@@ -23,7 +28,10 @@ export default function SubmissionDetailPage({
   const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showSetScheduleModal, setShowSetScheduleModal] = useState(false);
+  const [showViewScheduleModal, setShowViewScheduleModal] = useState(false);
   const [hasSchedule, setHasSchedule] = useState(false);
+  const [scheduleDetail, setScheduleDetail] =
+    useState<InterviewScheduleDetail | null>(null);
 
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
@@ -89,6 +97,24 @@ export default function SubmissionDetailPage({
       }
 
       toast.error("면접 일정 설정에 실패했습니다.");
+    }
+  };
+
+  const handleViewSchedule = async () => {
+    if (!submission?.applicantId) {
+      toast.error("지원자 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    try {
+      const data = await getInterviewSchedule(
+        submission.applicantId.toString(),
+      );
+      setScheduleDetail(data);
+      setShowViewScheduleModal(true);
+    } catch (error) {
+      console.error("면접 일정 조회 실패:", error);
+      toast.error("면접 일정을 불러올 수 없습니다.");
     }
   };
 
@@ -201,9 +227,7 @@ export default function SubmissionDetailPage({
             {hasSchedule && (
               <button
                 type="button"
-                onClick={() => {
-                  // 동작 안 함
-                }}
+                onClick={handleViewSchedule}
                 className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
               >
                 면접 일정 조회
@@ -226,6 +250,14 @@ export default function SubmissionDetailPage({
         onClose={() => setShowSetScheduleModal(false)}
         onConfirm={handleSetSchedule}
         onBackdropClick={() => setShowSetScheduleModal(false)}
+      />
+
+      {/* 면접 일정 조회 모달 */}
+      <InterviewScheduleViewModal
+        isOpen={showViewScheduleModal}
+        onClose={() => setShowViewScheduleModal(false)}
+        onBackdropClick={() => setShowViewScheduleModal(false)}
+        schedule={scheduleDetail}
       />
     </main>
   );

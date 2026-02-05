@@ -251,3 +251,21 @@ export const createInterviewSchedule = async (
 ): Promise<void> => {
   await apiClient.post(`/schedules/${userId}`, data);
 };
+
+export interface InterviewScheduleDetail {
+  userName: string;
+  classNumber: string;
+  major: string;
+  place: string;
+  interviewTime: string;
+  interviewSchedule: string;
+}
+
+export const getInterviewSchedule = async (
+  applicantId: string,
+): Promise<InterviewScheduleDetail> => {
+  const response = await apiClient.get<InterviewScheduleDetail>(
+    `/schedules/${applicantId}`,
+  );
+  return response.data;
+};
