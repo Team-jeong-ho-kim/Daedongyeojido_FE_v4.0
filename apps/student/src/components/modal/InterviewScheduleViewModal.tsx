@@ -11,6 +11,8 @@ interface InterviewScheduleViewModalProps {
   onBackdropClick: () => void;
   schedule: InterviewScheduleDetail | null;
   onUpdate?: () => void;
+  onInterviewComplete?: () => void;
+  isClubLeader?: boolean;
 }
 
 export function InterviewScheduleViewModal({
@@ -19,6 +21,8 @@ export function InterviewScheduleViewModal({
   onBackdropClick,
   schedule,
   onUpdate,
+  onInterviewComplete,
+  isClubLeader = false,
 }: InterviewScheduleViewModalProps) {
   const titleId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -404,22 +408,27 @@ export function InterviewScheduleViewModal({
             >
               닫기
             </button>
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="flex-1 rounded-lg border border-primary-500 bg-white py-4 font-semibold text-lg text-primary-500 transition-colors duration-200 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-            >
-              수정
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                // 면접완료 처리 (아직 구현 안함)
-              }}
-              className="flex-1 rounded-lg bg-[#FF7575] py-4 font-semibold text-lg text-white transition-colors duration-200 hover:bg-[#FF6464] focus:outline-none focus:ring-2 focus:ring-[#FF7575] focus:ring-offset-2"
-            >
-              면접완료
-            </button>
+            {isClubLeader && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  className="flex-1 rounded-lg border border-primary-500 bg-white py-4 font-semibold text-lg text-primary-500 transition-colors duration-200 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                >
+                  수정
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onInterviewComplete?.();
+                    onClose();
+                  }}
+                  className="flex-1 rounded-lg bg-[#FF7575] py-4 font-semibold text-lg text-white transition-colors duration-200 hover:bg-[#FF6464] focus:outline-none focus:ring-2 focus:ring-[#FF7575] focus:ring-offset-2"
+                >
+                  면접완료
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

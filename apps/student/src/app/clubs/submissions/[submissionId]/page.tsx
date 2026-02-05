@@ -10,6 +10,7 @@ import type {
 } from "@/api/applicationForm";
 import {
   createInterviewSchedule,
+  decidePass,
   getInterviewSchedule,
   getSubmissionDetail,
 } from "@/api/applicationForm";
@@ -32,9 +33,11 @@ export default function SubmissionDetailPage({
   const [hasSchedule, setHasSchedule] = useState(false);
   const [scheduleDetail, setScheduleDetail] =
     useState<InterviewScheduleDetail | null>(null);
+  const [isInterviewCompleted, setIsInterviewCompleted] = useState(false);
 
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+  const isClubLeader = role === "CLUB_LEADER";
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -128,6 +131,21 @@ export default function SubmissionDetailPage({
       setScheduleDetail(data);
     } catch (error) {
       console.error("면접 일정 재조회 실패:", error);
+    }
+  };
+
+  const handleInterviewComplete = () => {
+    setIsInterviewCompleted(true);
+  };
+
+  const handleDecidePass = async (isPassed: boolean) => {
+    try {
+      await decidePass(submissionId, { isPassed });
+      toast.success(isPassed ? "합격 처리되었습니다." : "탈락 처리되었습니다.");
+      router.back();
+    } catch (error) {
+      console.error("합격/탈락 처리 실패:", error);
+      toast.error("처리에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -237,22 +255,43 @@ export default function SubmissionDetailPage({
         {/* 하단 버튼 */}
         {isClubMember && (
           <div className="flex justify-end gap-4">
-            {hasSchedule && (
-              <button
-                type="button"
-                onClick={handleViewSchedule}
-                className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
-              >
-                면접 일정 조회
-              </button>
+            {isInterviewCompleted && isClubLeader ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleDecidePass(false)}
+                  className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-gray-500"
+                >
+                  탈락
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDecidePass(true)}
+                  className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                >
+                  합격
+                </button>
+              </>
+            ) : (
+              <>
+                {hasSchedule && (
+                  <button
+                    type="button"
+                    onClick={handleViewSchedule}
+                    className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
+                  >
+                    면접 일정 조회
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowSetScheduleModal(true)}
+                  className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                >
+                  면접 일정 설정
+                </button>
+              </>
             )}
-            <button
-              type="button"
-              onClick={() => setShowSetScheduleModal(true)}
-              className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
-            >
-              면접 일정 설정
-            </button>
           </div>
         )}
       </div>
@@ -272,6 +311,8 @@ export default function SubmissionDetailPage({
         onBackdropClick={() => setShowViewScheduleModal(false)}
         schedule={scheduleDetail}
         onUpdate={handleScheduleUpdate}
+        onInterviewComplete={handleInterviewComplete}
+        isClubLeader={isClubLeader}
       />
     </main>
   );

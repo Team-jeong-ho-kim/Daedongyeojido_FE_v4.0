@@ -283,3 +283,14 @@ export const updateInterviewSchedule = async (
 ): Promise<void> => {
   await apiClient.patch(`/schedules/${scheduleId}`, data);
 };
+
+export interface DecidePassRequest {
+  isPassed: boolean;
+}
+
+export const decidePass = async (
+  submissionId: string,
+  data: DecidePassRequest,
+): Promise<void> => {
+  await apiClient.patch(`/clubs/pass/${submissionId}`, data);
+};
