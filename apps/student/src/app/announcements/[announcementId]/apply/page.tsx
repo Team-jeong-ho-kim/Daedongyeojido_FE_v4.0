@@ -188,11 +188,15 @@ export default function ApplyDetailPage({
 
   // 공고 및 지원서 폼 조회
   useEffect(() => {
+    let isMounted = true;
+
     const fetchData = async () => {
       try {
         setIsLoading(true);
         // 1. 공고 조회하여 applicationFormId 가져오기
         const announcement = await getDetailAnnouncement(announcementId);
+
+        if (!isMounted) return;
 
         // CLOSED 상태 체크
         if (announcement.status === "CLOSED") {
@@ -229,6 +233,10 @@ export default function ApplyDetailPage({
     };
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [announcementId, router]);
 
   // 임시저장 불러오기
