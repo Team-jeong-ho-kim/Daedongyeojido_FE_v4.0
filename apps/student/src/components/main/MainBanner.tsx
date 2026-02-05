@@ -3,28 +3,53 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getResultDuration } from "@/api/applicationForm";
 
 export default function MainBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [resultPeriod, setResultPeriod] = useState<string>("발표 기간 미정");
+
+  useEffect(() => {
+    const fetchResultDuration = async () => {
+      const data = await getResultDuration();
+      if (data?.resultDuration) {
+        // 날짜 및 시간 포맷팅 (예: "2026-08-01T17:30:00" -> "8월 1일 오후 5시 30분")
+        const date = new Date(data.resultDuration);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hour24 = date.getHours();
+        const minute = date.getMinutes();
+
+        // 12시간 형식으로 변환
+        const period = hour24 < 12 ? "오전" : "오후";
+        const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
+
+        setResultPeriod(
+          `발표일: ${month}월 ${day}일 ${period} ${hour12}시${minute > 0 ? ` ${minute}분` : ""}`,
+        );
+      } else {
+        setResultPeriod("발표 기간이 설정되지 않았습니다");
+      }
+    };
+
+    fetchResultDuration();
+  }, []);
 
   const slides = [
     {
       id: "slide-1",
       title: "동아리 모집 기간, 나의 전공 동아리 찾기",
       description: "대덕소프트웨어마이스터고등학교 전공 동아리에 지원하세요!",
-      period: "지원기간: 12월 13일 (토) - 12월 26일 (목)",
     },
     {
       id: "slide-2",
       title: "새로운 경험을 시작하세요",
       description: "다양한 전공 동아리가 여러분을 기다립니다",
-      period: "지원기간: 12월 13일 (토) - 12월 26일 (목)",
     },
     {
       id: "slide-3",
       title: "함께 성장하는 동아리 생활",
       description: "열정적인 동료들과 함께 배우고 성장하세요",
-      period: "지원기간: 12월 13일 (토) - 12월 26일 (목)",
     },
   ];
 
@@ -78,7 +103,7 @@ export default function MainBanner() {
               {slides[currentSlide].description}
             </p>
             <p className="animate-fade-in-delayed-more text-gray-50 text-sm md:text-base lg:text-lg">
-              {slides[currentSlide].period}
+              {resultPeriod}
             </p>
           </div>
         </div>

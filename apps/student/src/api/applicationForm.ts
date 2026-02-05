@@ -296,3 +296,18 @@ export const decidePass = async (
 ): Promise<void> => {
   await apiClient.patch(`/clubs/pass/${submissionId}`, data);
 };
+
+export interface ResultDurationResponse {
+  resultDuration: string;
+}
+
+export const getResultDuration =
+  async (): Promise<ResultDurationResponse | null> => {
+    try {
+      const response =
+        await apiClient.get<ResultDurationResponse>("/result-duration");
+      return response.data;
+    } catch {
+      return null;
+    }
+  };
