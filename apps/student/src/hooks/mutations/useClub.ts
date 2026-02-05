@@ -107,7 +107,7 @@ export const useCreateClubApplicationMutation = () => {
         "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
       );
       setTimeout(() => {
-        router.push("/mypage/alarm");
+        router.push("/mypage/notifications");
       }, 1500);
     },
     onError: (error: any) => {
