@@ -30,7 +30,11 @@ export default function ClubCreationPage() {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!clubName.trim()) newErrors.clubName = "동아리 명을 입력해주세요";
+    if (!clubName.trim()) {
+      newErrors.clubName = "동아리 명을 입력해주세요";
+    } else if (clubName.length > 20) {
+      newErrors.clubName = "동아리 이름은 최대 20자까지 작성할 수 있습니다.";
+    }
     if (!clubIntro.trim())
       newErrors.clubIntro = "동아리 한줄 소개를 입력해주세요";
     if (!clubIntroDetail.trim())
@@ -110,6 +114,7 @@ export default function ClubCreationPage() {
               value={clubName}
               onChange={handleClubNameChange}
               placeholder="동아리 명"
+              maxLength={20}
               error={errors.clubName}
             />
           </FormField>

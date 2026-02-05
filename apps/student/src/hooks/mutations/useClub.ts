@@ -31,7 +31,7 @@ export const useUpdateClubMutation = (clubId: string) => {
     onError: (error: any) => {
       const status = error.response?.status;
       const message =
-        error.response?.data?.message || error.response?.data?.description;
+        error.response?.data?.description || error.response?.data?.message;
 
       if (status === 400) {
         toast.error(message || "요청 형식이 잘못되었습니다.");
@@ -60,7 +60,7 @@ export const useDissolveClubMutation = () => {
     onError: (error: any) => {
       const status = error.response?.status;
       const message =
-        error.response?.data?.message || error.response?.data?.description;
+        error.response?.data?.description || error.response?.data?.message;
 
       if (status === 400) {
         toast.error(message || "요청 형식이 잘못되었습니다.");
@@ -113,7 +113,7 @@ export const useCreateClubApplicationMutation = () => {
     onError: (error: any) => {
       const status = error.response?.status;
       const message =
-        error.response?.data?.message || error.response?.data?.description;
+        error.response?.data?.description || error.response?.data?.message;
 
       if (status === 400) {
         toast.error(message || "요청 형식이 잘못되었습니다.");
@@ -140,7 +140,7 @@ export const useDeleteClubMemberMutation = (clubId: string) => {
     onError: (error: any) => {
       const status = error.response?.status;
       const message =
-        error.response?.data?.message || error.response?.data?.description;
+        error.response?.data?.description || error.response?.data?.message;
 
       if (status === 403) {
         toast.error(message || "팀원 삭제 권한이 없습니다.");
@@ -171,7 +171,7 @@ export const useRequestAddClubMemberMutation = (clubId: string) => {
     onError: (error: any) => {
       const status = error.response?.status;
       const message =
-        error.response?.data?.message || error.response?.data?.description;
+        error.response?.data?.description || error.response?.data?.message;
 
       if (status === 400) {
         toast.error(message || "요청 형식이 잘못되었습니다.");
