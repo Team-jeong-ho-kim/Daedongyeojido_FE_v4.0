@@ -176,6 +176,9 @@ export interface Alarm {
   id: number;
   title: string;
   content: string;
+  category: "COMMON" | "CLUB_MEMBER_APPLY" | "CLUB_ACCEPTED";
+  clubId?: number;
+  referenceId?: number;
 }
 
 export interface AlarmsResponse {

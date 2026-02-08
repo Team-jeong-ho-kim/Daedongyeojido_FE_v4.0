@@ -3,16 +3,38 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { SkeletonListItem, useDeferredLoading } from "ui";
 import { Pagination } from "@/components/common/Pagination";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
+import {
+  useAcceptMemberRequestMutation,
+  useRejectMemberRequestMutation,
+  useSelectClubSubmissionMutation,
+} from "@/hooks/mutations/useAlarm";
 import { useGetUserAlarmsQuery } from "@/hooks/querys/useApplicationFormQuery";
+import type { AlarmCategory } from "@/types";
 
 export default function NotificationsPage() {
   const [curPage, setCurPage] = useState(1);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: "accept" | "reject";
+    alarmId: number | null;
+    category: AlarmCategory | null;
+  }>({
+    isOpen: false,
+    type: "accept",
+    alarmId: null,
+    category: null,
+  });
   const limit = 5;
 
   const { data: alarmsData, isPending } = useGetUserAlarmsQuery();
+  const { mutate: acceptMemberRequest } = useAcceptMemberRequestMutation();
+  const { mutate: rejectMemberRequest } = useRejectMemberRequestMutation();
+  const { mutate: selectClubSubmission } = useSelectClubSubmissionMutation();
   const showSkeleton = useDeferredLoading(isPending);
 
   // 최신순 정렬 (ID 내림차순)
@@ -23,6 +45,135 @@ export default function NotificationsPage() {
 
   const handleNotificationClick = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const handleAcceptClick = (
+    e: React.MouseEvent,
+    alarmId: number,
+    category: AlarmCategory,
+  ) => {
+    e.stopPropagation();
+    setConfirmModal({
+      isOpen: true,
+      type: "accept",
+      alarmId,
+      category,
+    });
+  };
+
+  const handleRejectClick = (
+    e: React.MouseEvent,
+    alarmId: number,
+    category: AlarmCategory,
+  ) => {
+    e.stopPropagation();
+    setConfirmModal({
+      isOpen: true,
+      type: "reject",
+      alarmId,
+      category,
+    });
+  };
+
+  const handleConfirm = () => {
+    if (confirmModal.alarmId === null || confirmModal.category === null) return;
+
+    const alarm = alarms.find((a) => a.id === confirmModal.alarmId);
+    if (!alarm) return;
+
+    if (confirmModal.category === "CLUB_ACCEPTED") {
+      // 동아리 합격 - 합류/거절 결정
+      if (!alarm.referenceId) {
+        toast.error("지원서 정보를 찾을 수 없습니다.");
+        return;
+      }
+      selectClubSubmission({
+        submissionId: alarm.referenceId,
+        isSelected: confirmModal.type === "accept",
+      });
+    } else if (confirmModal.category === "CLUB_MEMBER_APPLY") {
+      // 팀원 추가 신청 - 수락/거절
+      if (confirmModal.type === "accept") {
+        acceptMemberRequest(confirmModal.alarmId);
+      } else {
+        rejectMemberRequest(confirmModal.alarmId);
+      }
+    }
+
+    setConfirmModal({
+      isOpen: false,
+      type: "accept",
+      alarmId: null,
+      category: null,
+    });
+  };
+
+  const handleCloseModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      type: "accept",
+      alarmId: null,
+      category: null,
+    });
+  };
+
+  const getModalContent = () => {
+    const { type, category } = confirmModal;
+
+    let title = "";
+    let confirmText = "";
+
+    if (category === "CLUB_MEMBER_APPLY") {
+      // 팀원 추가 신청
+      if (type === "accept") {
+        title = "팀원 추가 신청을 수락하시겠습니까?";
+        confirmText = "수락";
+      } else {
+        title = "팀원 추가 신청을 거절하시겠습니까?";
+        confirmText = "거절";
+      }
+    } else if (category === "CLUB_ACCEPTED") {
+      // 동아리 합격
+      if (type === "accept") {
+        title = "동아리에 합류하시겠습니까?";
+        confirmText = "합류";
+      } else {
+        title = "동아리 합류를 거절하시겠습니까?";
+        confirmText = "거절";
+      }
+    }
+
+    return {
+      title,
+      description: "이 작업은 되돌릴 수 없습니다.",
+      confirmText,
+      cancelText: "닫기",
+    };
+  };
+
+  const getActionButtons = (category: AlarmCategory, alarmId: number) => {
+    if (category === "COMMON") return null;
+
+    const acceptText = category === "CLUB_ACCEPTED" ? "합류" : "수락";
+
+    return (
+      <div className="mt-4 flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={(e) => handleRejectClick(e, alarmId, category)}
+          className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-500"
+        >
+          거절
+        </button>
+        <button
+          type="button"
+          onClick={(e) => handleAcceptClick(e, alarmId, category)}
+          className="rounded-lg bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors duration-200 hover:bg-[#d14d4d]"
+        >
+          {acceptText}
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -95,7 +246,7 @@ export default function NotificationsPage() {
                     <div
                       className="transition-all duration-300 ease-in-out"
                       style={{
-                        maxHeight: isExpanded ? "200px" : "0px",
+                        maxHeight: isExpanded ? "300px" : "0px",
                         opacity: isExpanded ? 1 : 0,
                       }}
                     >
@@ -103,6 +254,8 @@ export default function NotificationsPage() {
                         <p className="text-gray-700 text-sm leading-relaxed">
                           {alarm.content}
                         </p>
+                        {isExpanded &&
+                          getActionButtons(alarm.category, alarm.id)}
                       </div>
                     </div>
                   </div>
@@ -123,6 +276,14 @@ export default function NotificationsPage() {
           </>
         )}
       </div>
+
+      <ApplicationConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirm}
+        onBackdropClick={handleCloseModal}
+        {...getModalContent()}
+      />
     </div>
   );
 }
