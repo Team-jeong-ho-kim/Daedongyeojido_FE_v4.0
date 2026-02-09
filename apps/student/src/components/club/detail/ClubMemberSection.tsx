@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MemberItem, Pagination } from "@/components";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { useDeleteClubMemberMutation } from "@/hooks/mutations/useClub";
 import type { ClubMember } from "@/types";
 import { AddMemberSection } from "./AddMemberSection";
@@ -28,6 +29,15 @@ export function ClubMemberSection({
   onAddMemberRequest,
 }: ClubMemberSectionProps) {
   const [memberPage, setMemberPage] = useState(1);
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    userId: number | null;
+    userName: string;
+  }>({
+    isOpen: false,
+    userId: null,
+    userName: "",
+  });
   const memberLimit = 8;
   const { mutate: deleteClubMemberMutate } =
     useDeleteClubMemberMutation(clubId);
@@ -36,6 +46,33 @@ export function ClubMemberSection({
     (memberPage - 1) * memberLimit,
     memberPage * memberLimit,
   );
+
+  const handleDeleteClick = (userId: number, userName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      userId,
+      userName,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.userId) {
+      deleteClubMemberMutate(deleteModal.userId);
+    }
+    setDeleteModal({
+      isOpen: false,
+      userId: null,
+      userName: "",
+    });
+  };
+
+  const handleCloseModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      userId: null,
+      userName: "",
+    });
+  };
 
   return (
     <section className="flex flex-col gap-4 md:flex-row md:gap-0">
@@ -74,7 +111,7 @@ export function ClubMemberSection({
               key={`${member.userId}-${member.userName}`}
               {...member}
               canDelete={isLeader}
-              onDelete={() => deleteClubMemberMutate(member.userId)}
+              onDelete={() => handleDeleteClick(member.userId, member.userName)}
             />
           ))}
         </div>
@@ -88,6 +125,17 @@ export function ClubMemberSection({
           />
         )}
       </div>
+
+      <ApplicationConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        onBackdropClick={handleCloseModal}
+        title={`${deleteModal.userName} 팀원을 삭제하시겠습니까?`}
+        description="이 작업은 되돌릴 수 없습니다."
+        confirmText="삭제"
+        cancelText="취소"
+      />
     </section>
   );
 }

@@ -9,8 +9,17 @@ export const useLoginMutation = () => {
     mutationFn: ({ accountId, password }) => login({ accountId, password }),
     onSuccess: (data) => {
       toast.success(`${data.userName}님, 환영합니다!`);
+
+      // 온보딩 필요 여부 체크 (이름, 학번 제외하고 하나라도 입력되어 있으면 완료)
+      const hasAnyInfo =
+        data.introduction ||
+        (data.major && data.major.length > 0) ||
+        (data.link && data.link.length > 0) ||
+        data.profileImage;
+      const needsOnboarding = !hasAnyInfo;
+
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = needsOnboarding ? "/onboarding" : "/";
       }, 1200);
     },
     onError: (error: any) => {
