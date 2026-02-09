@@ -179,6 +179,7 @@ export interface Alarm {
   category: "COMMON" | "CLUB_MEMBER_APPLY" | "CLUB_ACCEPTED";
   clubId?: number;
   referenceId?: number;
+  isExecuted?: boolean;
 }
 
 export interface AlarmsResponse {

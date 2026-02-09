@@ -151,8 +151,13 @@ export default function NotificationsPage() {
     };
   };
 
-  const getActionButtons = (category: AlarmCategory, alarmId: number) => {
+  const getActionButtons = (
+    category: AlarmCategory,
+    alarmId: number,
+    isExecuted?: boolean,
+  ) => {
     if (category === "COMMON") return null;
+    if (isExecuted) return null;
 
     const acceptText = category === "CLUB_ACCEPTED" ? "합류" : "수락";
 
@@ -255,7 +260,11 @@ export default function NotificationsPage() {
                           {alarm.content}
                         </p>
                         {isExpanded &&
-                          getActionButtons(alarm.category, alarm.id)}
+                          getActionButtons(
+                            alarm.category,
+                            alarm.id,
+                            alarm.isExecuted,
+                          )}
                       </div>
                     </div>
                   </div>

@@ -7,6 +7,7 @@ export interface ClubAlarm {
   category: AlarmCategory;
   clubId?: number;
   referenceId?: number;
+  isExecuted?: boolean;
 }
 
 export interface ClubAlarmsResponse {

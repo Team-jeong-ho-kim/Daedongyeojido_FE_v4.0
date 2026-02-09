@@ -11,6 +11,7 @@ export const acceptMemberRequest = async (alarmId: number) => {
   const response = await apiClient.patch("/users/members", {
     isApproved: true,
     alarmId: alarmId,
+    isExecuted: true,
   });
   return response.data;
 };
@@ -19,6 +20,7 @@ export const rejectMemberRequest = async (alarmId: number) => {
   const response = await apiClient.patch("/users/members", {
     isApproved: false,
     alarmId: alarmId,
+    isExecuted: true,
   });
   return response.data;
 };
