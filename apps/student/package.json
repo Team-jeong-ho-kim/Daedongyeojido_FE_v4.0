@@ -6,27 +6,32 @@
     "dev": "dotenv -e ../../.env.local -- next dev --port 3001",
     "dev:prod": "dotenv -e ../../.env.production -- next dev --port 3001",
     "build": "dotenv -e ../../.env.production -- next build",
+    "pages:build": "dotenv -e ../../.env.production -- npx @cloudflare/next-on-pages@1",
+    "preview": "npx wrangler pages dev .vercel/output/static --port 3001",
+    "deploy": "npx wrangler pages deploy .vercel/output/static",
     "start": "next start --port 3001",
     "lint": "../../node_modules/.bin/biome check .",
     "format": "../../node_modules/.bin/biome format --write ."
   },
   "dependencies": {
-    "ui": "workspace:*",
-    "config-tailwind": "workspace:*",
-    "shared": "workspace:*",
-    "utils": "workspace:*",
     "@tanstack/react-query": "^5.62.14",
-    "sonner": "^2.0.7",
+    "config-tailwind": "workspace:*",
+    "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.6"
+    "shared": "workspace:*",
+    "sonner": "^2.0.7",
+    "ui": "workspace:*",
+    "utils": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@cloudflare/next-on-pages": "^1.13.16",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vercel": "^50.15.1"
   }
 }
