@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, FieldSelector, FormField, TextArea, TextInput } from "ui";
