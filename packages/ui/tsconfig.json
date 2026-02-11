@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["dom", "dom.iterable", "ES2020"],
-    "types": ["react", "react-dom"],
+    "types": ["react", "react-dom", "node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,

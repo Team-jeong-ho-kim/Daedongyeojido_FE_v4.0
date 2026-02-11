@@ -4,11 +4,11 @@ import {
   useRejectMemberRequestMutation,
   useSelectClubSubmissionMutation,
 } from "@/hooks/mutations/useAlarm";
-import type { Alarm } from "@/types";
+import type { ClubAlarm } from "@/types";
 import type { ConfirmModalState } from "../constants/notifications";
 
 type UseNotificationActionsProps = {
-  alarms: Alarm[];
+  alarms: ClubAlarm[];
   closeModal: () => void;
 };
 

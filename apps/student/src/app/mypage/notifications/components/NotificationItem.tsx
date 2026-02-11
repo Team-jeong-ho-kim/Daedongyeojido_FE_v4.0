@@ -1,9 +1,9 @@
 import Image from "next/image";
-import type { Alarm, AlarmCategory } from "@/types";
+import type { AlarmCategory, ClubAlarm } from "@/types";
 import type { ActionType } from "../constants/notifications";
 
 type NotificationItemProps = {
-  alarm: Alarm;
+  alarm: ClubAlarm;
   isExpanded: boolean;
   onToggle: () => void;
   onAction: (

@@ -8,4 +8,8 @@ export interface LoginResponse {
   refreshToken: string;
   classNumber: string;
   userName: string;
+  introduction?: string;
+  major?: string;
+  link?: string;
+  profileImage?: string;
 }
