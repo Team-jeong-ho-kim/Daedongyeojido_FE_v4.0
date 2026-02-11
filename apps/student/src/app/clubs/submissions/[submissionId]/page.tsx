@@ -145,6 +145,33 @@ export default function SubmissionDetailPage({
       setLocalPassStatus(isPassed ? "ACCEPTED" : "REJECTED");
     } catch (error) {
       console.error("합격/탈락 처리 실패:", error);
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { status: number; data?: { message?: string } };
+        };
+
+        const status = axiosError.response?.status;
+        const message = axiosError.response?.data?.message;
+
+        if (status === 404 && message?.includes("발표시간")) {
+          toast.error(
+            "발표시간이 설정되지 않았습니다. 먼저 발표시간을 설정해주세요.",
+          );
+          return;
+        }
+
+        if (status === 403) {
+          toast.error("합격/탈락 처리 권한이 없습니다.");
+          return;
+        }
+
+        if (status === 404) {
+          toast.error("존재하지 않는 지원서입니다.");
+          return;
+        }
+      }
+
       toast.error("처리에 실패했습니다. 다시 시도해주세요.");
     }
   };

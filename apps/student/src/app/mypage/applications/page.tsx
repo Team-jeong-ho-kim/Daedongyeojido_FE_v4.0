@@ -37,7 +37,7 @@ export default function MyApplicationsPage() {
   };
 
   const getStatusText = (status: "WRITING" | "SUBMITTED") => {
-    return status === "WRITING" ? "작성중" : "제출완료";
+    return status === "WRITING" ? "작성중" : "작성완료";
   };
 
   const getStatusColor = (status: "WRITING" | "SUBMITTED") => {

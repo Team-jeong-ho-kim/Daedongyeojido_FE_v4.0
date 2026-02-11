@@ -29,9 +29,12 @@ export const rejectMemberRequest = async (alarmId: number) => {
 export const selectClubSubmission = async (
   submissionId: number,
   isSelected: boolean,
+  alarmId: number,
 ) => {
   const response = await apiClient.patch(`/users/submissions/${submissionId}`, {
     isSelected: isSelected,
+    alarmId: alarmId,
+    isExecuted: true,
   });
   return response.data;
 };

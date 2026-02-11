@@ -68,10 +68,12 @@ export const useSelectClubSubmissionMutation = () => {
     mutationFn: ({
       submissionId,
       isSelected,
+      alarmId,
     }: {
       submissionId: number;
       isSelected: boolean;
-    }) => selectClubSubmission(submissionId, isSelected),
+      alarmId: number;
+    }) => selectClubSubmission(submissionId, isSelected, alarmId),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["userAlarms"] });
       toast.success(

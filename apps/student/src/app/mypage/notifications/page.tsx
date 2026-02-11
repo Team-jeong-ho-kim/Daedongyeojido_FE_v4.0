@@ -90,6 +90,7 @@ export default function NotificationsPage() {
       selectClubSubmission({
         submissionId: alarm.referenceId,
         isSelected: confirmModal.type === "accept",
+        alarmId: confirmModal.alarmId,
       });
     } else if (confirmModal.category === "CLUB_MEMBER_APPLY") {
       // 팀원 추가 신청 - 수락/거절
