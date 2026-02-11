@@ -13,3 +13,6 @@ export interface ClubAlarm {
 export interface ClubAlarmsResponse {
   alarms: ClubAlarm[];
 }
+
+// Alias for convenience
+export type Alarm = ClubAlarm;
