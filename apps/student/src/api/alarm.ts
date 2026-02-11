@@ -11,7 +11,6 @@ export const acceptMemberRequest = async (alarmId: number) => {
   const response = await apiClient.patch("/users/members", {
     isApproved: true,
     alarmId: alarmId,
-    isExecuted: true,
   });
   return response.data;
 };
@@ -20,21 +19,18 @@ export const rejectMemberRequest = async (alarmId: number) => {
   const response = await apiClient.patch("/users/members", {
     isApproved: false,
     alarmId: alarmId,
-    isExecuted: true,
   });
   return response.data;
 };
 
 // 동아리 합격 후 합류/거절 결정 (CLUB_ACCEPTED)
 export const selectClubSubmission = async (
-  submissionId: number,
   isSelected: boolean,
   alarmId: number,
 ) => {
-  const response = await apiClient.patch(`/users/submissions/${submissionId}`, {
+  const response = await apiClient.patch("/users/submissions", {
     isSelected: isSelected,
     alarmId: alarmId,
-    isExecuted: true,
   });
   return response.data;
 };

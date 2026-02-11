@@ -66,14 +66,12 @@ export const useSelectClubSubmissionMutation = () => {
 
   return useMutation({
     mutationFn: ({
-      submissionId,
       isSelected,
       alarmId,
     }: {
-      submissionId: number;
       isSelected: boolean;
       alarmId: number;
-    }) => selectClubSubmission(submissionId, isSelected, alarmId),
+    }) => selectClubSubmission(isSelected, alarmId),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["userAlarms"] });
       toast.success(
@@ -92,7 +90,9 @@ export const useSelectClubSubmissionMutation = () => {
       } else if (status === 404) {
         toast.error(message || "지원서를 찾을 수 없습니다.");
       } else {
-        toast.error("처리에 실패했습니다. 다시 시도해주세요.");
+        toast.error(
+          `처리에 실패했습니다. ${message ? `(${message})` : "다시 시도해주세요."}`,
+        );
       }
     },
   });

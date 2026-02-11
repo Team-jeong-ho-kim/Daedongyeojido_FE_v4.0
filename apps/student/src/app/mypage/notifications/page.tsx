@@ -76,19 +76,20 @@ export default function NotificationsPage() {
   };
 
   const handleConfirm = () => {
-    if (confirmModal.alarmId === null || confirmModal.category === null) return;
+    if (confirmModal.alarmId === null || confirmModal.category === null) {
+      return;
+    }
 
     const alarm = alarms.find((a) => a.id === confirmModal.alarmId);
-    if (!alarm) return;
+
+    if (!alarm) {
+      toast.error("알림 정보를 찾을 수 없습니다.");
+      return;
+    }
 
     if (confirmModal.category === "CLUB_ACCEPTED") {
       // 동아리 합격 - 합류/거절 결정
-      if (!alarm.referenceId) {
-        toast.error("지원서 정보를 찾을 수 없습니다.");
-        return;
-      }
       selectClubSubmission({
-        submissionId: alarm.referenceId,
         isSelected: confirmModal.type === "accept",
         alarmId: confirmModal.alarmId,
       });
