@@ -6,6 +6,9 @@
     "dev": "dotenv -e ../../.env.local -- next dev",
     "dev:prod": "dotenv -e ../../.env.production -- next dev",
     "build": "dotenv -e ../../.env.production -- next build",
+    "pages:build": "dotenv -e ../../.env.production -- npx @cloudflare/next-on-pages@1",
+    "preview": "npx wrangler pages dev .vercel/output/static",
+    "deploy": "npx wrangler pages deploy .vercel/output/static",
     "start": "next start",
     "lint": "../../node_modules/.bin/biome check .",
     "format": "../../node_modules/.bin/biome format --write ."
@@ -26,6 +29,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
