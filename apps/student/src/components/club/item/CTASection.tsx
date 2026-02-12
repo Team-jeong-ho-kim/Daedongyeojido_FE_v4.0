@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "ui";
 
 interface CTASectionProps {
@@ -6,6 +7,7 @@ interface CTASectionProps {
   subtitle: string;
   description: string;
   buttonText: string;
+  buttonHref: string;
 }
 
 export default function CTASection({
@@ -13,6 +15,7 @@ export default function CTASection({
   subtitle,
   description,
   buttonText,
+  buttonHref,
 }: CTASectionProps) {
   return (
     <div className="flex flex-col items-center gap-10 px-6 md:flex-row md:justify-between md:px-20 xl:px-40">
@@ -25,9 +28,11 @@ export default function CTASection({
           {subtitle}
         </p>
         <p className="mb-10 text-gray-600 md:mb-14">{description}</p>
-        <Button className="rounded-xl bg-primary-50 px-6 py-4 text-base text-primary-500 hover:bg-primary-100 md:px-7 md:py-6 md:text-[18px]">
-          {buttonText}
-        </Button>
+        <Link href={buttonHref}>
+          <Button className="rounded-xl bg-primary-50 px-6 py-4 text-base text-primary-500 hover:bg-primary-100 md:px-7 md:py-6 md:text-[18px]">
+            {buttonText}
+          </Button>
+        </Link>
       </div>
 
       {/* 이미지 영역 */}

@@ -86,6 +86,7 @@ export default function AnnouncementsPage() {
             subtitle="아래 버튼을 눌러 다양한 동아리를 탐색해보세요!"
             description="아래 버튼을 눌러 나에게 맞는 동아리를 찾아보세요!"
             buttonText="동아리 찾아보기"
+            buttonHref="/clubs"
           />
         </div>
       </div>

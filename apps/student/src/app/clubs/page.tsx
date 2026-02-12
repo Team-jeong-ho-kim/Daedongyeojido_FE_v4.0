@@ -56,10 +56,11 @@ export default function ClubsPage() {
         {/* CTA 섹션 */}
         <div className="mt-32 mb-32">
           <CTASection
-            title="발견한 동아리에 지원하고 싶나요?"
-            subtitle="아래 버튼을 눌러 바로 지원하는 페이지로 이동해보세요!"
-            description="아래 버튼을 눌러 지원해보세요!"
-            buttonText="지원하러가기"
+            title="발견한 동아리의 공고를 찾아보고 싶나요?"
+            subtitle="아래 버튼을 눌러 여러 공고 페이지로 이동해보세요!"
+            description="아래 버튼을 눌러 찾아보세요!"
+            buttonText="공고 보러가기"
+            buttonHref="/announcements"
           />
         </div>
       </div>

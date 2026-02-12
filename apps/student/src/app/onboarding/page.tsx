@@ -212,7 +212,6 @@ export default function OnboardingPage() {
               placeholder="한줄 소개를 입력해주세요!"
               autoResize={true}
               maxHeight={200}
-              maxLength={30}
               error={errors.introduction}
             />
           </FormField>
