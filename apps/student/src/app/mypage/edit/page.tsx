@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { FieldSelector, ImageUpload, LinkInput, TextInput } from "ui";
 import { FIELDS } from "@/constants/club";
@@ -33,7 +33,20 @@ export default function MyPageEdit() {
     userInfo?.introduction || "",
   );
 
-  const handleImageChange = (file: File | null) => {
+  // userInfo 변경 시 상태 업데이트
+  useEffect(() => {
+    if (userInfo) {
+      setLinks(
+        Array.isArray(userInfo.link)
+          ? userInfo.link.map((url) => ({ id: crypto.randomUUID(), url }))
+          : [],
+      );
+      setSelectedFields(Array.isArray(userInfo.major) ? userInfo.major : []);
+      setIntroduction(userInfo.introduction || "");
+    }
+  }, [userInfo]);
+
+  const handleImageChange = (file: File | null, _previewUrl: string | null) => {
     setProfileImage(file);
   };
 
@@ -87,7 +100,10 @@ export default function MyPageEdit() {
             <h2 className="mb-4 font-bold text-xl tracking-tight">
               프로필 사진
             </h2>
-            <ImageUpload onFileChange={handleImageChange} />
+            <ImageUpload
+              onFileChange={handleImageChange}
+              defaultImageUrl={userInfo?.profileImage || null}
+            />
           </div>
 
           <div className="h-px w-full bg-gray-200"></div>
