@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import {
@@ -20,6 +21,7 @@ interface LinkItem {
 }
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const userInfo = useUserStore((state) => state.userInfo);
   const updateMyInfoMutation = useUpdateMyInfoMutation();
 
@@ -29,6 +31,55 @@ export default function OnboardingPage() {
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [introduction, setIntroduction] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const isSubmittingRef = useRef(false);
+
+  // 페이지 이탈 방지
+  useEffect(() => {
+    // 입력이 시작되었거나 아직 제출하지 않은 경우 이탈 방지
+    const hasAnyInput =
+      profileFile !== null ||
+      phone.trim() !== "" ||
+      links.length > 0 ||
+      selectedFields.length > 0 ||
+      introduction.trim() !== "";
+
+    const shouldPreventLeave = hasAnyInput && !isSubmittingRef.current;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (shouldPreventLeave) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      if (shouldPreventLeave) {
+        const target = e.target as HTMLElement;
+        const link = target.closest("a");
+        if (link?.href && !link.href.includes("/onboarding")) {
+          e.preventDefault();
+          e.stopPropagation();
+          const confirmLeave = window.confirm(
+            "입력한 내용이 저장되지 않습니다. 페이지를 떠나시겠습니까?",
+          );
+          if (confirmLeave) {
+            isSubmittingRef.current = true;
+            router.push(new URL(link.href).pathname);
+          }
+        }
+      }
+    };
+
+    if (shouldPreventLeave) {
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      document.addEventListener("click", handleClick, true);
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", handleClick, true);
+    };
+  }, [profileFile, phone, links, selectedFields, introduction, router]);
 
   const handleProfileChange = (
     file: File | null,
@@ -137,6 +188,7 @@ export default function OnboardingPage() {
 
     const cleanedPhone = phone.replace(/-/g, "");
 
+    isSubmittingRef.current = true;
     updateMyInfoMutation.mutate({
       introduction,
       phoneNumber: cleanedPhone || undefined,
