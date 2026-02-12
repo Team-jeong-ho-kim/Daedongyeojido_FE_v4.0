@@ -122,7 +122,7 @@ export default function MyPageEdit() {
             <TextInput
               value={introduction}
               onChange={setIntroduction}
-              placeholder="心臓を捧げよ!"
+              placeholder="한 줄 소개 문구를 입력해주세요."
             />
           </div>
 
