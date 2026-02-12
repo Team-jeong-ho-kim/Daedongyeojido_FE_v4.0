@@ -31,7 +31,7 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-    if (originalRequest.url?.includes("/auth/reissue")) {
+    if (originalRequest.url?.includes("/auth/login") || originalRequest.url?.includes("/auth/signup") || originalRequest.url?.includes("/auth/reissue")) {
       return Promise.reject(error);
     }
     if (error.response?.status === 401 && !originalRequest._retry) {

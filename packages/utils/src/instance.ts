@@ -28,7 +28,12 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (originalRequest.url?.includes("/auth/reissue")) {
+    // 로그인, 회원가입, 토큰 재발급 요청은 401 인터셉터를 건너뜀
+    if (
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/signup") ||
+      originalRequest.url?.includes("/auth/reissue")
+    ) {
       return Promise.reject(error);
     }
 

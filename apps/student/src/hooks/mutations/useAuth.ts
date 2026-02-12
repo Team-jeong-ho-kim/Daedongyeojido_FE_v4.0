@@ -24,9 +24,10 @@ export const useLoginMutation = () => {
     },
     onError: (error: any) => {
       const status = error.response?.status;
-      const serverMessage = error.response?.data?.message || error.response?.data?.description;
+      const serverMessage =
+        error.response?.data?.message || error.response?.data?.description;
 
-      // 네트워크 에러 (인터넷 연결 끊김, 서버 접속 불가 등)
+      // 네트워크 에러
       if (!error.response) {
         toast.error("네트워크 연결을 확인해주세요.");
         return;
@@ -53,12 +54,16 @@ export const useLoginMutation = () => {
           toast.error("존재하지 않는 계정입니다.");
           break;
         case 429:
-          toast.error("로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.");
+          toast.error(
+            "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.",
+          );
           break;
         case 500:
         case 502:
         case 503:
-          toast.error("서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+          toast.error(
+            "서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
+          );
           break;
         case 504:
           toast.error("서버 응답 시간이 초과되었습니다. 다시 시도해주세요.");
