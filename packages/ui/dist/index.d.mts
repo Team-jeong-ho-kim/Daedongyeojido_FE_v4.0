@@ -74,8 +74,10 @@ interface LinkInputProps {
     onLinksChange: (links: LinkItem[]) => void;
     placeholder?: string;
     error?: string;
+    maxLinks?: number;
+    onMaxLimitReached?: () => void;
 }
-declare function LinkInput({ links, onLinksChange, placeholder, error: externalError, }: LinkInputProps): react_jsx_runtime.JSX.Element;
+declare function LinkInput({ links, onLinksChange, placeholder, error: externalError, maxLinks, onMaxLimitReached, }: LinkInputProps): react_jsx_runtime.JSX.Element;
 
 interface TextAreaProps {
     value: string;

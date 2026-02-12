@@ -782,7 +782,9 @@ function LinkInput({
   links,
   onLinksChange,
   placeholder = "\uB3D9\uC544\uB9AC \uAD00\uB828 \uB9C1\uD06C\uB97C \uCCA8\uBD80\uD574\uC8FC\uC138\uC694.",
-  error: externalError
+  error: externalError,
+  maxLinks = 5,
+  onMaxLimitReached
 }) {
   const [currentLink, setCurrentLink] = (0, import_react3.useState)("");
   const [internalError, setInternalError] = (0, import_react3.useState)("");
@@ -800,6 +802,10 @@ function LinkInput({
       e.preventDefault();
       const trimmedLink = currentLink.trim();
       if (!trimmedLink) return;
+      if (links.length >= maxLinks) {
+        onMaxLimitReached?.();
+        return;
+      }
       if (!isValidUrl(trimmedLink)) {
         setInternalError(
           "\uC62C\uBC14\uB978 \uB9C1\uD06C \uD615\uC2DD\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694. (\uC608: https://example.com)"

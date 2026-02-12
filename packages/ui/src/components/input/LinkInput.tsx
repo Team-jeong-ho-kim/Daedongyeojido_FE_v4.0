@@ -16,6 +16,8 @@ interface LinkInputProps {
   onLinksChange: (links: LinkItem[]) => void;
   placeholder?: string;
   error?: string;
+  maxLinks?: number;
+  onMaxLimitReached?: () => void;
 }
 
 export default function LinkInput({
@@ -23,6 +25,8 @@ export default function LinkInput({
   onLinksChange,
   placeholder = "동아리 관련 링크를 첨부해주세요.",
   error: externalError,
+  maxLinks = 5,
+  onMaxLimitReached,
 }: LinkInputProps) {
   const [currentLink, setCurrentLink] = useState("");
   const [internalError, setInternalError] = useState("");
@@ -43,6 +47,11 @@ export default function LinkInput({
       const trimmedLink = currentLink.trim();
 
       if (!trimmedLink) return;
+
+      if (links.length >= maxLinks) {
+        onMaxLimitReached?.();
+        return;
+      }
 
       if (!isValidUrl(trimmedLink)) {
         setInternalError(
