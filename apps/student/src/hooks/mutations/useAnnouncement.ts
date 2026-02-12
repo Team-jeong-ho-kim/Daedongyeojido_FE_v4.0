@@ -7,6 +7,7 @@ import {
   publishAnnouncement,
   updateAnnouncement,
 } from "@/api/announcement";
+import { getErrorMessage } from "@/lib/error";
 import type { AnnouncementCreate } from "@/types/announcement";
 
 export const useCreateAnnouncementMutation = () => {
@@ -20,10 +21,11 @@ export const useCreateAnnouncementMutation = () => {
         router.push("/announcements");
       }, 1500);
     },
-    onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.description ||
-        "공고 생성에 실패했습니다. 다시 시도해주세요.";
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "공고 생성에 실패했습니다. 다시 시도해주세요.",
+      );
       toast.error(errorMessage);
     },
   });
@@ -41,18 +43,12 @@ export const useUpdateAnnouncementMutation = (announcementId: string) => {
         router.push(`/announcements/${announcementId}`);
       }, 1500);
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-
-      if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error("공고 수정 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error("존재하지 않는 공고입니다.");
-      } else {
-        toast.error("공고 수정에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "공고 수정에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -68,16 +64,12 @@ export const useDeleteAnnouncementMutation = () => {
         router.push("/announcements");
       }, 1500);
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-
-      if (status === 403) {
-        toast.error("공고 삭제 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error("존재하지 않는 공고입니다.");
-      } else {
-        toast.error("공고 삭제에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "공고 삭제에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -89,18 +81,12 @@ export const usePublishAnnouncementMutation = (announcementId: string) => {
     onSuccess: () => {
       toast.success("공고가 게시되었습니다");
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-
-      if (status === 400) {
-        toast.error("요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error("공고 게시 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error("존재하지 않는 공고 또는 지원서 폼입니다.");
-      } else {
-        toast.error("공고 게시에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "공고 게시에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };

@@ -14,6 +14,7 @@ import {
 } from "@/api/applicationForm";
 import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
 import { InterviewScheduleViewModal } from "@/components/modal/InterviewScheduleViewModal";
+import { getErrorMessage } from "@/lib/error";
 import type { InterviewScheduleDetail, SubmissionDetail } from "@/types";
 
 interface SubmissionDetailPageProps {
@@ -49,8 +50,11 @@ export default function SubmissionDetailPage({
         setSubmission(data);
         setHasSchedule(data.hasInterviewSchedule);
       } catch (error) {
-        console.error("지원내역 조회 실패:", error);
-        toast.error("지원내역을 불러올 수 없습니다.");
+        const errorMessage = getErrorMessage(
+          error,
+          "지원내역을 불러올 수 없습니다.",
+        );
+        toast.error(errorMessage);
         router.back();
       } finally {
         setIsLoading(false);
@@ -76,32 +80,11 @@ export default function SubmissionDetailPage({
       setHasSchedule(true);
       setShowSetScheduleModal(false);
     } catch (error) {
-      console.error("면접 일정 설정 실패:", error);
-
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { status: number; data?: { description?: string } };
-        };
-
-        // 400 에러 (유효성 검증 실패) 처리
-        if (axiosError.response?.status === 400) {
-          const errorMessage =
-            axiosError.response.data?.description ||
-            "입력값이 올바르지 않습니다.";
-          toast.error(errorMessage);
-          return;
-        }
-
-        // 409 에러 (이미 존재) 처리
-        if (axiosError.response?.status === 409) {
-          toast.error("이미 면접 일정이 존재합니다.");
-          setHasSchedule(true);
-          setShowSetScheduleModal(false);
-          return;
-        }
-      }
-
-      toast.error("면접 일정 설정에 실패했습니다.");
+      const errorMessage = getErrorMessage(
+        error,
+        "면접 일정 설정에 실패했습니다.",
+      );
+      toast.error(errorMessage);
     }
   };
 
@@ -118,8 +101,11 @@ export default function SubmissionDetailPage({
       setScheduleDetail(data);
       setShowViewScheduleModal(true);
     } catch (error) {
-      console.error("면접 일정 조회 실패:", error);
-      toast.error("면접 일정을 불러올 수 없습니다.");
+      const errorMessage = getErrorMessage(
+        error,
+        "면접 일정을 불러올 수 없습니다.",
+      );
+      toast.error(errorMessage);
     }
   };
 
@@ -131,8 +117,8 @@ export default function SubmissionDetailPage({
         submission.applicantId.toString(),
       );
       setScheduleDetail(data);
-    } catch (error) {
-      console.error("면접 일정 재조회 실패:", error);
+    } catch {
+      // 재조회 실패는 무시 (UI에 영향 없음)
     }
   };
 
@@ -146,35 +132,11 @@ export default function SubmissionDetailPage({
       toast.success(isPassed ? "합격 처리되었습니다." : "탈락 처리되었습니다.");
       setLocalPassStatus(isPassed ? "ACCEPTED" : "REJECTED");
     } catch (error) {
-      console.error("합격/탈락 처리 실패:", error);
-
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { status: number; data?: { message?: string } };
-        };
-
-        const status = axiosError.response?.status;
-        const message = axiosError.response?.data?.message;
-
-        if (status === 404 && message?.includes("발표시간")) {
-          toast.error(
-            "발표시간이 설정되지 않았습니다. 먼저 발표시간을 설정해주세요.",
-          );
-          return;
-        }
-
-        if (status === 403) {
-          toast.error("합격/탈락 처리 권한이 없습니다.");
-          return;
-        }
-
-        if (status === 404) {
-          toast.error("존재하지 않는 지원서입니다.");
-          return;
-        }
-      }
-
-      toast.error("처리에 실패했습니다. 다시 시도해주세요.");
+      const errorMessage = getErrorMessage(
+        error,
+        "처리에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     }
   };
 

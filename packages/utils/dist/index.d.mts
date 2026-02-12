@@ -19,9 +19,23 @@ interface LoginResponse {
     role: "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
 }
 
+interface ApiErrorResponse {
+    description: string;
+    message: string;
+    status: number;
+    timestamp: string;
+}
+declare class ApiError extends Error {
+    readonly description: string;
+    readonly status: number;
+    readonly timestamp: string;
+    readonly originalMessage: string;
+    constructor(description: string, status: number, timestamp: string, originalMessage: string);
+}
+
 declare const getUserInfo: () => {
     classNumber: string | null;
     userName: string | null;
 };
 
-export { type LoginRequest, type LoginResponse, apiClient, getUserInfo };
+export { ApiError, type ApiErrorResponse, type LoginRequest, type LoginResponse, apiClient, getUserInfo };

@@ -30,6 +30,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  ApiError: () => ApiError,
   apiClient: () => apiClient,
   getUserInfo: () => getUserInfo
 });
@@ -42,6 +43,18 @@ var import_axios = __toESM(require("axios"));
 var BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 var USER_DOMAIN = process.env.NEXT_PUBLIC_USER_URL;
 var NEXT_PUBLIC_ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL;
+
+// src/types/error.ts
+var ApiError = class extends Error {
+  constructor(description, status, timestamp, originalMessage) {
+    super(description);
+    this.description = description;
+    this.status = status;
+    this.timestamp = timestamp;
+    this.originalMessage = originalMessage;
+    this.name = "ApiError";
+  }
+};
 
 // src/instance.ts
 var apiClient = import_axios.default.create({
@@ -68,8 +81,22 @@ apiClient.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    const createApiError = (err) => {
+      if (import_axios.default.isAxiosError(err) && err.response?.data) {
+        const errorData = err.response.data;
+        if (errorData.description && errorData.status && errorData.timestamp) {
+          return new ApiError(
+            errorData.description,
+            errorData.status,
+            errorData.timestamp,
+            errorData.message || ""
+          );
+        }
+      }
+      return err;
+    };
     if (originalRequest.url?.includes("/auth/login") || originalRequest.url?.includes("/auth/signup") || originalRequest.url?.includes("/auth/reissue")) {
-      return Promise.reject(error);
+      return Promise.reject(createApiError(error));
     }
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -80,7 +107,7 @@ apiClient.interceptors.response.use(
           if (typeof window !== "undefined") {
             window.location.href = "/login";
           }
-          return Promise.reject(error);
+          return Promise.reject(createApiError(error));
         }
         const response = await import_axios.default.patch(
           `${BASE_URL}/auth/reissue`,
@@ -104,10 +131,10 @@ apiClient.interceptors.response.use(
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }
-        return Promise.reject(refreshError);
+        return Promise.reject(createApiError(refreshError));
       }
     }
-    return Promise.reject(error);
+    return Promise.reject(createApiError(error));
   }
 );
 
@@ -121,6 +148,7 @@ var getUserInfo = () => {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  ApiError,
   apiClient,
   getUserInfo
 });

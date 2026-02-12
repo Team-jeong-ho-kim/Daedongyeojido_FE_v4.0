@@ -8,6 +8,7 @@ import {
   requestAddClubMember,
   updateClub,
 } from "@/api/club";
+import { getErrorMessage } from "@/lib/error";
 import type { ClubUpdate } from "@/types";
 
 export const useUpdateClubMutation = (clubId: string) => {
@@ -28,20 +29,12 @@ export const useUpdateClubMutation = (clubId: string) => {
       queryClient.invalidateQueries({ queryKey: ["clubs"] });
       toast.success("변경 사항이 저장되었습니다.");
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-      const message =
-        error.response?.data?.description || error.response?.data?.message;
-
-      if (status === 400) {
-        toast.error(message || "요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error(message || "수정 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error(message || "존재하지 않는 동아리입니다.");
-      } else {
-        toast.error("동아리 수정에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "동아리 수정에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -57,20 +50,12 @@ export const useDissolveClubMutation = () => {
         router.push("/clubs");
       }, 1500);
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-      const message =
-        error.response?.data?.description || error.response?.data?.message;
-
-      if (status === 400) {
-        toast.error(message || "요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error(message || "해체 신청 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error(message || "동아리를 찾을 수 없습니다.");
-      } else {
-        toast.error("동아리 해체 신청에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "동아리 해체 신청에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -110,20 +95,12 @@ export const useCreateClubApplicationMutation = () => {
         router.push("/mypage/notifications");
       }, 1500);
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-      const message =
-        error.response?.data?.description || error.response?.data?.message;
-
-      if (status === 400) {
-        toast.error(message || "요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error(message || "동아리 개설 권한이 없습니다.");
-      } else if (status === 409) {
-        toast.error(message || "중복된 요청입니다.");
-      } else {
-        toast.error("동아리 개설 신청에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "동아리 개설 신청에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -137,18 +114,12 @@ export const useDeleteClubMemberMutation = (clubId: string) => {
       queryClient.invalidateQueries({ queryKey: ["club", clubId] });
       toast.success("팀원이 삭제되었습니다.");
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-      const message =
-        error.response?.data?.description || error.response?.data?.message;
-
-      if (status === 403) {
-        toast.error(message || "팀원 삭제 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error(message || "존재하지 않는 팀원입니다.");
-      } else {
-        toast.error("팀원 삭제에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "팀원 삭제에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -168,22 +139,12 @@ export const useRequestAddClubMemberMutation = (clubId: string) => {
       queryClient.invalidateQueries({ queryKey: ["club", clubId] });
       toast.success("팀원 추가 신청이 완료되었습니다");
     },
-    onError: (error: any) => {
-      const status = error.response?.status;
-      const message =
-        error.response?.data?.description || error.response?.data?.message;
-
-      if (status === 400) {
-        toast.error(message || "요청 형식이 잘못되었습니다.");
-      } else if (status === 403) {
-        toast.error(message || "팀원 추가 권한이 없습니다.");
-      } else if (status === 404) {
-        toast.error(message || "존재하지 않는 팀원입니다.");
-      } else if (status === 409) {
-        toast.error(message || "중복된 요청입니다.");
-      } else {
-        toast.error("팀원 추가 신청에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "팀원 추가 신청에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };

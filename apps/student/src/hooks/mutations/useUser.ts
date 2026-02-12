@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { updateMyInfo, updateProfile } from "@/api/user";
+import { getErrorMessage } from "@/lib/error";
 import type { UpdateMyInfoRequest, UpdateProfileRequest } from "@/types";
 
 export const useUpdateMyInfoMutation = () => {
@@ -20,15 +21,12 @@ export const useUpdateMyInfoMutation = () => {
         router.push("/mypage");
       }, 1500);
     },
-    onError: (error: any) => {
-      console.error("정보 업데이트 실패:", error);
-      const errorMessage = error.response?.data?.message;
-
-      if (errorMessage) {
-        toast.error(errorMessage);
-      } else {
-        toast.error("정보 저장에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "정보 저장에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };
@@ -48,15 +46,12 @@ export const useUpdateProfileMutation = () => {
         router.push("/mypage");
       }, 1500);
     },
-    onError: (error: any) => {
-      console.error("프로필 업데이트 실패:", error);
-      const errorMessage = error.response?.data?.message;
-
-      if (errorMessage) {
-        toast.error(errorMessage);
-      } else {
-        toast.error("정보 저장에 실패했습니다. 다시 시도해주세요.");
-      }
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "정보 저장에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
     },
   });
 };

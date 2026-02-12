@@ -30,6 +30,7 @@ import { useGetClubAlarmsQuery } from "@/hooks/querys/useAlarmQuery";
 import { useGetClubAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
+import { getErrorMessage } from "@/lib/error";
 import type { ApplicationSubmission } from "@/types";
 
 interface ClubDetailPageProps {
@@ -239,8 +240,11 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         const data = await getApplicationSubmissions(selectedApplicationFormId);
         setSubmissions(data);
       } catch (error) {
-        console.error("지원내역 조회 실패:", error);
-        toast.error("지원내역을 불러올 수 없습니다.");
+        const errorMessage = getErrorMessage(
+          error,
+          "지원내역을 불러올 수 없습니다.",
+        );
+        toast.error(errorMessage);
         setSubmissions([]);
       } finally {
         setIsLoadingSubmissions(false);

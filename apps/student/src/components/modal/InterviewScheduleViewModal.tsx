@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { updateInterviewSchedule } from "@/api/applicationForm";
+import { getErrorMessage } from "@/lib/error";
 import type { InterviewScheduleDetail } from "@/types";
 
 interface InterviewScheduleViewModalProps {
@@ -178,23 +179,11 @@ export function InterviewScheduleViewModal({
       setIsEditMode(false);
       onUpdate?.();
     } catch (error) {
-      console.error("면접 일정 수정 실패:", error);
-
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { status: number; data?: { description?: string } };
-        };
-
-        if (axiosError.response?.status === 400) {
-          const errorMessage =
-            axiosError.response.data?.description ||
-            "입력값이 올바르지 않습니다.";
-          toast.error(errorMessage);
-          return;
-        }
-      }
-
-      toast.error("면접 일정 수정에 실패했습니다.");
+      const errorMessage = getErrorMessage(
+        error,
+        "면접 일정 수정에 실패했습니다.",
+      );
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
