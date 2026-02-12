@@ -236,6 +236,10 @@ export default function OnboardingPage() {
               onLinksChange={handleLinksChange}
               placeholder="링크 추가하기"
               error={errors.links}
+              maxLinks={5}
+              onMaxLimitReached={() => {
+                toast.warning("링크는 최대 5개까지 추가할 수 있습니다");
+              }}
             />
           </FormField>
 
