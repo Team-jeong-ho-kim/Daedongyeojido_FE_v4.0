@@ -422,36 +422,38 @@ export default function AnnouncementDetailPage({
       {/* 지원내역 탭 */}
       {activeTab === "applications" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {isLoadingApplicants ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원내역을 불러오는 중...
-            </div>
-          ) : applicants.length === 0 ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원내역이 없습니다.
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6 md:gap-8">
-              <div className="flex flex-col gap-4">
-                {applicants
-                  .slice((applicationPage - 1) * 5, applicationPage * 5)
-                  .map((applicant) => (
-                    <ApplicantCard
-                      key={applicant.submissionId}
-                      applicant={applicant}
-                    />
-                  ))}
+          <div className="min-h-[450px]">
+            {isLoadingApplicants ? (
+              <div className="flex min-h-[450px] items-center justify-center text-center text-[14px] text-gray-400 md:text-[15px]">
+                지원내역을 불러오는 중...
               </div>
-              {applicants.length > 5 && (
-                <Pagination
-                  listLen={applicants.length}
-                  limit={5}
-                  curPage={applicationPage}
-                  setCurPage={setApplicationPage}
-                />
-              )}
-            </div>
-          )}
+            ) : applicants.length === 0 ? (
+              <div className="flex min-h-[450px] items-center justify-center text-center text-[14px] text-gray-400 md:text-[15px]">
+                지원내역이 없습니다.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div className="flex flex-col gap-4">
+                  {applicants
+                    .slice((applicationPage - 1) * 5, applicationPage * 5)
+                    .map((applicant) => (
+                      <ApplicantCard
+                        key={applicant.submissionId}
+                        applicant={applicant}
+                      />
+                    ))}
+                </div>
+                {applicants.length > 5 && (
+                  <Pagination
+                    listLen={applicants.length}
+                    limit={5}
+                    curPage={applicationPage}
+                    setCurPage={setApplicationPage}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

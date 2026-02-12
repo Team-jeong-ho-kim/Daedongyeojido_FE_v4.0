@@ -765,42 +765,44 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           )}
 
           {/* 지원내역 목록 */}
-          {isLoadingSubmissions ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원내역을 불러오는 중...
-            </div>
-          ) : !selectedApplicationFormId ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원서 폼을 선택해주세요.
-            </div>
-          ) : submissions.length === 0 ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
-              지원내역이 없습니다.
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6 md:gap-8">
-              <div className="flex flex-col gap-4">
-                {[...submissions]
-                  .sort((a, b) => b.submissionId - a.submissionId)
-                  .slice((applicationPage - 1) * 5, applicationPage * 5)
-                  .map((applicant) => (
-                    <ApplicantCard
-                      key={applicant.submissionId}
-                      applicant={applicant}
-                      onClick={() => {}}
-                    />
-                  ))}
+          <div className="min-h-[700px]">
+            {isLoadingSubmissions ? (
+              <div className="flex min-h-[700px] items-center justify-center text-center text-[14px] text-gray-400 md:text-[15px]">
+                지원내역을 불러오는 중...
               </div>
-              {submissions.length > 5 && (
-                <Pagination
-                  listLen={submissions.length}
-                  limit={5}
-                  curPage={applicationPage}
-                  setCurPage={setApplicationPage}
-                />
-              )}
-            </div>
-          )}
+            ) : !selectedApplicationFormId ? (
+              <div className="flex min-h-[700px] items-center justify-center text-center text-[14px] text-gray-400 md:text-[15px]">
+                지원서 폼을 선택해주세요.
+              </div>
+            ) : submissions.length === 0 ? (
+              <div className="flex min-h-[700px] items-center justify-center text-center text-[14px] text-gray-400 md:text-[15px]">
+                지원내역이 없습니다.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div className="flex flex-col gap-4">
+                  {[...submissions]
+                    .sort((a, b) => b.submissionId - a.submissionId)
+                    .slice((applicationPage - 1) * 5, applicationPage * 5)
+                    .map((applicant) => (
+                      <ApplicantCard
+                        key={applicant.submissionId}
+                        applicant={applicant}
+                        onClick={() => {}}
+                      />
+                    ))}
+                </div>
+                {submissions.length > 5 && (
+                  <Pagination
+                    listLen={submissions.length}
+                    limit={5}
+                    curPage={applicationPage}
+                    setCurPage={setApplicationPage}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

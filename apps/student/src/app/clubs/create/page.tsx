@@ -43,7 +43,8 @@ export default function ClubCreationPage() {
     if (!clubIntroDetail.trim()) {
       newErrors.clubIntroDetail = "동아리 소개 문구를 입력해주세요";
     } else if (clubIntroDetail.length > 500) {
-      newErrors.clubIntroDetail = "동아리 소개는 최대 500자까지 작성할 수 있습니다.";
+      newErrors.clubIntroDetail =
+        "동아리 소개는 최대 500자까지 작성할 수 있습니다.";
     }
     if (selectedFields.length === 0)
       newErrors.selectedFields = "동아리 전공을 선택해주세요";

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface DeadlineModalProps {
   isOpen: boolean;
@@ -57,6 +58,15 @@ export default function DeadlineModal({
   const handleSave = () => {
     if (year && month && day) {
       const deadline = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      const selectedDate = new Date(deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        toast.warning("과거 날짜는 선택할 수 없습니다");
+        return;
+      }
+
       onSave(deadline);
       setYear("");
       setMonth("");
