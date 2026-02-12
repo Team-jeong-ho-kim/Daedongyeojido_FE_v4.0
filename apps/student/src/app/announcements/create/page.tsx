@@ -27,7 +27,11 @@ export default function CreateAnnouncementPage() {
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) newErrors.title = "모집 공고 제목을 입력해주세요";
-    if (!contact.trim()) newErrors.contact = "대표자 연락처를 입력해주세요";
+    if (!contact.trim()) {
+      newErrors.contact = "대표자 연락처를 입력해주세요";
+    } else if (contact.replace(/-/g, "").length !== 11) {
+      newErrors.contact = "올바른 전화번호 형식이 아닙니다";
+    }
     if (!introduction.trim())
       newErrors.introduction = "공고 소개글을 입력해주세요";
     if (!idealCandidate.trim())
@@ -53,9 +57,21 @@ export default function CreateAnnouncementPage() {
     if (value.trim()) clearError("title");
   };
 
+  const formatPhoneNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 3) {
+      return numbers;
+    }
+    if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    }
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   const handleContactChange = (value: string) => {
-    setContact(value);
-    if (value.trim()) clearError("contact");
+    const formatted = formatPhoneNumber(value);
+    setContact(formatted);
+    if (formatted.trim()) clearError("contact");
   };
 
   const handleIntroductionChange = (value: string) => {
@@ -85,7 +101,7 @@ export default function CreateAnnouncementPage() {
     createAnnouncementMutate({
       title: title.trim(),
       introduction: introduction.trim(),
-      phoneNumber: contact.trim(),
+      phoneNumber: contact.replace(/-/g, ""),
       major: selectedFields,
       deadline,
       talentDescription: idealCandidate.trim(),
