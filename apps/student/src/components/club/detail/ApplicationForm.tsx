@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ApiError } from "utils";
 import { createApplicationForm } from "@/api/applicationForm";
 import { DeadlineModal } from "@/components";
 import { FIELDS } from "@/constants/club";
@@ -39,8 +40,10 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
       setQuestions([]);
       setDeadline("");
     },
-    onError: (error) => {
-      toast.error(`지원서 생성에 실패했습니다: ${error.message}`);
+    onError: (error: unknown) => {
+      if (error instanceof ApiError) {
+        toast.error(error.description);
+      }
     },
   });
 
