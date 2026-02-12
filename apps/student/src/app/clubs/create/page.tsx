@@ -35,10 +35,16 @@ export default function ClubCreationPage() {
     } else if (clubName.length > 20) {
       newErrors.clubName = "동아리 이름은 최대 20자까지 작성할 수 있습니다.";
     }
-    if (!clubIntro.trim())
+    if (!clubIntro.trim()) {
       newErrors.clubIntro = "동아리 한줄 소개를 입력해주세요";
-    if (!clubIntroDetail.trim())
+    } else if (clubIntro.length > 30) {
+      newErrors.clubIntro = "한줄 소개는 최대 30자까지 작성할 수 있습니다.";
+    }
+    if (!clubIntroDetail.trim()) {
       newErrors.clubIntroDetail = "동아리 소개 문구를 입력해주세요";
+    } else if (clubIntroDetail.length > 500) {
+      newErrors.clubIntroDetail = "동아리 소개는 최대 500자까지 작성할 수 있습니다.";
+    }
     if (selectedFields.length === 0)
       newErrors.selectedFields = "동아리 전공을 선택해주세요";
 
@@ -56,16 +62,28 @@ export default function ClubCreationPage() {
   };
 
   const handleClubNameChange = (value: string) => {
+    if (value.length > 20) {
+      toast.warning("동아리 이름은 20자까지 입력 가능합니다");
+      return;
+    }
     setClubName(value);
     if (value.trim()) clearError("clubName");
   };
 
   const handleClubIntroChange = (value: string) => {
+    if (value.length > 30) {
+      toast.warning("한줄 소개는 30자까지 입력 가능합니다");
+      return;
+    }
     setClubIntro(value);
     if (value.trim()) clearError("clubIntro");
   };
 
   const handleClubIntroDetailChange = (value: string) => {
+    if (value.length > 500) {
+      toast.warning("동아리 소개는 500자까지 입력 가능합니다");
+      return;
+    }
     setClubIntroDetail(value);
     if (value.trim()) clearError("clubIntroDetail");
   };
@@ -143,7 +161,7 @@ export default function ClubCreationPage() {
               value={clubIntroDetail}
               onChange={handleClubIntroDetailChange}
               placeholder="동아리 소개 문구를 작성해주세요."
-              rows={12}
+              rows={8}
               error={errors.clubIntroDetail}
             />
           </FormField>
