@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     "학생 동아리",
   ],
   authors: [{ name: "대동여지도" }],
+  verification: {
+    google: "hf7Wmpstr3d6XCpt2EfJVsv7Z_DPRu7TwU6OPpNOcDU",
+  },
   openGraph: {
     title: "대동여지도 - 나의 동아리를 찾는 지름길",
     description:
