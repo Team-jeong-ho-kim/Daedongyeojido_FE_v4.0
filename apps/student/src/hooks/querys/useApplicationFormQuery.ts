@@ -14,6 +14,7 @@ export const useGetClubApplicationFormsQuery = (clubId: string) => {
     queryKey: ["applicationForms", clubId],
     queryFn: () => getClubApplicationForms(clubId),
     enabled: !!clubId,
+    refetchOnMount: true,
   });
 };
 
