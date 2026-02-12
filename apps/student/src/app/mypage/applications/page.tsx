@@ -60,95 +60,97 @@ export default function MyApplicationsPage() {
           나의 지원서
         </h1>
 
-        {showSkeleton ? (
-          <div className="space-y-4">
-            {Array.from({ length: limit }, () => (
-              <SkeletonListItem key={crypto.randomUUID()} />
-            ))}
-          </div>
-        ) : applications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24">
-            <Image
-              src="/images/icons/redTiger.svg"
-              alt="지원서 없음"
-              width={194}
-              height={201}
-              className="mb-8"
-            />
-            <p className="text-center text-base text-gray-500">
-              지원서가 없어요
-            </p>
-          </div>
-        ) : (
-          <>
+        <div className="min-h-[600px]">
+          {showSkeleton ? (
             <div className="space-y-4">
-              {currentApplications.map((application) => (
-                <button
-                  key={application.submissionId}
-                  type="button"
-                  onClick={() =>
-                    handleApplicationClick(application.submissionId)
-                  }
-                  className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"
-                >
-                  <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl">
-                    {application.clubImage ? (
-                      <Image
-                        src={application.clubImage}
-                        alt={application.clubName}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#7D5C5C]">
-                        <span className="font-bold text-white text-xl">
-                          {application.clubName[0]}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col items-start gap-2">
-                    <div className="flex items-center gap-3">
-                      <span className="font-semibold text-base text-primary-500">
-                        {application.clubName}
-                      </span>
-                      <span
-                        className={`rounded-md border px-2 py-0.5 font-medium text-xs ${getStatusColor(application.user_application_status)}`}
-                      >
-                        {getStatusText(application.user_application_status)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-gray-600 text-sm">
-                      <span className="font-normal">
-                        지원 마감일 :{" "}
-                        {formatDeadline(application.submissionDuration)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Image
-                    src="/images/clubs/rightArrow.svg"
-                    alt="상세보기"
-                    width={10}
-                    height={18}
-                  />
-                </button>
+              {Array.from({ length: limit }, () => (
+                <SkeletonListItem key={crypto.randomUUID()} />
               ))}
             </div>
+          ) : applications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24">
+              <Image
+                src="/images/icons/redTiger.svg"
+                alt="지원서 없음"
+                width={194}
+                height={201}
+                className="mb-8"
+              />
+              <p className="text-center text-base text-gray-500">
+                지원서가 없어요
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-4">
+                {currentApplications.map((application) => (
+                  <button
+                    key={application.submissionId}
+                    type="button"
+                    onClick={() =>
+                      handleApplicationClick(application.submissionId)
+                    }
+                    className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"
+                  >
+                    <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl">
+                      {application.clubImage ? (
+                        <Image
+                          src={application.clubImage}
+                          alt={application.clubName}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center rounded-xl bg-[#7D5C5C]">
+                          <span className="font-bold text-white text-xl">
+                            {application.clubName[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-            {applications.length > limit && (
-              <div className="mt-12">
-                <Pagination
-                  listLen={applications.length}
-                  limit={limit}
-                  curPage={curPage}
-                  setCurPage={setCurPage}
-                />
+                    <div className="flex flex-1 flex-col items-start gap-2">
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-base text-primary-500">
+                          {application.clubName}
+                        </span>
+                        <span
+                          className={`rounded-md border px-2 py-0.5 font-medium text-xs ${getStatusColor(application.user_application_status)}`}
+                        >
+                          {getStatusText(application.user_application_status)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-4 text-gray-600 text-sm">
+                        <span className="font-normal">
+                          지원 마감일 :{" "}
+                          {formatDeadline(application.submissionDuration)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <Image
+                      src="/images/clubs/rightArrow.svg"
+                      alt="상세보기"
+                      width={10}
+                      height={18}
+                    />
+                  </button>
+                ))}
               </div>
-            )}
-          </>
-        )}
+
+              {applications.length > limit && (
+                <div className="mt-12">
+                  <Pagination
+                    listLen={applications.length}
+                    limit={limit}
+                    curPage={curPage}
+                    setCurPage={setCurPage}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
