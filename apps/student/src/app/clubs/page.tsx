@@ -29,45 +29,39 @@ export default function ClubsPage() {
         </div>
 
         {/* 동아리 목록 */}
-        {showSkeleton ? (
-          <div className="mb-10 flex flex-wrap gap-7">
-            {Array.from({ length: limit }, () => (
+        <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
+          {showSkeleton ? (
+            Array.from({ length: limit }, () => (
               <SkeletonClubCard key={crypto.randomUUID()} />
-            ))}
-          </div>
-        ) : !clubs || clubs.length === 0 ? (
-          <div className="flex min-h-[400px] items-center justify-center">
-            <p className="text-gray-500 text-lg">등록된 동아리가 없습니다.</p>
-          </div>
-        ) : (
-          <>
-            <div className="mb-10 flex flex-wrap gap-7">
-              {clubs
-                .slice((curPage - 1) * limit, curPage * limit)
-                .map((club) => (
-                  <ClubItem key={club.clubId} {...club} />
-                ))}
+            ))
+          ) : !clubs || clubs.length === 0 ? (
+            <div className="flex w-full items-center justify-center py-20">
+              <p className="text-gray-400 text-lg">등록된 동아리가 없습니다.</p>
             </div>
+          ) : (
+            clubs
+              .slice((curPage - 1) * limit, curPage * limit)
+              .map((club) => <ClubItem key={club.clubId} {...club} />)
+          )}
+        </div>
 
-            {/* 페이지네이션 */}
-            <div className="mt-30 mb-30">
-              <Pagination
-                listLen={clubs.length}
-                limit={limit}
-                curPage={curPage}
-                setCurPage={setCurPage}
-              />
-            </div>
-          </>
-        )}
+        {/* 페이지네이션 */}
+        <Pagination
+          listLen={clubs?.length || 0}
+          limit={limit}
+          curPage={curPage}
+          setCurPage={setCurPage}
+        />
 
         {/* CTA 섹션 */}
-        <CTASection
-          title="발견한 동아리에 지원하고 싶나요?"
-          subtitle="아래 버튼을 눌러 바로 지원하는 페이지로 이동해보세요!"
-          description="아래 버튼을 눌러 지원해보세요!"
-          buttonText="지원하러가기"
-        />
+        <div className="mt-32 mb-32">
+          <CTASection
+            title="발견한 동아리에 지원하고 싶나요?"
+            subtitle="아래 버튼을 눌러 바로 지원하는 페이지로 이동해보세요!"
+            description="아래 버튼을 눌러 지원해보세요!"
+            buttonText="지원하러가기"
+          />
+        </div>
       </div>
     </main>
   );

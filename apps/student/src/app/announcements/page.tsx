@@ -72,22 +72,22 @@ export default function AnnouncementsPage() {
         </div>
 
         {/* 페이지네이션 */}
-        <div className="mt-20 mb-20">
-          <Pagination
-            listLen={announcements.length}
-            limit={limit}
-            curPage={curPage}
-            setCurPage={setCurPage}
-          />
-        </div>
+        <Pagination
+          listLen={announcements.length}
+          limit={limit}
+          curPage={curPage}
+          setCurPage={setCurPage}
+        />
 
         {/* CTA 섹션 */}
-        <CTASection
-          title="어떤 동아리에 지원해야 할지 모르겠다면?"
-          subtitle="아래 버튼을 눌러 다양한 동아리를 탐색해보세요!"
-          description="아래 버튼을 눌러 나에게 맞는 동아리를 찾아보세요!"
-          buttonText="동아리 찾아보기"
-        />
+        <div className="mt-32 mb-32">
+          <CTASection
+            title="어떤 동아리에 지원해야 할지 모르겠다면?"
+            subtitle="아래 버튼을 눌러 다양한 동아리를 탐색해보세요!"
+            description="아래 버튼을 눌러 나에게 맞는 동아리를 찾아보세요!"
+            buttonText="동아리 찾아보기"
+          />
+        </div>
       </div>
     </main>
   );
