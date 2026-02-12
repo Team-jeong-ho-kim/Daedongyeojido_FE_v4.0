@@ -116,8 +116,9 @@ export default function OnboardingPage() {
   };
 
   const handleIntroductionChange = (value: string) => {
-    if (value.length >= 30 && introduction.length < 30) {
+    if (value.length > 30) {
       toast.warning("한줄 소개는 30자까지 입력 가능합니다");
+      return;
     }
     setIntroduction(value);
     if (errors.introduction) {

@@ -19,11 +19,11 @@ export default function MyPage() {
 
         <div className="mb-10 flex items-center gap-8">
           <Image
-            src="/images/icons/profile.svg"
-            alt="profile"
-            className="h-18 w-18"
-            width={15}
-            height={15}
+            src={userInfo?.profileImage || "/images/icons/profile.svg"}
+            alt="프로필 이미지"
+            className="h-18 w-18 rounded-full object-cover"
+            width={72}
+            height={72}
           />
           <div>
             <h2 className="mb-3 text-2xl tracking-tight">
