@@ -42,7 +42,7 @@ export default function AnnouncementsPage() {
             <Button
               variant="ghost"
               onClick={() => router.push("/announcements/create")}
-              className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:shadow-lg"
+              className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:text-white hover:shadow-lg"
             >
               동아리 공고 개설하기
             </Button>

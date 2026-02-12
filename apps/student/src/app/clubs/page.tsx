@@ -21,7 +21,7 @@ export default function ClubsPage() {
           <Link href="/clubs/create">
             <Button
               variant="ghost"
-              className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:shadow-lg"
+              className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:text-white hover:shadow-lg"
             >
               동아리 개설 신청하기
             </Button>
