@@ -61,8 +61,9 @@ interface ImageUploadProps {
     onFileChange: (file: File | null, previewUrl: string | null) => void;
     placeholder?: string;
     defaultImageUrl?: string | null;
+    error?: string;
 }
-declare function ImageUpload({ onFileChange, placeholder, defaultImageUrl, }: ImageUploadProps): react_jsx_runtime.JSX.Element;
+declare function ImageUpload({ onFileChange, placeholder, defaultImageUrl, error, }: ImageUploadProps): react_jsx_runtime.JSX.Element;
 
 interface LinkItem {
     id: string;
@@ -72,8 +73,9 @@ interface LinkInputProps {
     links: LinkItem[];
     onLinksChange: (links: LinkItem[]) => void;
     placeholder?: string;
+    error?: string;
 }
-declare function LinkInput({ links, onLinksChange, placeholder, }: LinkInputProps): react_jsx_runtime.JSX.Element;
+declare function LinkInput({ links, onLinksChange, placeholder, error: externalError, }: LinkInputProps): react_jsx_runtime.JSX.Element;
 
 interface TextAreaProps {
     value: string;

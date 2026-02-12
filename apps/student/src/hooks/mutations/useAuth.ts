@@ -2,25 +2,41 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { LoginRequest, LoginResponse } from "utils";
 import { login, logout } from "@/api/auth";
-import { clearTokens } from "@/lib/token";
+import { getMyInfo } from "@/api/user";
+import { clearTokens, saveTokens } from "@/lib/token";
 
 export const useLoginMutation = () => {
   return useMutation<LoginResponse, Error, LoginRequest>({
     mutationFn: ({ accountId, password }) => login({ accountId, password }),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // 1. 토큰 먼저 저장 (이후 API 호출을 위해 필요)
+      saveTokens(data);
+
       toast.success(`${data.userName}님, 환영합니다!`);
 
-      // 온보딩 필요 여부 체크 (이름, 학번 제외하고 하나라도 입력되어 있으면 완료)
-      const hasAnyInfo =
-        data.introduction ||
-        (data.major && data.major.length > 0) ||
-        (data.link && data.link.length > 0) ||
-        data.profileImage;
-      const needsOnboarding = !hasAnyInfo;
+      try {
+        // 2. 최신 유저 정보 조회
+        const userInfo = await getMyInfo();
 
-      setTimeout(() => {
-        window.location.href = needsOnboarding ? "/onboarding" : "/";
-      }, 1200);
+        // 3. 온보딩 필요 여부 체크
+        const hasAnyInfo =
+          userInfo.introduction ||
+          (userInfo.major && userInfo.major.length > 0) ||
+          (userInfo.link && userInfo.link.length > 0) ||
+          userInfo.profileImage;
+        const needsOnboarding = !hasAnyInfo;
+
+        // 4. 리다이렉트
+        setTimeout(() => {
+          window.location.href = needsOnboarding ? "/onboarding" : "/";
+        }, 1200);
+      } catch (error) {
+        console.error("유저 정보 조회 실패:", error);
+        // 에러 발생 시 기본적으로 메인으로 이동
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1200);
+      }
     },
     onError: (error: any) => {
       const status = error.response?.status;

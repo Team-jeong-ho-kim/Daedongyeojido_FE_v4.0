@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import ErrorMessage from "./ErrorMessage";
 
 const INPUT_STYLE =
   "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
@@ -14,15 +15,17 @@ interface LinkInputProps {
   links: LinkItem[];
   onLinksChange: (links: LinkItem[]) => void;
   placeholder?: string;
+  error?: string;
 }
 
 export default function LinkInput({
   links,
   onLinksChange,
   placeholder = "동아리 관련 링크를 첨부해주세요.",
+  error: externalError,
 }: LinkInputProps) {
   const [currentLink, setCurrentLink] = useState("");
-  const [error, setError] = useState("");
+  const [internalError, setInternalError] = useState("");
   const inputId = useId();
 
   const isValidUrl = (url: string) => {
@@ -42,11 +45,11 @@ export default function LinkInput({
       if (!trimmedLink) return;
 
       if (!isValidUrl(trimmedLink)) {
-        setError("올바른 링크 형식을 입력해주세요. (예: https://example.com)");
+        setInternalError("올바른 링크 형식을 입력해주세요. (예: https://example.com)");
         return;
       }
 
-      setError("");
+      setInternalError("");
       onLinksChange([...links, { id: crypto.randomUUID(), url: trimmedLink }]);
       setCurrentLink("");
     }
@@ -55,6 +58,8 @@ export default function LinkInput({
   const removeLink = (idToRemove: string) => {
     onLinksChange(links.filter((link) => link.id !== idToRemove));
   };
+
+  const displayError = externalError || internalError;
 
   return (
     <>
@@ -65,10 +70,14 @@ export default function LinkInput({
         value={currentLink}
         onChange={(e) => setCurrentLink(e.target.value)}
         onKeyDown={handleKeyDown}
-        className={INPUT_STYLE}
+        className={`${INPUT_STYLE} ${
+          displayError
+            ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+            : ""
+        }`}
       />
-      {error ? (
-        <p className="mt-2 text-[12px] text-red-500">{error}</p>
+      {displayError ? (
+        <ErrorMessage message={displayError} />
       ) : (
         <p className="mt-2 ml-2 text-[#999999] text-[12px]">
           엔터를 누르면 링크가 추가됩니다

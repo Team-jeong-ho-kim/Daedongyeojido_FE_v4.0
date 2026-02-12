@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useUserStore } from "shared";
-import { toast } from "sonner";
 import {
   FieldSelector,
   FormField,
@@ -35,6 +34,13 @@ export default function OnboardingPage() {
     _previewUrl: string | null,
   ) => {
     setProfileFile(file);
+    if (errors.profile && file) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.profile;
+        return newErrors;
+      });
+    }
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -50,11 +56,40 @@ export default function OnboardingPage() {
 
   const handlePhoneChange = (value: string) => {
     setPhone(formatPhoneNumber(value));
+    if (errors.phone && value) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.phone;
+        return newErrors;
+      });
+    }
+  };
+
+  const handleLinksChange = (newLinks: LinkItem[]) => {
+    setLinks(newLinks);
+    if (errors.links && newLinks.length > 0) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.links;
+        return newErrors;
+      });
+    }
   };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    if (!profileFile) {
+      newErrors.profile = "프로필 사진을 업로드해주세요";
+    }
+    if (!phone.trim()) {
+      newErrors.phone = "전화번호를 입력해주세요";
+    } else if (phone.replace(/-/g, "").length !== 11) {
+      newErrors.phone = "올바른 전화번호 형식이 아닙니다";
+    }
+    if (links.length === 0) {
+      newErrors.links = "최소 1개 이상의 링크를 추가해주세요";
+    }
     if (selectedFields.length === 0) {
       newErrors.fields = "전공을 선택해주세요";
     }
@@ -90,7 +125,6 @@ export default function OnboardingPage() {
 
   const handleSubmit = () => {
     if (!validateForm()) {
-      toast.error("필수 항목을 모두 입력해주세요");
       return;
     }
 
@@ -111,10 +145,11 @@ export default function OnboardingPage() {
         <h1 className="px-8 pt-8 font-bold text-2xl">필수 정보</h1>
 
         <div className="flex flex-col gap-2">
-          <FormField label="프로필 사진" alignTop>
+          <FormField label="프로필 사진" alignTop required>
             <ImageUpload
               onFileChange={handleProfileChange}
               placeholder="파일을 업로드 해주세요."
+              error={errors.profile}
             />
           </FormField>
 
@@ -136,19 +171,21 @@ export default function OnboardingPage() {
             />
           </FormField>
 
-          <FormField label="관련 링크" alignTop>
+          <FormField label="관련 링크" alignTop required>
             <LinkInput
               links={links}
-              onLinksChange={setLinks}
+              onLinksChange={handleLinksChange}
               placeholder="링크 추가하기"
+              error={errors.links}
             />
           </FormField>
 
-          <FormField label="전화번호">
+          <FormField label="전화번호" required>
             <TextInput
               value={phone}
               onChange={handlePhoneChange}
               placeholder="010-xxxx-xxxx"
+              error={errors.phone}
             />
           </FormField>
 

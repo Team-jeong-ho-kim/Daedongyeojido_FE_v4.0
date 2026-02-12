@@ -22,12 +22,10 @@ export const useUpdateMyInfoMutation = () => {
     },
     onError: (error: any) => {
       console.error("정보 업데이트 실패:", error);
-      const status = error.response?.status;
+      const errorMessage = error.response?.data?.message;
 
-      if (status === 400) {
-        toast.error("입력 정보를 확인해주세요.");
-      } else if (status === 401) {
-        toast.error("로그인이 필요합니다.");
+      if (errorMessage) {
+        toast.error(errorMessage);
       } else {
         toast.error("정보 저장에 실패했습니다. 다시 시도해주세요.");
       }
@@ -52,12 +50,10 @@ export const useUpdateProfileMutation = () => {
     },
     onError: (error: any) => {
       console.error("프로필 업데이트 실패:", error);
-      const status = error.response?.status;
+      const errorMessage = error.response?.data?.message;
 
-      if (status === 400) {
-        toast.error("입력 정보를 확인해주세요.");
-      } else if (status === 401) {
-        toast.error("로그인이 필요합니다.");
+      if (errorMessage) {
+        toast.error(errorMessage);
       } else {
         toast.error("정보 저장에 실패했습니다. 다시 시도해주세요.");
       }

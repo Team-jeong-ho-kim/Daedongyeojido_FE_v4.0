@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useId, useState } from "react";
 import { toast } from "sonner";
+import ErrorMessage from "./ErrorMessage";
 
 const INPUT_STYLE =
   "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-gray-200 text-base placeholder-gray-400 focus:outline-none";
@@ -11,12 +12,14 @@ interface ImageUploadProps {
   onFileChange: (file: File | null, previewUrl: string | null) => void;
   placeholder?: string;
   defaultImageUrl?: string | null;
+  error?: string;
 }
 
 export default function ImageUpload({
   onFileChange,
   placeholder = "파일을 업로드 해주세요.",
   defaultImageUrl,
+  error,
 }: ImageUploadProps) {
   const [fileName, setFileName] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(
@@ -70,32 +73,39 @@ export default function ImageUpload({
 
   return (
     <>
-      <label htmlFor={fileInputId} className="relative block cursor-pointer">
-        <input
-          id={inputId}
-          type="text"
-          placeholder={placeholder}
-          readOnly
-          value={fileName}
-          className={`${INPUT_STYLE} pointer-events-none cursor-pointer pr-12`}
-        />
-        <span className="-translate-y-1/2 absolute top-1/2 right-4">
-          <Image
-            src="/images/icons/upload.svg"
-            alt=""
-            width={18}
-            height={18}
-            aria-hidden="true"
+      <div>
+        <label htmlFor={fileInputId} className="relative block cursor-pointer">
+          <input
+            id={inputId}
+            type="text"
+            placeholder={placeholder}
+            readOnly
+            value={fileName}
+            className={`${INPUT_STYLE} pointer-events-none cursor-pointer pr-12 ${
+              error
+                ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                : ""
+            }`}
           />
-        </span>
-        <input
-          id={fileInputId}
-          type="file"
-          accept=".jpg,.jpeg,.png,.webp"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-      </label>
+          <span className="-translate-y-1/2 absolute top-1/2 right-4">
+            <Image
+              src="/images/icons/upload.svg"
+              alt=""
+              width={18}
+              height={18}
+              aria-hidden="true"
+            />
+          </span>
+          <input
+            id={fileInputId}
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+        </label>
+        <ErrorMessage message={error} />
+      </div>
 
       {previewUrl && (
         <div className="mt-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">

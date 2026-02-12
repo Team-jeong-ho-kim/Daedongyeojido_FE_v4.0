@@ -554,7 +554,8 @@ var INPUT_STYLE = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border-
 function ImageUpload({
   onFileChange,
   placeholder = "\uD30C\uC77C\uC744 \uC5C5\uB85C\uB4DC \uD574\uC8FC\uC138\uC694.",
-  defaultImageUrl
+  defaultImageUrl,
+  error
 }) {
   const [fileName, setFileName] = useState2("");
   const [previewUrl, setPreviewUrl] = useState2(
@@ -599,38 +600,41 @@ function ImageUpload({
     }
   }, [isModalOpen, handleKeyDown]);
   return /* @__PURE__ */ jsxs8(Fragment2, { children: [
-    /* @__PURE__ */ jsxs8("label", { htmlFor: fileInputId, className: "relative block cursor-pointer", children: [
-      /* @__PURE__ */ jsx9(
-        "input",
-        {
-          id: inputId,
-          type: "text",
-          placeholder,
-          readOnly: true,
-          value: fileName,
-          className: `${INPUT_STYLE} pointer-events-none cursor-pointer pr-12`
-        }
-      ),
-      /* @__PURE__ */ jsx9("span", { className: "-translate-y-1/2 absolute top-1/2 right-4", children: /* @__PURE__ */ jsx9(
-        Image3,
-        {
-          src: "/images/icons/upload.svg",
-          alt: "",
-          width: 18,
-          height: 18,
-          "aria-hidden": "true"
-        }
-      ) }),
-      /* @__PURE__ */ jsx9(
-        "input",
-        {
-          id: fileInputId,
-          type: "file",
-          accept: ".jpg,.jpeg,.png,.webp",
-          onChange: handleFileUpload,
-          className: "hidden"
-        }
-      )
+    /* @__PURE__ */ jsxs8("div", { children: [
+      /* @__PURE__ */ jsxs8("label", { htmlFor: fileInputId, className: "relative block cursor-pointer", children: [
+        /* @__PURE__ */ jsx9(
+          "input",
+          {
+            id: inputId,
+            type: "text",
+            placeholder,
+            readOnly: true,
+            value: fileName,
+            className: `${INPUT_STYLE} pointer-events-none cursor-pointer pr-12 ${error ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""}`
+          }
+        ),
+        /* @__PURE__ */ jsx9("span", { className: "-translate-y-1/2 absolute top-1/2 right-4", children: /* @__PURE__ */ jsx9(
+          Image3,
+          {
+            src: "/images/icons/upload.svg",
+            alt: "",
+            width: 18,
+            height: 18,
+            "aria-hidden": "true"
+          }
+        ) }),
+        /* @__PURE__ */ jsx9(
+          "input",
+          {
+            id: fileInputId,
+            type: "file",
+            accept: ".jpg,.jpeg,.png,.webp",
+            onChange: handleFileUpload,
+            className: "hidden"
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsx9(ErrorMessage, { message: error })
     ] }),
     previewUrl && /* @__PURE__ */ jsxs8("div", { className: "mt-3 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3", children: [
       /* @__PURE__ */ jsxs8(
@@ -704,10 +708,11 @@ var INPUT_STYLE2 = "w-full rounded-md bg-white px-4 py-3.5 border-[0.1px] border
 function LinkInput({
   links,
   onLinksChange,
-  placeholder = "\uB3D9\uC544\uB9AC \uAD00\uB828 \uB9C1\uD06C\uB97C \uCCA8\uBD80\uD574\uC8FC\uC138\uC694."
+  placeholder = "\uB3D9\uC544\uB9AC \uAD00\uB828 \uB9C1\uD06C\uB97C \uCCA8\uBD80\uD574\uC8FC\uC138\uC694.",
+  error: externalError
 }) {
   const [currentLink, setCurrentLink] = useState3("");
-  const [error, setError] = useState3("");
+  const [internalError, setInternalError] = useState3("");
   const inputId = useId2();
   const isValidUrl = (url) => {
     try {
@@ -723,10 +728,10 @@ function LinkInput({
       const trimmedLink = currentLink.trim();
       if (!trimmedLink) return;
       if (!isValidUrl(trimmedLink)) {
-        setError("\uC62C\uBC14\uB978 \uB9C1\uD06C \uD615\uC2DD\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694. (\uC608: https://example.com)");
+        setInternalError("\uC62C\uBC14\uB978 \uB9C1\uD06C \uD615\uC2DD\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694. (\uC608: https://example.com)");
         return;
       }
-      setError("");
+      setInternalError("");
       onLinksChange([...links, { id: crypto.randomUUID(), url: trimmedLink }]);
       setCurrentLink("");
     }
@@ -734,6 +739,7 @@ function LinkInput({
   const removeLink = (idToRemove) => {
     onLinksChange(links.filter((link) => link.id !== idToRemove));
   };
+  const displayError = externalError || internalError;
   return /* @__PURE__ */ jsxs9(Fragment3, { children: [
     /* @__PURE__ */ jsx10(
       "input",
@@ -744,10 +750,10 @@ function LinkInput({
         value: currentLink,
         onChange: (e) => setCurrentLink(e.target.value),
         onKeyDown: handleKeyDown,
-        className: INPUT_STYLE2
+        className: `${INPUT_STYLE2} ${displayError ? "border-red-300 focus:border-red-500 focus:ring-red-500" : ""}`
       }
     ),
-    error ? /* @__PURE__ */ jsx10("p", { className: "mt-2 text-[12px] text-red-500", children: error }) : /* @__PURE__ */ jsx10("p", { className: "mt-2 ml-2 text-[#999999] text-[12px]", children: "\uC5D4\uD130\uB97C \uB204\uB974\uBA74 \uB9C1\uD06C\uAC00 \uCD94\uAC00\uB429\uB2C8\uB2E4" }),
+    displayError ? /* @__PURE__ */ jsx10(ErrorMessage, { message: displayError }) : /* @__PURE__ */ jsx10("p", { className: "mt-2 ml-2 text-[#999999] text-[12px]", children: "\uC5D4\uD130\uB97C \uB204\uB974\uBA74 \uB9C1\uD06C\uAC00 \uCD94\uAC00\uB429\uB2C8\uB2E4" }),
     links.length > 0 && /* @__PURE__ */ jsx10("div", { className: "mt-3 flex flex-wrap gap-2", children: links.map((link) => /* @__PURE__ */ jsxs9(
       "div",
       {
