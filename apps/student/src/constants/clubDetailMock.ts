@@ -13,32 +13,32 @@ export const MOCK_CLUB: ClubDetail = {
 
 export const MOCK_CLUB_MEMBERS: ClubMember[] = [
   {
-    userId: "1212",
+    userId: 1212,
     userName: "김경민",
     majors: ["BE", "FE"],
     introduction:
       "김경민입니다.ㅁㄴㅇㄹㄴㅁㄹㄴㅁㄹㅁㄴㅁㄴㄹㅁㄴㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹ",
   },
   {
-    userId: "12122",
+    userId: 12122,
     userName: "지도현",
     majors: ["BE"],
     introduction: "지도현입니다.",
   },
   {
-    userId: "1212312",
+    userId: 1212312,
     userName: "박민수",
     majors: ["FE"],
     introduction: "박민수입니다.",
   },
   {
-    userId: "12132",
+    userId: 12132,
     userName: "이준호",
     majors: ["BE"],
     introduction: "이준호입니다.",
   },
   {
-    userId: "121342",
+    userId: 121342,
     userName: "최유진",
     majors: ["FE"],
     introduction: "최유진입니다.",

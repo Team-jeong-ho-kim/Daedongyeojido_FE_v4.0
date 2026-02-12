@@ -71,3 +71,7 @@ logs
 tmp/
 temp/
 .aider*
+
+# Generated sitemap files
+**/public/sitemap*.xml
+**/public/robots.txt

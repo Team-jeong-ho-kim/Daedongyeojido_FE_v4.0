@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://dsm.daedongyeojido.site
-
-# Sitemaps
-Sitemap: https://dsm.daedongyeojido.site/sitemap.xml
