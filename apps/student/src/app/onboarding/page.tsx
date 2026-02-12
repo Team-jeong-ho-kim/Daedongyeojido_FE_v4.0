@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUserStore } from "shared";
+import { toast } from "sonner";
 import {
   FieldSelector,
   FormField,
@@ -95,6 +96,8 @@ export default function OnboardingPage() {
     }
     if (!introduction.trim()) {
       newErrors.introduction = "한줄 소개를 입력해주세요";
+    } else if (introduction.length > 30) {
+      newErrors.introduction = "한줄 소개는 30자 이하로 입력해주세요";
     }
 
     setErrors(newErrors);
@@ -113,6 +116,9 @@ export default function OnboardingPage() {
   };
 
   const handleIntroductionChange = (value: string) => {
+    if (value.length >= 30 && introduction.length < 30) {
+      toast.warning("한줄 소개는 30자까지 입력 가능합니다");
+    }
     setIntroduction(value);
     if (errors.introduction) {
       setErrors((prev) => {
@@ -205,6 +211,7 @@ export default function OnboardingPage() {
               placeholder="한줄 소개를 입력해주세요!"
               autoResize={true}
               maxHeight={200}
+              maxLength={30}
               error={errors.introduction}
             />
           </FormField>

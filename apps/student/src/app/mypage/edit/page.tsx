@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useUserStore } from "shared";
+import { toast } from "sonner";
 import { FieldSelector, ImageUpload, LinkInput, TextInput } from "ui";
 import { FIELDS } from "@/constants/club";
 import { useUpdateProfileMutation } from "@/hooks/mutations/useUser";
@@ -48,6 +49,13 @@ export default function MyPageEdit() {
 
   const handleImageChange = (file: File | null, _previewUrl: string | null) => {
     setProfileImage(file);
+  };
+
+  const handleIntroductionChange = (value: string) => {
+    if (value.length >= 30 && introduction.length < 30) {
+      toast.warning("한줄 소개는 30자까지 입력 가능합니다");
+    }
+    setIntroduction(value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -137,8 +145,9 @@ export default function MyPageEdit() {
             <h2 className="mb-4 font-bold text-xl tracking-tight">한줄 소개</h2>
             <TextInput
               value={introduction}
-              onChange={setIntroduction}
+              onChange={handleIntroductionChange}
               placeholder="한 줄 소개 문구를 입력해주세요."
+              maxLength={30}
             />
           </div>
 
