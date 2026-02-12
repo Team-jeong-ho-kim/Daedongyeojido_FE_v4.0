@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ interface ApplicationFormProps {
 
 export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const id = useId();
+  const queryClient = useQueryClient();
   const [applicationTitle, setApplicationTitle] = useState("");
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [questions, setQuestions] = useState<
@@ -30,6 +31,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const createMutation = useMutation({
     mutationFn: createApplicationForm,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applicationForms"] });
       toast.success("지원서가 성공적으로 생성되었습니다.");
       // 폼 초기화
       setApplicationTitle("");

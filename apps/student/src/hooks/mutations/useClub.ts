@@ -41,10 +41,12 @@ export const useUpdateClubMutation = (clubId: string) => {
 
 export const useDissolveClubMutation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: dissolveClub,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clubs"] });
       toast.success("동아리 해체 신청이 완료되었습니다.");
       setTimeout(() => {
         router.push("/clubs");

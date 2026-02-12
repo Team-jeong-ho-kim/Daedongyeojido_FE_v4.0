@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -12,10 +12,12 @@ import type { AnnouncementCreate } from "@/types/announcement";
 
 export const useCreateAnnouncementMutation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: AnnouncementCreate) => createAnnouncement(data),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast.success("공고 등록이 완료되었습니다");
       setTimeout(() => {
         router.push("/announcements");
@@ -33,11 +35,16 @@ export const useCreateAnnouncementMutation = () => {
 
 export const useUpdateAnnouncementMutation = (announcementId: string) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: AnnouncementCreate) =>
       updateAnnouncement(announcementId, data),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["announcement", announcementId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast.success("공고가 수정되었습니다");
       setTimeout(() => {
         router.push(`/announcements/${announcementId}`);
@@ -55,10 +62,12 @@ export const useUpdateAnnouncementMutation = (announcementId: string) => {
 
 export const useDeleteAnnouncementMutation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (announcementId: string) => deleteAnnouncement(announcementId),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast.success("공고가 삭제되었습니다");
       setTimeout(() => {
         router.push("/announcements");
@@ -75,10 +84,16 @@ export const useDeleteAnnouncementMutation = () => {
 };
 
 export const usePublishAnnouncementMutation = (announcementId: string) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (applicationFormId: number) =>
       publishAnnouncement(announcementId, applicationFormId),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["announcement", announcementId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["announcements"] });
       toast.success("공고가 게시되었습니다");
     },
     onError: (error: unknown) => {

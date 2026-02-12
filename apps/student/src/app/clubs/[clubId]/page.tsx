@@ -432,7 +432,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 : "text-gray-400"
             }`}
           >
-            {isClubMember ? "공고/지원서" : "공고 이력"}
+            {isClubMember ? "공고/지원서 폼" : "공고 이력"}
           </button>
           {isClubMember && (
             <button
@@ -450,7 +450,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         </nav>
       </div>
 
-      {/* 공고/지원서 서브탭 */}
+      {/* 공고/지원서 폼 서브탭 */}
       {isClubMember && activeTab === "history" && (
         <nav className="flex">
           <button
@@ -473,7 +473,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 : "text-gray-400"
             }`}
           >
-            지원서
+            지원서 폼
           </button>
         </nav>
       )}
@@ -617,7 +617,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         </div>
       )}
 
-      {/* 공고/지원서 탭 - 소속 */}
+      {/* 공고/지원서 폼 탭 - 소속 */}
       {activeTab === "history" && isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {historySubTab === "posting" && (
