@@ -13,6 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="icon" href="/daedong.svg" type="image/svg+xml" />
+      </head>
       <body>{children}</body>
     </html>
   );

@@ -18,6 +18,10 @@ export default function RootLayout({
 
   return (
     <html lang="ko">
+      <head>
+        <title>대동여지도 - 나의 동아리를 찾는 지름길</title>
+        <link rel="icon" href="/daedong.svg" type="image/svg+xml" />
+      </head>
       <body>
         <QueryProvider>
           <UserProvider>
