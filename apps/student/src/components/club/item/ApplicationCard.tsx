@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface Application {
   id: number;
   title: string;
@@ -15,20 +13,30 @@ export default function ApplicationCard({
   application,
   onClick,
 }: ApplicationCardProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick?.(application);
+  };
+
   return (
-    <div className="rounded-3xl bg-white px-5 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
-      {/* Header with arrow */}
-      <div className="mb-6 flex items-center justify-between">
+    // biome-ignore lint/a11y/useSemanticElements: button 안에 button이 있어 div 사용
+    <div
+      onClick={() => onClick?.(application)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.(application);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      className="w-full cursor-pointer rounded-3xl bg-white px-5 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+    >
+      {/* Header */}
+      <div className="mb-6">
         <h2 className="font-semibold text-gray-900 text-lg">
           {application.title}
         </h2>
-        <Image
-          src="/images/clubs/rightArrow.svg"
-          alt="화살표"
-          width={12}
-          height={12}
-          className="text-gray-400"
-        />
       </div>
 
       {/* Deadline */}
@@ -39,7 +47,7 @@ export default function ApplicationCard({
       {/* View button */}
       <button
         type="button"
-        onClick={() => onClick?.(application)}
+        onClick={handleClick}
         className="rounded-lg bg-primary-500 px-5 py-2 font-medium text-white transition-colors duration-200 hover:bg-primary-600"
       >
         조회
