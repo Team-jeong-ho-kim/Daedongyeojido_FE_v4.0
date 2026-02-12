@@ -122,6 +122,7 @@ export interface MySubmissionDetail {
   classNumber: string;
   introduction: string;
   major: string;
+  availableMajors?: string[];
   contents: MySubmissionAnswer[];
   submissionDuration: string | [number, number, number];
   user_application_status?: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";

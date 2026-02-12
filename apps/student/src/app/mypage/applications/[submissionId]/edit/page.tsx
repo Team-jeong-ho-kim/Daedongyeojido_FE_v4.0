@@ -12,6 +12,7 @@ import {
   getMySubmissionDetail,
   updateMySubmission,
 } from "@/api/applicationForm";
+import { FIELDS } from "@/constants/club";
 import type { MySubmissionDetail } from "@/types";
 
 interface MySubmissionEditPageProps {
@@ -93,6 +94,17 @@ export default function MySubmissionEditPage({
       setErrors((prev) => {
         const next = { ...prev };
         delete next[errorKey];
+        return next;
+      });
+    }
+  };
+
+  const handleMajorSelect = (major: string) => {
+    setFormData((prev) => ({ ...prev, major }));
+    if (errors.major) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.major;
         return next;
       });
     }
@@ -242,13 +254,25 @@ export default function MySubmissionEditPage({
         {/* 지원 전공 */}
         <div className="mb-12">
           <h2 className="mb-4 font-bold text-xl">지원 전공</h2>
-          <TextInput
-            name="major"
-            placeholder="지원 전공을 입력해주세요."
-            value={formData.major}
-            onChange={(value) => handleFieldChange("major", value)}
-            error={errors.major}
-          />
+          <div className="flex flex-wrap gap-2">
+            {(submission.availableMajors || FIELDS).map((major) => (
+              <button
+                key={major}
+                type="button"
+                onClick={() => handleMajorSelect(major)}
+                className={`rounded-full border px-5 py-2 font-normal text-base transition-colors ${
+                  formData.major === major
+                    ? "border-primary-500 bg-primary-50 text-primary-500"
+                    : "border-gray-400 bg-white text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                {major}
+              </button>
+            ))}
+          </div>
+          {errors.major && (
+            <p className="mt-2 text-red-500 text-sm">{errors.major}</p>
+          )}
         </div>
 
         {/* 질문 답변 */}
