@@ -45,7 +45,9 @@ export default function LinkInput({
       if (!trimmedLink) return;
 
       if (!isValidUrl(trimmedLink)) {
-        setInternalError("올바른 링크 형식을 입력해주세요. (예: https://example.com)");
+        setInternalError(
+          "올바른 링크 형식을 입력해주세요. (예: https://example.com)",
+        );
         return;
       }
 

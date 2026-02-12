@@ -6,19 +6,21 @@ import { getMyInfo } from "@/api/user";
 import { clearTokens, saveTokens } from "@/lib/token";
 
 export const useLoginMutation = () => {
-  return useMutation<LoginResponse, Error, LoginRequest>({
-    mutationFn: ({ accountId, password }) => login({ accountId, password }),
+  return useMutation<
+    LoginResponse,
+    Error,
+    LoginRequest & { rememberMe?: boolean }
+  >({
+    mutationFn: ({ accountId, password, rememberMe }) =>
+      login({ accountId, password, rememberMe }),
     onSuccess: async (data) => {
-      // 1. 토큰 먼저 저장 (이후 API 호출을 위해 필요)
       saveTokens(data);
 
       toast.success(`${data.userName}님, 환영합니다!`);
 
       try {
-        // 2. 최신 유저 정보 조회
         const userInfo = await getMyInfo();
 
-        // 3. 온보딩 필요 여부 체크
         const hasAnyInfo =
           userInfo.introduction ||
           (userInfo.major && userInfo.major.length > 0) ||
@@ -26,13 +28,11 @@ export const useLoginMutation = () => {
           userInfo.profileImage;
         const needsOnboarding = !hasAnyInfo;
 
-        // 4. 리다이렉트
         setTimeout(() => {
           window.location.href = needsOnboarding ? "/onboarding" : "/";
         }, 1200);
       } catch (error) {
         console.error("유저 정보 조회 실패:", error);
-        // 에러 발생 시 기본적으로 메인으로 이동
         setTimeout(() => {
           window.location.href = "/";
         }, 1200);
@@ -43,19 +43,16 @@ export const useLoginMutation = () => {
       const serverMessage =
         error.response?.data?.message || error.response?.data?.description;
 
-      // 네트워크 에러
       if (!error.response) {
         toast.error("네트워크 연결을 확인해주세요.");
         return;
       }
 
-      // 서버 응답 메시지가 있으면 우선 사용
       if (serverMessage) {
         toast.error(serverMessage);
         return;
       }
 
-      // HTTP 상태 코드별 에러 처리
       switch (status) {
         case 400:
           toast.error("입력 형식이 올바르지 않습니다.");

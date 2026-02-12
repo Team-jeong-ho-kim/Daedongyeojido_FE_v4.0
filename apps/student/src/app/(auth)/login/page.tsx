@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [accountId, setAccountId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const { mutate: login, isPending: loginPending } = useLoginMutation();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function LoginPage() {
       return;
     }
 
-    login({ accountId, password });
+    login({ accountId, password, rememberMe });
   };
 
   const accountInputId = useId();
@@ -136,6 +137,8 @@ export default function LoginPage() {
                 <input
                   type="checkbox"
                   id={rememberId}
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-600 bg-transparent checked:border-gray-500 checked:bg-gray-600"
                 />
                 <svg

@@ -728,7 +728,9 @@ function LinkInput({
       const trimmedLink = currentLink.trim();
       if (!trimmedLink) return;
       if (!isValidUrl(trimmedLink)) {
-        setInternalError("\uC62C\uBC14\uB978 \uB9C1\uD06C \uD615\uC2DD\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694. (\uC608: https://example.com)");
+        setInternalError(
+          "\uC62C\uBC14\uB978 \uB9C1\uD06C \uD615\uC2DD\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694. (\uC608: https://example.com)"
+        );
         return;
       }
       setInternalError("");
