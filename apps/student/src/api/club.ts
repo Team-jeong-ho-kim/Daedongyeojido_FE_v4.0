@@ -84,7 +84,7 @@ export const createClubApplication = async (
   return response.data;
 };
 
-export const deleteClubMember = async (userId: number) => {
+export const deleteClubMember = async (userId: string) => {
   const response = await apiClient.delete(`/clubs/members/${userId}`);
   return response.data;
 };

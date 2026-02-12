@@ -8,7 +8,7 @@ interface MemberItemProps extends ClubMember {
 export default function MemberItem({
   userName,
   majors,
-  introduce,
+  introduction,
   canDelete = false,
   onDelete,
 }: MemberItemProps) {
@@ -53,7 +53,7 @@ export default function MemberItem({
           {userName}
         </h3>
         <p className="mt-1 line-clamp-2 flex-shrink-0 overflow-hidden text-[12px] text-gray-600 leading-relaxed md:text-[13px]">
-          {introduce || "소개가 없습니다."}
+          {introduction || "소개가 없습니다."}
         </p>
         <div className="relative flex min-h-7 flex-shrink-0 flex-wrap gap-1 overflow-visible text-[11px] text-gray-500 md:text-[12px]">
           {/* 기본 표시 (항상 보임) */}
