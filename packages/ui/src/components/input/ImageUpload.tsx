@@ -46,6 +46,14 @@ export default function ImageUpload({
         return;
       }
 
+      // 파일 크기 검증 (10MB)
+      const maxSizeInBytes = 10 * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        toast.error("이미지 파일은 10MB 이하만 업로드 가능합니다.");
+        e.target.value = "";
+        return;
+      }
+
       setFileName(file.name);
 
       const reader = new FileReader();

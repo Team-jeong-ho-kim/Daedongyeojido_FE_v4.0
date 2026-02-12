@@ -645,6 +645,12 @@ function ImageUpload({
         e.target.value = "";
         return;
       }
+      const maxSizeInBytes = 10 * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        import_sonner.toast.error("\uC774\uBBF8\uC9C0 \uD30C\uC77C\uC740 10MB \uC774\uD558\uB9CC \uC5C5\uB85C\uB4DC \uAC00\uB2A5\uD569\uB2C8\uB2E4.");
+        e.target.value = "";
+        return;
+      }
       setFileName(file.name);
       const reader = new FileReader();
       reader.onloadend = () => {
