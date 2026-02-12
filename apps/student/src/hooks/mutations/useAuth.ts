@@ -7,13 +7,8 @@ import { getErrorMessage } from "@/lib/error";
 import { clearTokens, saveTokens } from "@/lib/token";
 
 export const useLoginMutation = () => {
-  return useMutation<
-    LoginResponse,
-    Error,
-    LoginRequest & { rememberMe?: boolean }
-  >({
-    mutationFn: ({ accountId, password, rememberMe }) =>
-      login({ accountId, password, rememberMe }),
+  return useMutation<LoginResponse, Error, LoginRequest>({
+    mutationFn: ({ accountId, password }) => login({ accountId, password }),
     onSuccess: async (data) => {
       saveTokens(data);
 

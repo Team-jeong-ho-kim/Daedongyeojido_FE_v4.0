@@ -11,7 +11,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [accountId, setAccountId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const isSubmittingRef = useRef<boolean>(false);
@@ -51,7 +50,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     login(
-      { accountId, password, rememberMe },
+      { accountId, password },
       {
         onSettled: () => {
           isSubmittingRef.current = false;
@@ -63,7 +62,6 @@ export default function LoginPage() {
 
   const accountInputId = useId();
   const passwordId = useId();
-  const rememberId = useId();
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -179,30 +177,6 @@ export default function LoginPage() {
                     />
                   </button>
                 </div>
-              </div>
-
-              <div className="relative flex items-center">
-                <input
-                  type="checkbox"
-                  id={rememberId}
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-600 bg-transparent checked:border-gray-500 checked:bg-gray-600"
-                />
-                <svg
-                  aria-hidden="true"
-                  className="pointer-events-none absolute left-0 h-4 w-4 text-gray-300 opacity-0 peer-checked:opacity-100"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
-                >
-                  <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
-                </svg>
-                <label
-                  htmlFor={rememberId}
-                  className="ml-2 cursor-pointer text-gray-400 text-sm"
-                >
-                  로그인 유지
-                </label>
               </div>
             </div>
           </div>

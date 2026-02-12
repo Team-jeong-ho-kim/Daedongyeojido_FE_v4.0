@@ -5,14 +5,13 @@ import { saveTokens } from "@/lib/token";
 export const login = async ({
   accountId,
   password,
-  rememberMe = false,
-}: LoginRequest & { rememberMe?: boolean }): Promise<LoginResponse> => {
+}: LoginRequest): Promise<LoginResponse> => {
   const response = await apiClient.post<LoginResponse>("/auth/login", {
     accountId,
     password,
   });
 
-  saveTokens(response.data, rememberMe);
+  saveTokens(response.data);
 
   return response.data;
 };
