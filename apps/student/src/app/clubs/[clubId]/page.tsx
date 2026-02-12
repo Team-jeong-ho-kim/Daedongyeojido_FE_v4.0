@@ -811,6 +811,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           subtitle="동아리 가입 신청을 위해 아래 버튼을 눌러주세요!"
           description="아래 버튼을 눌러 지원해보세요!"
           buttonText="이 동아리의 공고로 바로가기"
+          buttonHref="/announcements"
         />
       )}
 
