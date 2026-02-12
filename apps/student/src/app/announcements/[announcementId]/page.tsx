@@ -128,6 +128,11 @@ export default function AnnouncementDetailPage({
     announcement?.phoneNumber ?? "",
   );
 
+  // 공고 종료 여부 확인
+  const isExpired = formattedDeadline
+    ? new Date(formattedDeadline) < new Date()
+    : false;
+
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {
     deleteAnnouncementMutate(announcementId);
@@ -392,12 +397,22 @@ export default function AnnouncementDetailPage({
             {/* 지원서 작성하기 버튼 */}
             {!isClubMember && (
               <div className="flex justify-center pt-4">
-                <Link
-                  href={`/announcements/${announcementId}/apply`}
-                  className="w-full max-w-md cursor-pointer rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white contain-paint hover:bg-primary-400 md:text-[16px]"
-                >
-                  지원서 작성하기
-                </Link>
+                {isExpired ? (
+                  <button
+                    type="button"
+                    onClick={() => toast.warning("종료된 공고입니다")}
+                    className="w-full max-w-md cursor-not-allowed rounded-lg bg-gray-400 py-3 text-center font-medium text-[15px] text-white contain-paint md:text-[16px]"
+                  >
+                    지원서 작성하기 (종료)
+                  </button>
+                ) : (
+                  <Link
+                    href={`/announcements/${announcementId}/apply`}
+                    className="w-full max-w-md cursor-pointer rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white contain-paint hover:bg-primary-400 md:text-[16px]"
+                  >
+                    지원서 작성하기
+                  </Link>
+                )}
               </div>
             )}
           </div>
