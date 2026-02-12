@@ -584,7 +584,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       {activeTab === "history" && !isClubMember && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {jobPostings.length === 0 ? (
-            <div className="py-12 text-center text-[14px] text-gray-400 md:py-16 md:text-[15px] lg:py-20">
+            <div className="flex min-h-[400px] items-center justify-center text-center text-[14px] text-gray-400 md:min-h-[460px] md:text-[15px]">
               공고 이력이 없습니다.
             </div>
           ) : (
