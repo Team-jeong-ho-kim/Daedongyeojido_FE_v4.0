@@ -34,3 +34,8 @@ export const selectClubSubmission = async (
   });
   return response.data;
 };
+
+// 동아리 알림 삭제 (동아리 리더, 멤버만 가능)
+export const deleteClubAlarm = async (alarmId: number) => {
+  await apiClient.delete(`/clubs/alarms/${alarmId}`);
+};

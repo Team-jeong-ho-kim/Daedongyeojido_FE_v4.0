@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   acceptMemberRequest,
+  deleteClubAlarm,
   rejectMemberRequest,
   selectClubSubmission,
 } from "@/api/alarm";
@@ -66,6 +67,25 @@ export const useSelectClubSubmissionMutation = () => {
       const errorMessage = getErrorMessage(
         error,
         "처리에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useDeleteClubAlarmMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteClubAlarm,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clubAlarms"] });
+      toast.success("알림이 삭제되었습니다.");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "알림 삭제에 실패했습니다. 다시 시도해주세요.",
       );
       toast.error(errorMessage);
     },

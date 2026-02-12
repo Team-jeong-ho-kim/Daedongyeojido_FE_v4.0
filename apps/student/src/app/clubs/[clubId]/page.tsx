@@ -21,6 +21,7 @@ import {
   NoticeCard,
   Pagination,
 } from "@/components";
+import { useDeleteClubAlarmMutation } from "@/hooks/mutations/useAlarm";
 import {
   useDissolveClubMutation,
   useRequestAddClubMemberMutation,
@@ -51,6 +52,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     useDissolveClubMutation();
   const { mutate: requestAddMemberMutate, isPending: isAddMemberPending } =
     useRequestAddClubMemberMutation(clubId);
+  const { mutate: deleteAlarmMutate } = useDeleteClubAlarmMutation();
 
   const role = useUserStore((state) => state.userInfo?.role);
 
@@ -372,6 +374,11 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     );
   };
 
+  // 알림 삭제 핸들러
+  const handleDeleteAlarm = (alarmId: number) => {
+    deleteAlarmMutate(alarmId);
+  };
+
   const pagedPostings = jobPostings.slice(
     (postingPage - 1) * postingLimit,
     postingPage * postingLimit,
@@ -568,6 +575,9 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                       title={alarm.title}
                       date=""
                       content={alarm.content}
+                      alarmId={alarm.id}
+                      isClubMember={isClubMember}
+                      onDelete={handleDeleteAlarm}
                     />
                   ))}
               </div>
