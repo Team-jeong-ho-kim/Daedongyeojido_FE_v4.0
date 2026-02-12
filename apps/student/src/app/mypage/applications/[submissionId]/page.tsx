@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
+  cancelMySubmission,
   deleteMySubmission,
   getMySubmissionDetail,
   submitMySubmission,
@@ -29,8 +30,10 @@ export default function MySubmissionDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -92,6 +95,21 @@ export default function MySubmissionDetailPage({
       toast.error("지원서 삭제에 실패했습니다.");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCancelApplication = async () => {
+    setIsCanceling(true);
+    try {
+      await cancelMySubmission(submissionId);
+      toast.success("지원이 취소되었습니다.");
+      setShowCancelModal(false);
+      router.push("/mypage/applications");
+    } catch (error) {
+      console.error("지원 취소 실패:", error);
+      toast.error("지원 취소에 실패했습니다.");
+    } finally {
+      setIsCanceling(false);
     }
   };
 
@@ -245,6 +263,16 @@ export default function MySubmissionDetailPage({
               </button>
             </>
           )}
+          {(isSubmitted || fromHistory) && (
+            <button
+              type="button"
+              onClick={() => setShowCancelModal(true)}
+              disabled={isCanceling}
+              className="rounded-xl border border-red-500 bg-white px-8 py-3 font-medium text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
+            >
+              {isCanceling ? "취소 중..." : "제출 취소하기"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() =>
@@ -281,6 +309,17 @@ export default function MySubmissionDetailPage({
         description="삭제된 지원서는 복구할 수 없습니다."
         cancelText="취소"
         confirmText="삭제하기"
+      />
+
+      <ApplicationConfirmModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelApplication}
+        onBackdropClick={() => setShowCancelModal(false)}
+        title="지원을 취소하시겠습니까?"
+        description="취소 후에는 다시 지원서를 작성할 수 있습니다."
+        cancelText="닫기"
+        confirmText="취소하기"
       />
     </div>
   );

@@ -128,6 +128,12 @@ export const deleteMySubmission = async (
   await apiClient.delete(`/applications/${submissionId}`);
 };
 
+export const cancelMySubmission = async (
+  submissionId: string,
+): Promise<void> => {
+  await apiClient.patch(`/applications/cancel/${submissionId}`);
+};
+
 export const createInterviewSchedule = async (
   userId: string,
   data: CreateInterviewScheduleRequest,
