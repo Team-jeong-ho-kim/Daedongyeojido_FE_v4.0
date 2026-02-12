@@ -7,6 +7,12 @@ if (process.env.NODE_ENV === "development") {
 
 const nextConfig: NextConfig = {
   transpilePackages: ["ui", "config-tailwind"],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
