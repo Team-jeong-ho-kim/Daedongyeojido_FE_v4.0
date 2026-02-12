@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const isSubmittingRef = useRef<boolean>(false);
   const { mutate: login, isPending: loginPending } = useLoginMutation();
 
@@ -141,21 +142,43 @@ export default function LoginPage() {
                 >
                   비밀번호
                 </label>
-                <input
-                  value={password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setPassword(e.target.value)
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleLogin();
+                <div className="relative">
+                  <input
+                    value={password}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setPassword(e.target.value)
                     }
-                  }}
-                  id={passwordId}
-                  type="password"
-                  placeholder="비밀번호를 입력해주세요."
-                  className="w-full rounded-lg border border-transparent bg-[#2a2a2a] px-4 py-3.5 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"
-                />
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleLogin();
+                      }
+                    }}
+                    id={passwordId}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="비밀번호를 입력해주세요."
+                    className="w-full rounded-lg border border-transparent bg-[#2a2a2a] px-4 py-3.5 pr-12 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="-translate-y-1/2 absolute top-1/2 right-4 text-gray-400 transition-colors hover:text-gray-300"
+                    aria-label={
+                      showPassword ? "비밀번호 숨기기" : "비밀번호 보기"
+                    }
+                  >
+                    <Image
+                      src={
+                        showPassword
+                          ? "/images/icons/eye-slash.svg"
+                          : "/images/icons/eye.svg"
+                      }
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                    />
+                  </button>
+                </div>
               </div>
 
               <div className="relative flex items-center">
