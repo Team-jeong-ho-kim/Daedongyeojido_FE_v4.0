@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useLoginMutation } from "@/hooks/mutations/useAuth";
 import { getAccessToken } from "@/lib/token";
@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [accountId, setAccountId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const isSubmittingRef = useRef<boolean>(false);
   const { mutate: login, isPending: loginPending } = useLoginMutation();
 
   useEffect(() => {
@@ -21,18 +23,41 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const handleLogin = () => {
+  const handleLogin = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    // 이벤트 전파 차단
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // 동기적으로 중복 요청 차단
+    if (loginPending || isSubmittingRef.current) {
+      return;
+    }
+
     if (!accountId.trim()) {
-      toast.error("DSM 계정 ID를 입력해주세요.");
+      toast.error("DSM 계정 ID를 입력해주세요.", { id: "login-validation" });
       return;
     }
 
     if (!password.trim()) {
-      toast.error("비밀번호를 입력해주세요.");
+      toast.error("비밀번호를 입력해주세요.", { id: "login-validation" });
       return;
     }
 
-    login({ accountId, password, rememberMe });
+    // 즉시 차단
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+
+    login(
+      { accountId, password, rememberMe },
+      {
+        onSettled: () => {
+          isSubmittingRef.current = false;
+          setIsSubmitting(false);
+        },
+      },
+    );
   };
 
   const accountInputId = useId();
@@ -161,12 +186,21 @@ export default function LoginPage() {
         </div>
 
         <button
-          onClick={handleLogin}
-          disabled={loginPending}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!loginPending && !isSubmitting && !isSubmittingRef.current) {
+              handleLogin(e);
+            }
+          }}
+          disabled={loginPending || isSubmitting}
           type="button"
+          style={
+            loginPending || isSubmitting ? { pointerEvents: "none" } : undefined
+          }
           className="w-full max-w-md rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loginPending ? "로그인 중..." : "로그인"}
+          {loginPending || isSubmitting ? "로그인 중..." : "로그인"}
         </button>
       </div>
     </div>
