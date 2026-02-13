@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ClubMember } from "@/types";
 
 interface MemberItemProps extends ClubMember {
@@ -9,6 +10,7 @@ export default function MemberItem({
   userName,
   majors,
   introduction,
+  profileImage,
   canDelete = false,
   onDelete,
 }: MemberItemProps) {
@@ -45,7 +47,16 @@ export default function MemberItem({
       )}
 
       {/* 이미지 영역 */}
-      <div className="h-[140px] w-full rounded-t-[14px] bg-[#3D5A4C] md:h-[155px] md:rounded-t-[16px] lg:h-[165px]" />
+      <div className="relative h-[140px] w-full overflow-hidden rounded-t-[14px] bg-gray-200 md:h-[155px] md:rounded-t-[16px] lg:h-[165px]">
+        <Image
+          src={profileImage}
+          alt={`${userName} 프로필`}
+          fill
+          unoptimized
+          className="object-cover"
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 240px"
+        />
+      </div>
 
       {/* 정보 영역 */}
       <div className="flex h-[110px] flex-col gap-1.5 rounded-b-[14px] bg-gray-50 p-3 transition-shadow duration-200 group-hover:shadow-xl md:h-[115px] md:rounded-b-[16px] md:p-4 lg:h-[120px]">

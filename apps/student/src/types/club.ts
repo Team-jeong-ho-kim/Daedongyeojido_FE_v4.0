@@ -33,7 +33,8 @@ export interface ClubMember {
   userId: number;
   userName: string;
   majors: string[];
-  introduction: string | null;
+  introduction: string;
+  profileImage: string;
 }
 
 export interface ClubDetailResponse {

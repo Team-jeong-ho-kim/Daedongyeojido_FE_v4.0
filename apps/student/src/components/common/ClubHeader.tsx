@@ -30,6 +30,8 @@ export function ClubHeader({
                 alt={clubName}
                 width={104}
                 height={104}
+                priority
+                unoptimized
                 className="h-full w-full object-cover"
               />
             ) : (
