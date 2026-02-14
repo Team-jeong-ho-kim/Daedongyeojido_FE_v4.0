@@ -125,13 +125,13 @@ pnpm install
 ### 루트 스크립트
 | 명령 | 설명 |
 | --- | --- |
-| `pnpm dev` | `turbo run dev` – web/student/admin 앱을 동시에 dev 모드로 실행 (root `.env.local` 사용) |
-| `pnpm dev:prod` | `turbo run dev:prod` – `.env.production` 값을 로드하여 프로덕션 환경을 리허설 |
-| `pnpm build` | `turbo run build` – 모든 앱/패키지를 순차 빌드 (`.next`, `dist` 아티팩트 캐시) |
-| `pnpm lint` | `turbo run lint` – Biome lint 확인 |
-| `pnpm lint:fix` | `biome check --write .` – lint 에러를 자동 수정 |
-| `pnpm format` | `turbo run format` – Biome 포맷 체크 |
-| `pnpm format:fix` | `biome format --write .` – 전역 서식 자동 정렬 |
+| `pnpm dev` | web/student/admin 앱을 동시에 dev 모드로 실행 (root `.env.local` 사용) |
+| `pnpm dev:prod` | `.env.production` 값을 로드하여 프로덕션 환경을 리허설 |
+| `pnpm build` | 모든 앱/패키지를 순차 빌드 (`.next`, `dist` 아티팩트 캐시) |
+| `pnpm lint` | Biome lint 확인 |
+| `pnpm lint:fix` | lint 에러를 자동 수정 |
+| `pnpm format` | Biome 포맷 체크 |
+| `pnpm format:fix` | 전역 서식 자동 정렬 |
 
 ### 필터링 실행 예시
 | 대상 | 개발 | 빌드/배포 | 비고 |
