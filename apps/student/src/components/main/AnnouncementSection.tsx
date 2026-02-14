@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { useGetAllAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import AnnouncementItem from "../announcement/item/AnnouncementItem";
+import { EmptyDocumentIcon } from "../icons";
 
 export default function AnnouncementSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -82,26 +83,40 @@ export default function AnnouncementSection() {
       </div>
 
       {/* 공고 리스트 */}
-      <div
-        ref={scrollContainerRef}
-        className="scrollbar-hide overflow-x-auto"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        <div className="flex gap-4 px-4 md:gap-6 md:px-8 lg:pr-8 lg:pl-[calc((100vw-1280px)/2+32px)]">
-          {announcements?.map((announcement) => (
-            <div key={announcement.announcementId} className="flex-shrink-0">
-              <AnnouncementItem
-                announcement_id={announcement.announcementId}
-                title={announcement.title}
-                club_name={announcement.clubName}
-                deadline={daedlineFormat(announcement.deadline)}
-                club_image={announcement.clubImage}
-              />
-            </div>
-          ))}
-          <div className="w-1 flex-shrink-0 pr-4 md:pr-8" />
+      {announcements && announcements.length > 0 ? (
+        <div
+          ref={scrollContainerRef}
+          className="scrollbar-hide overflow-x-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <div className="flex gap-4 px-4 md:gap-6 md:px-8 lg:pr-8 lg:pl-[calc((100vw-1280px)/2+32px)]">
+            {announcements.map((announcement) => (
+              <div key={announcement.announcementId} className="flex-shrink-0">
+                <AnnouncementItem
+                  announcement_id={announcement.announcementId}
+                  title={announcement.title}
+                  club_name={announcement.clubName}
+                  deadline={daedlineFormat(announcement.deadline)}
+                  club_image={announcement.clubImage}
+                />
+              </div>
+            ))}
+            <div className="w-1 flex-shrink-0 pr-4 md:pr-8" />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-12 md:px-8 md:py-16">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 md:h-24 md:w-24">
+            <EmptyDocumentIcon />
+          </div>
+          <p className="mb-2 font-medium text-base text-gray-900 md:text-lg">
+            진행 중인 동아리 공고가 없습니다
+          </p>
+          <p className="text-center text-gray-500 text-sm md:text-base">
+            새로운 공고가 올라오면 이곳에서 확인할 수 있어요
+          </p>
+        </div>
+      )}
     </section>
   );
 }
