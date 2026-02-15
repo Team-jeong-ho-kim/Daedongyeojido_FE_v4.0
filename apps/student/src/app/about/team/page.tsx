@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "팀원 소개",
+  description:
+    "대동여지도를 만드는 사람들을 소개합니다. PM, 프론트엔드, 백엔드, 디자이너로 구성된 전문가 팀이 함께 만들어가는 대동여지도입니다.",
+  openGraph: {
+    title: "팀원 소개 | 대동여지도",
+    description:
+      "대동여지도를 만드는 사람들. PM, 프론트엔드, 백엔드, 디자이너로 구성된 전문가 팀",
+  },
+};
 
 const teamMembers = [
   {

@@ -83,7 +83,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full overflow-x-hidden bg-white">
+    <main className="relative w-full overflow-x-hidden bg-white">
       <div className="absolute top-[70px] left-0 h-[1000px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white md:h-[1500px]" />
 
       <section
@@ -534,6 +534,6 @@ export default function Home() {
       </div>
 
       <Footer />
-    </div>
+    </main>
   );
 }

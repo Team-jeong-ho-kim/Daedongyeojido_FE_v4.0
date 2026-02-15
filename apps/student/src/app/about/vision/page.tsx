@@ -1,5 +1,22 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "비전",
+  description:
+    "대동여지도의 비전과 핵심 가치를 소개합니다. 동아리 문화의 혁신, 지속 가능한 발전, 서비스 확장을 통해 더 나은 동아리 문화를 만들어가겠습니다.",
+  keywords: [
+    "대동여지도 비전",
+    "동아리 문화 혁신",
+    "지속 가능한 발전",
+    "사용자 중심",
+  ],
+  openGraph: {
+    title: "비전 | 대동여지도",
+    description: "동아리 문화의 혁신을 꿈꾸는 대동여지도의 비전과 핵심 가치",
+  },
+};
 
 export default function VisionPage() {
   return (

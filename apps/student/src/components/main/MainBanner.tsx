@@ -65,7 +65,7 @@ export default function MainBanner() {
   };
 
   return (
-    <div className="relative h-[500px] w-full overflow-hidden bg-black md:h-[600px] lg:h-[650px]">
+    <section className="relative h-[500px] w-full overflow-hidden bg-black md:h-[600px] lg:h-[650px]">
       <div className="relative mx-auto h-full max-w-7xl px-4 py-20 md:px-8 md:py-32">
         <div className="absolute top-8 left-4 h-24 w-24 animate-float md:top-12 md:left-8 md:h-32 md:w-32 lg:h-48 lg:w-48">
           <Image
@@ -142,6 +142,6 @@ export default function MainBanner() {
           height={250}
         />
       </div>
-    </div>
+    </section>
   );
 }

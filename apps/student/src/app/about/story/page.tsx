@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "대동여지도의 탄생",
+  description:
+    "대동여지도가 탄생한 배경과 스토리를 소개합니다. 비효율적인 동아리 관리 문제를 발견하고, 학생들이 직접 해결책을 만들어 디지털 혁신을 이루어낸 여정입니다.",
+  keywords: ["대동여지도 스토리", "동아리 문화 혁신", "학생 개발", "디지털화"],
+  openGraph: {
+    title: "대동여지도의 탄생 | 대동여지도",
+    description: "비효율적인 동아리 관리를 혁신한 대동여지도의 탄생 스토리",
+  },
+};
 
 export default function StoryPage() {
   return (

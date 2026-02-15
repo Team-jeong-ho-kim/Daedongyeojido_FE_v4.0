@@ -1,5 +1,25 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "기능 소개",
+  description:
+    "대동여지도의 핵심 기능을 소개합니다. 동아리 생성 및 관리, 공고 및 모집, 통계 및 분석, 실시간 알림, 지원서 폼 생성, 대시보드 등 동아리 관리의 모든 것을 한 곳에서 해결하세요.",
+  keywords: [
+    "동아리 기능",
+    "동아리 관리",
+    "공고 모집",
+    "지원서 관리",
+    "실시간 알림",
+    "대시보드",
+  ],
+  openGraph: {
+    title: "기능 소개 | 대동여지도",
+    description:
+      "동아리 생성, 공고 관리, 통계 분석, 실시간 알림 등 동아리 관리의 모든 기능",
+  },
+};
 
 export default function FeaturesPage() {
   return (
