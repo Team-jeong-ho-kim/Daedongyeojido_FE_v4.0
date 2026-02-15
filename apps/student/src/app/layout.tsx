@@ -6,7 +6,8 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { UserProvider } from "@/components/providers/UserProvider";
 import "./globals.css";
 
-const siteUrl = "https://student.daedongyeojido.site";
+const siteUrl =
+  process.env.NEXT_PUBLIC_USER_URL || "https://student.daedongyeojido.site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
