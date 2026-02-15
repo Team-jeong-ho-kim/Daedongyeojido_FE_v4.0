@@ -12,5 +12,10 @@ module.exports = {
         disallow: ["/mypage/", "/api/"],
       },
     ],
+    additionalSitemaps: [],
+    transformRobotsTxt: async (_, robotsTxt) => {
+      // Remove Host directive (not supported by Googlebot)
+      return robotsTxt.replace(/# Host\nHost: .*\n\n/g, "");
+    },
   },
 };
