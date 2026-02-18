@@ -6,7 +6,7 @@
     "dev": "dotenv -e ../../.env.local -- next dev --port 3001",
     "dev:prod": "dotenv -e ../../.env.production -- next dev --port 3001",
     "build": "dotenv -e ../../.env.production -- next build",
-    "postbuild": "next-sitemap",
+    "postbuild": "dotenv -e ../../.env.production -- next-sitemap",
     "pages:build": "dotenv -e ../../.env.production -- npx @cloudflare/next-on-pages@1",
     "preview": "npx wrangler pages dev .vercel/output/static --port 3001",
     "deploy": "npx wrangler pages deploy .vercel/output/static",
