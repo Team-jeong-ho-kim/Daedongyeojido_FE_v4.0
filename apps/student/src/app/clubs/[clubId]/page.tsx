@@ -55,6 +55,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const { mutate: deleteAlarmMutate } = useDeleteClubAlarmMutation();
 
   const role = useUserStore((state) => state.userInfo?.role);
+  const userClubName = useUserStore((state) => state.userInfo?.clubName);
 
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
   const isLeader = role === "CLUB_LEADER";
@@ -163,6 +164,10 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
   const club = clubData;
   const clubMembers = clubData?.clubMembers || [];
 
+  // 현재 보는 동아리가 내 동아리인지 여부
+  const isMyClub = isClubMember && userClubName === club?.club.clubName;
+  const isMyClubLeader = isLeader && userClubName === club?.club.clubName;
+
   // ClubAnnouncement를 JobPosting 형태로 변환
   const allJobPostings = (announcements || [])
     .map((announcement) => {
@@ -192,8 +197,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     })
     .sort((a, b) => b.id - a.id); // 최신순 정렬
 
-  // 비회원일 때는 OPEN 상태(게시된 공고)만 표시
-  const jobPostings = isClubMember
+  // 내 동아리가 아닐 때는 OPEN 상태(게시된 공고)만 표시
+  const jobPostings = isMyClub
     ? allJobPostings
     : allJobPostings.filter((posting) => posting.serverStatus === "OPEN");
 
@@ -417,7 +422,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           >
             소개
           </button>
-          {isClubMember && (
+          {isMyClub && (
             <button
               type="button"
               onClick={() => handleTabChange("notification")}
@@ -439,9 +444,9 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 : "text-gray-400"
             }`}
           >
-            {isClubMember ? "공고/지원서 폼" : "공고 이력"}
+            {isMyClub ? "공고/지원서 폼" : "공고"}
           </button>
-          {isClubMember && (
+          {isMyClub && (
             <button
               type="button"
               onClick={() => handleTabChange("application")}
@@ -458,7 +463,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       </div>
 
       {/* 공고/지원서 폼 서브탭 */}
-      {isClubMember && activeTab === "history" && (
+      {isMyClub && activeTab === "history" && (
         <nav className="flex">
           <button
             type="button"
@@ -491,7 +496,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
           <div className="flex flex-col gap-8 md:gap-12 lg:gap-16">
             <ClubInfoEditSection
               club={club.club}
-              isClubMember={isClubMember}
+              isClubMember={isMyClub}
               editClubImage={editClubImage}
               setEditClubImage={setEditClubImage}
               setEditClubImageFile={setEditClubImageFile}
@@ -510,7 +515,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
             <ClubMemberSection
               clubId={clubId}
               clubMembers={clubMembers}
-              isLeader={isLeader}
+              isLeader={isMyClubLeader}
               studentNumber={studentNumber}
               setStudentNumber={setStudentNumber}
               studentName={studentName}
@@ -519,7 +524,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
             />
 
             {/* 변경 사항 저장 */}
-            {isClubMember && (
+            {isMyClub && (
               <section className="flex justify-center border-gray-200 border-t px-8 pt-8 md:px-32 lg:px-60">
                 <Button
                   onClick={handleSave}
@@ -533,7 +538,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
             )}
 
             {/* 동아리 해체 신청 */}
-            {isLeader && (
+            {isMyClubLeader && (
               <section className="flex justify-end pt-4">
                 <button
                   type="button"
@@ -558,7 +563,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       )}
 
       {/* 알림 탭 */}
-      {activeTab === "notification" && isClubMember && (
+      {activeTab === "notification" && isMyClub && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {!clubAlarms || clubAlarms.length === 0 ? (
             <div className="flex min-h-[400px] items-center justify-center text-center text-[14px] text-gray-400 md:min-h-[460px] md:text-[15px]">
@@ -576,7 +581,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                       date=""
                       content={alarm.content}
                       alarmId={alarm.id}
-                      isClubMember={isClubMember}
+                      isClubMember={isMyClub}
                       onDelete={handleDeleteAlarm}
                     />
                   ))}
@@ -594,8 +599,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         </div>
       )}
 
-      {/* 공고 이력 탭 - 비소속 */}
-      {activeTab === "history" && !isClubMember && (
+      {/* 공고 탭 - 타 동아리 */}
+      {activeTab === "history" && !isMyClub && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {jobPostings.length === 0 ? (
             <div className="flex min-h-[400px] items-center justify-center text-center text-[14px] text-gray-400 md:min-h-[460px] md:text-[15px]">
@@ -627,8 +632,8 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         </div>
       )}
 
-      {/* 공고/지원서 폼 탭 - 소속 */}
-      {activeTab === "history" && isClubMember && (
+      {/* 공고/지원서 폼 탭 - 내 동아리 */}
+      {activeTab === "history" && isMyClub && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {historySubTab === "posting" && (
             <div className="flex flex-col gap-6 md:gap-8">
@@ -654,7 +659,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                         status={posting.status}
                         title={posting.title}
                         date={posting.date}
-                        isMember={isClubMember}
+                        isMember={isMyClub}
                         content={posting.content}
                         onClick={() =>
                           router.push(`/announcements/${posting.id}`)
@@ -747,7 +752,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       )}
 
       {/* 지원내역 탭 */}
-      {activeTab === "application" && isClubMember && (
+      {activeTab === "application" && isMyClub && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           {/* 지원서 폼 선택 */}
           {applicationForms && applicationForms.length > 0 && (
@@ -821,7 +826,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       )}
 
       {/* CTA */}
-      {!isClubMember && (
+      {!isMyClub && (
         <div className="mt-32 mb-32">
           <CTASection
             title="이 동아리가 마음에 든다면?"
