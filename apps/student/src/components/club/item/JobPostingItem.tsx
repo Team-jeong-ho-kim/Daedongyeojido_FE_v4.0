@@ -22,6 +22,12 @@ export default function JobPostingItem({
 }: JobPostingItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const statusLabel = status === "진행중" ? "OPEN" : "CLOSED";
+  const statusClass =
+    status === "진행중"
+      ? "border-blue-500 bg-blue-50 text-blue-500"
+      : "border-red-500 bg-red-50 text-red-500";
+
   if (!isMember) {
     return (
       <button
@@ -31,15 +37,9 @@ export default function JobPostingItem({
       >
         <div className="flex items-center gap-3 md:gap-4">
           <span
-            className={`rounded-md px-2.5 py-1 font-medium text-[12px] md:text-[13px] ${
-              status === "종료됨"
-                ? "bg-red-50 text-red-500"
-                : status === "진행중"
-                  ? "bg-blue-50 text-blue-500"
-                  : "bg-gray-50 text-gray-500"
-            }`}
+            className={`rounded-xl border px-2.5 py-1 font-medium text-[12px] md:text-[13px] ${statusClass}`}
           >
-            {status}
+            {statusLabel}
           </span>
           <span className="text-[14px] text-gray-900 md:text-[15px]">
             {title}
@@ -57,9 +57,16 @@ export default function JobPostingItem({
         className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg px-6 py-4 transition-all hover:bg-gray-100"
         onClick={onClick}
       >
-        <h2 className="truncate font-medium text-base text-gray-900">
-          {title}
-        </h2>
+        <div className="flex min-w-0 items-center gap-3">
+          <span
+            className={`shrink-0 rounded-xl border px-2.5 py-1 font-medium text-[12px] md:text-[13px] ${statusClass}`}
+          >
+            {statusLabel}
+          </span>
+          <h2 className="truncate font-medium text-base text-gray-900">
+            {title}
+          </h2>
+        </div>
         <div className="flex shrink-0 items-center gap-7">
           <span className="whitespace-nowrap text-gray-500 text-sm">
             {date}
