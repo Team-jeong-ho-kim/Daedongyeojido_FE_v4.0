@@ -1,100 +1,17 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
 import { Footer } from "ui";
+import { AnimatedSection } from "@/components/landing/AnimatedSection";
+import { mobileCards } from "@/components/landing/data";
+import { FloatingCards } from "@/components/landing/FloatingCards";
+import { ImageCarousel } from "@/components/landing/ImageCarousel";
 
 export default function Home() {
-  const images = [
-    { id: "slide-1", src: "/images/landing/mac2.png" },
-    { id: "slide-2", src: "/images/landing/mac2.png" },
-    { id: "slide-3", src: "/images/landing/mac2.png" },
-  ];
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(
-    new Set(),
-  );
-
-  const heroId = useId();
-  const descriptionId = useId();
-  const featuresId = useId();
-  const cardsId = useId();
-  const registerId = useId();
-  const announceId = useId();
-  const applyId = useId();
-  const calendarId = useId();
-
-  const heroRef = useRef<HTMLDivElement>(null);
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const registerRef = useRef<HTMLDivElement>(null);
-  const announceRef = useRef<HTMLDivElement>(null);
-  const applyRef = useRef<HTMLDivElement>(null);
-  const calendarRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => new Set(prev).add(entry.target.id));
-          }
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
-      },
-    );
-
-    const refs = [
-      heroRef,
-      descriptionRef,
-      featuresRef,
-      cardsRef,
-      registerRef,
-      announceRef,
-      applyRef,
-      calendarRef,
-    ];
-    for (const ref of refs) {
-      if (ref.current) {
-        observer.observe(ref.current);
-      }
-    }
-
-    return () => {
-      for (const ref of refs) {
-        if (ref.current) {
-          observer.unobserve(ref.current);
-        }
-      }
-    };
-  }, []);
-
   return (
     <main className="relative w-full overflow-x-hidden bg-white">
       <div className="absolute top-[70px] left-0 h-[1000px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white md:h-[1500px]" />
 
-      <section
-        ref={heroRef}
-        id={heroId}
-        className={`relative flex flex-col items-center gap-12 px-4 pt-24 pb-8 transition-all duration-1000 ease-out md:gap-20 md:pt-32 lg:pt-40 ${
-          visibleSections.has(heroId)
-            ? "translate-y-0 opacity-100"
-            : "translate-y-10 opacity-0"
-        }`}
-      >
+      <AnimatedSection className="relative flex flex-col items-center gap-12 px-4 pt-24 pb-8 md:gap-20 md:pt-32 lg:pt-40">
         <div className="flex flex-col items-center text-center">
           <h1 className="mb-6 font-bold text-3xl text-black leading-tight tracking-tight md:mb-8 md:text-5xl md:leading-tight lg:text-6xl">
             <span className="block">동아리의 모든 것</span>
@@ -108,96 +25,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="relative w-full max-w-2xl lg:max-w-3xl">
-          {/* Slider */}
-          <div className="overflow-hidden rounded-xl">
-            <div
-              className="flex transition-transform duration-500 ease-out"
-              style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
-            >
-              {images.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="relative aspect-[16/10] w-full flex-shrink-0"
-                >
-                  <Image
-                    src={image.src}
-                    alt={`hero ${index + 1}`}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Navigation Arrows */}
-          <button
-            type="button"
-            onClick={() =>
-              setCurrentImageIndex((prev) =>
-                prev === 0 ? images.length - 1 : prev - 1,
-              )
-            }
-            className="-translate-y-1/2 -left-10 md:-left-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
-            aria-label="이전 슬라이드"
-          >
-            <svg
-              className="size-5 md:size-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              setCurrentImageIndex((prev) => (prev + 1) % images.length)
-            }
-            className="-translate-y-1/2 -right-10 md:-right-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
-            aria-label="다음 슬라이드"
-          >
-            <svg
-              className="size-5 md:size-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-
-          {/* Indicators */}
-          <div className="mt-4 flex items-center justify-center gap-1.5">
-            {images.map((image, index) => (
-              <button
-                key={image.id}
-                type="button"
-                className={`cursor-pointer rounded-full transition-all duration-300 ${
-                  index === currentImageIndex
-                    ? "h-2 w-5 bg-[#f45851]"
-                    : "size-2 bg-gray-300 hover:bg-gray-400"
-                }`}
-                onClick={() => setCurrentImageIndex(index)}
-                aria-label={`슬라이드 ${index + 1}로 이동`}
-              />
-            ))}
-          </div>
-        </div>
+        <ImageCarousel />
 
         <Image
           src="/images/landing/arrow.png"
@@ -206,17 +34,9 @@ export default function Home() {
           height={12}
           className="mt-4 animate-bounce opacity-50"
         />
-      </section>
+      </AnimatedSection>
 
-      <section
-        ref={descriptionRef}
-        id={descriptionId}
-        className={`bg-[#fbf9fa] px-4 py-16 transition-all duration-1000 ease-out md:py-24 lg:py-32 ${
-          visibleSections.has(descriptionId)
-            ? "translate-y-0 opacity-100"
-            : "translate-y-10 opacity-0"
-        }`}
-      >
+      <AnimatedSection className="bg-[#fbf9fa] px-4 py-16 md:py-24 lg:py-32">
         <div className="mx-auto max-w-4xl text-center">
           <p className="font-bold text-[#28191b] text-lg leading-relaxed md:text-2xl md:leading-relaxed lg:text-3xl lg:leading-relaxed">
             대덕소프트웨어마이스터고등학교의
@@ -233,125 +53,21 @@ export default function Home() {
             <br className="sm:hidden" /> 당신의 전공동아리가 새로워질 거예요.
           </p>
         </div>
-      </section>
+      </AnimatedSection>
 
-      <section
-        ref={featuresRef}
-        id={featuresId}
-        className={`px-4 py-16 text-center transition-all duration-1000 ease-out md:py-24 lg:py-32 ${
-          visibleSections.has(featuresId)
-            ? "translate-y-0 opacity-100"
-            : "translate-y-10 opacity-0"
-        }`}
-      >
+      <AnimatedSection className="px-4 py-16 text-center md:py-24 lg:py-32">
         <h2 className="font-bold text-4xl leading-tight md:text-5xl lg:text-6xl">
           <span className="block text-[#28191b]">전공동아리</span>
           <span className="block text-[#ff4d62]">관리의 모든 것</span>
           <span className="block text-[#28191b]">하나로 관리하다</span>
         </h2>
-      </section>
+      </AnimatedSection>
 
-      <section
-        ref={cardsRef}
-        id={cardsId}
-        className={`relative hidden py-12 transition-all duration-1000 ease-out lg:block lg:h-[600px] lg:py-16 ${
-          visibleSections.has(cardsId) ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <div className="relative mx-auto flex h-full max-w-6xl items-center justify-center">
-          <div
-            className={`absolute top-8 left-[5%] rotate-[-6deg] transition-all duration-700 ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: "100ms" }}
-          >
-            <Image
-              src="/images/landing/card1.png"
-              alt="동아리카드"
-              width={180}
-              height={240}
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-          <div
-            className={`absolute top-0 left-[18%] transition-all duration-700 ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          >
-            <Image
-              src="/images/landing/card2.png"
-              alt="지원 카드"
-              width={260}
-              height={300}
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-          <div
-            className={`absolute top-4 left-[38%] transition-all duration-700 ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: "300ms" }}
-          >
-            <Image
-              src="/images/landing/card3.png"
-              alt="면접 카드"
-              width={180}
-              height={240}
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-          <div
-            className={`absolute top-12 left-[55%] rotate-[-5deg] transition-all duration-700 ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: "400ms" }}
-          >
-            <Image
-              src="/images/landing/card4.png"
-              alt="회식 카드"
-              width={220}
-              height={270}
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-          <div
-            className={`absolute top-0 left-[75%] transition-all duration-700 ${
-              visibleSections.has(cardsId)
-                ? "translate-y-0 opacity-100"
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: "500ms" }}
-          >
-            <Image
-              src="/images/landing/card5.png"
-              alt="공지 카드"
-              width={220}
-              height={280}
-              className="rounded-lg shadow-lg"
-            />
-          </div>
-        </div>
-      </section>
+      <FloatingCards />
 
-      {/* Mobile Cards - Horizontal scroll */}
       <section className="px-4 py-8 lg:hidden">
         <div className="scrollbar-hide flex gap-4 overflow-x-auto pb-4">
-          {[
-            { src: "/images/landing/card1.png", alt: "동아리카드" },
-            { src: "/images/landing/card2.png", alt: "지원 카드" },
-            { src: "/images/landing/card3.png", alt: "면접 카드" },
-            { src: "/images/landing/card4.png", alt: "회식 카드" },
-            { src: "/images/landing/card5.png", alt: "공지 카드" },
-          ].map((card) => (
+          {mobileCards.map((card) => (
             <div key={card.alt} className="flex-shrink-0">
               <Image
                 src={card.src}
@@ -366,15 +82,7 @@ export default function Home() {
       </section>
 
       <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-        <section
-          ref={registerRef}
-          id={registerId}
-          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
-            visibleSections.has(registerId)
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
+        <AnimatedSection className="mb-20 md:mb-32">
           <p className="mb-2 font-bold text-[#ff4a50] text-xl md:mb-4 md:text-2xl">
             등록 · 생성
           </p>
@@ -396,17 +104,9 @@ export default function Home() {
             <span className="block">클릭 한 번으로 전공 동아리를</span>
             <span className="block">쉽게 생성할 수 있어요.</span>
           </p>
-        </section>
+        </AnimatedSection>
 
-        <section
-          ref={announceRef}
-          id={announceId}
-          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
-            visibleSections.has(announceId)
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
+        <AnimatedSection className="mb-20 md:mb-32">
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
               <div className="mb-2 flex items-center gap-2 md:mb-4">
@@ -447,17 +147,9 @@ export default function Home() {
               />
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
-        <section
-          ref={applyRef}
-          id={applyId}
-          className={`mb-20 transition-all duration-1000 ease-out md:mb-32 ${
-            visibleSections.has(applyId)
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
+        <AnimatedSection className="mb-20 md:mb-32">
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <div className="order-2 lg:order-1">
               <Image
@@ -491,17 +183,9 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
-        <section
-          ref={calendarRef}
-          id={calendarId}
-          className={`transition-all duration-1000 ease-out ${
-            visibleSections.has(calendarId)
-              ? "translate-y-0 opacity-100"
-              : "translate-y-10 opacity-0"
-          }`}
-        >
+        <AnimatedSection>
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
             <div>
               <p className="mb-2 font-bold text-[#ff4a50] text-lg md:mb-4 md:text-xl">
@@ -530,7 +214,7 @@ export default function Home() {
               />
             </div>
           </div>
-        </section>
+        </AnimatedSection>
       </div>
 
       <Footer />
