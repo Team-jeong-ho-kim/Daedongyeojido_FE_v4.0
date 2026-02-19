@@ -10,7 +10,7 @@ import {
 import { getErrorMessage } from "@/lib/error";
 import type { AnnouncementCreate } from "@/types/announcement";
 
-export const useCreateAnnouncementMutation = () => {
+export const useCreateAnnouncementMutation = (clubId?: string) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -18,9 +18,14 @@ export const useCreateAnnouncementMutation = () => {
     mutationFn: (data: AnnouncementCreate) => createAnnouncement(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      queryClient.invalidateQueries({ queryKey: ["announcements", "club"] });
       toast.success("공고 등록이 완료되었습니다");
       setTimeout(() => {
-        router.push("/announcements");
+        if (clubId) {
+          router.push(`/clubs/${clubId}?tab=history&subtab=posting`);
+        } else {
+          router.push("/announcements");
+        }
       }, 1500);
     },
     onError: (error: unknown) => {

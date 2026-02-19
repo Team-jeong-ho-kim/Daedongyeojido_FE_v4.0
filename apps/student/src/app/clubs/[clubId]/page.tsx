@@ -641,7 +641,9 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
                 <button
                   type="button"
                   className="rounded-lg bg-primary-500 px-4 py-2 font-medium text-[14px] text-white hover:bg-primary-600"
-                  onClick={() => router.push("/announcements/create")}
+                  onClick={() =>
+                    router.push(`/announcements/create?clubId=${clubId}`)
+                  }
                 >
                   공고 생성하기
                 </button>

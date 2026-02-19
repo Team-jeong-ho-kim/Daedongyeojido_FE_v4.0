@@ -24,5 +24,6 @@ export const useGetClubAnnouncementsQuery = (clubId: string) => {
     queryKey: ["announcements", "club", clubId],
     queryFn: () => getClubAnnouncements(Number(clubId)),
     enabled: !!clubId,
+    refetchOnMount: true,
   });
 };

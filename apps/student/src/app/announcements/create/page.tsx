@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button, FieldSelector, FormField, TextArea, TextInput } from "ui";
@@ -10,6 +11,8 @@ import { useCreateAnnouncementMutation } from "@/hooks/mutations/useAnnouncement
 import { useModalStore } from "@/stores/useModalStore";
 
 export default function CreateAnnouncementPage() {
+  const searchParams = useSearchParams();
+  const clubId = searchParams.get("clubId") ?? undefined;
   const [title, setTitle] = useState("");
   const [contact, setContact] = useState("");
   const [introduction, setIntroduction] = useState("");
@@ -21,7 +24,8 @@ export default function CreateAnnouncementPage() {
   const { show, toggleShow } = useModalStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { mutate: createAnnouncementMutate } = useCreateAnnouncementMutation();
+  const { mutate: createAnnouncementMutate } =
+    useCreateAnnouncementMutation(clubId);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
