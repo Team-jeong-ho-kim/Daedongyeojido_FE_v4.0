@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { toast } from "sonner";
 import { Button, FieldSelector, FormField, TextArea, TextInput } from "ui";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
@@ -10,7 +10,7 @@ import { FIELDS } from "@/constants/club";
 import { useCreateAnnouncementMutation } from "@/hooks/mutations/useAnnouncement";
 import { useModalStore } from "@/stores/useModalStore";
 
-export default function CreateAnnouncementPage() {
+function CreateAnnouncementContent() {
   const searchParams = useSearchParams();
   const clubId = searchParams.get("clubId") ?? undefined;
   const [title, setTitle] = useState("");
@@ -221,5 +221,13 @@ export default function CreateAnnouncementPage() {
         onSave={(newDeadline: string) => setDeadline(newDeadline)}
       />
     </div>
+  );
+}
+
+export default function CreateAnnouncementPage() {
+  return (
+    <Suspense fallback={<div>공고들 불러오는 중...</div>}>
+      <CreateAnnouncementContent />
+    </Suspense>
   );
 }
