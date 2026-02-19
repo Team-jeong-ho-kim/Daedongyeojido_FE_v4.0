@@ -94,7 +94,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
 
     // 유효성 검사
     if (!applicationTitle.trim()) {
-      toast.error("공고 제목을 입력해주세요.");
+      toast.error("지원서 폼 제목을 입력해주세요.");
       return;
     }
 
@@ -141,7 +141,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
                   htmlFor={`${id}-posting-title`}
                   className="mb-1.5 block font-medium text-gray-700 text-sm md:mb-2"
                 >
-                  공고 제목<span className="text-red-500">*</span>
+                  지원서 폼 제목<span className="text-red-500">*</span>
                 </label>
                 <input
                   id={`${id}-posting-title`}
@@ -307,7 +307,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
               disabled={createMutation.isPending}
               className="rounded-lg bg-primary-500 px-6 py-2.5 font-medium text-sm text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-gray-400 md:rounded-xl md:px-8 md:text-base"
             >
-              {createMutation.isPending ? "생성 중..." : "지원서 생성하기"}
+              {createMutation.isPending ? "생성 중..." : "지원서 폼 생성하기"}
             </button>
           </div>
         </form>
