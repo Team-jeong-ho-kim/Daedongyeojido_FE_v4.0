@@ -18,30 +18,35 @@ export const MOCK_CLUB_MEMBERS: ClubMember[] = [
     majors: ["BE", "FE"],
     introduction:
       "김경민입니다.ㅁㄴㅇㄹㄴㅁㄹㄴㅁㄹㅁㄴㅁㄴㄹㅁㄴㄴㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹㅁㄴㅇㄹㄴㅁㅇㄹ",
+    profileImage: "/images/icons/profile.svg",
   },
   {
     userId: 12122,
     userName: "지도현",
     majors: ["BE"],
     introduction: "지도현입니다.",
+    profileImage: "/images/icons/profile.svg",
   },
   {
     userId: 1212312,
     userName: "박민수",
     majors: ["FE"],
     introduction: "박민수입니다.",
+    profileImage: "/images/icons/profile.svg",
   },
   {
     userId: 12132,
     userName: "이준호",
     majors: ["BE"],
     introduction: "이준호입니다.",
+    profileImage: "/images/icons/profile.svg",
   },
   {
     userId: 121342,
     userName: "최유진",
     majors: ["FE"],
     introduction: "최유진입니다.",
+    profileImage: "/images/icons/profile.svg",
   },
 ];
 

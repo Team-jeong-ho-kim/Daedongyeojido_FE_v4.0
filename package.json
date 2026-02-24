@@ -10,8 +10,7 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "format:fix": "biome format --write .",
-    "lint:fix": "biome check --write .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint:fix": "biome check --write ."
   },
   "keywords": [],
   "author": "",
@@ -19,6 +18,8 @@
   "packageManager": "pnpm@10.17.1",
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.0",
     "dotenv-cli": "^11.0.0",
     "turbo": "^2.5.8"
   },

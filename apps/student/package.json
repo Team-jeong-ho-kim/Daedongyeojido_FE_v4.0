@@ -12,7 +12,9 @@
     "deploy": "npx wrangler pages deploy .vercel/output/static",
     "start": "next start --port 3001",
     "lint": "../../node_modules/.bin/biome check .",
-    "format": "../../node_modules/.bin/biome format --write ."
+    "format": "../../node_modules/.bin/biome format --write .",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.14",
