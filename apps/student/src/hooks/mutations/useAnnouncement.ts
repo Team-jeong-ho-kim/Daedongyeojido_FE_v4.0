@@ -8,6 +8,7 @@ import {
   updateAnnouncement,
 } from "@/api/announcement";
 import { getErrorMessage } from "@/lib/error";
+import { queryKeys } from "@/lib/queryKeys";
 import type { AnnouncementCreate } from "@/types/announcement";
 
 export const useCreateAnnouncementMutation = (clubId?: string) => {
@@ -17,8 +18,7 @@ export const useCreateAnnouncementMutation = (clubId?: string) => {
   return useMutation({
     mutationFn: (data: AnnouncementCreate) => createAnnouncement(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
-      queryClient.invalidateQueries({ queryKey: ["announcements", "club"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.announcements._def });
       toast.success("공고 등록이 완료되었습니다");
       setTimeout(() => {
         if (clubId) {
@@ -47,9 +47,9 @@ export const useUpdateAnnouncementMutation = (announcementId: string) => {
       updateAnnouncement(announcementId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["announcement", announcementId],
+        queryKey: queryKeys.announcements.detail(announcementId).queryKey,
       });
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.announcements._def });
       toast.success("공고가 수정되었습니다");
       setTimeout(() => {
         router.push(`/announcements/${announcementId}`);
@@ -72,7 +72,7 @@ export const useDeleteAnnouncementMutation = () => {
   return useMutation({
     mutationFn: (announcementId: string) => deleteAnnouncement(announcementId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.announcements._def });
       toast.success("공고가 삭제되었습니다");
       setTimeout(() => {
         router.push("/announcements");
@@ -96,9 +96,9 @@ export const usePublishAnnouncementMutation = (announcementId: string) => {
       publishAnnouncement(announcementId, applicationFormId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["announcement", announcementId],
+        queryKey: queryKeys.announcements.detail(announcementId).queryKey,
       });
-      queryClient.invalidateQueries({ queryKey: ["announcements"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.announcements._def });
       toast.success("공고가 게시되었습니다");
     },
     onError: (error: unknown) => {

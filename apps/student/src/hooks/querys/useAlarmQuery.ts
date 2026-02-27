@@ -2,10 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getClubAlarms } from "@/api/alarm";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const useGetClubAlarmsQuery = () => {
   return useQuery({
-    queryKey: ["clubAlarms"],
+    queryKey: queryKeys.alarms.club.queryKey,
     queryFn: getClubAlarms,
   });
 };

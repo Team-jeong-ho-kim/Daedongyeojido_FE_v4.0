@@ -9,6 +9,7 @@ import {
   updateClub,
 } from "@/api/club";
 import { getErrorMessage } from "@/lib/error";
+import { queryKeys } from "@/lib/queryKeys";
 import type { ClubUpdate } from "@/types";
 
 export const useUpdateClubMutation = (clubId: string) => {
@@ -25,8 +26,10 @@ export const useUpdateClubMutation = (clubId: string) => {
       imageChanged: boolean;
     }) => updateClub(clubId, data, imageFile, imageChanged),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["club", clubId] });
-      queryClient.invalidateQueries({ queryKey: ["clubs"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.clubs.detail(clubId).queryKey,
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clubs._def });
       toast.success("변경 사항이 저장되었습니다.");
     },
     onError: (error: unknown) => {
@@ -46,7 +49,7 @@ export const useDissolveClubMutation = () => {
   return useMutation({
     mutationFn: dissolveClub,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clubs"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clubs._def });
       toast.success("동아리 해체 신청이 완료되었습니다.");
       setTimeout(() => {
         router.push("/clubs");
@@ -64,6 +67,7 @@ export const useDissolveClubMutation = () => {
 
 export const useCreateClubApplicationMutation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
@@ -93,6 +97,7 @@ export const useCreateClubApplicationMutation = () => {
       toast.success(
         "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
       );
+      queryClient.invalidateQueries({ queryKey: queryKeys.clubs._def });
       setTimeout(() => {
         router.push("/mypage/notifications");
       }, 1500);
@@ -113,7 +118,9 @@ export const useDeleteClubMemberMutation = (clubId: string) => {
   return useMutation({
     mutationFn: (userId: number) => deleteClubMember(userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.clubs.detail(clubId).queryKey,
+      });
       toast.success("팀원이 삭제되었습니다.");
     },
     onError: (error: unknown) => {
@@ -138,7 +145,9 @@ export const useRequestAddClubMemberMutation = (clubId: string) => {
       classNumber: string;
     }) => requestAddClubMember(userName, classNumber),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["club", clubId] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.clubs.detail(clubId).queryKey,
+      });
       toast.success("팀원 추가 신청이 완료되었습니다");
     },
     onError: (error: unknown) => {

@@ -6,6 +6,7 @@ import { ApiError } from "utils";
 import { createApplicationForm } from "@/api/applicationForm";
 import { DeadlineModal } from "@/components";
 import { FIELDS } from "@/constants/club";
+import { queryKeys } from "@/lib/queryKeys";
 import type { CreateApplicationFormRequest } from "@/types";
 
 interface ApplicationFormProps {
@@ -32,7 +33,9 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
   const createMutation = useMutation({
     mutationFn: createApplicationForm,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["applicationForms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applicationForms._def,
+      });
       toast.success("지원서가 성공적으로 생성되었습니다.");
       // 폼 초기화
       setApplicationTitle("");

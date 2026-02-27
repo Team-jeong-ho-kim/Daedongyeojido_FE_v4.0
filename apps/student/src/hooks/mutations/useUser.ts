@@ -4,6 +4,7 @@ import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { updateMyInfo, updateProfile } from "@/api/user";
 import { getErrorMessage } from "@/lib/error";
+import { queryKeys } from "@/lib/queryKeys";
 import type { UpdateMyInfoRequest, UpdateProfileRequest } from "@/types";
 
 export const useUpdateMyInfoMutation = () => {
@@ -15,7 +16,7 @@ export const useUpdateMyInfoMutation = () => {
     mutationFn: (data: UpdateMyInfoRequest) => updateMyInfo(data),
     onSuccess: (data) => {
       setUserInfo(data);
-      queryClient.invalidateQueries({ queryKey: ["myInfo"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.me.queryKey });
       toast.success("정보가 저장되었습니다.");
       setTimeout(() => {
         router.push("/mypage");
@@ -40,7 +41,7 @@ export const useUpdateProfileMutation = () => {
     mutationFn: (data: UpdateProfileRequest) => updateProfile(data),
     onSuccess: (data) => {
       setUserInfo(data);
-      queryClient.invalidateQueries({ queryKey: ["myInfo"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.me.queryKey });
       toast.success("정보가 저장되었습니다.");
       setTimeout(() => {
         router.push("/mypage");

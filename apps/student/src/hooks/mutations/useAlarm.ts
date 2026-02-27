@@ -7,6 +7,7 @@ import {
   selectClubSubmission,
 } from "@/api/alarm";
 import { getErrorMessage } from "@/lib/error";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const useAcceptMemberRequestMutation = () => {
   const queryClient = useQueryClient();
@@ -14,7 +15,9 @@ export const useAcceptMemberRequestMutation = () => {
   return useMutation({
     mutationFn: acceptMemberRequest,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userAlarms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.alarms.user.queryKey,
+      });
       toast.success("수락되었습니다.");
     },
     onError: (error: unknown) => {
@@ -33,7 +36,9 @@ export const useRejectMemberRequestMutation = () => {
   return useMutation({
     mutationFn: rejectMemberRequest,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userAlarms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.alarms.user.queryKey,
+      });
       toast.success("거절되었습니다.");
     },
     onError: (error: unknown) => {
@@ -58,7 +63,9 @@ export const useSelectClubSubmissionMutation = () => {
       alarmId: number;
     }) => selectClubSubmission(isSelected, alarmId),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["userAlarms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.alarms.user.queryKey,
+      });
       toast.success(
         variables.isSelected ? "합류가 완료되었습니다." : "거절되었습니다.",
       );
@@ -79,7 +86,9 @@ export const useDeleteClubAlarmMutation = () => {
   return useMutation({
     mutationFn: deleteClubAlarm,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clubAlarms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.alarms.club.queryKey,
+      });
       toast.success("알림이 삭제되었습니다.");
     },
     onError: (error: unknown) => {

@@ -12,6 +12,7 @@ import {
   updateMySubmission,
 } from "@/api/applicationForm";
 import { getErrorMessage } from "@/lib/error";
+import { queryKeys } from "@/lib/queryKeys";
 import type {
   DecidePassRequest,
   SubmitApplicationRequest,
@@ -25,7 +26,9 @@ export const useDeleteApplicationFormMutation = () => {
     mutationFn: deleteApplicationForm,
     onSuccess: () => {
       toast.success("지원서 폼이 삭제되었습니다.");
-      queryClient.invalidateQueries({ queryKey: ["applicationForms"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applicationForms._def,
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(
@@ -48,9 +51,12 @@ export const useDecidePassMutation = (submissionId: string) => {
         : "지원자를 탈락 처리했습니다.";
       toast.success(message);
       queryClient.invalidateQueries({
-        queryKey: ["submissionDetail", submissionId],
+        queryKey:
+          queryKeys.applications.submissionDetail(submissionId).queryKey,
       });
-      queryClient.invalidateQueries({ queryKey: ["applicationSubmissions"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.submissions.queryKey,
+      });
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(
@@ -69,8 +75,12 @@ export const useSubmitApplicationMutation = (applicationFormId: string) => {
     mutationFn: (data: SubmitApplicationRequest) =>
       submitApplication(applicationFormId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["applications"] });
-      queryClient.invalidateQueries({ queryKey: ["myApplications"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.all.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mine.queryKey,
+      });
       toast.success("지원서가 제출되었습니다.");
     },
     onError: (error: unknown) => {
@@ -92,10 +102,14 @@ export const useUpdateMySubmissionMutation = (submissionId: string) => {
       updateMySubmission(submissionId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["mySubmission", submissionId],
+        queryKey: queryKeys.applications.mySubmission(submissionId).queryKey,
       });
-      queryClient.invalidateQueries({ queryKey: ["applications"] });
-      queryClient.invalidateQueries({ queryKey: ["myApplications"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.all.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mine.queryKey,
+      });
       toast.success("지원서가 수정되었습니다.");
       router.push(`/mypage/applications/${submissionId}`);
     },
@@ -116,9 +130,15 @@ export const useSubmitMySubmissionMutation = () => {
   return useMutation({
     mutationFn: (submissionId: string) => submitMySubmission(submissionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["applications"] });
-      queryClient.invalidateQueries({ queryKey: ["myApplications"] });
-      queryClient.invalidateQueries({ queryKey: ["mySubmissionHistory"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.all.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mine.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.history.queryKey,
+      });
       toast.success("지원서가 제출되었습니다.");
       router.push("/mypage/history");
     },
@@ -139,8 +159,12 @@ export const useDeleteMySubmissionMutation = () => {
   return useMutation({
     mutationFn: (submissionId: string) => deleteMySubmission(submissionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["applications"] });
-      queryClient.invalidateQueries({ queryKey: ["myApplications"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.all.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mine.queryKey,
+      });
       toast.success("지원서가 삭제되었습니다.");
       router.push("/mypage/applications");
     },

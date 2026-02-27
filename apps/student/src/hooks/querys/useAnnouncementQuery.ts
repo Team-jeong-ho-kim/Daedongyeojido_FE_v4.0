@@ -4,24 +4,25 @@ import {
   getClubAnnouncements,
   getDetailAnnouncement,
 } from "@/api/announcement";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const useGetAllAnnouncementsQuery = () => {
   return useQuery({
-    queryKey: ["announcements"],
+    queryKey: queryKeys.announcements.all.queryKey,
     queryFn: getAllAnnouncements,
   });
 };
 
 export const useGetDetailAnnounceQuery = (announcementId: string) => {
   return useQuery({
-    queryKey: ["announcement", announcementId],
+    queryKey: queryKeys.announcements.detail(announcementId).queryKey,
     queryFn: () => getDetailAnnouncement(announcementId),
   });
 };
 
 export const useGetClubAnnouncementsQuery = (clubId: string) => {
   return useQuery({
-    queryKey: ["announcements", "club", clubId],
+    queryKey: queryKeys.announcements.byClub(clubId).queryKey,
     queryFn: () => getClubAnnouncements(Number(clubId)),
     enabled: !!clubId,
     refetchOnMount: true,
