@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_WEB_URL || "https://dsm.daedongyeojido.site";
+const siteUrl = (
+  process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"
+).trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

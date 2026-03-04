@@ -126,7 +126,10 @@ pnpm install
 | 명령 | 설명 |
 | --- | --- |
 | `pnpm dev` | web/student/admin 앱을 동시에 dev 모드로 실행 (root `.env.local` 사용) |
-| `pnpm dev:prod` | `.env.production` 값을 로드하여 프로덕션 환경을 리허설 |
+| `pnpm dev:stag` | `.env.stag` 값을 로드하여 스테이징 환경을 리허설 |
+| `pnpm dev:prod` | `.env.prod` 값을 로드하여 프로덕션 환경을 리허설 |
+| `pnpm build:stag` | 스테이징 변수(`.env.stag`)로 전체 빌드 |
+| `pnpm build:prod` | 프로덕션 변수(`.env.prod`)로 전체 빌드 |
 | `pnpm build` | 모든 앱/패키지를 순차 빌드 (`.next`, `dist` 아티팩트 캐시) |
 | `pnpm lint` | Biome lint 확인 |
 | `pnpm lint:fix` | lint 에러를 자동 수정 |
@@ -144,26 +147,30 @@ pnpm install
 | utils | `pnpm --filter utils dev` | `pnpm --filter utils build` | Axios/Env 헬퍼 번들 |
 
 ### Turbo & tsup
-- `turbo.json`은 `dev`, `dev:prod`, `build`, `lint`, `format`, `type-check`, `clean` 태스크를 정의하며 `.env.*local` 파일을 글로벌 의존성으로 감시합니다.
+- `turbo.json`은 `dev`, `dev:stag`, `dev:prod`, `build`, `build:stag`, `lint`, `format`, `type-check`, `clean` 태스크를 정의하며 `.env.local`, `.env.stag`, `.env.prod` 변경을 글로벌 의존성으로 감시합니다.
 - 라이브러리 패키지(`ui`, `shared`, `utils`)는 `tsup.config.ts`를 통해 esm/cjs/typings을 동시 생성하므로 UI/API 패키지를 다른 앱에서 안전하게 임포트할 수 있습니다.
 
 ## 환경 변수
-- 모든 앱은 **root** `.env.local`, `.env.production`을 사용합니다. `dotenv -e ../../.env.local -- next dev` 스크립트 때문에 앱 폴더 내에 별도 `.env`를 둘 필요가 없습니다.
+- 모든 앱은 **root** `.env.local`, `.env.stag`, `.env.prod`를 사용합니다. `dotenv -e ../../.env.* -- next ...` 스크립트 때문에 앱 폴더 내에 별도 `.env`를 둘 필요가 없습니다.
+- Cloudflare Pages에서는 같은 키를 `Preview(스테이징)`/`Production(프로덕션)`으로 나눠서 관리합니다.
 - 샘플은 `.env.example`에 있으며 아래처럼 복사해 사용합니다.
 
 ```bash
 cp .env.example .env.local
-cp .env.example .env.production
+cp .env.example .env.stag
+cp .env.example .env.prod
 ```
 
 | 변수 | 설명 | 예시 |
 | --- | --- | --- |
-| `NEXT_PUBLIC_WEB_URL` | 랜딩/메인 진입 도메인 | `https://web.localhost` |
-| `NEXT_PUBLIC_USER_URL` | 학생 포털 기본 URL (`packages/ui` Header 링크) | `https://student.localhost` |
-| `NEXT_PUBLIC_ADMIN_URL` | 관리자 도구 URL | `https://admin.localhost` |
+| `NEXT_PUBLIC_WEB_URL` | 랜딩/메인 진입 도메인 | `http://localhost:3000` |
+| `NEXT_PUBLIC_USER_URL` | 학생 포털 기본 URL (`packages/ui` Header 링크) | `http://localhost:3001` |
+| `NEXT_PUBLIC_ADMIN_URL` | 관리자 도구 URL | `http://localhost:3002` |
 | `NEXT_PUBLIC_API_BASE_URL` | REST API Origin (`utils/apiClient` baseURL) | `https://api.server-url.site` |
 
-> 로컬에서는 `pnpm dev`가 `.env.local`을, 배포 전 확인은 `pnpm dev:prod`가 `.env.production`을 주입합니다.
+> Cloudflare 설정 예시: `NEXT_PUBLIC_USER_URL` 값을 Preview=`https://stag.daedongyeojido.site`, Production=`https://prod.daedongyeojido.site` 형태로 각각 입력합니다.
+
+> 로컬에서는 `pnpm dev`가 `.env.local`을, 스테이징 리허설은 `pnpm dev:stag`, 프로덕션 리허설은 `pnpm dev:prod`가 각각 `.env.stag`, `.env.prod`를 주입합니다.
 
 ## 포트 정보
 | 앱 | 포트 | 설명 |

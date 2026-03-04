@@ -1,9 +1,31 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["NODE_ENV"],
+  "globalDependencies": [
+    ".env",
+    ".env.local",
+    "**/.env.stag",
+    ".env.stag",
+    "**/.env.prod",
+    ".env.prod",
+    "**/.env.production",
+    ".env.production",
+    "**/.env.development",
+    ".env.development",
+    "**/.env.*local"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "NEXT_PUBLIC_WEB_URL",
+    "NEXT_PUBLIC_USER_URL",
+    "NEXT_PUBLIC_ADMIN_URL",
+    "NEXT_PUBLIC_API_BASE_URL"
+  ],
   "tasks": {
     "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "dist/**"]
+    },
+    "build:stag": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
@@ -18,6 +40,10 @@
       "outputs": []
     },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:stag": {
       "cache": false,
       "persistent": true
     },

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "turbo run build",
+    "build:stag": "turbo run build:stag",
+    "build:prod": "turbo run build",
     "dev": "turbo run dev",
+    "dev:stag": "turbo run dev:stag",
     "dev:prod": "turbo run dev:prod",
     "lint": "turbo run lint",
     "format": "turbo run format",
