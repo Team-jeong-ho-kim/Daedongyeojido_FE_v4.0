@@ -72,11 +72,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type RootLayoutProps = {
   children: React.ReactNode;
-}>) {
+};
+
+export default function RootLayout(props: RootLayoutProps) {
+  const { children } = props;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
