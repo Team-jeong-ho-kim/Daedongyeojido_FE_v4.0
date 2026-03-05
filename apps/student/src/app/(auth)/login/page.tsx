@@ -9,6 +9,7 @@ import { getAccessToken } from "@/lib/token";
 
 export default function LoginPage() {
   const router = useRouter();
+  const adminLoginUrl = process.env.NEXT_PUBLIC_ADMIN_URL;
   const [accountId, setAccountId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -62,6 +63,14 @@ export default function LoginPage() {
 
   const accountInputId = useId();
   const passwordId = useId();
+
+  const handleMoveAdminLogin = () => {
+    if (!adminLoginUrl) {
+      toast.error("관리자 로그인 주소가 설정되지 않았습니다.");
+      return;
+    }
+    window.location.href = `${adminLoginUrl.replace(/\/$/, "")}/login`;
+  };
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -209,23 +218,34 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!loginPending && !isSubmitting && !isSubmittingRef.current) {
-              handleLogin(e);
+        <div className="w-full max-w-md space-y-2">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!loginPending && !isSubmitting && !isSubmittingRef.current) {
+                handleLogin(e);
+              }
+            }}
+            disabled={loginPending || isSubmitting}
+            type="button"
+            style={
+              loginPending || isSubmitting
+                ? { pointerEvents: "none" }
+                : undefined
             }
-          }}
-          disabled={loginPending || isSubmitting}
-          type="button"
-          style={
-            loginPending || isSubmitting ? { pointerEvents: "none" } : undefined
-          }
-          className="w-full max-w-md rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loginPending || isSubmitting ? "로그인 중..." : "로그인"}
-        </button>
+            className="w-full rounded-lg bg-[#F45F5F] py-3.5 font-bold text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loginPending || isSubmitting ? "로그인 중..." : "로그인"}
+          </button>
+          <button
+            type="button"
+            onClick={handleMoveAdminLogin}
+            className="w-full py-1 text-center font-medium text-gray-400 text-xs underline underline-offset-4 transition hover:text-gray-200"
+          >
+            관리자 로그인
+          </button>
+        </div>
       </div>
     </div>
   );

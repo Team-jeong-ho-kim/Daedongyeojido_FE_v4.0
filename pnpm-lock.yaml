@@ -45,9 +45,15 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      tailwindcss-animate:
+        specifier: ^1.0.7
+        version: 1.0.7(tailwindcss@4.1.15)
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
+      utils:
+        specifier: workspace:*
+        version: link:../../packages/utils
     devDependencies:
       '@cloudflare/next-on-pages':
         specifier: '1'

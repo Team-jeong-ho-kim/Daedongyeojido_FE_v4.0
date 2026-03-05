@@ -11,12 +11,7 @@ interface LoginResponse {
     refreshToken: string;
     classNumber: string;
     userName: string;
-    introduction: string | null;
-    clubName: string | null;
-    major: string[];
-    link: string[];
-    profileImage: string | null;
-    role: "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
+    role: "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER" | "MASTER";
 }
 
 interface ApiErrorResponse {
