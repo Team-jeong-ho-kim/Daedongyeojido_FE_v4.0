@@ -1,55 +1,58 @@
-import { apiClient, type LoginRequest, type LoginResponse } from "utils";
-import type {
-  AdminUserInfo,
-  ApplicationFormListItem,
-  ApplicationFormsResponse,
-  ClubDetailResponse,
-  ClubSummary,
-  ClubsResponse,
-} from "@/types/admin";
+import { apiClient } from "utils";
+import type { AdminClubCreationForm } from "@/types/admin";
 
-export const login = async (payload: LoginRequest): Promise<LoginResponse> => {
-  const response = await apiClient.post<LoginResponse>("/auth/login", payload);
-  return response.data;
+export const setResultDuration = async (payload: {
+  startDate: string;
+  endDate: string;
+}): Promise<void> => {
+  await apiClient.post("/admin/result-duration", payload);
 };
 
-export const logout = async (): Promise<void> => {
-  await apiClient.delete("/auth/logout");
-};
-
-export const getMyInfo = async (): Promise<AdminUserInfo> => {
-  const response = await apiClient.get<AdminUserInfo>("/users");
-  return response.data;
-};
-
-export const getAllClubs = async (): Promise<ClubSummary[]> => {
-  const response = await apiClient.get<ClubsResponse>("/clubs");
-  return response.data.clubs;
-};
-
-export const getClubDetail = async (
-  clubId: string,
-): Promise<ClubDetailResponse> => {
-  const response = await apiClient.get<ClubDetailResponse>(`/clubs/${clubId}`);
-  return response.data;
-};
-
-export const getClubApplicationForms = async (
-  clubId: string,
-): Promise<ApplicationFormListItem[]> => {
-  const response = await apiClient.get<ApplicationFormsResponse>(
-    `/application-forms/clubs/${clubId}`,
-  );
-  return response.data.applicationForms;
-};
-
-export const decidePass = async (
-  submissionId: string,
-  isPassed: boolean,
+export const updateResultDuration = async (
+  resultDurationId: string,
+  payload: {
+    startDate: string;
+    endDate: string;
+  },
 ): Promise<void> => {
-  await apiClient.patch(`/clubs/pass/${submissionId}`, { isPassed });
+  await apiClient.patch(`/admin/result-duration/${resultDurationId}`, payload);
 };
 
-export const dissolveClub = async (): Promise<void> => {
-  await apiClient.post("/clubs/dissolution");
+export const decideClubApplication = async (
+  clubId: string,
+  isApproved: boolean,
+): Promise<void> => {
+  await apiClient.patch(`/admin/clubs/applications/${clubId}`, { isApproved });
+};
+
+export const decideDissolution = async (
+  clubId: string,
+  isApproved: boolean,
+): Promise<void> => {
+  await apiClient.delete(`/admin/dissolution/${clubId}`, {
+    data: { isApproved },
+  });
+};
+
+export const getClubCreationForm = async (
+  clubId: string,
+): Promise<AdminClubCreationForm> => {
+  const response = await apiClient.get<AdminClubCreationForm>(
+    `/admin/club-creation-form/${clubId}`,
+  );
+  return response.data;
+};
+
+export const uploadClubCreationForm = async (payload: {
+  title: string;
+  description: string;
+  clubId: string;
+}): Promise<void> => {
+  await apiClient.post("/admin/club-creation-form", payload);
+};
+
+export const deleteClubCreationForm = async (
+  clubCreationFormId: string,
+): Promise<void> => {
+  await apiClient.delete(`/admin/club-creation-form/${clubCreationFormId}`);
 };

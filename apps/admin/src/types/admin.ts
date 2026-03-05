@@ -1,21 +1,8 @@
-export type AdminRole =
-  | "ADMIN"
-  | "STUDENT"
-  | "CLUB_MEMBER"
-  | "CLUB_LEADER"
-  | "TEACHER"
-  | "MASTER"
-  | string;
+export type Role = "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | string;
 
 export interface AdminUserInfo {
   userName: string;
-  classNumber: string;
-  introduction: string | null;
-  clubName: string | null;
-  major: string[];
-  link: string[];
-  profileImage: string | null;
-  role: AdminRole;
+  role: Role;
 }
 
 export interface ClubSummary {
@@ -62,4 +49,52 @@ export interface ApplicationFormListItem {
 
 export interface ApplicationFormsResponse {
   applicationForms: ApplicationFormListItem[];
+}
+
+export interface AdminAlarm {
+  id: number;
+  title: string;
+  content: string;
+  category: "COMMON" | "CLUB_MEMBER_APPLY" | "CLUB_ACCEPTED";
+  clubId?: number;
+  referenceId?: number;
+  isExecuted?: boolean;
+}
+
+export interface AdminAlarmsResponse {
+  alarms: AdminAlarm[];
+}
+
+export interface AdminAnnouncementListItem {
+  announcementId: number;
+  title: string;
+  clubName: string;
+  deadline: [number, number, number] | string;
+  clubImage: string;
+  status?: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
+}
+
+export interface AdminAnnouncementListResponse {
+  announcements: AdminAnnouncementListItem[];
+}
+
+export interface AdminClubAnnouncement {
+  announcementId: number;
+  title: string;
+  deadline: [number, number, number] | string;
+  status: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
+}
+
+export interface AdminClubAnnouncementResponse {
+  clubAnnouncements: AdminClubAnnouncement[];
+}
+
+export interface AdminClubCreationForm {
+  clubCreationFormId: number;
+  clubId: number;
+  title: string;
+  description: string;
+  createdAt?: string;
 }
