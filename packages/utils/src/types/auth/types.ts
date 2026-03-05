@@ -10,6 +10,7 @@ export interface LoginResponse {
   userName: string;
   role:
     | "ADMIN"
+    | "STUDENTS"
     | "STUDENT"
     | "CLUB_MEMBER"
     | "CLUB_LEADER"

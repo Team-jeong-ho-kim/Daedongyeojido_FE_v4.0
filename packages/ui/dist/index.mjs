@@ -88,6 +88,8 @@ function StudentHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const userInfo = useUserStore((state) => state.userInfo);
+  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000").trim().replace(/\/$/, "");
+  const webLoginUrl = `${webUrl}/login`;
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -244,7 +246,7 @@ function StudentHeader() {
           ] }) : /* @__PURE__ */ jsx2(
             Link,
             {
-              href: "/login",
+              href: webLoginUrl,
               className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
               children: "\uB85C\uADF8\uC778"
             }
@@ -343,7 +345,7 @@ function StudentHeader() {
           ) : /* @__PURE__ */ jsx2(
             Link,
             {
-              href: "/login",
+              href: webLoginUrl,
               onClick: handleLinkClick,
               className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
               children: "\uB85C\uADF8\uC778"

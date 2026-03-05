@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getAccessToken } from "utils";
 import { useMyInfoQuery } from "@/hooks/querys/useMyInfoQuery";
-import { getAccessToken } from "@/lib/token";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [hasToken, setHasToken] = useState(false);

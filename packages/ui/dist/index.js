@@ -155,6 +155,8 @@ function StudentHeader() {
   const [isDropdownOpen, setIsDropdownOpen] = (0, import_react.useState)(false);
   const pathname = (0, import_navigation.usePathname)();
   const userInfo = (0, import_shared.useUserStore)((state) => state.userInfo);
+  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000").trim().replace(/\/$/, "");
+  const webLoginUrl = `${webUrl}/login`;
   (0, import_react.useEffect)(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -311,7 +313,7 @@ function StudentHeader() {
           ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
-              href: "/login",
+              href: webLoginUrl,
               className: "font-normal text-[15px] text-gray-400 transition-colors hover:text-gray-600",
               children: "\uB85C\uADF8\uC778"
             }
@@ -410,7 +412,7 @@ function StudentHeader() {
           ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             import_link.default,
             {
-              href: "/login",
+              href: webLoginUrl,
               onClick: handleLinkClick,
               className: "rounded-lg bg-gray-100 py-3 text-center font-medium text-[15px] text-gray-700 transition-colors hover:bg-gray-200",
               children: "\uB85C\uADF8\uC778"

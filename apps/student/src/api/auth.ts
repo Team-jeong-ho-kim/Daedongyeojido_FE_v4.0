@@ -1,6 +1,5 @@
 import type { LoginRequest, LoginResponse } from "utils";
-import { apiClient } from "utils";
-import { saveTokens } from "@/lib/token";
+import { apiClient, saveSessionUser, saveTokens } from "utils";
 
 export const login = async ({
   accountId,
@@ -12,6 +11,7 @@ export const login = async ({
   });
 
   saveTokens(response.data);
+  saveSessionUser(response.data);
 
   return response.data;
 };

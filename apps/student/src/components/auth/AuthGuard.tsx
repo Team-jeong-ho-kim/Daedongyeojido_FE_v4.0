@@ -1,21 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getAccessToken } from "@/lib/token";
+import { getAccessToken } from "utils";
+
+const moveToWebLogin = () => {
+  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
+    .trim()
+    .replace(/\/$/, "");
+  window.location.href = `${webUrl}/login`;
+};
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     const token = getAccessToken();
     if (!token) {
-      router.replace("/login");
+      moveToWebLogin();
     } else {
       setIsAuthorized(true);
     }
-  }, [router]);
+  }, []);
 
   if (!isAuthorized) {
     return null;

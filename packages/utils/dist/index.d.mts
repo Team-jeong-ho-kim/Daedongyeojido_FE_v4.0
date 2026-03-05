@@ -11,7 +11,7 @@ interface LoginResponse {
     refreshToken: string;
     classNumber: string;
     userName: string;
-    role: "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER" | "MASTER";
+    role: "ADMIN" | "STUDENTS" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER" | "MASTER";
 }
 
 interface ApiErrorResponse {
@@ -28,9 +28,21 @@ declare class ApiError extends Error {
     constructor(description: string, status: number, timestamp: string, originalMessage: string);
 }
 
+type AuthSessionUser = {
+    role: LoginResponse["role"];
+    userName: string;
+};
+declare const saveTokens: ({ accessToken, refreshToken, }: Pick<LoginResponse, "accessToken" | "refreshToken">) => void;
+declare const saveSessionUser: ({ role, userName }: LoginResponse) => void;
+declare const getAccessToken: () => string | null;
+declare const getRefreshToken: () => string | null;
+declare const getSessionUser: () => AuthSessionUser | null;
+declare const clearSessionUser: () => void;
+declare const clearTokens: () => void;
+
 declare const getUserInfo: () => {
     classNumber: string | null;
     userName: string | null;
 };
 
-export { ApiError, type ApiErrorResponse, type LoginRequest, type LoginResponse, apiClient, getUserInfo };
+export { ApiError, type ApiErrorResponse, type LoginRequest, type LoginResponse, apiClient, clearSessionUser, clearTokens, getAccessToken, getRefreshToken, getSessionUser, getUserInfo, saveSessionUser, saveTokens };

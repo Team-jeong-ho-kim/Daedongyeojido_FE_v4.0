@@ -1,9 +1,16 @@
 import axios from "axios";
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  saveTokens,
+} from "./auth-cookie";
 import { BASE_URL } from "./env";
 import { ApiError, type ApiErrorResponse } from "./types/error";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +18,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("access_token");
+    const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -58,12 +65,14 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = sessionStorage.getItem("refresh_token");
+        const refreshToken = getRefreshToken();
 
         if (!refreshToken) {
-          sessionStorage.removeItem("access_token");
+          clearTokens();
           if (typeof window !== "undefined") {
-            window.location.href = "/login";
+            const webUrl =
+              process.env.NEXT_PUBLIC_WEB_URL || window.location.origin;
+            window.location.href = `${webUrl.replace(/\/$/, "")}/login`;
           }
           return Promise.reject(createApiError(error));
         }
@@ -75,24 +84,26 @@ apiClient.interceptors.response.use(
             headers: {
               "X-Refresh-Token": refreshToken,
             },
+            withCredentials: true,
           },
         );
 
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
           response.data;
 
-        sessionStorage.setItem("access_token", newAccessToken);
-        if (newRefreshToken) {
-          sessionStorage.setItem("refresh_token", newRefreshToken);
-        }
+        saveTokens({
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken || refreshToken,
+        });
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
+        clearTokens();
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          const webUrl =
+            process.env.NEXT_PUBLIC_WEB_URL || window.location.origin;
+          window.location.href = `${webUrl.replace(/\/$/, "")}/login`;
         }
         return Promise.reject(createApiError(refreshError));
       }

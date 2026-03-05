@@ -7,10 +7,6 @@ import { FloatingCards } from "@/components/landing/FloatingCards";
 import { ImageCarousel } from "@/components/landing/ImageCarousel";
 
 export default function Home() {
-  const userUrl = (
-    process.env.NEXT_PUBLIC_USER_URL || "http://localhost:3001"
-  ).trim();
-
   return (
     <main className="relative w-full overflow-x-hidden bg-white">
       <div className="absolute top-[70px] left-0 h-[1000px] w-full bg-gradient-to-b from-transparent via-red-50/10 to-white md:h-[1500px]" />
@@ -22,7 +18,7 @@ export default function Home() {
             <span className="block">대동여지도에서 쉽고 간편하게</span>
           </h1>
           <Link
-            href={`${userUrl}/login`}
+            href="/login"
             className="rounded-2xl bg-[#f0e5e5] px-6 py-3 font-bold text-[#4a4444] text-base transition-colors hover:bg-[#e5d5d5] md:px-8 md:py-4 md:text-lg"
           >
             로그인 하기
