@@ -1,9 +1,17 @@
 import { apiClient } from "utils";
-import type { AdminClubCreationForm } from "@/types/admin";
+import type {
+  AdminClubCreationForm,
+  ResultDurationResponse,
+} from "@/types/admin";
+
+export const getResultDuration = async (): Promise<ResultDurationResponse> => {
+  const response =
+    await apiClient.get<ResultDurationResponse>("/result-duration");
+  return response.data;
+};
 
 export const setResultDuration = async (payload: {
-  startDate: string;
-  endDate: string;
+  resultDuration: string;
 }): Promise<void> => {
   await apiClient.post("/admin/result-duration", payload);
 };
@@ -11,8 +19,7 @@ export const setResultDuration = async (payload: {
 export const updateResultDuration = async (
   resultDurationId: string,
   payload: {
-    startDate: string;
-    endDate: string;
+    resultDuration: string;
   },
 ): Promise<void> => {
   await apiClient.patch(`/admin/result-duration/${resultDurationId}`, payload);
@@ -44,11 +51,18 @@ export const getClubCreationForm = async (
 };
 
 export const uploadClubCreationForm = async (payload: {
-  title: string;
-  description: string;
-  clubId: string;
+  name: string;
+  file: File;
 }): Promise<void> => {
-  await apiClient.post("/admin/club-creation-form", payload);
+  const formData = new FormData();
+  formData.append("name", payload.name);
+  formData.append("file", payload.file, payload.file.name);
+
+  await apiClient.post("/admin/club-creation-form", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 export const deleteClubCreationForm = async (

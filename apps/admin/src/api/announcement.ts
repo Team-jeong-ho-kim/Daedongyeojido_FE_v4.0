@@ -1,5 +1,6 @@
 import { apiClient } from "utils";
 import type {
+  AdminAnnouncementDetail,
   AdminAnnouncementListItem,
   AdminAnnouncementListResponse,
   AdminClubAnnouncement,
@@ -21,4 +22,13 @@ export const getClubAnnouncements = async (
     `/announcements/clubs/${clubId}`,
   );
   return response.data.clubAnnouncements || [];
+};
+
+export const getAnnouncementDetail = async (
+  announcementId: string,
+): Promise<AdminAnnouncementDetail> => {
+  const response = await apiClient.get<AdminAnnouncementDetail>(
+    `/announcements/${announcementId}`,
+  );
+  return response.data;
 };

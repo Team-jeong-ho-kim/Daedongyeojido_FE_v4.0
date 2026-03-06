@@ -79,6 +79,19 @@ export interface AdminAnnouncementListResponse {
   announcements: AdminAnnouncementListItem[];
 }
 
+export interface AdminAnnouncementDetail {
+  clubId: number;
+  title: string;
+  major: string[];
+  phoneNumber: string;
+  deadline: string | [number, number, number];
+  introduction: string;
+  talentDescription: string;
+  assignment: string;
+  status?: "OPEN" | "CLOSED";
+  applicationFormId?: number | null;
+}
+
 export interface AdminClubAnnouncement {
   announcementId: number;
   title: string;
@@ -97,4 +110,9 @@ export interface AdminClubCreationForm {
   title: string;
   description: string;
   createdAt?: string;
+}
+
+export interface ResultDurationResponse {
+  resultDuration: string;
+  resultDurationId?: number;
 }

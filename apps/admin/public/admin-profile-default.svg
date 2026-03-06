@@ -1,22 +1,12 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="128" height="128" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_admin_profile)">
+    <rect width="100" height="100" rx="50" fill="#C9C7C7" />
+    <ellipse cx="50" cy="83.5" rx="37" ry="28.5" fill="#F9F9F9" />
+    <circle cx="50" cy="34" r="16" fill="#F9F9F9" />
+  </g>
   <defs>
-    <linearGradient id="bg" x1="12" y1="12" x2="116" y2="116" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#111827" />
-      <stop offset="1" stop-color="#374151" />
-    </linearGradient>
-    <linearGradient id="ring" x1="20" y1="20" x2="108" y2="108" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F45F5F" />
-      <stop offset="1" stop-color="#EF4444" />
-    </linearGradient>
+    <clipPath id="clip0_admin_profile">
+      <rect width="100" height="100" rx="50" fill="white" />
+    </clipPath>
   </defs>
-
-  <rect x="4" y="4" width="120" height="120" rx="60" fill="url(#bg)" />
-  <rect x="8" y="8" width="112" height="112" rx="56" stroke="url(#ring)" stroke-width="4" />
-
-  <circle cx="64" cy="50" r="20" fill="#E5E7EB" />
-  <path
-    d="M30 100C34.8 83.6 48.5 74 64 74C79.5 74 93.2 83.6 98 100"
-    fill="#E5E7EB"
-  />
-
 </svg>

@@ -4,6 +4,14 @@ import type {
   ApplicationFormsResponse,
 } from "@/types/admin";
 
+export const getAllApplicationForms = async (): Promise<
+  ApplicationFormListItem[]
+> => {
+  const response =
+    await apiClient.get<ApplicationFormsResponse>("/application-forms");
+  return response.data.applicationForms;
+};
+
 export const getClubApplicationForms = async (
   clubId: string,
 ): Promise<ApplicationFormListItem[]> => {
