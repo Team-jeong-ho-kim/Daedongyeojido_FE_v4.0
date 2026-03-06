@@ -11,7 +11,6 @@ import {
   getClubCreationForm,
   getResultDuration,
   setResultDuration,
-  updateResultDuration,
   uploadClubCreationForm,
 } from "@/api/admin";
 import {
@@ -45,6 +44,10 @@ const toDateText = (value: [number, number, number] | string | undefined) => {
 };
 
 const toResultDurationDateTime = (dateTime: string) => {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateTime)) {
+    return `${dateTime}T00:00:00`;
+  }
+
   if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(dateTime)) {
     return dateTime;
   }
@@ -102,11 +105,8 @@ export default function AdminMyPage() {
   >([]);
 
   const [setResultDate, setSetResultDate] = useState("");
-  const [updateResultDurationId, setUpdateResultDurationId] = useState("");
-  const [updateResultDate, setUpdateResultDate] = useState("");
+  const [setResultTime, setSetResultTime] = useState("");
   const [isSettingResultDuration, setIsSettingResultDuration] = useState(false);
-  const [isUpdatingResultDuration, setIsUpdatingResultDuration] =
-    useState(false);
 
   const [clubApplicationClubId, setClubApplicationClubId] = useState("");
   const [isDecidingClubApplication, setIsDecidingClubApplication] =
@@ -215,12 +215,6 @@ export default function AdminMyPage() {
     };
   }, [loadOverviewData]);
 
-  useEffect(() => {
-    if (!resultDurationInfo?.resultDurationId) return;
-    if (updateResultDurationId) return;
-    setUpdateResultDurationId(String(resultDurationInfo.resultDurationId));
-  }, [resultDurationInfo, updateResultDurationId]);
-
   const handleLogout = async () => {
     setLoadingLogout(true);
 
@@ -238,42 +232,31 @@ export default function AdminMyPage() {
   };
 
   const handleSetResultDuration = async () => {
-    if (!setResultDate) {
-      toast.error("설정할 발표일시를 입력해 주세요.");
+    if (resultDurationInfo?.resultDuration) {
+      toast.error("이미 발표 기간이 존재합니다.");
+      return;
+    }
+
+    if (!setResultDate || !setResultTime) {
+      toast.error("설정할 발표 날짜와 시간을 입력해 주세요.");
       return;
     }
 
     setIsSettingResultDuration(true);
     try {
       await setResultDuration({
-        resultDuration: toResultDurationDateTime(setResultDate),
+        resultDuration: toResultDurationDateTime(
+          `${setResultDate}T${setResultTime}`,
+        ),
       });
       toast.success("결과 발표 기간을 설정했습니다.");
+      setSetResultDate("");
+      setSetResultTime("");
       await loadOverviewData();
     } catch (error) {
       toast.error(toErrorMessage(error, "발표 기간 설정에 실패했습니다."));
     } finally {
       setIsSettingResultDuration(false);
-    }
-  };
-
-  const handleUpdateResultDuration = async () => {
-    if (!updateResultDurationId.trim() || !updateResultDate) {
-      toast.error("수정할 기간 ID와 발표일시를 입력해 주세요.");
-      return;
-    }
-
-    setIsUpdatingResultDuration(true);
-    try {
-      await updateResultDuration(updateResultDurationId.trim(), {
-        resultDuration: toResultDurationDateTime(updateResultDate),
-      });
-      toast.success("결과 발표 기간을 수정했습니다.");
-      await loadOverviewData();
-    } catch (error) {
-      toast.error(toErrorMessage(error, "발표 기간 수정에 실패했습니다."));
-    } finally {
-      setIsUpdatingResultDuration(false);
     }
   };
 
@@ -423,6 +406,8 @@ export default function AdminMyPage() {
         : "text-gray-400 hover:text-gray-600"
     }`;
 
+  const hasExistingResultDuration = Boolean(resultDurationInfo?.resultDuration);
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white [&_input::placeholder]:text-gray-400 [&_textarea::placeholder]:text-gray-400">
       <div className="mx-auto max-w-[1100px] px-6 py-16">
@@ -566,59 +551,40 @@ export default function AdminMyPage() {
 
                   <PanelCard
                     title="결과 발표 기간 설정"
-                    description="발표일시를 기준으로 새 기간을 생성합니다."
+                    description="발표 날짜와 시간을 입력해 새 기간을 생성합니다."
                   >
-                    <div className="grid gap-3 sm:grid-cols-1">
+                    <div className="grid gap-3 sm:grid-cols-2">
                       <input
-                        type="datetime-local"
+                        type="date"
                         value={setResultDate}
                         onChange={(event) =>
                           setSetResultDate(event.target.value)
                         }
-                        placeholder="발표일시"
+                        placeholder="발표일"
+                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+                      />
+                      <input
+                        type="time"
+                        value={setResultTime}
+                        onChange={(event) =>
+                          setSetResultTime(event.target.value)
+                        }
+                        placeholder="발표 시간"
                         className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
                       />
                     </div>
                     <button
                       type="button"
-                      className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                      className={`mt-3 rounded-lg px-4 py-2 font-medium text-sm text-white transition ${
+                        hasExistingResultDuration
+                          ? "cursor-not-allowed bg-gray-400"
+                          : "bg-gray-900 hover:bg-black"
+                      } disabled:cursor-not-allowed disabled:opacity-60`}
                       onClick={handleSetResultDuration}
                       disabled={isSettingResultDuration}
+                      aria-disabled={hasExistingResultDuration}
                     >
                       {isSettingResultDuration ? "설정 중..." : "설정"}
-                    </button>
-                  </PanelCard>
-
-                  <PanelCard
-                    title="발표 기간 수정"
-                    description="기간 ID를 기준으로 발표일시를 수정합니다."
-                  >
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <input
-                        value={updateResultDurationId}
-                        onChange={(event) =>
-                          setUpdateResultDurationId(event.target.value)
-                        }
-                        placeholder="기간 ID"
-                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-                      />
-                      <input
-                        type="datetime-local"
-                        value={updateResultDate}
-                        onChange={(event) =>
-                          setUpdateResultDate(event.target.value)
-                        }
-                        placeholder="발표일시"
-                        className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-                      onClick={handleUpdateResultDuration}
-                      disabled={isUpdatingResultDuration}
-                    >
-                      {isUpdatingResultDuration ? "수정 중..." : "수정"}
                     </button>
                   </PanelCard>
                 </>

@@ -25,13 +25,6 @@ export const setResultDuration = async (
   await apiClient.post("/admin/result-duration", payload);
 };
 
-export const updateResultDuration = async (
-  resultDurationId: string,
-  payload: ResultDurationPayload,
-): Promise<void> => {
-  await apiClient.patch(`/admin/result-duration/${resultDurationId}`, payload);
-};
-
 export const decideClubApplication = async (
   clubId: string,
   isApproved: boolean,
