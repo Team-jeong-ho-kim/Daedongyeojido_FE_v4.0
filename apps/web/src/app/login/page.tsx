@@ -1,17 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useId, useState } from "react";
+import Link from "next/link";
+import { type FormEvent, useId, useState } from "react";
 import type { LoginRequest, LoginResponse } from "utils";
-import {
-  ApiError,
-  apiClient,
-  getAccessToken,
-  getSessionUser,
-  saveSessionUser,
-  saveTokens,
-} from "utils";
+import { ApiError, apiClient, saveSessionUser, saveTokens } from "utils";
 
 const toErrorMessage = (error: unknown, fallback: string) => {
   if (error instanceof ApiError) return error.description;
@@ -19,11 +12,12 @@ const toErrorMessage = (error: unknown, fallback: string) => {
 };
 
 export default function LoginPage() {
-  const router = useRouter();
-  const userUrl =
-    process.env.NEXT_PUBLIC_USER_URL || "http://localhost:3001".trim();
-  const adminUrl =
-    process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3002".trim();
+  const userUrl = (
+    process.env.NEXT_PUBLIC_USER_URL || "http://localhost:3001"
+  ).trim();
+  const adminUrl = (
+    process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3002"
+  ).trim();
 
   const accountIdInput = useId();
   const passwordInput = useId();
@@ -33,20 +27,7 @@ export default function LoginPage() {
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const accessToken = getAccessToken();
-    const sessionUser = getSessionUser();
-    if (!sessionUser || !accessToken) return;
-
-    if (sessionUser.role === "ADMIN") {
-      window.location.href = adminUrl;
-      return;
-    }
-
-    window.location.href = userUrl;
-  }, [adminUrl, userUrl]);
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
 
@@ -82,7 +63,7 @@ export default function LoginPage() {
     } finally {
       setPending(false);
     }
-  };
+  }
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -112,7 +93,7 @@ export default function LoginPage() {
 
           <h2 className="mb-2 font-bold text-3xl text-white">로그인</h2>
           <p className="mb-8 text-gray-400">
-            계정 권한(role)에 맞는 서비스로 자동 이동합니다.
+            로그인 후 계정 권한(role)에 맞는 서비스로 이동합니다.
           </p>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -211,13 +192,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="mt-3 w-full py-1 text-center font-medium text-gray-400 text-xs underline underline-offset-4 transition hover:text-gray-200"
+          <Link
+            href="/"
+            className="mt-3 block w-full py-1 text-center font-medium text-gray-400 text-xs underline underline-offset-4 transition hover:text-gray-200"
           >
             홈으로 돌아가기
-          </button>
+          </Link>
         </div>
       </div>
     </div>
