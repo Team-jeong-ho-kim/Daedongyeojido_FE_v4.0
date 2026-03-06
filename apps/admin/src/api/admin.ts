@@ -4,23 +4,30 @@ import type {
   ResultDurationResponse,
 } from "@/types/admin";
 
+type ResultDurationPayload = {
+  resultDuration: string;
+};
+
+type ClubCreationFormUploadPayload = {
+  fileUrl: File;
+  fileName: string;
+};
+
 export const getResultDuration = async (): Promise<ResultDurationResponse> => {
   const response =
     await apiClient.get<ResultDurationResponse>("/result-duration");
   return response.data;
 };
 
-export const setResultDuration = async (payload: {
-  resultDuration: string;
-}): Promise<void> => {
+export const setResultDuration = async (
+  payload: ResultDurationPayload,
+): Promise<void> => {
   await apiClient.post("/admin/result-duration", payload);
 };
 
 export const updateResultDuration = async (
   resultDurationId: string,
-  payload: {
-    resultDuration: string;
-  },
+  payload: ResultDurationPayload,
 ): Promise<void> => {
   await apiClient.patch(`/admin/result-duration/${resultDurationId}`, payload);
 };
@@ -50,19 +57,14 @@ export const getClubCreationForm = async (
   return response.data;
 };
 
-export const uploadClubCreationForm = async (payload: {
-  name: string;
-  file: File;
-}): Promise<void> => {
+export const uploadClubCreationForm = async (
+  payload: ClubCreationFormUploadPayload,
+): Promise<void> => {
   const formData = new FormData();
-  formData.append("name", payload.name);
-  formData.append("file", payload.file, payload.file.name);
+  formData.append("fileUrl", payload.fileUrl, payload.fileUrl.name);
+  formData.append("fileName", payload.fileName);
 
-  await apiClient.post("/admin/club-creation-form", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  await apiClient.post("/admin/club-creation-form", formData);
 };
 
 export const deleteClubCreationForm = async (

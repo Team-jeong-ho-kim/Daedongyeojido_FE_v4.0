@@ -1,7 +1,5 @@
 import * as axios from 'axios';
 
-declare const apiClient: axios.AxiosInstance;
-
 interface LoginRequest {
     accountId: string;
     password: string;
@@ -40,6 +38,8 @@ declare const getRefreshToken: () => string | null;
 declare const getSessionUser: () => AuthSessionUser | null;
 declare const clearSessionUser: () => void;
 declare const clearTokens: () => void;
+
+declare const apiClient: axios.AxiosInstance;
 
 declare const getUserInfo: () => {
     classNumber: string | null;

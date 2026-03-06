@@ -340,8 +340,8 @@ export default function AdminMyPage() {
     setIsUploadingClubCreationForm(true);
     try {
       await uploadClubCreationForm({
-        name: uploadName.trim(),
-        file: uploadFile,
+        fileUrl: uploadFile,
+        fileName: uploadName.trim(),
       });
       toast.success("동아리 개설 양식을 업로드했습니다.");
       setUploadName("");

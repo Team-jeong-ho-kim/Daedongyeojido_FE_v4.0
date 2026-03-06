@@ -43,9 +43,6 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/instance.ts
-var import_axios = __toESM(require("axios"));
-
 // src/auth-cookie.ts
 var import_react_cookie = require("react-cookie");
 var ACCESS_TOKEN_KEY = "access_token";
@@ -130,6 +127,9 @@ var clearTokens = () => {
   clearSessionUser();
 };
 
+// src/instance.ts
+var import_axios = __toESM(require("axios"));
+
 // src/env.ts
 var BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 var USER_DOMAIN = process.env.NEXT_PUBLIC_USER_URL;
@@ -160,6 +160,9 @@ apiClient.interceptors.request.use(
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },

@@ -1,6 +1,3 @@
-// src/instance.ts
-import axios from "axios";
-
 // src/auth-cookie.ts
 import { Cookies } from "react-cookie";
 var ACCESS_TOKEN_KEY = "access_token";
@@ -85,6 +82,9 @@ var clearTokens = () => {
   clearSessionUser();
 };
 
+// src/instance.ts
+import axios from "axios";
+
 // src/env.ts
 var BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 var USER_DOMAIN = process.env.NEXT_PUBLIC_USER_URL;
@@ -115,6 +115,9 @@ apiClient.interceptors.request.use(
     const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },
