@@ -59,6 +59,7 @@ export const createClubApplication = async (
   major: string[],
   link: string[],
   clubImage: File,
+  clubCreationFormFile: File,
 ) => {
   const formData = new FormData();
 
@@ -75,6 +76,13 @@ export const createClubApplication = async (
   });
 
   formData.append("clubImage", clubImage);
+  formData.append(
+    "clubCreationFormFile",
+    clubCreationFormFile,
+    clubCreationFormFile.name,
+  );
+  // Backward-compatible alias in case backend expects generic "file"
+  formData.append("file", clubCreationFormFile, clubCreationFormFile.name);
 
   const response = await apiClient.post("/clubs/applications", formData, {
     headers: {

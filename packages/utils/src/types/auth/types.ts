@@ -3,17 +3,12 @@ export interface LoginRequest {
   password: string;
 }
 
+export type Role = "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
+
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   classNumber: string;
   userName: string;
-  role:
-    | "ADMIN"
-    | "STUDENTS"
-    | "STUDENT"
-    | "CLUB_MEMBER"
-    | "CLUB_LEADER"
-    | "TEACHER"
-    | "MASTER";
+  role: Role;
 }

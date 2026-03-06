@@ -77,6 +77,7 @@ export const useCreateClubApplicationMutation = () => {
       major,
       link,
       clubImage,
+      clubCreationFormFile,
     }: {
       clubName: string;
       oneLiner: string;
@@ -84,6 +85,7 @@ export const useCreateClubApplicationMutation = () => {
       major: string[];
       link: string[];
       clubImage: File;
+      clubCreationFormFile: File;
     }) =>
       createClubApplication(
         clubName,
@@ -92,6 +94,7 @@ export const useCreateClubApplicationMutation = () => {
         major,
         link,
         clubImage,
+        clubCreationFormFile,
       ),
     onSuccess: () => {
       toast.success(

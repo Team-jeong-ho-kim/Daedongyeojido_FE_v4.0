@@ -188,7 +188,7 @@ export async function setAuthSession(page: Page) {
     // biome-ignore lint/suspicious/noDocumentCookie: e2e 초기 인증 상태를 빠르게 주입한다.
     document.cookie = "refresh_token=mock-refresh-token; path=/";
     // biome-ignore lint/suspicious/noDocumentCookie: e2e 초기 인증 상태를 빠르게 주입한다.
-    document.cookie = "auth_role=STUDENTS; path=/";
+    document.cookie = "auth_role=STUDENT; path=/";
     // biome-ignore lint/suspicious/noDocumentCookie: e2e 초기 인증 상태를 빠르게 주입한다.
     document.cookie =
       "auth_user_name=%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%9C%A0%EC%A0%80; path=/";

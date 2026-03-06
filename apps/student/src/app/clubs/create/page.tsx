@@ -20,6 +20,9 @@ export default function ClubCreationPage() {
   const { mutate: createClubMutate } = useCreateClubApplicationMutation();
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
+  const [clubCreationFormFile, setClubCreationFormFile] = useState<File | null>(
+    null,
+  );
   const [clubIntro, setClubIntro] = useState("");
   const [clubLinks, setClubLinks] = useState<{ id: string; url: string }[]>([]);
   const [clubIntroDetail, setClubIntroDetail] = useState("");
@@ -48,6 +51,9 @@ export default function ClubCreationPage() {
     }
     if (selectedFields.length === 0)
       newErrors.selectedFields = "동아리 전공을 선택해주세요";
+    if (!clubCreationFormFile)
+      newErrors.clubCreationFormFile =
+        "작성한 동아리 개설 양식 파일을 업로드해주세요";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -108,6 +114,11 @@ export default function ClubCreationPage() {
       toggleShow();
       return;
     }
+    if (!clubCreationFormFile) {
+      toast.error("작성한 동아리 개설 양식 파일을 업로드해주세요.");
+      toggleShow();
+      return;
+    }
 
     const links = clubLinks.map((link) => link.url).filter((url) => url.trim());
 
@@ -118,6 +129,7 @@ export default function ClubCreationPage() {
       major: selectedFields,
       link: links,
       clubImage: clubLogo,
+      clubCreationFormFile,
     });
     toggleShow();
   };
@@ -174,6 +186,47 @@ export default function ClubCreationPage() {
               onSelectionChange={handleFieldsChange}
               error={errors.selectedFields}
             />
+          </FormField>
+
+          <FormField label="동아리 개설 양식 파일" alignTop>
+            <div className="space-y-2">
+              <input
+                type="file"
+                accept=".hwp,.hwpx,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  if (!file) {
+                    setClubCreationFormFile(null);
+                    return;
+                  }
+
+                  const lower = file.name.toLowerCase();
+                  const isAllowed =
+                    lower.endsWith(".hwp") ||
+                    lower.endsWith(".hwpx") ||
+                    lower.endsWith(".pdf");
+
+                  if (!isAllowed) {
+                    toast.error("HWP/HWPX/PDF 파일만 업로드할 수 있습니다.");
+                    event.currentTarget.value = "";
+                    setClubCreationFormFile(null);
+                    return;
+                  }
+
+                  setClubCreationFormFile(file);
+                  clearError("clubCreationFormFile");
+                }}
+                className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-gray-700 file:text-sm focus:border-primary-500"
+              />
+              <p className="text-gray-500 text-xs">
+                작성 완료한 양식을 업로드해주세요. (HWP/HWPX/PDF)
+              </p>
+              {errors.clubCreationFormFile ? (
+                <p className="text-red-500 text-xs">
+                  {errors.clubCreationFormFile}
+                </p>
+              ) : null}
+            </div>
           </FormField>
         </div>
       </div>

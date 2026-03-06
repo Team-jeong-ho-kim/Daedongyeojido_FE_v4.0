@@ -6,12 +6,13 @@ interface LoginRequest {
     accountId: string;
     password: string;
 }
+type Role = "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
 interface LoginResponse {
     accessToken: string;
     refreshToken: string;
     classNumber: string;
     userName: string;
-    role: "ADMIN" | "STUDENTS" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER" | "MASTER";
+    role: Role;
 }
 
 interface ApiErrorResponse {
