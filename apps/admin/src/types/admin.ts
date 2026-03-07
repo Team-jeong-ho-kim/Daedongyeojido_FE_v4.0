@@ -112,6 +112,11 @@ export interface AdminClubCreationForm {
   createdAt?: string;
 }
 
+export interface AdminClubCreationFormDownload {
+  fileName: string;
+  fileUrl: string;
+}
+
 export interface ResultDurationResponse {
   resultDuration: string;
   resultDurationId?: number;

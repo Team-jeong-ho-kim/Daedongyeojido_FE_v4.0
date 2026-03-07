@@ -8,6 +8,7 @@ import {
   decideClubApplication,
   decideDissolution,
   deleteClubCreationForm,
+  downloadClubCreationApplicationForm,
   getClubCreationForm,
   getResultDuration,
   setResultDuration,
@@ -21,6 +22,7 @@ import { logout } from "@/api/auth";
 import { getAllClubs } from "@/api/club";
 import type {
   AdminClubCreationForm,
+  AdminClubCreationFormDownload,
   ApplicationFormListItem,
   ResultDurationResponse,
 } from "@/types/admin";
@@ -41,6 +43,60 @@ const toDateText = (value: [number, number, number] | string | undefined) => {
   if (!value) return "-";
   if (typeof value === "string") return value;
   return `${value[0]}-${String(value[1]).padStart(2, "0")}-${String(value[2]).padStart(2, "0")}`;
+};
+
+const getFileExtension = (fileUrl: string, contentType?: string | null) => {
+  const urlPath = fileUrl.split("?")[0] ?? fileUrl;
+  const extensionMatch = urlPath.match(/(\.[A-Za-z0-9]+)$/);
+  if (extensionMatch?.[1]) {
+    return extensionMatch[1];
+  }
+
+  switch (contentType?.toLowerCase()) {
+    case "application/pdf":
+      return ".pdf";
+    case "application/x-hwp":
+    case "application/haansofthwp":
+      return ".hwp";
+    case "application/zip":
+    case "application/octet-stream":
+      return "";
+    case "application/x-hwpx":
+    case "application/vnd.hancom.hwpx":
+      return ".hwpx";
+    default:
+      return "";
+  }
+};
+
+const getDownloadFileName = (
+  fileName: string,
+  fileUrl: string,
+  contentType?: string | null,
+) => {
+  const sanitizedFileName = fileName.trim();
+  const extension = getFileExtension(fileUrl, contentType);
+
+  if (!sanitizedFileName) {
+    return `club-creation-form${extension}`;
+  }
+
+  if (!extension) {
+    return sanitizedFileName;
+  }
+
+  return sanitizedFileName.toLowerCase().endsWith(extension.toLowerCase())
+    ? sanitizedFileName
+    : `${sanitizedFileName}${extension}`;
+};
+
+const triggerFileDownload = (href: string, fileName: string) => {
+  const link = document.createElement("a");
+  link.href = href;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 const toResultDurationDateTime = (dateTime: string) => {
@@ -116,6 +172,16 @@ export default function AdminMyPage() {
   const [clubCreationForm, setClubCreationForm] =
     useState<AdminClubCreationForm | null>(null);
   const [isLoadingClubCreationForm, setIsLoadingClubCreationForm] =
+    useState(false);
+  const [downloadClubCreationFormId, setDownloadClubCreationFormId] =
+    useState("");
+  const [downloadClubCreationForm, setDownloadClubCreationForm] =
+    useState<AdminClubCreationFormDownload | null>(null);
+  const [
+    isFetchingDownloadClubCreationForm,
+    setIsFetchingDownloadClubCreationForm,
+  ] = useState(false);
+  const [isDownloadingClubCreationForm, setIsDownloadingClubCreationForm] =
     useState(false);
 
   const [uploadName, setUploadName] = useState("");
@@ -300,6 +366,71 @@ export default function AdminMyPage() {
       );
     } finally {
       setIsLoadingClubCreationForm(false);
+      setClubCreationLookupClubId("");
+    }
+  };
+
+  const handleDownloadClubCreationApplicationForm = async () => {
+    if (!downloadClubCreationForm) {
+      toast.error("먼저 개설 양식을 조회해 주세요.");
+      return;
+    }
+
+    setIsDownloadingClubCreationForm(true);
+    try {
+      const { fileName, fileUrl } = downloadClubCreationForm;
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        throw new Error("파일 다운로드 응답이 올바르지 않습니다.");
+      }
+
+      const blob = await response.blob();
+      if (blob.size === 0) {
+        throw new Error("다운로드한 파일 크기가 비어 있습니다.");
+      }
+
+      const downloadFileName = getDownloadFileName(
+        fileName,
+        fileUrl,
+        response.headers.get("content-type") ?? blob.type,
+      );
+
+      const objectUrl = URL.createObjectURL(blob);
+      triggerFileDownload(objectUrl, downloadFileName);
+      window.setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+      }, 1000);
+
+      toast.success("동아리 개설 신청 양식을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(
+        toErrorMessage(error, "동아리 개설 신청 양식 다운로드에 실패했습니다."),
+      );
+    } finally {
+      setIsDownloadingClubCreationForm(false);
+    }
+  };
+
+  const handleFetchDownloadClubCreationForm = async () => {
+    if (!downloadClubCreationFormId.trim()) {
+      toast.error("조회할 개설 양식 ID를 입력해 주세요.");
+      return;
+    }
+
+    setIsFetchingDownloadClubCreationForm(true);
+    try {
+      const data = await downloadClubCreationApplicationForm(
+        downloadClubCreationFormId.trim(),
+      );
+      setDownloadClubCreationForm(data);
+      toast.success("동아리 개설 신청 양식을 조회했습니다.");
+    } catch (error) {
+      setDownloadClubCreationForm(null);
+      toast.error(
+        toErrorMessage(error, "동아리 개설 신청 양식 조회에 실패했습니다."),
+      );
+    } finally {
+      setIsFetchingDownloadClubCreationForm(false);
     }
   };
 
@@ -364,6 +495,7 @@ export default function AdminMyPage() {
       );
     } finally {
       setIsDeletingClubCreationForm(false);
+      setDeleteClubCreationFormId("");
     }
   };
 
@@ -657,6 +789,57 @@ export default function AdminMyPage() {
                         <p className="mt-3 whitespace-pre-wrap text-gray-800 leading-relaxed">
                           {clubCreationForm.description}
                         </p>
+                      </div>
+                    ) : null}
+                  </PanelCard>
+
+                  <PanelCard
+                    title="동아리 개설 신청 양식 조회 및 다운로드"
+                    description="개설 양식 ID로 신청 양식을 조회한 뒤 다운로드합니다."
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      <input
+                        value={downloadClubCreationFormId}
+                        onChange={(event) => {
+                          setDownloadClubCreationFormId(event.target.value);
+                          setDownloadClubCreationForm(null);
+                        }}
+                        placeholder="개설 양식 ID"
+                        className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+                      />
+                      <button
+                        type="button"
+                        className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={handleFetchDownloadClubCreationForm}
+                        disabled={isFetchingDownloadClubCreationForm}
+                      >
+                        {isFetchingDownloadClubCreationForm
+                          ? "조회 중..."
+                          : "조회"}
+                      </button>
+                    </div>
+
+                    {downloadClubCreationForm ? (
+                      <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm">
+                        <p className="font-medium text-gray-900">
+                          {getDownloadFileName(
+                            downloadClubCreationForm.fileName,
+                            downloadClubCreationForm.fileUrl,
+                          )}
+                        </p>
+                        <p className="mt-1 break-all text-gray-600">
+                          {downloadClubCreationForm.fileUrl}
+                        </p>
+                        <button
+                          type="button"
+                          className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                          onClick={handleDownloadClubCreationApplicationForm}
+                          disabled={isDownloadingClubCreationForm}
+                        >
+                          {isDownloadingClubCreationForm
+                            ? "다운로드 중..."
+                            : "다운로드"}
+                        </button>
                       </div>
                     ) : null}
                   </PanelCard>
