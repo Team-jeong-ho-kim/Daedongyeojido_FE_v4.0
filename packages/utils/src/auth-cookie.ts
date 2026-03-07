@@ -25,9 +25,6 @@ const isBrowser = () => typeof window !== "undefined";
 const resolveCookieDomain = () => {
   if (!isBrowser()) return null;
 
-  const configuredDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN?.trim();
-  if (configuredDomain) return configuredDomain;
-
   const host = window.location.hostname;
   const isLocalHost = host === "localhost" || host === "127.0.0.1";
 
