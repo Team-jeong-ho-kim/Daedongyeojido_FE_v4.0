@@ -192,7 +192,7 @@ export default function ClubCreationPage() {
             <div className="space-y-2">
               <input
                 type="file"
-                accept=".hwp,.hwpx,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
+                accept=".hwp,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
                   if (!file) {
@@ -202,12 +202,10 @@ export default function ClubCreationPage() {
 
                   const lower = file.name.toLowerCase();
                   const isAllowed =
-                    lower.endsWith(".hwp") ||
-                    lower.endsWith(".hwpx") ||
-                    lower.endsWith(".pdf");
+                    lower.endsWith(".hwp") || lower.endsWith(".pdf");
 
                   if (!isAllowed) {
-                    toast.error("HWP/HWPX/PDF 파일만 업로드할 수 있습니다.");
+                    toast.error("HWP/PDF 파일만 업로드할 수 있습니다.");
                     event.currentTarget.value = "";
                     setClubCreationFormFile(null);
                     return;
@@ -219,7 +217,7 @@ export default function ClubCreationPage() {
                 className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-gray-700 file:text-sm focus:border-primary-500"
               />
               <p className="text-gray-500 text-xs">
-                작성 완료한 양식을 업로드해주세요. (HWP/HWPX/PDF)
+                작성 완료한 양식을 업로드해주세요. (HWP/PDF)
               </p>
               {errors.clubCreationFormFile ? (
                 <p className="text-red-500 text-xs">

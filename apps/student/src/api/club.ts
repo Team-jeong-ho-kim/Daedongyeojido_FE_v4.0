@@ -77,18 +77,12 @@ export const createClubApplication = async (
 
   formData.append("clubImage", clubImage);
   formData.append(
-    "clubCreationFormFile",
+    "clubCreationForm",
     clubCreationFormFile,
     clubCreationFormFile.name,
   );
-  // Backward-compatible alias in case backend expects generic "file"
-  formData.append("file", clubCreationFormFile, clubCreationFormFile.name);
 
-  const response = await apiClient.post("/clubs/applications", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await apiClient.post("/clubs/applications", formData);
   return response.data;
 };
 
