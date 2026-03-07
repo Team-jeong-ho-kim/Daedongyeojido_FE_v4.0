@@ -71,7 +71,7 @@ export const createClubApplication = async (
     formData.append("major", m);
   });
 
-  link.forEach((l) => {
+  [...new Set(link.map((item) => item.trim()).filter(Boolean))].forEach((l) => {
     formData.append("link", l);
   });
 

@@ -814,6 +814,10 @@ function LinkInput({
         );
         return;
       }
+      if (links.some((link) => link.url === trimmedLink)) {
+        setInternalError("\uC774\uBBF8 \uCD94\uAC00\uB41C \uB9C1\uD06C\uC785\uB2C8\uB2E4.");
+        return;
+      }
       setInternalError("");
       onLinksChange([...links, { id: crypto.randomUUID(), url: trimmedLink }]);
       setCurrentLink("");

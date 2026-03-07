@@ -120,7 +120,9 @@ export default function ClubCreationPage() {
       return;
     }
 
-    const links = clubLinks.map((link) => link.url).filter((url) => url.trim());
+    const links = [...new Set(clubLinks.map((link) => link.url.trim()))].filter(
+      (url) => url,
+    );
 
     createClubMutate({
       clubName: clubName.trim(),
