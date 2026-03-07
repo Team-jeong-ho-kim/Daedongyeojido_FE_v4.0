@@ -544,7 +544,7 @@ export default function AdminMyPage() {
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white [&_input::placeholder]:text-gray-400 [&_textarea::placeholder]:text-gray-400">
       <div className="mx-auto max-w-[1100px] px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-[170px_1fr]">
-          <aside>
+          <aside className="lg:sticky lg:top-10 lg:self-start">
             <h1 className="mb-10 font-extrabold text-4xl tracking-tight">
               마이페이지
             </h1>
