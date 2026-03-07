@@ -99,6 +99,30 @@ const triggerFileDownload = (href: string, fileName: string) => {
   document.body.removeChild(link);
 };
 
+const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
+  const response = await fetch(fileUrl);
+  if (!response.ok) {
+    throw new Error("파일 다운로드 응답이 올바르지 않습니다.");
+  }
+
+  const blob = await response.blob();
+  if (blob.size === 0) {
+    throw new Error("다운로드한 파일 크기가 비어 있습니다.");
+  }
+
+  const downloadFileName = getDownloadFileName(
+    fileName,
+    fileUrl,
+    response.headers.get("content-type") ?? blob.type,
+  );
+
+  const objectUrl = URL.createObjectURL(blob);
+  triggerFileDownload(objectUrl, downloadFileName);
+  window.setTimeout(() => {
+    URL.revokeObjectURL(objectUrl);
+  }, 1000);
+};
+
 const toResultDurationDateTime = (dateTime: string) => {
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateTime)) {
     return `${dateTime}T00:00:00`;
@@ -173,6 +197,10 @@ export default function AdminMyPage() {
     useState<AdminClubCreationForm | null>(null);
   const [isLoadingClubCreationForm, setIsLoadingClubCreationForm] =
     useState(false);
+  const [
+    isDownloadingCreationSubmissionForm,
+    setIsDownloadingCreationSubmissionForm,
+  ] = useState(false);
   const [downloadClubCreationFormId, setDownloadClubCreationFormId] =
     useState("");
   const [downloadClubCreationForm, setDownloadClubCreationForm] =
@@ -370,6 +398,31 @@ export default function AdminMyPage() {
     }
   };
 
+  const handleDownloadCreationSubmissionForm = async () => {
+    if (!clubCreationForm?.clubCreationForm) {
+      toast.error("먼저 동아리 개설 정보를 조회해 주세요.");
+      return;
+    }
+
+    setIsDownloadingCreationSubmissionForm(true);
+    try {
+      await downloadFileFromUrl(
+        clubCreationForm.clubCreationForm,
+        `${clubCreationForm.club.clubName}-동아리-개설-양식`,
+      );
+      toast.success("첨부된 동아리 개설 양식을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(
+        toErrorMessage(
+          error,
+          "첨부된 동아리 개설 양식 다운로드에 실패했습니다.",
+        ),
+      );
+    } finally {
+      setIsDownloadingCreationSubmissionForm(false);
+    }
+  };
+
   const handleDownloadClubCreationApplicationForm = async () => {
     if (!downloadClubCreationForm) {
       toast.error("먼저 개설 양식을 조회해 주세요.");
@@ -379,28 +432,7 @@ export default function AdminMyPage() {
     setIsDownloadingClubCreationForm(true);
     try {
       const { fileName, fileUrl } = downloadClubCreationForm;
-      const response = await fetch(fileUrl);
-      if (!response.ok) {
-        throw new Error("파일 다운로드 응답이 올바르지 않습니다.");
-      }
-
-      const blob = await response.blob();
-      if (blob.size === 0) {
-        throw new Error("다운로드한 파일 크기가 비어 있습니다.");
-      }
-
-      const downloadFileName = getDownloadFileName(
-        fileName,
-        fileUrl,
-        response.headers.get("content-type") ?? blob.type,
-      );
-
-      const objectUrl = URL.createObjectURL(blob);
-      triggerFileDownload(objectUrl, downloadFileName);
-      window.setTimeout(() => {
-        URL.revokeObjectURL(objectUrl);
-      }, 1000);
-
+      await downloadFileFromUrl(fileUrl, fileName);
       toast.success("동아리 개설 신청 양식을 다운로드했습니다.");
     } catch (error) {
       toast.error(
@@ -442,12 +474,10 @@ export default function AdminMyPage() {
 
     const lowerFileName = uploadFile.name.toLowerCase();
     const isAllowedTemplateFile =
-      lowerFileName.endsWith(".pdf") ||
-      lowerFileName.endsWith(".hwp") ||
-      lowerFileName.endsWith(".hwpx");
+      lowerFileName.endsWith(".pdf") || lowerFileName.endsWith(".hwp");
 
     if (!isAllowedTemplateFile) {
-      toast.error("HWP/HWPX/PDF 파일만 업로드할 수 있습니다.");
+      toast.error("HWP/PDF 파일만 업로드할 수 있습니다.");
       return;
     }
 
@@ -481,13 +511,7 @@ export default function AdminMyPage() {
     try {
       await deleteClubCreationForm(deleteClubCreationFormId.trim());
       toast.success("동아리 개설 양식을 삭제했습니다.");
-      if (
-        clubCreationForm &&
-        String(clubCreationForm.clubCreationFormId) ===
-          deleteClubCreationFormId.trim()
-      ) {
-        setClubCreationForm(null);
-      }
+      setClubCreationForm(null);
       await loadOverviewData();
     } catch (error) {
       toast.error(
@@ -539,6 +563,9 @@ export default function AdminMyPage() {
     }`;
 
   const hasExistingResultDuration = Boolean(resultDurationInfo?.resultDuration);
+  const uniqueClubCreationLinks = clubCreationForm
+    ? [...new Set(clubCreationForm.club.links)]
+    : [];
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white [&_input::placeholder]:text-gray-400 [&_textarea::placeholder]:text-gray-400">
@@ -781,14 +808,87 @@ export default function AdminMyPage() {
 
                     {clubCreationForm ? (
                       <div className="mt-4 rounded-xl bg-gray-50 p-4 text-sm">
-                        <p className="font-medium">{clubCreationForm.title}</p>
-                        <p className="mt-1 text-gray-600">
-                          양식 ID: {clubCreationForm.clubCreationFormId} ·
-                          동아리 ID: {clubCreationForm.clubId}
-                        </p>
-                        <p className="mt-3 whitespace-pre-wrap text-gray-800 leading-relaxed">
-                          {clubCreationForm.description}
-                        </p>
+                        <div className="flex flex-wrap items-start gap-4">
+                          {/* biome-ignore lint/performance/noImgElement: Admin page displays external S3 image URLs without Next remotePatterns config. */}
+                          <img
+                            src={clubCreationForm.club.clubImage}
+                            alt={clubCreationForm.club.clubName}
+                            className="h-20 w-20 rounded-xl border border-gray-200 object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-base text-gray-900">
+                              {clubCreationForm.club.clubName}
+                            </p>
+                            <p className="mt-1 text-gray-600 text-sm">
+                              신청자: {clubCreationForm.userName} · 학번:{" "}
+                              {clubCreationForm.classNumber}
+                            </p>
+                            <p className="mt-3 text-gray-500 text-xs">
+                              한줄 소개
+                            </p>
+                            <p className="mt-1 text-gray-900 text-sm">
+                              {clubCreationForm.club.oneLiner}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 space-y-4">
+                          <div>
+                            <p className="text-gray-500 text-xs">동아리 소개</p>
+                            <p className="mt-1 whitespace-pre-wrap text-gray-800 leading-relaxed">
+                              {clubCreationForm.club.introduction}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-gray-500 text-xs">전공</p>
+                            <p className="mt-1 text-gray-900 text-sm">
+                              {clubCreationForm.club.majors.join(", ")}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-gray-500 text-xs">관련 링크</p>
+                            <div className="mt-1 space-y-1">
+                              {uniqueClubCreationLinks.length > 0 ? (
+                                uniqueClubCreationLinks.map((link, index) => (
+                                  <a
+                                    key={`${clubCreationForm.club.clubName}-${index}-${link}`}
+                                    href={link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block break-all text-[#2563EB] text-sm underline underline-offset-2"
+                                  >
+                                    {link}
+                                  </a>
+                                ))
+                              ) : (
+                                <p className="text-gray-500 text-sm">
+                                  등록된 링크가 없습니다.
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <p className="text-gray-500 text-xs">
+                              첨부 개설 양식
+                            </p>
+                            <p className="mt-1 break-all text-gray-600 text-sm">
+                              {clubCreationForm.clubCreationForm}
+                            </p>
+                            <button
+                              type="button"
+                              className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                              onClick={handleDownloadCreationSubmissionForm}
+                              disabled={isDownloadingCreationSubmissionForm}
+                            >
+                              {isDownloadingCreationSubmissionForm
+                                ? "다운로드 중..."
+                                : "첨부 양식 다운로드"}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ) : null}
                   </PanelCard>
@@ -846,7 +946,7 @@ export default function AdminMyPage() {
 
                   <PanelCard
                     title="동아리 개설 양식 업로드"
-                    description="한글(HWP/HWPX) 또는 PDF 양식을 등록합니다."
+                    description="한글(HWP) 또는 PDF 양식을 등록합니다."
                   >
                     <div className="space-y-3">
                       <input
@@ -858,7 +958,7 @@ export default function AdminMyPage() {
                       <input
                         key={uploadFileInputKey}
                         type="file"
-                        accept=".hwp,.hwpx,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
+                        accept=".hwp,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
                         onChange={(event) =>
                           setUploadFile(event.target.files?.[0] ?? null)
                         }
@@ -867,7 +967,7 @@ export default function AdminMyPage() {
                       <p className="text-gray-500 text-xs">
                         {uploadFile
                           ? `선택된 파일: ${uploadFile.name}`
-                          : "HWP/HWPX/PDF 파일을 선택해 주세요."}
+                          : "HWP/PDF 파일을 선택해 주세요."}
                       </p>
                     </div>
                     <button

@@ -104,12 +104,20 @@ export interface AdminClubAnnouncementResponse {
   clubAnnouncements: AdminClubAnnouncement[];
 }
 
+export interface AdminClubCreationSubmissionClub {
+  clubName: string;
+  introduction: string;
+  oneLiner: string;
+  clubImage: string;
+  majors: string[];
+  links: string[];
+}
+
 export interface AdminClubCreationForm {
-  clubCreationFormId: number;
-  clubId: number;
-  title: string;
-  description: string;
-  createdAt?: string;
+  club: AdminClubCreationSubmissionClub;
+  userName: string;
+  classNumber: string;
+  clubCreationForm: string;
 }
 
 export interface AdminClubCreationFormDownload {
