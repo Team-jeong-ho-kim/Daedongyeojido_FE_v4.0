@@ -3,16 +3,15 @@
 export const runtime = "edge";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
-import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
-import { getAnnouncementDetail } from "@/api/announcement";
-import { getClubDetail } from "@/api/club";
 import ClubHeader from "@/components/common/ClubHeader";
-import type {
-  AdminAnnouncementDetail,
-  ClubDetailResponse,
-} from "@/types/admin";
+import {
+  useGetAnnouncementDetailQuery,
+  useGetClubDetailQuery,
+} from "@/hooks/querys";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";
 
 const iconClassName = "h-6 w-6 text-[#FF6B6B]";
 
@@ -123,18 +122,6 @@ const interviewSteps = [
   { id: 6, name: "최종 합격 발표" },
 ];
 
-const moveToWebLogin = () => {
-  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
-    .trim()
-    .replace(/\/$/, "");
-  window.location.href = `${webUrl}/login`;
-};
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
-
 const formatDeadline = (deadline: string | [number, number, number]) => {
   if (!deadline) return "";
 
@@ -195,65 +182,41 @@ export default function AdminAnnouncementDetailPage() {
       ? params.announcementId[0]
       : params.announcementId;
   }, [params]);
+  const { isAuthorized, isBooting } = useAdminAuth();
+  const announcementDetailQuery = useGetAnnouncementDetailQuery(
+    announcementId,
+    isAuthorized,
+  );
+  const announcementDetail = announcementDetailQuery.data ?? null;
+  const clubDetailQuery = useGetClubDetailQuery(
+    String(announcementDetail?.clubId ?? ""),
+    isAuthorized && !!announcementDetail?.clubId,
+  );
+  const clubDetail = clubDetailQuery.data ?? null;
+  useQueryErrorToast(
+    announcementDetailQuery.error,
+    "공고 상세 정보를 불러오지 못했습니다.",
+  );
+  useQueryErrorToast(
+    clubDetailQuery.error,
+    "공고 상세 정보를 불러오지 못했습니다.",
+  );
 
-  const [booting, setBooting] = useState(true);
-  const [announcementDetail, setAnnouncementDetail] =
-    useState<AdminAnnouncementDetail | null>(null);
-  const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);
+  if (!announcementId) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">잘못된 공고 ID입니다.</p>
+      </main>
+    );
+  }
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const bootstrap = async () => {
-      if (!announcementId) {
-        toast.error("잘못된 공고 ID입니다.");
-        setBooting(false);
-        return;
-      }
-
-      const accessToken = getAccessToken();
-      const sessionUser = getSessionUser();
-
-      if (!accessToken || !sessionUser || sessionUser.role !== "ADMIN") {
-        clearTokens();
-        moveToWebLogin();
-        if (!cancelled) setBooting(false);
-        return;
-      }
-
-      try {
-        const detail = await getAnnouncementDetail(announcementId);
-        if (cancelled) return;
-
-        setAnnouncementDetail(detail);
-
-        const club = await getClubDetail(String(detail.clubId));
-        if (cancelled) return;
-
-        setClubDetail(club);
-      } catch (error) {
-        toast.error(
-          toErrorMessage(error, "공고 상세 정보를 불러오지 못했습니다."),
-        );
-        if (!cancelled) {
-          setAnnouncementDetail(null);
-          setClubDetail(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setBooting(false);
-        }
-      }
-    };
-
-    bootstrap();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [announcementId]);
-
-  if (booting || !announcementDetail || !clubDetail) {
+  if (
+    isBooting ||
+    (isAuthorized &&
+      (announcementDetailQuery.isLoading || clubDetailQuery.isLoading)) ||
+    !announcementDetail ||
+    !clubDetail
+  ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
         <p className="text-gray-500 text-lg">공고 정보를 불러오는 중...</p>

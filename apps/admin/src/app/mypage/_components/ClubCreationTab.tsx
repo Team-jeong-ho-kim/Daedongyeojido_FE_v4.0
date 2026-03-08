@@ -1,0 +1,330 @@
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  useDecideClubApplicationMutation,
+  useDeleteClubCreationFormMutation,
+  useGetClubCreationDownloadMutation,
+  useGetClubCreationFormMutation,
+  useUploadClubCreationFormMutation,
+} from "@/hooks/mutations";
+import { downloadFileFromUrl, toErrorMessage } from "../_lib";
+import { ClubCreationDetails } from "./ClubCreationDetails";
+import { ClubCreationDownloadPreview } from "./ClubCreationDownloadPreview";
+import { PanelCard } from "./PanelCard";
+
+export function ClubCreationTab() {
+  const [clubApplicationClubId, setClubApplicationClubId] = useState("");
+  const decideClubApplicationMutation = useDecideClubApplicationMutation();
+
+  const [clubCreationLookupClubId, setClubCreationLookupClubId] = useState("");
+  const clubCreationFormMutation = useGetClubCreationFormMutation();
+  const [
+    isDownloadingCreationSubmissionForm,
+    setIsDownloadingCreationSubmissionForm,
+  ] = useState(false);
+
+  const [downloadClubCreationFormId, setDownloadClubCreationFormId] =
+    useState("");
+  const clubCreationDownloadMutation = useGetClubCreationDownloadMutation();
+  const [isDownloadingClubCreationForm, setIsDownloadingClubCreationForm] =
+    useState(false);
+
+  const [uploadName, setUploadName] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFileInputKey, setUploadFileInputKey] = useState(0);
+  const uploadClubCreationFormMutation = useUploadClubCreationFormMutation();
+
+  const [deleteClubCreationFormId, setDeleteClubCreationFormId] = useState("");
+  const deleteClubCreationFormMutation = useDeleteClubCreationFormMutation();
+
+  const clubCreationForm = clubCreationFormMutation.data ?? null;
+  const downloadClubCreationForm = clubCreationDownloadMutation.data ?? null;
+
+  const handleDecideClubApplication = async (isOpen: boolean) => {
+    if (!clubApplicationClubId.trim()) {
+      toast.error("처리할 동아리 ID를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      await decideClubApplicationMutation.mutateAsync({
+        clubId: clubApplicationClubId.trim(),
+        isOpen,
+      });
+    } catch {}
+  };
+
+  const handleFetchClubCreationForm = async () => {
+    if (!clubCreationLookupClubId.trim()) {
+      toast.error("조회할 동아리 ID를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      await clubCreationFormMutation.mutateAsync(
+        clubCreationLookupClubId.trim(),
+      );
+      setClubCreationLookupClubId("");
+    } catch {}
+  };
+
+  const handleDownloadCreationSubmissionForm = async () => {
+    if (!clubCreationForm?.clubCreationForm) {
+      toast.error("먼저 동아리 개설 정보를 조회해 주세요.");
+      return;
+    }
+
+    setIsDownloadingCreationSubmissionForm(true);
+    try {
+      await downloadFileFromUrl(
+        clubCreationForm.clubCreationForm,
+        `${clubCreationForm.club.clubName}-동아리-개설-양식`,
+      );
+      toast.success("첨부된 동아리 개설 양식을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(
+        toErrorMessage(
+          error,
+          "첨부된 동아리 개설 양식 다운로드에 실패했습니다.",
+        ),
+      );
+    } finally {
+      setIsDownloadingCreationSubmissionForm(false);
+    }
+  };
+
+  const handleFetchDownloadClubCreationForm = async () => {
+    if (!downloadClubCreationFormId.trim()) {
+      toast.error("조회할 개설 양식 ID를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      await clubCreationDownloadMutation.mutateAsync(
+        downloadClubCreationFormId.trim(),
+      );
+    } catch {}
+  };
+
+  const handleDownloadClubCreationApplicationForm = async () => {
+    if (!downloadClubCreationForm) {
+      toast.error("먼저 개설 양식을 조회해 주세요.");
+      return;
+    }
+
+    setIsDownloadingClubCreationForm(true);
+    try {
+      const { fileName, fileUrl } = downloadClubCreationForm;
+      await downloadFileFromUrl(fileUrl, fileName);
+      toast.success("동아리 개설 신청 양식을 다운로드했습니다.");
+    } catch (error) {
+      toast.error(
+        toErrorMessage(error, "동아리 개설 신청 양식 다운로드에 실패했습니다."),
+      );
+    } finally {
+      setIsDownloadingClubCreationForm(false);
+    }
+  };
+
+  const handleUploadClubCreationForm = async () => {
+    if (!uploadName.trim() || !uploadFile) {
+      toast.error("양식 이름과 양식 파일을 입력해 주세요.");
+      return;
+    }
+
+    const lowerFileName = uploadFile.name.toLowerCase();
+    const isAllowedTemplateFile =
+      lowerFileName.endsWith(".pdf") || lowerFileName.endsWith(".hwp");
+
+    if (!isAllowedTemplateFile) {
+      toast.error("HWP/PDF 파일만 업로드할 수 있습니다.");
+      return;
+    }
+
+    try {
+      await uploadClubCreationFormMutation.mutateAsync({
+        fileUrl: uploadFile,
+        fileName: uploadName.trim(),
+      });
+      setUploadName("");
+      setUploadFile(null);
+      setUploadFileInputKey((prev) => prev + 1);
+    } catch {}
+  };
+
+  const handleDeleteClubCreationForm = async () => {
+    if (!deleteClubCreationFormId.trim()) {
+      toast.error("삭제할 개설 양식 ID를 입력해 주세요.");
+      return;
+    }
+
+    try {
+      await deleteClubCreationFormMutation.mutateAsync(
+        deleteClubCreationFormId.trim(),
+      );
+      clubCreationFormMutation.reset();
+      setDeleteClubCreationFormId("");
+    } catch {}
+  };
+
+  return (
+    <>
+      <PanelCard
+        title="동아리 개설 수락/거절"
+        description="동아리 개설 신청 ID(=동아리 ID)를 입력해 승인/거절합니다."
+      >
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={clubApplicationClubId}
+            onChange={(event) => setClubApplicationClubId(event.target.value)}
+            placeholder="동아리 ID"
+            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-[#2563EB] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => handleDecideClubApplication(true)}
+            disabled={decideClubApplicationMutation.isPending}
+          >
+            수락
+          </button>
+          <button
+            type="button"
+            className="rounded-lg bg-[#DC2626] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => handleDecideClubApplication(false)}
+            disabled={decideClubApplicationMutation.isPending}
+          >
+            거절
+          </button>
+        </div>
+      </PanelCard>
+
+      <PanelCard
+        title="동아리 개설 정보 조회"
+        description="동아리 ID로 개설 정보를 조회합니다."
+      >
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={clubCreationLookupClubId}
+            onChange={(event) =>
+              setClubCreationLookupClubId(event.target.value)
+            }
+            placeholder="동아리 ID"
+            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleFetchClubCreationForm}
+            disabled={clubCreationFormMutation.isPending}
+          >
+            {clubCreationFormMutation.isPending ? "조회 중..." : "조회"}
+          </button>
+        </div>
+
+        {clubCreationForm ? (
+          <ClubCreationDetails
+            clubCreationForm={clubCreationForm}
+            isDownloadingCreationSubmissionForm={
+              isDownloadingCreationSubmissionForm
+            }
+            onDownloadCreationSubmissionForm={
+              handleDownloadCreationSubmissionForm
+            }
+          />
+        ) : null}
+      </PanelCard>
+
+      <PanelCard
+        title="동아리 개설 신청 양식 조회 및 다운로드"
+        description="개설 양식 ID로 신청 양식을 조회한 뒤 다운로드합니다."
+      >
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={downloadClubCreationFormId}
+            onChange={(event) => {
+              setDownloadClubCreationFormId(event.target.value);
+              clubCreationDownloadMutation.reset();
+            }}
+            placeholder="개설 양식 ID"
+            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleFetchDownloadClubCreationForm}
+            disabled={clubCreationDownloadMutation.isPending}
+          >
+            {clubCreationDownloadMutation.isPending ? "조회 중..." : "조회"}
+          </button>
+        </div>
+
+        {downloadClubCreationForm ? (
+          <ClubCreationDownloadPreview
+            downloadClubCreationForm={downloadClubCreationForm}
+            isDownloadingClubCreationForm={isDownloadingClubCreationForm}
+            onDownload={handleDownloadClubCreationApplicationForm}
+          />
+        ) : null}
+      </PanelCard>
+
+      <PanelCard
+        title="동아리 개설 양식 업로드"
+        description="한글(HWP) 또는 PDF 양식을 등록합니다."
+      >
+        <div className="space-y-3">
+          <input
+            value={uploadName}
+            onChange={(event) => setUploadName(event.target.value)}
+            placeholder="양식 이름"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+          <input
+            key={uploadFileInputKey}
+            type="file"
+            accept=".hwp,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
+            onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-gray-700 file:text-sm focus:border-gray-400"
+          />
+          <p className="text-gray-500 text-xs">
+            {uploadFile
+              ? `선택된 파일: ${uploadFile.name}`
+              : "HWP/PDF 파일을 선택해 주세요."}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={handleUploadClubCreationForm}
+          disabled={uploadClubCreationFormMutation.isPending}
+        >
+          {uploadClubCreationFormMutation.isPending ? "업로드 중..." : "업로드"}
+        </button>
+      </PanelCard>
+
+      <PanelCard
+        title="동아리 개설 양식 삭제"
+        description="개설 양식 ID를 입력해 삭제합니다."
+      >
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={deleteClubCreationFormId}
+            onChange={(event) =>
+              setDeleteClubCreationFormId(event.target.value)
+            }
+            placeholder="개설 양식 ID"
+            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+          <button
+            type="button"
+            className="rounded-lg bg-[#DC2626] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleDeleteClubCreationForm}
+            disabled={deleteClubCreationFormMutation.isPending}
+          >
+            {deleteClubCreationFormMutation.isPending ? "삭제 중..." : "삭제"}
+          </button>
+        </div>
+      </PanelCard>
+    </>
+  );
+}

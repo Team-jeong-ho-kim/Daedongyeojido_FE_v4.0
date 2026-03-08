@@ -1,72 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
-import { getAllClubs } from "@/api/club";
+import { useState } from "react";
 import Pagination from "@/components/common/Pagination";
-import type { ClubSummary } from "@/types/admin";
-
-const moveToWebLogin = () => {
-  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
-    .trim()
-    .replace(/\/$/, "");
-  window.location.href = `${webUrl}/login`;
-};
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
+import { useGetAllClubsQuery } from "@/hooks/querys";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";
 
 export default function AdminClubsPage() {
-  const [booting, setBooting] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [clubs, setClubs] = useState<ClubSummary[]>([]);
   const [curPage, setCurPage] = useState(1);
+  const { isAuthorized, isBooting } = useAdminAuth();
+  const clubsQuery = useGetAllClubsQuery(isAuthorized);
+  const clubs = clubsQuery.data ?? [];
   const limit = 8;
 
-  useEffect(() => {
-    let cancelled = false;
+  useQueryErrorToast(clubsQuery.error, "동아리 목록을 불러오지 못했습니다.");
 
-    const bootstrap = async () => {
-      const accessToken = getAccessToken();
-      const sessionUser = getSessionUser();
-
-      if (!accessToken || !sessionUser || sessionUser.role !== "ADMIN") {
-        clearTokens();
-        moveToWebLogin();
-        if (!cancelled) setBooting(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const data = await getAllClubs();
-        if (cancelled) return;
-        setClubs(data);
-      } catch (error) {
-        toast.error(
-          toErrorMessage(error, "동아리 목록을 불러오지 못했습니다."),
-        );
-        if (!cancelled) setClubs([]);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          setBooting(false);
-        }
-      }
-    };
-
-    bootstrap();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (booting) {
+  if (isBooting || (isAuthorized && clubsQuery.isLoading)) {
     return (
       <main className="mt-10 flex min-h-screen justify-center bg-white">
         <div className="container mx-auto max-w-7xl px-6 py-12">
@@ -84,7 +34,7 @@ export default function AdminClubsPage() {
         </div>
 
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
-          {isLoading ? (
+          {clubsQuery.isFetching ? (
             <div className="flex w-full items-center justify-center py-20">
               <p className="text-gray-400 text-lg">불러오는 중...</p>
             </div>
@@ -97,13 +47,13 @@ export default function AdminClubsPage() {
               <Link key={club.clubId} href={`/clubs/${club.clubId}`}>
                 <article className="group relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl">
                   <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 ease-out group-hover:h-[200px]">
-                    {club.clubImage && (
+                    {club.clubImage ? (
                       <img
                         src={club.clubImage}
                         alt={club.clubName}
                         className="h-full w-full object-cover"
                       />
-                    )}
+                    ) : null}
                     <span className="absolute top-6 right-3 z-10 flex h-6 w-6 items-center justify-center">
                       <img
                         src="/images/clubs/rightArrow.svg"

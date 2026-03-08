@@ -3,28 +3,17 @@
 export const runtime = "edge";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
-import { getClubAnnouncements } from "@/api/announcement";
-import { getClubDetail } from "@/api/club";
+import { useMemo, useState } from "react";
 import JobPostingItem from "@/components/club/item/JobPostingItem";
 import MemberItem from "@/components/club/item/MemberItem";
 import ClubHeader from "@/components/common/ClubHeader";
 import Pagination from "@/components/common/Pagination";
-import type { AdminClubAnnouncement, ClubDetailResponse } from "@/types/admin";
-
-const moveToWebLogin = () => {
-  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
-    .trim()
-    .replace(/\/$/, "");
-  window.location.href = `${webUrl}/login`;
-};
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
+import {
+  useGetClubAnnouncementsQuery,
+  useGetClubDetailQuery,
+} from "@/hooks/querys";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";
 
 type DetailTab = "intro" | "history";
 
@@ -36,100 +25,25 @@ export default function AdminClubDetailPage() {
     return Array.isArray(params.clubId) ? params.clubId[0] : params.clubId;
   }, [params]);
 
-  const [booting, setBooting] = useState(true);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);
-  const [clubAnnouncements, setClubAnnouncements] = useState<
-    AdminClubAnnouncement[]
-  >([]);
   const [activeTab, setActiveTab] = useState<DetailTab>("intro");
   const [postingPage, setPostingPage] = useState(1);
   const [memberPage, setMemberPage] = useState(1);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const bootstrap = async () => {
-      if (!clubId) {
-        toast.error("잘못된 동아리 ID입니다.");
-        setBooting(false);
-        return;
-      }
-
-      const accessToken = getAccessToken();
-      const sessionUser = getSessionUser();
-
-      if (!accessToken || !sessionUser || sessionUser.role !== "ADMIN") {
-        clearTokens();
-        moveToWebLogin();
-        if (!cancelled) setBooting(false);
-        return;
-      }
-
-      try {
-        const detail = await getClubDetail(clubId);
-
-        if (cancelled) return;
-        setClubDetail(detail);
-      } catch (error) {
-        toast.error(
-          toErrorMessage(error, "동아리 상세 정보를 불러오지 못했습니다."),
-        );
-        if (!cancelled) {
-          setClubDetail(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setBooting(false);
-        }
-      }
-    };
-
-    bootstrap();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [clubId]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchAnnouncements = async () => {
-      if (activeTab !== "history" || !clubId || clubAnnouncements.length > 0) {
-        return;
-      }
-
-      try {
-        setHistoryLoading(true);
-        const announcements = await getClubAnnouncements(clubId);
-
-        if (cancelled) return;
-        setClubAnnouncements(
-          [...announcements].sort(
-            (a, b) => b.announcementId - a.announcementId,
-          ),
-        );
-      } catch (error) {
-        toast.error(
-          toErrorMessage(error, "동아리 공고 목록을 불러오지 못했습니다."),
-        );
-        if (!cancelled) {
-          setClubAnnouncements([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setHistoryLoading(false);
-        }
-      }
-    };
-
-    fetchAnnouncements();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activeTab, clubAnnouncements.length, clubId]);
+  const { isAuthorized, isBooting } = useAdminAuth();
+  const clubDetailQuery = useGetClubDetailQuery(clubId, isAuthorized);
+  const clubAnnouncementsQuery = useGetClubAnnouncementsQuery(
+    clubId,
+    isAuthorized && activeTab === "history",
+  );
+  const clubDetail = clubDetailQuery.data ?? null;
+  const clubAnnouncements = clubAnnouncementsQuery.data ?? [];
+  useQueryErrorToast(
+    clubDetailQuery.error,
+    "동아리 상세 정보를 불러오지 못했습니다.",
+  );
+  useQueryErrorToast(
+    clubAnnouncementsQuery.error,
+    "동아리 공고 목록을 불러오지 못했습니다.",
+  );
 
   const postingLimit = 5;
   const memberLimit = 8;
@@ -164,7 +78,19 @@ export default function AdminClubDetailPage() {
     memberPage * memberLimit,
   );
 
-  if (booting) {
+  if (!clubId) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">잘못된 동아리 ID입니다.</p>
+      </main>
+    );
+  }
+
+  if (
+    isBooting ||
+    (isAuthorized &&
+      (clubDetailQuery.isLoading || clubAnnouncementsQuery.isLoading))
+  ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
         <p className="text-gray-500 text-lg">동아리 정보를 불러오는 중...</p>
@@ -365,7 +291,7 @@ export default function AdminClubDetailPage() {
 
       {activeTab === "history" && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {historyLoading ? (
+          {clubAnnouncementsQuery.isFetching ? (
             <div className="flex min-h-[400px] items-center justify-center text-center text-[14px] text-gray-400 md:min-h-[460px] md:text-[15px]">
               불러오는 중...
             </div>

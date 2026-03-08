@@ -1,24 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
-import { getAllAnnouncements } from "@/api/announcement";
+import { useState } from "react";
 import Pagination from "@/components/common/Pagination";
-import type { AdminAnnouncementListItem } from "@/types/admin";
-
-const moveToWebLogin = () => {
-  const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
-    .trim()
-    .replace(/\/$/, "");
-  window.location.href = `${webUrl}/login`;
-};
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
+import { useGetAllAnnouncementsQuery } from "@/hooks/querys";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";
 
 const toDeadlineText = (deadline: [number, number, number] | string) => {
   if (typeof deadline === "string") return deadline;
@@ -27,54 +14,18 @@ const toDeadlineText = (deadline: [number, number, number] | string) => {
 
 export default function AdminAnnouncementsPage() {
   const router = useRouter();
-  const [booting, setBooting] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [announcements, setAnnouncements] = useState<
-    AdminAnnouncementListItem[]
-  >([]);
   const [curPage, setCurPage] = useState(1);
+  const { isAuthorized, isBooting } = useAdminAuth();
+  const announcementsQuery = useGetAllAnnouncementsQuery(isAuthorized);
+  const announcements = announcementsQuery.data ?? [];
   const limit = 8;
 
-  useEffect(() => {
-    let cancelled = false;
+  useQueryErrorToast(
+    announcementsQuery.error,
+    "공고 목록을 불러오지 못했습니다.",
+  );
 
-    const bootstrap = async () => {
-      const accessToken = getAccessToken();
-      const sessionUser = getSessionUser();
-
-      if (!accessToken || !sessionUser || sessionUser.role !== "ADMIN") {
-        clearTokens();
-        moveToWebLogin();
-        if (!cancelled) setBooting(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const data = await getAllAnnouncements();
-        if (cancelled) return;
-        setAnnouncements(
-          [...data].sort((a, b) => b.announcementId - a.announcementId),
-        );
-      } catch (error) {
-        toast.error(toErrorMessage(error, "공고 목록을 불러오지 못했습니다."));
-        if (!cancelled) setAnnouncements([]);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          setBooting(false);
-        }
-      }
-    };
-
-    bootstrap();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (booting) {
+  if (isBooting || (isAuthorized && announcementsQuery.isLoading)) {
     return (
       <main className="mt-10 flex min-h-screen justify-center bg-white">
         <div className="container mx-auto max-w-7xl px-6 py-12">
@@ -92,7 +43,7 @@ export default function AdminAnnouncementsPage() {
         </div>
 
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
-          {isLoading ? (
+          {announcementsQuery.isFetching ? (
             <div className="flex w-full items-center justify-center py-20">
               <p className="text-gray-400 text-lg">불러오는 중...</p>
             </div>
@@ -113,13 +64,13 @@ export default function AdminAnnouncementsPage() {
                   className="group relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl text-left"
                 >
                   <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 group-hover:h-[200px]">
-                    {announcement.clubImage && (
+                    {announcement.clubImage ? (
                       <img
                         src={announcement.clubImage}
                         alt={announcement.title}
                         className="h-full w-full object-cover"
                       />
-                    )}
+                    ) : null}
                     <span className="absolute top-6 right-3 z-10 flex h-6 w-6 items-center justify-center">
                       <img
                         src="/images/clubs/rightArrow.svg"
