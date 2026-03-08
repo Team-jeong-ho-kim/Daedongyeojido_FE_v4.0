@@ -1,7 +1,6 @@
 export {
   useGetAdminOverviewQuery,
   useGetClubCreationDownloadQuery,
-  useGetClubCreationFormQuery,
   useGetResultDurationQuery,
 } from "./useAdminQuery";
 export {

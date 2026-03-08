@@ -104,22 +104,6 @@ export interface AdminClubAnnouncementResponse {
   clubAnnouncements: AdminClubAnnouncement[];
 }
 
-export interface AdminClubCreationSubmissionClub {
-  clubName: string;
-  introduction: string;
-  oneLiner: string;
-  clubImage: string;
-  majors: string[];
-  links: string[];
-}
-
-export interface AdminClubCreationForm {
-  club: AdminClubCreationSubmissionClub;
-  userName: string;
-  classNumber: string;
-  clubCreationForm: string;
-}
-
 export interface AdminClubCreationFormDownload {
   fileName: string;
   fileUrl: string;

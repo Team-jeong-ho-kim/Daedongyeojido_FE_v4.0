@@ -7,7 +7,6 @@ import {
   decideDissolution,
   deleteClubCreationForm,
   downloadClubCreationApplicationForm,
-  getClubCreationForm,
   setResultDuration,
   uploadClubCreationForm,
 } from "@/api/admin";
@@ -63,24 +62,9 @@ export const useDecideClubApplicationMutation = () => {
   });
 };
 
-export const useGetClubCreationFormMutation = () => {
-  return useMutation({
-    mutationFn: (clubId: string) => getClubCreationForm(clubId),
-    onSuccess: () => {
-      toast.success("동아리 개설 정보를 조회했습니다.");
-    },
-    onError: (error: unknown) => {
-      toast.error(
-        getErrorMessage(error, "동아리 개설 정보를 불러오지 못했습니다."),
-      );
-    },
-  });
-};
-
 export const useGetClubCreationDownloadMutation = () => {
   return useMutation({
-    mutationFn: (clubCreationFormId: string) =>
-      downloadClubCreationApplicationForm(clubCreationFormId),
+    mutationFn: downloadClubCreationApplicationForm,
     onSuccess: () => {
       toast.success("동아리 개설 신청 양식을 조회했습니다.");
     },

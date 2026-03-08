@@ -3,7 +3,6 @@ export {
   useDecideDissolutionMutation,
   useDeleteClubCreationFormMutation,
   useGetClubCreationDownloadMutation,
-  useGetClubCreationFormMutation,
   useSetResultDurationMutation,
   useUploadClubCreationFormMutation,
 } from "./useAdmin";

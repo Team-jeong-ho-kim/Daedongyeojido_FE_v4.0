@@ -3,7 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   downloadClubCreationApplicationForm,
-  getClubCreationForm,
   getResultDuration,
 } from "@/api/admin";
 import { loadAdminOverviewData } from "@/app/mypage/_lib";
@@ -25,21 +24,10 @@ export const useGetResultDurationQuery = (enabled = true) => {
   });
 };
 
-export const useGetClubCreationFormQuery = (clubId: string, enabled = true) => {
+export const useGetClubCreationDownloadQuery = (enabled = true) => {
   return useQuery({
-    queryKey: queryKeys.admin.clubCreationForm(clubId).queryKey,
-    queryFn: () => getClubCreationForm(clubId),
-    enabled: enabled && !!clubId,
-  });
-};
-
-export const useGetClubCreationDownloadQuery = (
-  clubCreationFormId: string,
-  enabled = true,
-) => {
-  return useQuery({
-    queryKey: queryKeys.admin.clubCreationDownload(clubCreationFormId).queryKey,
-    queryFn: () => downloadClubCreationApplicationForm(clubCreationFormId),
-    enabled: enabled && !!clubCreationFormId,
+    queryKey: queryKeys.admin.clubCreationDownload.queryKey,
+    queryFn: downloadClubCreationApplicationForm,
+    enabled,
   });
 };
