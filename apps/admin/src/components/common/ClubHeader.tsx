@@ -3,6 +3,7 @@ interface ClubHeaderProps {
   clubName: string;
   title: string;
   subtitle?: string;
+  metaText?: string;
   oneLiner?: string;
   buttonText?: string;
   onButtonClick?: () => void;
@@ -13,6 +14,7 @@ export default function ClubHeader({
   clubName,
   title,
   subtitle = "전공동아리",
+  metaText,
   oneLiner,
   buttonText,
   onButtonClick,
@@ -42,6 +44,11 @@ export default function ClubHeader({
             <p className="text-[13px] text-gray-400 md:text-[14px] lg:text-[15px]">
               {subtitle}
             </p>
+            {metaText ? (
+              <p className="text-[13px] text-gray-400 md:text-[14px] lg:text-[15px]">
+                {metaText}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

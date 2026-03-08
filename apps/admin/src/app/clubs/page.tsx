@@ -118,6 +118,9 @@ export default function AdminClubsPage() {
                     <h2 className="font-semibold text-2xl text-gray-900">
                       {club.clubName}
                     </h2>
+                    <p className="text-[13px] text-gray-400">
+                      동아리 ID: {club.clubId}
+                    </p>
                     <p className="line-clamp-1 text-gray-500 text-sm opacity-70 transition-opacity delay-150 duration-300 ease-out group-hover:line-clamp-none group-hover:opacity-100">
                       {club.introduction}
                     </p>

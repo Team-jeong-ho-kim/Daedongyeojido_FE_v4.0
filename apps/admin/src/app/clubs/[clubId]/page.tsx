@@ -187,6 +187,7 @@ export default function AdminClubDetailPage() {
         clubName={clubDetail.club.clubName}
         title={clubDetail.club.clubName}
         oneLiner={clubDetail.club.oneLiner}
+        metaText={`동아리 ID: ${clubId}`}
         buttonText="공고 보러가기"
         onButtonClick={() => router.push("/announcements")}
       />
