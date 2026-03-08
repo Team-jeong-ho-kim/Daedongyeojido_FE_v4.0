@@ -28,9 +28,9 @@ export const setResultDuration = async (
 
 export const decideClubApplication = async (
   clubId: string,
-  isApproved: boolean,
+  isOpen: boolean,
 ): Promise<void> => {
-  await apiClient.patch(`/admin/clubs/applications/${clubId}`, { isApproved });
+  await apiClient.patch(`/admin/clubs/applications/${clubId}`, { isOpen });
 };
 
 export const decideDissolution = async (

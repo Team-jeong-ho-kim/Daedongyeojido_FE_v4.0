@@ -354,7 +354,7 @@ export default function AdminMyPage() {
     }
   };
 
-  const handleDecideClubApplication = async (isApproved: boolean) => {
+  const handleDecideClubApplication = async (isOpen: boolean) => {
     if (!clubApplicationClubId.trim()) {
       toast.error("처리할 동아리 ID를 입력해 주세요.");
       return;
@@ -362,11 +362,9 @@ export default function AdminMyPage() {
 
     setIsDecidingClubApplication(true);
     try {
-      await decideClubApplication(clubApplicationClubId.trim(), isApproved);
+      await decideClubApplication(clubApplicationClubId.trim(), isOpen);
       toast.success(
-        isApproved
-          ? "동아리 개설을 수락했습니다."
-          : "동아리 개설을 거절했습니다.",
+        isOpen ? "동아리 개설을 수락했습니다." : "동아리 개설을 거절했습니다.",
       );
       await loadOverviewData();
     } catch (error) {
