@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com",
+      },
+      {
+        protocol: "https",
         hostname: "daedong-bucket.s3.ap-northeast-2.amazonaws.com",
       },
     ],

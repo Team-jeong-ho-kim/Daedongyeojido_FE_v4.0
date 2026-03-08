@@ -35,10 +35,10 @@ export const decideClubApplication = async (
 
 export const decideDissolution = async (
   clubId: string,
-  isApproved: boolean,
+  isDecision: boolean,
 ): Promise<void> => {
   await apiClient.delete(`/admin/dissolution/${clubId}`, {
-    data: { isApproved },
+    data: { isDecision },
   });
 };
 

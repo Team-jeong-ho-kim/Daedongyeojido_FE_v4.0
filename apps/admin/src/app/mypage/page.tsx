@@ -521,7 +521,7 @@ export default function AdminMyPage() {
     }
   };
 
-  const handleDecideDissolution = async (isApproved: boolean) => {
+  const handleDecideDissolution = async (isDecision: boolean) => {
     if (!dissolutionClubId.trim()) {
       toast.error("처리할 동아리 ID를 입력해 주세요.");
       return;
@@ -529,9 +529,9 @@ export default function AdminMyPage() {
 
     setIsDecidingDissolution(true);
     try {
-      await decideDissolution(dissolutionClubId.trim(), isApproved);
+      await decideDissolution(dissolutionClubId.trim(), isDecision);
       toast.success(
-        isApproved
+        isDecision
           ? "동아리 해체를 수락했습니다."
           : "동아리 해체를 거절했습니다.",
       );
