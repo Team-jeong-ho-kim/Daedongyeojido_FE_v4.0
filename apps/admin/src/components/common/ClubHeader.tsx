@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 interface ClubHeaderProps {
   clubImage: string;
   clubName: string;
@@ -25,12 +23,9 @@ export default function ClubHeader({
         <div className="flex items-start gap-4 md:gap-6 lg:gap-8">
           <div className="h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-[16px] bg-gray-200 md:h-[88px] md:w-[88px] md:rounded-[18px] lg:h-[104px] lg:w-[104px] lg:rounded-[20px]">
             {clubImage && clubImage.trim() !== "" ? (
-              <Image
+              <img
                 src={clubImage}
                 alt={clubName}
-                width={104}
-                height={104}
-                unoptimized
                 className="h-full w-full object-cover"
               />
             ) : (

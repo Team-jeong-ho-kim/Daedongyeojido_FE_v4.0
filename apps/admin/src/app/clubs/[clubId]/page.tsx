@@ -2,29 +2,28 @@
 
 export const runtime = "edge";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
 import { getClubAnnouncements } from "@/api/announcement";
 import { getClubDetail } from "@/api/club";
-import CTASection from "@/components/club/item/CTASection";
 import JobPostingItem from "@/components/club/item/JobPostingItem";
+import MemberItem from "@/components/club/item/MemberItem";
 import ClubHeader from "@/components/common/ClubHeader";
 import Pagination from "@/components/common/Pagination";
 import type { AdminClubAnnouncement, ClubDetailResponse } from "@/types/admin";
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
 
 const moveToWebLogin = () => {
   const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000")
     .trim()
     .replace(/\/$/, "");
   window.location.href = `${webUrl}/login`;
+};
+
+const toErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof ApiError) return error.description;
+  return fallback;
 };
 
 type DetailTab = "intro" | "history";
@@ -38,13 +37,14 @@ export default function AdminClubDetailPage() {
   }, [params]);
 
   const [booting, setBooting] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [clubDetail, setClubDetail] = useState<ClubDetailResponse | null>(null);
   const [clubAnnouncements, setClubAnnouncements] = useState<
     AdminClubAnnouncement[]
   >([]);
   const [activeTab, setActiveTab] = useState<DetailTab>("intro");
   const [postingPage, setPostingPage] = useState(1);
+  const [memberPage, setMemberPage] = useState(1);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +58,7 @@ export default function AdminClubDetailPage() {
 
       const accessToken = getAccessToken();
       const sessionUser = getSessionUser();
+
       if (!accessToken || !sessionUser || sessionUser.role !== "ADMIN") {
         clearTokens();
         moveToWebLogin();
@@ -66,30 +67,19 @@ export default function AdminClubDetailPage() {
       }
 
       try {
-        setLoading(true);
-        const [detail, announcements] = await Promise.all([
-          getClubDetail(clubId),
-          getClubAnnouncements(clubId),
-        ]);
+        const detail = await getClubDetail(clubId);
 
         if (cancelled) return;
         setClubDetail(detail);
-        setClubAnnouncements(
-          [...announcements].sort(
-            (a, b) => b.announcementId - a.announcementId,
-          ),
-        );
       } catch (error) {
         toast.error(
           toErrorMessage(error, "동아리 상세 정보를 불러오지 못했습니다."),
         );
         if (!cancelled) {
           setClubDetail(null);
-          setClubAnnouncements([]);
         }
       } finally {
         if (!cancelled) {
-          setLoading(false);
           setBooting(false);
         }
       }
@@ -102,41 +92,82 @@ export default function AdminClubDetailPage() {
     };
   }, [clubId]);
 
-  const postingLimit = 5;
-  const jobPostings = clubAnnouncements.map((announcement) => {
-    const dateString =
-      typeof announcement.deadline === "string"
-        ? announcement.deadline
-        : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
-    const deadlineDate = new Date(dateString);
-    const today = new Date();
+  useEffect(() => {
+    let cancelled = false;
 
-    let status: "준비중" | "진행중" | "종료됨";
-    if (announcement.status === "CLOSED") {
-      status = "준비중";
-    } else {
-      status = deadlineDate < today ? "종료됨" : "진행중";
-    }
+    const fetchAnnouncements = async () => {
+      if (activeTab !== "history" || !clubId || clubAnnouncements.length > 0) {
+        return;
+      }
 
-    return {
-      id: announcement.announcementId,
-      status,
-      title: announcement.title,
-      date: dateString,
+      try {
+        setHistoryLoading(true);
+        const announcements = await getClubAnnouncements(clubId);
+
+        if (cancelled) return;
+        setClubAnnouncements(
+          [...announcements].sort(
+            (a, b) => b.announcementId - a.announcementId,
+          ),
+        );
+      } catch (error) {
+        toast.error(
+          toErrorMessage(error, "동아리 공고 목록을 불러오지 못했습니다."),
+        );
+        if (!cancelled) {
+          setClubAnnouncements([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setHistoryLoading(false);
+        }
+      }
     };
-  });
+
+    fetchAnnouncements();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, clubAnnouncements.length, clubId]);
+
+  const postingLimit = 5;
+  const memberLimit = 8;
+  const uniqueLinks = clubDetail ? [...new Set(clubDetail.club.links)] : [];
+  const memberNames = clubDetail?.clubMembers ?? [];
+
+  const jobPostings = clubAnnouncements
+    .filter((announcement) => announcement.status === "OPEN")
+    .map((announcement) => {
+      const dateString =
+        typeof announcement.deadline === "string"
+          ? announcement.deadline
+          : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
+      const deadlineDate = new Date(dateString);
+      const today = new Date();
+
+      return {
+        id: announcement.announcementId,
+        status:
+          deadlineDate < today ? ("종료됨" as const) : ("진행중" as const),
+        title: announcement.title,
+        date: dateString,
+      };
+    });
 
   const pagedPostings = jobPostings.slice(
     (postingPage - 1) * postingLimit,
     postingPage * postingLimit,
   );
+  const pagedMembers = (clubDetail?.clubMembers ?? []).slice(
+    (memberPage - 1) * memberLimit,
+    memberPage * memberLimit,
+  );
 
   if (booting) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500 text-sm">
-          동아리 상세 정보를 확인하고 있습니다...
-        </p>
+        <p className="text-gray-500 text-lg">동아리 정보를 불러오는 중...</p>
       </main>
     );
   }
@@ -144,15 +175,7 @@ export default function AdminClubDetailPage() {
   if (!clubDetail) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <p className="text-gray-500 text-sm">상세 정보를 찾을 수 없습니다.</p>
-          <Link
-            href="/clubs"
-            className="mt-3 inline-block rounded-lg border border-gray-200 px-3 py-2 text-gray-700 text-xs hover:bg-gray-50"
-          >
-            동아리 목록으로 돌아가기
-          </Link>
-        </div>
+        <p className="text-gray-500 text-lg">동아리 정보를 찾을 수 없습니다.</p>
       </main>
     );
   }
@@ -197,48 +220,151 @@ export default function AdminClubDetailPage() {
 
       {activeTab === "intro" && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          <section className="rounded-2xl bg-white p-6">
-            <h2 className="mb-2 font-semibold text-gray-900 text-lg">
-              동아리 소개
-            </h2>
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {clubDetail.club.introduction || "동아리 소개가 없습니다."}
-            </p>
-            <p className="mt-3 text-gray-500 text-xs">
-              전공: {clubDetail.club.majors.join(", ") || "-"}
-            </p>
-          </section>
+          <div className="flex flex-col gap-8 md:gap-12 lg:gap-16">
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리 이미지
+              </h2>
+              <div className="flex items-center gap-4">
+                <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                  {clubDetail.club.clubImage ? (
+                    <img
+                      src={clubDetail.club.clubImage}
+                      alt="동아리 이미지"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[12px] text-gray-400">
+                      No Image
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
 
-          <section className="mt-6 rounded-2xl bg-white p-6">
-            <h2 className="mb-4 font-semibold text-gray-900 text-lg">
-              동아리원
-            </h2>
-            {clubDetail.clubMembers.length === 0 ? (
-              <p className="text-gray-500 text-sm">동아리원이 없습니다.</p>
-            ) : (
-              <ul className="space-y-2">
-                {clubDetail.clubMembers.map((member) => (
-                  <li
-                    key={member.userId}
-                    className="rounded-xl border border-gray-200 px-4 py-3"
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리명
+              </h2>
+              <div className="flex flex-1 items-center rounded-lg border border-gray-100 bg-white px-4 py-2.5">
+                <p className="flex-1 text-[14px] text-gray-700 md:text-[15px]">
+                  {clubDetail.club.clubName}
+                </p>
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                한줄 소개
+              </h2>
+              <div className="flex flex-1 items-center rounded-lg border border-gray-100 bg-white px-4 py-2.5">
+                <p className="flex-1 text-[14px] text-gray-700 md:text-[15px]">
+                  {clubDetail.club.oneLiner}
+                </p>
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리 전공
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {[...new Set(clubDetail.club.majors)].map((major) => (
+                  <span
+                    key={major}
+                    className="rounded-full border border-primary-300 px-3 py-1 text-[12px] text-primary-500 md:text-[13px]"
                   >
-                    <p className="font-medium text-gray-900 text-sm">
-                      {member.userName}
-                    </p>
-                    <p className="text-gray-500 text-xs">
-                      ID: {member.userId} · {member.majors.join(", ") || "-"}
-                    </p>
-                  </li>
+                    {major}
+                  </span>
                 ))}
-              </ul>
-            )}
-          </section>
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리 소개
+              </h2>
+              <div className="flex flex-1 items-start rounded-lg border border-gray-100 bg-white p-4">
+                <p className="flex-1 text-[14px] text-gray-700 md:text-[15px]">
+                  {clubDetail.club.introduction}
+                </p>
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-2 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리 관련 링크
+              </h2>
+              <div className="flex flex-1 items-start rounded-lg border border-gray-100 bg-white p-4">
+                <div className="flex flex-1 flex-col gap-1">
+                  {uniqueLinks.length === 0 ? (
+                    <p className="text-[14px] text-gray-400 md:text-[15px]">
+                      등록된 링크가 없습니다.
+                    </p>
+                  ) : (
+                    uniqueLinks.map((link) => (
+                      <a
+                        key={link}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="truncate text-[14px] text-gray-500 underline md:text-[15px]"
+                      >
+                        {link}
+                      </a>
+                    ))
+                  )}
+                </div>
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-4 md:flex-row md:gap-0">
+              <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
+                동아리 팀원
+              </h2>
+
+              <div className="flex flex-col gap-6 md:gap-8">
+                <div className="flex flex-wrap gap-2">
+                  {memberNames.map((member, index) => (
+                    <span
+                      key={`name-${member.userId}`}
+                      className="text-[14px] text-gray-700 md:text-[15px]"
+                    >
+                      {member.userName}
+                      {index < memberNames.length - 1 && ","}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="grid min-h-[590px] grid-cols-2 content-start items-start gap-5 md:grid-cols-3 lg:grid-cols-4">
+                  {pagedMembers.map((member) => (
+                    <MemberItem
+                      key={`${member.userId}-${member.userName}`}
+                      userName={member.userName}
+                      majors={member.majors}
+                      introduction={member.introduction}
+                      profileImage={member.profileImage}
+                    />
+                  ))}
+                </div>
+
+                {clubDetail.clubMembers.length > memberLimit && (
+                  <Pagination
+                    listLen={clubDetail.clubMembers.length}
+                    limit={memberLimit}
+                    curPage={memberPage}
+                    setCurPage={setMemberPage}
+                  />
+                )}
+              </div>
+            </section>
+          </div>
         </div>
       )}
 
       {activeTab === "history" && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
-          {loading ? (
+          {historyLoading ? (
             <div className="flex min-h-[400px] items-center justify-center text-center text-[14px] text-gray-400 md:min-h-[460px] md:text-[15px]">
               불러오는 중...
             </div>
@@ -255,7 +381,7 @@ export default function AdminClubDetailPage() {
                     status={posting.status}
                     title={posting.title}
                     date={posting.date}
-                    onClick={() => router.push("/announcements")}
+                    onClick={() => router.push(`/announcements/${posting.id}`)}
                   />
                 ))}
               </div>
@@ -271,16 +397,6 @@ export default function AdminClubDetailPage() {
           )}
         </div>
       )}
-
-      <div className="mt-20 mb-24">
-        <CTASection
-          title="이 동아리가 마음에 든다면?"
-          subtitle="동아리 가입 신청을 위해 아래 버튼을 눌러주세요!"
-          description="아래 버튼을 눌러 지원해보세요!"
-          buttonText="이 동아리의 공고로 바로가기"
-          buttonHref="/announcements"
-        />
-      </div>
     </main>
   );
 }

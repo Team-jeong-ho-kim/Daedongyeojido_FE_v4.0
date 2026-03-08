@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ApiError, clearTokens, getAccessToken, getSessionUser } from "utils";
@@ -26,6 +26,7 @@ const toDeadlineText = (deadline: [number, number, number] | string) => {
 };
 
 export default function AdminAnnouncementsPage() {
+  const router = useRouter();
   const [booting, setBooting] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [announcements, setAnnouncements] = useState<
@@ -107,27 +108,23 @@ export default function AdminAnnouncementsPage() {
                   key={announcement.announcementId}
                   type="button"
                   onClick={() =>
-                    toast("공고 상세 페이지는 준비 중입니다.", {
-                      description: `${announcement.title}`,
-                    })
+                    router.push(`/announcements/${announcement.announcementId}`)
                   }
                   className="group relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl text-left"
                 >
                   <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 group-hover:h-[200px]">
                     {announcement.clubImage && (
-                      <Image
+                      <img
                         src={announcement.clubImage}
                         alt={announcement.title}
-                        fill
-                        className="object-cover"
+                        className="h-full w-full object-cover"
                       />
                     )}
                     <span className="absolute top-6 right-3 z-10 flex h-6 w-6 items-center justify-center">
-                      <Image
+                      <img
                         src="/images/clubs/rightArrow.svg"
                         alt="상세보기"
-                        width={10}
-                        height={10}
+                        className="h-[10px] w-[10px]"
                       />
                     </span>
                   </div>

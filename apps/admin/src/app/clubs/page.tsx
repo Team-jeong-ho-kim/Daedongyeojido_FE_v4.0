@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -99,20 +98,18 @@ export default function AdminClubsPage() {
                 <article className="group relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl">
                   <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 ease-out group-hover:h-[200px]">
                     {club.clubImage && (
-                      <Image
+                      <img
                         src={club.clubImage}
                         alt={club.clubName}
-                        fill
-                        className="object-cover"
+                        className="h-full w-full object-cover"
                       />
                     )}
                     <span className="absolute top-6 right-3 z-10 flex h-6 w-6 items-center justify-center">
-                      <Image
+                      <img
                         src="/images/clubs/rightArrow.svg"
                         alt=""
-                        width={10}
-                        height={10}
                         aria-hidden
+                        className="h-[10px] w-[10px]"
                       />
                     </span>
                   </div>
