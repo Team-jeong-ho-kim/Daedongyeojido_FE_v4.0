@@ -25,6 +25,19 @@ export const setResultDuration = async (
   await apiClient.post("/admin/result-duration", payload);
 };
 
+export const updateResultDuration = async (
+  resultDurationId: number,
+  payload: ResultDurationPayload,
+): Promise<void> => {
+  await apiClient.patch(`/admin/result-duration/${resultDurationId}`, payload);
+};
+
+export const deleteResultDuration = async (
+  resultDurationId: number,
+): Promise<void> => {
+  await apiClient.delete(`/admin/result-duration/${resultDurationId}`);
+};
+
 export const decideClubApplication = async (
   clubId: string,
   isOpen: boolean,

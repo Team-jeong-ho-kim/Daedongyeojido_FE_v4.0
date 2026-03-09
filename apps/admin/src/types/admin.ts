@@ -105,6 +105,7 @@ export interface AdminClubAnnouncementResponse {
 }
 
 export interface AdminClubCreationFormDownload {
+  clubCreationFormId?: number;
   fileName: string;
   fileUrl: string;
 }

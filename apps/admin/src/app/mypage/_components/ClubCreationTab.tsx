@@ -104,7 +104,6 @@ export function ClubCreationTab() {
       await deleteClubCreationFormMutation.mutateAsync(
         deleteClubCreationFormId.trim(),
       );
-      clubCreationFormMutation.reset();
       setDeleteClubCreationFormId("");
     } catch {}
   };
