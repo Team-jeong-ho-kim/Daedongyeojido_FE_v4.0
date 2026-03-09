@@ -11,13 +11,47 @@ const toErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
+
+const resolveServiceUrl = (
+  envUrl: string | undefined,
+  service: "web" | "student" | "admin",
+) => {
+  if (envUrl?.trim()) {
+    return normalizeUrl(envUrl);
+  }
+
+  if (typeof window !== "undefined") {
+    const { protocol, hostname } = window.location;
+
+    if (hostname.endsWith(".daedongyeojido.site")) {
+      const serviceHost =
+        service === "web"
+          ? "dsm.daedongyeojido.site"
+          : `${service}.daedongyeojido.site`;
+
+      return `${protocol}//${serviceHost}`;
+    }
+  }
+
+  const localFallbackMap = {
+    web: "http://localhost:3000",
+    student: "http://localhost:3001",
+    admin: "http://localhost:3002",
+  } satisfies Record<typeof service, string>;
+
+  return localFallbackMap[service];
+};
+
 export default function LoginPage() {
-  const userUrl = (
-    process.env.NEXT_PUBLIC_USER_URL || "http://localhost:3001"
-  ).trim();
-  const adminUrl = (
-    process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3002"
-  ).trim();
+  const userUrl = resolveServiceUrl(
+    process.env.NEXT_PUBLIC_USER_URL,
+    "student",
+  );
+  const adminUrl = resolveServiceUrl(
+    process.env.NEXT_PUBLIC_ADMIN_URL,
+    "admin",
+  );
 
   const accountIdInput = useId();
   const passwordInput = useId();
