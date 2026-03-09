@@ -18,7 +18,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "utils": ["../../packages/utils/src/index.ts"],
+      "utils/*": ["../../packages/utils/src/*"],
+      "ui": ["../../packages/ui/src/index.ts"],
+      "ui/*": ["../../packages/ui/src/*"],
+      "shared": ["../../packages/shared/src/index.ts"],
+      "shared/*": ["../../packages/shared/src/*"]
     },
     "target": "ES2017"
   },

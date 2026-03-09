@@ -8,6 +8,7 @@ export { Toaster, toast } from 'sonner';
 declare function Footer(): react_jsx_runtime.JSX.Element;
 
 declare function LandingHeader(): react_jsx_runtime.JSX.Element;
+
 declare function StudentHeader(): react_jsx_runtime.JSX.Element;
 
 interface LoadingOverlayProps {

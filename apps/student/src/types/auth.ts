@@ -1,1 +1,1 @@
-export type UserRole = "STUDENTS" | "CLUB_MEMBER" | "CLUB_LEADER";
+export type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";

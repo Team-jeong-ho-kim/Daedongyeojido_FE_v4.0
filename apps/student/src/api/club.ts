@@ -59,6 +59,7 @@ export const createClubApplication = async (
   major: string[],
   link: string[],
   clubImage: File,
+  clubCreationFormFile: File,
 ) => {
   const formData = new FormData();
 
@@ -70,17 +71,18 @@ export const createClubApplication = async (
     formData.append("major", m);
   });
 
-  link.forEach((l) => {
+  [...new Set(link.map((item) => item.trim()).filter(Boolean))].forEach((l) => {
     formData.append("link", l);
   });
 
   formData.append("clubImage", clubImage);
+  formData.append(
+    "clubCreationForm",
+    clubCreationFormFile,
+    clubCreationFormFile.name,
+  );
 
-  const response = await apiClient.post("/clubs/applications", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await apiClient.post("/clubs/applications", formData);
   return response.data;
 };
 

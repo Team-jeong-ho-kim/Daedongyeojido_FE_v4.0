@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
+import AdminFooter from "@/components/layout/AdminFooter";
+import AdminLayoutContent from "@/components/layout/AdminLayoutContent";
+import { AdminProviders } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +30,13 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/daedong.svg" type="image/svg+xml" />
       </head>
-      <body>{children}</body>
+      <body>
+        <AdminProviders>
+          <Toaster position="top-right" duration={3000} richColors />
+          <AdminLayoutContent>{children}</AdminLayoutContent>
+          <AdminFooter />
+        </AdminProviders>
+      </body>
     </html>
   );
 }

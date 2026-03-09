@@ -60,6 +60,11 @@ export default function LinkInput({
         return;
       }
 
+      if (links.some((link) => link.url === trimmedLink)) {
+        setInternalError("이미 추가된 링크입니다.");
+        return;
+      }
+
       setInternalError("");
       onLinksChange([...links, { id: crypto.randomUUID(), url: trimmedLink }]);
       setCurrentLink("");
