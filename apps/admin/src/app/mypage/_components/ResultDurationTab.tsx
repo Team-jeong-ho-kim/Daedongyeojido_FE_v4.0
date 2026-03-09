@@ -67,6 +67,18 @@ const isValidDateValue = (value: string) => {
   );
 };
 
+const isPastDateTime = (date: string, time: string) => {
+  if (!isValidDateValue(date) || !time) {
+    return false;
+  }
+
+  const selectedDateTime = new Date(`${date}T${time}:00`);
+  const currentDateTime = new Date();
+  currentDateTime.setSeconds(0, 0);
+
+  return selectedDateTime < currentDateTime;
+};
+
 function KoreanDateField(props: KoreanDateFieldProps) {
   const { value, onChange } = props;
   const [year = "", month = "", day = ""] = value.split("-");
@@ -195,6 +207,11 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
       return;
     }
 
+    if (isPastDateTime(resultDate, resultTime)) {
+      toast.error("발표 기간은 현재보다 이전 시점으로 설정할 수 없습니다.");
+      return;
+    }
+
     try {
       await setResultDurationMutation.mutateAsync(
         toResultDurationDateTime(`${resultDate}T${resultTime}`),
@@ -212,6 +229,11 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
 
     if (!isValidDateValue(editResultDate) || !editResultTime) {
       toast.error("수정할 발표 날짜와 시간을 입력해 주세요.");
+      return;
+    }
+
+    if (isPastDateTime(editResultDate, editResultTime)) {
+      toast.error("발표 기간은 현재보다 이전 시점으로 수정할 수 없습니다.");
       return;
     }
 
