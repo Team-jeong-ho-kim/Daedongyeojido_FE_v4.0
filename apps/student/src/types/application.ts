@@ -28,6 +28,12 @@ export interface ApplicationFormsResponse {
   applicationForms: ApplicationFormListItem[];
 }
 
+export interface ClubCreationFormDownload {
+  clubCreationFormId?: number;
+  fileName: string;
+  fileUrl: string;
+}
+
 export interface ApplicationQuestion {
   applicationQuestionId: number;
   content: string;

@@ -12,6 +12,7 @@ export const queryKeys = createQueryKeyStore({
   },
   applicationForms: {
     byClub: (clubId: string) => [clubId],
+    clubCreationForm: null,
     detail: (applicationFormId: string) => [applicationFormId],
   },
   applications: {
