@@ -25,10 +25,10 @@ export default function MainBanner() {
         const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
 
         setResultPeriod(
-          `발표일: ${month}월 ${day}일 ${period} ${hour12}시${minute > 0 ? ` ${minute}분` : ""}`,
+          `동아리 면접 결과 발표일: ${month}월 ${day}일 ${period} ${hour12}시${minute > 0 ? ` ${minute}분` : ""}`,
         );
       } else {
-        setResultPeriod("발표 기간이 설정되지 않았습니다");
+        setResultPeriod("동아리 면접 결과 발표일 기간이 설정되지 않았습니다");
       }
     };
 
