@@ -102,7 +102,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen bg-black">
       <div className="hidden flex-1 items-center justify-center p-8 lg:flex lg:p-16">
-        <div className="w-full max-w-2xl">
+        <div className="w-full max-w-2xl space-y-12">
           <Image
             src="/images/login/school.svg"
             alt="대동여지도 학교 이미지"
@@ -111,12 +111,25 @@ export default function LoginPage() {
             className="h-auto w-full rounded-2xl object-cover"
             priority
           />
+          <div className="w-full space-y-4">
+            <h1 className="font-bold text-4xl text-white leading-tight">
+              나의 동아리를 찾는 지름길,
+              <br />
+              동아리에 가입해서 전공{" "}
+              <span className="whitespace-nowrap">실력을 길러보세요!</span>
+            </h1>
+            <p className="text-base text-gray-400 leading-7">
+              자신의 전공 분야와 맞는 동아리를 찾고,
+              <br />
+              자신이 가입하고 싶은 동아리를 쉽게 관리할 수 있습니다.
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="flex w-full flex-col items-center justify-center rounded-3xl bg-[#1a1a1a] px-6 py-12 sm:px-12 lg:my-6 lg:mr-6 lg:w-[540px]">
         <div className="w-full max-w-md">
-          <div className="mb-10 flex items-center gap-2">
+          <div className="mb-10 flex justify-center">
             <Image
               src="/images/logos/blackLogo.svg"
               alt="대동여지도 로고"
@@ -125,9 +138,11 @@ export default function LoginPage() {
             />
           </div>
 
-          <h2 className="mb-2 font-bold text-3xl text-white">로그인</h2>
-          <p className="mb-8 text-gray-400">
-            로그인 후 계정 권한(role)에 맞는 서비스로 이동합니다.
+          <h2 className="mb-4 font-bold text-3xl text-white">로그인</h2>
+          <p className="mb-8 text-gray-400 leading-8">
+            대동여지도에서 다양한 동아리를 알아보고,
+            <br />
+            나의 동아리를 찾아보세요!
           </p>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
