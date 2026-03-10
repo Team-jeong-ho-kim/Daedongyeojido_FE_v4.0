@@ -73,7 +73,7 @@ export const uploadClubCreationForm = async (
 };
 
 export const deleteClubCreationForm = async (
-  clubCreationFormId: string,
+  clubCreationFormId: number,
 ): Promise<void> => {
   await apiClient.delete(`/admin/club-creation-form/${clubCreationFormId}`);
 };

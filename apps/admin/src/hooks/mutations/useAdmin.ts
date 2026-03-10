@@ -153,7 +153,7 @@ export const useDeleteClubCreationFormMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (clubCreationFormId: string) =>
+    mutationFn: (clubCreationFormId: number) =>
       deleteClubCreationForm(clubCreationFormId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({

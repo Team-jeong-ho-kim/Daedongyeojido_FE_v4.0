@@ -23,10 +23,11 @@ export function ClubCreationTab() {
   const [uploadFileInputKey, setUploadFileInputKey] = useState(0);
   const uploadClubCreationFormMutation = useUploadClubCreationFormMutation();
 
-  const [deleteClubCreationFormId, setDeleteClubCreationFormId] = useState("");
   const deleteClubCreationFormMutation = useDeleteClubCreationFormMutation();
 
   const downloadClubCreationForm = clubCreationDownloadMutation.data ?? null;
+  const clubCreationFormId =
+    downloadClubCreationForm?.clubCreationFormId ?? null;
 
   const handleDecideClubApplication = async (isOpen: boolean) => {
     if (!clubApplicationClubId.trim()) {
@@ -88,6 +89,7 @@ export function ClubCreationTab() {
         fileUrl: uploadFile,
         fileName: uploadName.trim(),
       });
+      clubCreationDownloadMutation.reset();
       setUploadName("");
       setUploadFile(null);
       setUploadFileInputKey((prev) => prev + 1);
@@ -95,16 +97,14 @@ export function ClubCreationTab() {
   };
 
   const handleDeleteClubCreationForm = async () => {
-    if (!deleteClubCreationFormId.trim()) {
-      toast.error("삭제할 개설 양식 ID를 입력해 주세요.");
+    if (!clubCreationFormId) {
+      toast.error("먼저 삭제할 개설 양식을 조회해 주세요.");
       return;
     }
 
     try {
-      await deleteClubCreationFormMutation.mutateAsync(
-        deleteClubCreationFormId.trim(),
-      );
-      setDeleteClubCreationFormId("");
+      await deleteClubCreationFormMutation.mutateAsync(clubCreationFormId);
+      clubCreationDownloadMutation.reset();
     } catch {}
   };
 
@@ -200,22 +200,21 @@ export function ClubCreationTab() {
 
       <PanelCard
         title="동아리 개설 양식 삭제"
-        description="개설 양식 ID를 입력해 삭제합니다."
+        description="조회한 개설 양식을 바로 삭제합니다."
       >
-        <div className="flex flex-wrap gap-2">
-          <input
-            value={deleteClubCreationFormId}
-            onChange={(event) =>
-              setDeleteClubCreationFormId(event.target.value)
-            }
-            placeholder="개설 양식 ID"
-            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-gray-600 text-sm">
+            {clubCreationFormId
+              ? `조회된 개설 양식 ID: ${clubCreationFormId}`
+              : "먼저 상단에서 개설 양식을 조회해 주세요."}
+          </p>
           <button
             type="button"
             className="rounded-lg bg-[#DC2626] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
             onClick={handleDeleteClubCreationForm}
-            disabled={deleteClubCreationFormMutation.isPending}
+            disabled={
+              deleteClubCreationFormMutation.isPending || !clubCreationFormId
+            }
           >
             {deleteClubCreationFormMutation.isPending ? "삭제 중..." : "삭제"}
           </button>
