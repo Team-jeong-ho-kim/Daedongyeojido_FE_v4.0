@@ -24,9 +24,6 @@ export function ClubCreationDownloadPreview(
           downloadClubCreationForm.fileUrl,
         )}
       </p>
-      <p className="mt-1 break-all text-gray-600">
-        {downloadClubCreationForm.fileUrl}
-      </p>
       <button
         type="button"
         className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
