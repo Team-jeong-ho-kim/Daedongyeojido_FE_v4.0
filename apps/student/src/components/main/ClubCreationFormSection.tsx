@@ -103,9 +103,6 @@ export default function ClubCreationFormSection() {
                   <p className="font-medium text-gray-900 text-sm md:text-base">
                     {clubCreationFormQuery.data.fileName}
                   </p>
-                  <p className="mt-1 break-all text-gray-500 text-xs md:text-sm">
-                    {clubCreationFormQuery.data.fileUrl}
-                  </p>
                 </div>
               ) : null}
             </div>

@@ -67,7 +67,7 @@ export default function MyPageEdit() {
 
   const handleIntroductionChange = (value: string) => {
     if (value.length > 30) {
-      toast.warning("한줄 소개는 30자까지 입력 가능합니다");
+      toast.warning("한 줄 소개는 30자까지 입력 가능합니다");
       return;
     }
     setIntroduction(value);
@@ -194,7 +194,7 @@ export default function MyPageEdit() {
             {/* 한줄 소개 */}
             <div>
               <h2 className="mb-4 font-bold text-xl tracking-tight">
-                한줄 소개
+                한 줄 소개
               </h2>
               <TextInput
                 value={introduction}
