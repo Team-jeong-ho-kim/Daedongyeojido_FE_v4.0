@@ -143,6 +143,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     if (clubData) {
       setEditClubName(clubData.club.clubName);
       setEditClubImage(clubData.club.clubImage);
+      setEditClubImageFile(null);
       setEditOneLiner(clubData.club.oneLiner);
       setEditIntroduction(clubData.club.introduction);
 
@@ -284,12 +285,6 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
     }
   };
 
-  // 빈 더미 파일 생성 (이미지 변경하지 않은 경우 사용)
-  const createDummyFile = (): File => {
-    const blob = new Blob([], { type: "image/jpeg" });
-    return new File([blob], "dummy.jpg", { type: "image/jpeg" });
-  };
-
   // 저장 핸들러
   const handleSave = async () => {
     if (!hasChanges) {
@@ -329,18 +324,12 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       link: uniqueLinks, // 중복 제거된 링크
     };
 
-    // 이미지 파일 준비 -> 새로 선택한 파일이 있으면 그걸 사용, 없으면 빈 더미 파일 사용
-    let imageFileToSend: File;
-    let imageChanged = false;
+    const imageFileToSend = editClubImageFile ?? editClubImage;
+    const imageChanged = editClubImageFile !== null;
 
-    if (editClubImageFile) {
-      // 새 이미지를 선택한 경우
-      imageFileToSend = editClubImageFile;
-      imageChanged = true;
-    } else {
-      // 이미지를 변경하지 않은 경우 -> 빈 더미 파일 사용
-      imageFileToSend = createDummyFile();
-      imageChanged = false;
+    if (!imageFileToSend) {
+      toast.error("동아리 이미지를 준비하지 못했습니다.");
+      return;
     }
 
     try {

@@ -72,6 +72,12 @@
   * {
     @apply border-border;
   }
+  ::selection {
+    @apply bg-primary-500 text-white;
+  }
+  ::-moz-selection {
+    @apply bg-primary-500 text-white;
+  }
   body {
     @apply bg-background text-foreground;
   }

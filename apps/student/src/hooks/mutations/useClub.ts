@@ -22,7 +22,7 @@ export const useUpdateClubMutation = (clubId: string) => {
       imageChanged,
     }: {
       data: ClubUpdate;
-      imageFile: File;
+      imageFile: File | string;
       imageChanged: boolean;
     }) => updateClub(clubId, data, imageFile, imageChanged),
     onSuccess: () => {

@@ -14,7 +14,7 @@ export const getDetailClub = async (clubId: string) => {
 export const updateClub = async (
   clubId: string,
   data: ClubUpdate,
-  imageFile: File,
+  imageFile: File | string,
   imageChanged: boolean,
 ) => {
   const formData = new FormData();
@@ -33,7 +33,8 @@ export const updateClub = async (
     formData.append("link", l);
   });
 
-  // 이미지는 무조건 포함 (변경되지 않은 경우 빈 더미 파일)
+  // 이미지는 무조건 포함
+  // 변경된 경우 File, 변경되지 않은 경우 기존 이미지 URL 문자열
   formData.append("clubImage", imageFile);
 
   // 이미지 변경 여부 플래그
