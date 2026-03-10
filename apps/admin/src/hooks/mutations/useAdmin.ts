@@ -9,7 +9,6 @@ import {
   deleteResultDuration,
   downloadClubCreationApplicationForm,
   setResultDuration,
-  updateResultDuration,
   uploadClubCreationForm,
 } from "@/api/admin";
 import { getErrorMessage, queryKeys } from "@/lib";
@@ -33,34 +32,6 @@ export const useSetResultDurationMutation = () => {
     },
     onError: (error: unknown) => {
       toast.error(getErrorMessage(error, "발표 기간 설정에 실패했습니다."));
-    },
-  });
-};
-
-export const useUpdateResultDurationMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({
-      resultDurationId,
-      resultDuration,
-    }: {
-      resultDurationId: number;
-      resultDuration: string;
-    }) => updateResultDuration(resultDurationId, { resultDuration }),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.admin.overview.queryKey,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.admin.resultDuration.queryKey,
-        }),
-      ]);
-      toast.success("결과 발표 기간을 수정했습니다.");
-    },
-    onError: (error: unknown) => {
-      toast.error(getErrorMessage(error, "발표 기간 수정에 실패했습니다."));
     },
   });
 };

@@ -1,9 +1,8 @@
-import { type ChangeEvent, useEffect, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { toast } from "sonner";
 import {
   useDeleteResultDurationMutation,
   useSetResultDurationMutation,
-  useUpdateResultDurationMutation,
 } from "@/hooks/mutations";
 import type { ResultDurationResponse } from "@/types/admin";
 import { toResultDurationDateTime } from "../_lib";
@@ -165,36 +164,11 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
   const { resultDurationInfo } = props;
   const [resultDate, setResultDate] = useState("");
   const [resultTime, setResultTime] = useState("");
-  const [editResultDate, setEditResultDate] = useState("");
-  const [editResultTime, setEditResultTime] = useState("");
   const deleteResultDurationMutation = useDeleteResultDurationMutation();
   const setResultDurationMutation = useSetResultDurationMutation();
-  const updateResultDurationMutation = useUpdateResultDurationMutation();
 
   const hasExistingResultDuration = Boolean(resultDurationInfo?.resultDuration);
   const resultDurationId = resultDurationInfo?.resultDurationId ?? null;
-
-  useEffect(() => {
-    const currentResultDuration = resultDurationInfo?.resultDuration;
-    if (!currentResultDuration) {
-      setEditResultDate("");
-      setEditResultTime("");
-      return;
-    }
-
-    const matched = currentResultDuration.match(
-      /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/,
-    );
-
-    if (!matched) {
-      setEditResultDate("");
-      setEditResultTime("");
-      return;
-    }
-
-    setEditResultDate(matched[1]);
-    setEditResultTime(matched[2]);
-  }, [resultDurationInfo?.resultDuration]);
 
   const handleSetResultDuration = async () => {
     if (hasExistingResultDuration) {
@@ -218,32 +192,6 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
       );
       setResultDate("");
       setResultTime("");
-    } catch {}
-  };
-
-  const handleUpdateResultDuration = async () => {
-    if (!resultDurationId) {
-      toast.error("수정할 발표 기간 ID가 없습니다.");
-      return;
-    }
-
-    if (!isValidDateValue(editResultDate) || !editResultTime) {
-      toast.error("수정할 발표 날짜와 시간을 입력해 주세요.");
-      return;
-    }
-
-    if (isPastDateTime(editResultDate, editResultTime)) {
-      toast.error("발표 기간은 현재보다 이전 시점으로 수정할 수 없습니다.");
-      return;
-    }
-
-    try {
-      await updateResultDurationMutation.mutateAsync({
-        resultDurationId,
-        resultDuration: toResultDurationDateTime(
-          `${editResultDate}T${editResultTime}`,
-        ),
-      });
     } catch {}
   };
 
@@ -295,41 +243,6 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
           aria-disabled={hasExistingResultDuration}
         >
           {setResultDurationMutation.isPending ? "설정 중..." : "설정"}
-        </button>
-      </PanelCard>
-
-      <PanelCard
-        title="결과 발표 기간 수정"
-        description="발표 날짜와 시간을 입력해 현재 기간을 수정합니다."
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <KoreanDateField
-            value={editResultDate}
-            onChange={setEditResultDate}
-          />
-          <input
-            type="time"
-            value={editResultTime}
-            onChange={(event) => setEditResultTime(event.target.value)}
-            placeholder="발표 시간"
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-        <button
-          type="button"
-          className={`mt-3 rounded-lg px-4 py-2 font-medium text-sm text-white transition ${
-            hasExistingResultDuration && resultDurationId
-              ? "bg-gray-900 hover:bg-black"
-              : "cursor-not-allowed bg-gray-400"
-          } disabled:cursor-not-allowed disabled:opacity-60`}
-          onClick={handleUpdateResultDuration}
-          disabled={
-            updateResultDurationMutation.isPending ||
-            !hasExistingResultDuration ||
-            !resultDurationId
-          }
-        >
-          {updateResultDurationMutation.isPending ? "수정 중..." : "수정"}
         </button>
       </PanelCard>
 
