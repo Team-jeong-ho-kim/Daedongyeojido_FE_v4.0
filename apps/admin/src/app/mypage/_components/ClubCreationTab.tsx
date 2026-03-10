@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -6,17 +7,19 @@ import {
   useGetClubCreationDownloadMutation,
   useUploadClubCreationFormMutation,
 } from "@/hooks/mutations";
+import { useGetClubCreationApplicationsQuery } from "@/hooks/querys";
 import { downloadFileFromUrl, toErrorMessage } from "../_lib";
 import { ClubCreationDownloadPreview } from "./ClubCreationDownloadPreview";
 import { PanelCard } from "./PanelCard";
 
 export function ClubCreationTab() {
-  const [clubApplicationClubId, setClubApplicationClubId] = useState("");
   const decideClubApplicationMutation = useDecideClubApplicationMutation();
 
   const clubCreationDownloadMutation = useGetClubCreationDownloadMutation();
   const [isDownloadingClubCreationForm, setIsDownloadingClubCreationForm] =
     useState(false);
+  const clubCreationApplicationsQuery =
+    useGetClubCreationApplicationsQuery(false);
 
   const [uploadName, setUploadName] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -28,16 +31,15 @@ export function ClubCreationTab() {
   const downloadClubCreationForm = clubCreationDownloadMutation.data ?? null;
   const clubCreationFormId =
     downloadClubCreationForm?.clubCreationFormId ?? null;
+  const clubCreationApplications = clubCreationApplicationsQuery.data ?? [];
 
-  const handleDecideClubApplication = async (isOpen: boolean) => {
-    if (!clubApplicationClubId.trim()) {
-      toast.error("처리할 동아리 ID를 입력해 주세요.");
-      return;
-    }
-
+  const handleDecideClubApplication = async (
+    clubId: number,
+    isOpen: boolean,
+  ) => {
     try {
       await decideClubApplicationMutation.mutateAsync({
-        clubId: clubApplicationClubId.trim(),
+        clubId: String(clubId),
         isOpen,
       });
     } catch {}
@@ -47,6 +49,22 @@ export function ClubCreationTab() {
     try {
       await clubCreationDownloadMutation.mutateAsync();
     } catch {}
+  };
+
+  const handleFetchClubCreationApplications = async () => {
+    const result = await clubCreationApplicationsQuery.refetch();
+
+    if (result.error) {
+      toast.error(
+        toErrorMessage(
+          result.error,
+          "동아리 개설 신청 전체 조회에 실패했습니다.",
+        ),
+      );
+      return;
+    }
+
+    toast.success("동아리 개설 신청 목록을 조회했습니다.");
   };
 
   const handleDownloadClubCreationApplicationForm = async () => {
@@ -111,33 +129,103 @@ export function ClubCreationTab() {
   return (
     <>
       <PanelCard
-        title="동아리 개설 수락/거절"
-        description="동아리 개설 신청 ID(=동아리 ID)를 입력해 승인/거절합니다."
+        title="동아리 개설 신청 전체 조회"
+        description="현재 접수된 동아리 개설 신청 목록을 조회하고 바로 승인/거절합니다."
       >
         <div className="flex flex-wrap gap-2">
-          <input
-            value={clubApplicationClubId}
-            onChange={(event) => setClubApplicationClubId(event.target.value)}
-            placeholder="동아리 ID"
-            className="w-[220px] rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
           <button
             type="button"
-            className="rounded-lg bg-[#2563EB] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={() => handleDecideClubApplication(true)}
-            disabled={decideClubApplicationMutation.isPending}
+            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={handleFetchClubCreationApplications}
+            disabled={clubCreationApplicationsQuery.isFetching}
           >
-            수락
-          </button>
-          <button
-            type="button"
-            className="rounded-lg bg-[#DC2626] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={() => handleDecideClubApplication(false)}
-            disabled={decideClubApplicationMutation.isPending}
-          >
-            거절
+            {clubCreationApplicationsQuery.isFetching ? "조회 중..." : "조회"}
           </button>
         </div>
+
+        {clubCreationApplicationsQuery.isFetched ? (
+          clubCreationApplications.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              {clubCreationApplications.map((club) => (
+                <article
+                  key={club.clubId}
+                  className="rounded-xl border border-gray-200 bg-gray-50 p-4 transition"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                          {club.clubImage ? (
+                            <Image
+                              src={club.clubImage}
+                              alt={`${club.clubName} 동아리 이미지`}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
+                              이미지 없음
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">
+                            {club.clubName}
+                          </p>
+                          <p className="mt-1 text-gray-500 text-xs">
+                            신청 ID #{club.clubId}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {club.majors.map((major) => (
+                          <span
+                            key={`${club.clubId}-${major}`}
+                            className="rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] text-gray-600"
+                          >
+                            {major}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <p className="mt-3 text-gray-700 text-sm">
+                        {club.introduction || "소개가 없습니다."}
+                      </p>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        className="rounded-lg bg-[#2563EB] px-3 py-1.5 font-medium text-white text-xs transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() =>
+                          handleDecideClubApplication(club.clubId, true)
+                        }
+                        disabled={decideClubApplicationMutation.isPending}
+                      >
+                        수락
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-lg bg-[#DC2626] px-3 py-1.5 font-medium text-white text-xs transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() =>
+                          handleDecideClubApplication(club.clubId, false)
+                        }
+                        disabled={decideClubApplicationMutation.isPending}
+                      >
+                        거절
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl bg-gray-50 px-4 py-3 text-gray-500 text-sm">
+              조회된 동아리 개설 신청이 없습니다.
+            </p>
+          )
+        ) : null}
       </PanelCard>
 
       <PanelCard

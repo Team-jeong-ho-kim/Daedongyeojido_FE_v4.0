@@ -110,6 +110,18 @@ export interface AdminClubCreationFormDownload {
   fileUrl: string;
 }
 
+export interface AdminClubCreationApplication {
+  clubId: number;
+  clubName: string;
+  clubImage: string;
+  introduction: string;
+  majors: string[];
+}
+
+export interface AdminClubCreationApplicationsResponse {
+  clubs: AdminClubCreationApplication[];
+}
+
 export interface ResultDurationResponse {
   resultDuration: string;
   resultDurationId?: number;

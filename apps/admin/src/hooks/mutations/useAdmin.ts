@@ -71,6 +71,9 @@ export const useDecideClubApplicationMutation = () => {
           queryKey: queryKeys.admin.overview.queryKey,
         }),
         queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.clubCreationApplications.queryKey,
+        }),
+        queryClient.invalidateQueries({
           queryKey: queryKeys.clubs.all.queryKey,
         }),
       ]);
