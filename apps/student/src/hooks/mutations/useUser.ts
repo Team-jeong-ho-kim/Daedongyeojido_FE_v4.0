@@ -19,7 +19,7 @@ export const useUpdateMyInfoMutation = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.me.queryKey });
       toast.success("정보가 저장되었습니다.");
       setTimeout(() => {
-        router.push("/");
+        router.push("/mypage");
       }, 1500);
     },
     onError: (error: unknown) => {
