@@ -316,27 +316,39 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       .filter((url) => url.trim() !== "");
     const uniqueLinks = [...new Set(linkUrls)];
 
+    const trimmedClubName = editClubName.trim();
+    const trimmedOneLiner = editOneLiner.trim();
+    const trimmedIntroduction = editIntroduction.trim();
+    const dedupedMajors = [...new Set(editMajors)];
     const updateData = {
-      clubName: editClubName.trim(),
-      oneLiner: editOneLiner.trim(),
-      introduction: editIntroduction.trim(),
-      major: [...new Set(editMajors)], // 중복 제거
-      link: uniqueLinks, // 중복 제거된 링크
+      ...(trimmedClubName !== club?.club.clubName && {
+        clubName: trimmedClubName,
+      }),
+      ...(trimmedOneLiner !== club?.club.oneLiner && {
+        oneLiner: trimmedOneLiner,
+      }),
+      ...(trimmedIntroduction !== club?.club.introduction && {
+        introduction: trimmedIntroduction,
+      }),
+      ...(JSON.stringify(normalizedEditMajors) !==
+        JSON.stringify(normalizedClubMajors) && {
+        major: dedupedMajors,
+      }),
+      ...(JSON.stringify(normalizedEditLinks) !==
+        JSON.stringify(normalizedClubLinks) && {
+        link: uniqueLinks,
+      }),
     };
 
-    const imageFileToSend = editClubImageFile ?? editClubImage;
-    const imageChanged = editClubImageFile !== null;
-
-    if (!imageFileToSend) {
-      toast.error("동아리 이미지를 준비하지 못했습니다.");
+    if (Object.keys(updateData).length === 0 && !editClubImageFile) {
+      toast.error("변경 사항이 없습니다");
       return;
     }
 
     try {
       await updateClubMutate({
         data: updateData,
-        imageFile: imageFileToSend,
-        imageChanged,
+        imageFile: editClubImageFile,
       });
       // 성공 후 이미지 파일 상태 리셋
       setEditClubImageFile(null);

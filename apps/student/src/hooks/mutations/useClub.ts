@@ -19,12 +19,10 @@ export const useUpdateClubMutation = (clubId: string) => {
     mutationFn: ({
       data,
       imageFile,
-      imageChanged,
     }: {
       data: ClubUpdate;
-      imageFile: File | string;
-      imageChanged: boolean;
-    }) => updateClub(clubId, data, imageFile, imageChanged),
+      imageFile?: File | null;
+    }) => updateClub(clubId, data, imageFile),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.clubs.detail(clubId).queryKey,

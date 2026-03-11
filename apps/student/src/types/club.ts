@@ -22,11 +22,11 @@ export interface ClubDetail {
 }
 
 export interface ClubUpdate {
-  clubName: string;
-  introduction: string;
-  oneLiner: string;
-  major: string[];
-  link: string[];
+  clubName?: string;
+  introduction?: string;
+  oneLiner?: string;
+  major?: string[];
+  link?: string[];
 }
 
 export interface ClubMember {

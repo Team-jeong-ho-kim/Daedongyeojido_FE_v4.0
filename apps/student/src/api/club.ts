@@ -14,31 +14,35 @@ export const getDetailClub = async (clubId: string) => {
 export const updateClub = async (
   clubId: string,
   data: ClubUpdate,
-  imageFile: File | string,
-  imageChanged: boolean,
+  imageFile?: File | null,
 ) => {
   const formData = new FormData();
 
-  formData.append("clubName", data.clubName);
-  formData.append("oneLiner", data.oneLiner);
-  formData.append("introduction", data.introduction);
+  if (data.clubName !== undefined) {
+    formData.append("clubName", data.clubName);
+  }
+  if (data.oneLiner !== undefined) {
+    formData.append("oneLiner", data.oneLiner);
+  }
+  if (data.introduction !== undefined) {
+    formData.append("introduction", data.introduction);
+  }
 
-  // 중복 제거
-  [...new Set(data.major)].forEach((m) => {
-    formData.append("major", m);
-  });
+  if (data.major !== undefined) {
+    [...new Set(data.major)].forEach((m) => {
+      formData.append("major", m);
+    });
+  }
 
-  // 중복 제거
-  [...new Set(data.link)].forEach((l) => {
-    formData.append("link", l);
-  });
+  if (data.link !== undefined) {
+    [...new Set(data.link)].forEach((l) => {
+      formData.append("link", l);
+    });
+  }
 
-  // 이미지는 무조건 포함
-  // 변경된 경우 File, 변경되지 않은 경우 기존 이미지 URL 문자열
-  formData.append("clubImage", imageFile);
-
-  // 이미지 변경 여부 플래그
-  formData.append("imageChanged", imageChanged.toString());
+  if (imageFile) {
+    formData.append("clubImage", imageFile);
+  }
 
   const response = await apiClient.patch(`/clubs/${clubId}`, formData, {
     headers: {
