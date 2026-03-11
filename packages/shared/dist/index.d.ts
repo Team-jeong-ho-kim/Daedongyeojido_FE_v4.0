@@ -4,6 +4,7 @@ type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
 interface UserInfo {
     userName: string;
     classNumber: string;
+    phoneNumber?: string | null;
     introduction: string | null;
     clubName: string | null;
     major: string[];

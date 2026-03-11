@@ -24,6 +24,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const userInfo = useUserStore((state) => state.userInfo);
   const updateMyInfoMutation = useUpdateMyInfoMutation();
+  const isInitializedRef = useRef(false);
 
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [phone, setPhone] = useState("");
@@ -106,6 +107,25 @@ export default function OnboardingPage() {
     return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
   };
 
+  useEffect(() => {
+    if (!userInfo || isInitializedRef.current) {
+      return;
+    }
+
+    setPhone(formatPhoneNumber(userInfo.phoneNumber || ""));
+    setLinks(
+      (userInfo.link || [])
+        .filter((url) => url.trim() !== "")
+        .map((url, index) => ({
+          id: `initial-link-${index}`,
+          url,
+        })),
+    );
+    setSelectedFields(userInfo.major || []);
+    setIntroduction(userInfo.introduction || "");
+    isInitializedRef.current = true;
+  }, [userInfo]);
+
   const handlePhoneChange = (value: string) => {
     setPhone(formatPhoneNumber(value));
     if (errors.phone && value) {
@@ -130,13 +150,12 @@ export default function OnboardingPage() {
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
+    const hasExistingProfileImage = Boolean(userInfo?.profileImage?.trim());
 
-    if (!profileFile) {
+    if (!profileFile && !hasExistingProfileImage) {
       newErrors.profile = "프로필 사진을 업로드해주세요";
     }
-    if (!phone.trim()) {
-      newErrors.phone = "전화번호를 입력해주세요";
-    } else if (phone.replace(/-/g, "").length !== 11) {
+    if (phone.trim() && phone.replace(/-/g, "").length !== 11) {
       newErrors.phone = "올바른 전화번호 형식이 아닙니다";
     }
     if (links.length === 0) {
@@ -208,6 +227,7 @@ export default function OnboardingPage() {
             <ImageUpload
               onFileChange={handleProfileChange}
               placeholder="파일을 업로드 해주세요."
+              defaultImageUrl={userInfo?.profileImage || null}
               error={errors.profile}
             />
           </FormField>

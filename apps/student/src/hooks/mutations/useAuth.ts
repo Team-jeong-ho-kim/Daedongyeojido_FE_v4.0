@@ -5,6 +5,7 @@ import { clearTokens } from "utils";
 import { login, logout } from "@/api/auth";
 import { getMyInfo } from "@/api/user";
 import { getErrorMessage } from "@/lib/error";
+import { isOnboardingRequired } from "@/lib/onboarding";
 
 const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
 
@@ -28,13 +29,7 @@ export const useLoginMutation = () => {
 
       try {
         const userInfo = await getMyInfo();
-
-        const hasAnyInfo =
-          userInfo.introduction ||
-          (userInfo.major && userInfo.major.length > 0) ||
-          (userInfo.link && userInfo.link.length > 0) ||
-          userInfo.profileImage;
-        const needsOnboarding = !hasAnyInfo;
+        const needsOnboarding = isOnboardingRequired(userInfo);
 
         setTimeout(() => {
           window.location.href = needsOnboarding ? "/onboarding" : "/";
