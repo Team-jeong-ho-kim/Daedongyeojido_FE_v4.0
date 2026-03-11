@@ -23,6 +23,13 @@ const getDownloadFileName = (fileName: string, fileUrl: string) => {
     : `${sanitizedFileName}${extension}`;
 };
 
+const getFileExtensionLabel = (fileName: string, fileUrl: string) => {
+  const downloadFileName = getDownloadFileName(fileName, fileUrl);
+  const extension = downloadFileName.split(".").pop()?.trim();
+
+  return extension ? extension.toUpperCase() : "FILE";
+};
+
 const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
   const response = await fetch(fileUrl);
   if (!response.ok) {
@@ -50,6 +57,18 @@ const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
 export default function ClubCreationFormSection() {
   const clubCreationFormQuery = useGetClubCreationFormQuery(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const downloadFileName = clubCreationFormQuery.data
+    ? getDownloadFileName(
+        clubCreationFormQuery.data.fileName,
+        clubCreationFormQuery.data.fileUrl,
+      )
+    : "";
+  const fileExtensionLabel = clubCreationFormQuery.data
+    ? getFileExtensionLabel(
+        clubCreationFormQuery.data.fileName,
+        clubCreationFormQuery.data.fileUrl,
+      )
+    : "FILE";
 
   useEffect(() => {
     if (!clubCreationFormQuery.error) {
@@ -99,10 +118,20 @@ export default function ClubCreationFormSection() {
                 수 있습니다.
               </p>
               {clubCreationFormQuery.data ? (
-                <div className="rounded-xl border border-gray-200 bg-white/90 px-4 py-3">
-                  <p className="font-medium text-gray-900 text-sm md:text-base">
-                    {clubCreationFormQuery.data.fileName}
-                  </p>
+                <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
+                      {fileExtensionLabel}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-all font-medium text-gray-900 text-sm md:text-base">
+                        {downloadFileName}
+                      </p>
+                      <p className="mt-1 text-[12px] text-gray-500">
+                        동아리 개설 양식 문서
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : null}
             </div>
