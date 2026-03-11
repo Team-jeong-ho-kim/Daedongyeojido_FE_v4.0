@@ -30,13 +30,6 @@ const teamMembers = [
     description: "깔끔하고 효율적인 코드를 작성하는 프론트엔드 개발자",
   },
   {
-    roles: ["FRONTEND"],
-    name: "지도현",
-    position: "Frontend Developer",
-    github: "https://github.com/jidohyun",
-    description: "사용자 경험을 최우선으로 생각하는 프론트엔드 개발자",
-  },
-  {
     roles: ["BACKEND"],
     name: "채도훈",
     position: "Backend Developer",

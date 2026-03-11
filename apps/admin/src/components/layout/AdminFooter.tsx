@@ -24,8 +24,8 @@ export default function AdminFooter() {
             대동여지도
           </p>
           <p>
-            PM: 박태수 | FRONTEND: 지도현, 최민수 | BACKEND: 박태수, 채도훈 |
-            DESIGN: 손희찬
+            PM: 박태수 | FRONTEND: 최민수 | BACKEND: 박태수, 채도훈 | DESIGN:
+            손희찬
           </p>
           <p>주소 : 대전광역시 유성구 가정북로 76</p>
         </div>
