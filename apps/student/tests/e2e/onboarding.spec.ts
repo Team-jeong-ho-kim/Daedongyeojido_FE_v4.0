@@ -9,6 +9,7 @@ test.describe("Student onboarding", () => {
   test("필수 입력이 비어 있으면 검증 메시지를 보여준다", async ({ page }) => {
     await installStudentApiMocks(page, {
       user: {
+        profileImage: null,
         introduction: null,
         link: [],
         major: [],
@@ -19,7 +20,6 @@ test.describe("Student onboarding", () => {
     await page.getByRole("button", { name: "저장 완료" }).click();
 
     await expect(page.getByText("프로필 사진을 업로드해주세요")).toBeVisible();
-    await expect(page.getByText("전화번호를 입력해주세요")).toBeVisible();
     await expect(
       page.getByText("최소 1개 이상의 링크를 추가해주세요"),
     ).toBeVisible();

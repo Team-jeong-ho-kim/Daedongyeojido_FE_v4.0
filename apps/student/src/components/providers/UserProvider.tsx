@@ -34,7 +34,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!needsOnboarding && isOnboardingPage) {
-      router.replace("/");
+      router.replace("/mypage");
     }
   }, [hasToken, myInfoQuery.data, pathname, router]);
 
