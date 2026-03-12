@@ -187,7 +187,7 @@ export default function ClubCreationFormSection({
             type="button"
             onClick={handleFetch}
             disabled={clubCreationFormQuery.isFetching}
-            className="rounded-full bg-gray-900 px-6 py-3 font-semibold text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-xl bg-gray-900 px-6 py-3 font-semibold text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
           >
             {clubCreationFormQuery.isFetching ? "조회 중..." : "양식 조회"}
           </button>
@@ -195,7 +195,7 @@ export default function ClubCreationFormSection({
             type="button"
             onClick={handleDownload}
             disabled={!clubCreationFormQuery.data || isDownloading}
-            className="rounded-full border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isDownloading ? "다운로드 중..." : "다운로드"}
           </button>
@@ -204,7 +204,7 @@ export default function ClubCreationFormSection({
               type="button"
               onClick={handlePreview}
               disabled={!clubCreationFormQuery.data}
-              className="rounded-full border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               미리보기
             </button>
