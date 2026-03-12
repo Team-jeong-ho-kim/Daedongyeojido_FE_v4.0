@@ -42,6 +42,9 @@ out/
 
 # Build outputs
 build/
+packages/ui/dist/
+packages/shared/dist/
+packages/utils/dist/
 
 # IDE files (except our workspace settings)
 .idea/

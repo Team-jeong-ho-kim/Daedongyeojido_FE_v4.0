@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["ui", "config-tailwind"],
+  transpilePackages: ["ui", "shared", "utils", "config-tailwind"],
   images: {
     remotePatterns: [
       {
