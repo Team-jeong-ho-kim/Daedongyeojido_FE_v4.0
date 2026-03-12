@@ -10,6 +10,7 @@ import { useHeaderVisibility } from "./useHeaderVisibility";
 const studentNavItems = [
   { href: "/clubs", label: "동아리" },
   { href: "/announcements", label: "공고" },
+  { href: "/documents", label: "양식" },
 ];
 
 const dropdownItems = [
