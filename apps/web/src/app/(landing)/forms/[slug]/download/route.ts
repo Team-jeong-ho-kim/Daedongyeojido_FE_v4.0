@@ -3,6 +3,8 @@ import {
   getFormBySlug,
 } from "@/components/forms/data";
 
+export const runtime = "edge";
+
 type RouteContext = {
   params: Promise<{
     slug: string;

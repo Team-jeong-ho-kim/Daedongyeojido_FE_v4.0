@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Footer } from "ui";
 import { getFormBySlug } from "@/components/forms/data";
 
+export const runtime = "edge";
+
 type PageProps = {
   params: Promise<{
     slug: string;
