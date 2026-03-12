@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useGetClubCreationFormQuery } from "@/hooks/querys/useApplicationFormQuery";
+import { useGetDocumentFilesQuery } from "@/hooks/querys/useApplicationFormQuery";
+import type { DocumentFileItem } from "@/types";
 
 type ClubCreationFormSectionProps = {
   embedded?: boolean;
 };
 
 const previewPdfPath = encodeURI("/documents/2026 동아리 개설 양식.pdf");
-const previewPdfName = "2026 동아리 개설 신청 양식";
 
 const getDownloadFileName = (fileName: string, fileUrl: string) => {
   const sanitizedFileName = fileName.trim();
@@ -64,47 +64,44 @@ const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
 export default function ClubCreationFormSection({
   embedded = false,
 }: ClubCreationFormSectionProps) {
-  const clubCreationFormQuery = useGetClubCreationFormQuery(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const downloadFileName = clubCreationFormQuery.data
-    ? getDownloadFileName(
-        clubCreationFormQuery.data.fileName,
-        clubCreationFormQuery.data.fileUrl,
-      )
-    : "";
-  const fileExtensionLabel = clubCreationFormQuery.data
-    ? getFileExtensionLabel(
-        clubCreationFormQuery.data.fileName,
-        clubCreationFormQuery.data.fileUrl,
-      )
-    : "FILE";
+  const documentFilesQuery = useGetDocumentFilesQuery();
+  const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
+    null,
+  );
+  const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
+  const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
 
   useEffect(() => {
-    if (!clubCreationFormQuery.error) {
+    if (!documentFilesQuery.error) {
       return;
     }
 
     toast.error("동아리 개설 양식을 불러오지 못했습니다.");
-  }, [clubCreationFormQuery.error]);
+  }, [documentFilesQuery.error]);
 
   useEffect(() => {
-    if (clubCreationFormQuery.data) {
+    if (!previewFile) {
       return;
     }
 
-    setIsPreviewOpen(false);
-  }, [clubCreationFormQuery.data]);
+    const exists = documentFiles.some(
+      (file) => file.clubCreationFormId === previewFile.clubCreationFormId,
+    );
+
+    if (!exists) {
+      setPreviewFile(null);
+    }
+  }, [documentFiles, previewFile]);
 
   useEffect(() => {
-    if (!isPreviewOpen) {
+    if (!previewFile) {
       document.body.style.overflow = "";
       return;
     }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsPreviewOpen(false);
+        setPreviewFile(null);
       }
     };
 
@@ -115,41 +112,22 @@ export default function ClubCreationFormSection({
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isPreviewOpen]);
+  }, [previewFile]);
 
-  const handleFetch = async () => {
+  const handleDownload = async (file: DocumentFileItem) => {
+    setDownloadingFileId(file.clubCreationFormId);
     try {
-      await clubCreationFormQuery.refetch();
-    } catch {}
-  };
-
-  const handleDownload = async () => {
-    if (!clubCreationFormQuery.data) {
-      toast.error("먼저 양식을 조회해 주세요.");
-      return;
-    }
-
-    setIsDownloading(true);
-    try {
-      await downloadFileFromUrl(
-        clubCreationFormQuery.data.fileUrl,
-        clubCreationFormQuery.data.fileName,
-      );
+      await downloadFileFromUrl(file.fileUrl, file.fileName);
       toast.success("동아리 개설 양식을 다운로드했습니다.");
     } catch {
       toast.error("동아리 개설 양식 다운로드에 실패했습니다.");
     } finally {
-      setIsDownloading(false);
+      setDownloadingFileId(null);
     }
   };
 
-  const handlePreview = () => {
-    if (!clubCreationFormQuery.data) {
-      toast.error("먼저 양식을 조회해 주세요.");
-      return;
-    }
-
-    setIsPreviewOpen((prev) => !prev);
+  const handlePreview = (file: DocumentFileItem) => {
+    setPreviewFile(file);
   };
 
   const card = (
@@ -157,118 +135,164 @@ export default function ClubCreationFormSection({
       <div className="flex flex-col gap-6">
         <div className="max-w-2xl space-y-3">
           <h2 className="font-bold text-2xl text-gray-900 md:text-3xl">
-            동아리 개설 양식을 먼저 확인해보세요
+            동아리 개설 양식 목록
           </h2>
           <p className="text-gray-600 text-sm leading-6 md:text-base">
-            새 동아리를 준비 중이라면 개설 양식을 조회하고 바로 다운로드할 수
-            있습니다.
+            등록된 양식을 바로 다운로드할 수 있고, 미리보기는 공통 PDF로 확인할
+            수 있습니다.
           </p>
-          {clubCreationFormQuery.data ? (
-            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
-                  {fileExtensionLabel}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="break-all font-medium text-gray-900 text-sm md:text-base">
-                    {downloadFileName}
-                  </p>
-                  <p className="mt-1 text-[12px] text-gray-500">
-                    동아리 개설 양식 문서
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={handleFetch}
-            disabled={clubCreationFormQuery.isFetching}
-            className="rounded-xl bg-gray-900 px-6 py-3 font-semibold text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {clubCreationFormQuery.isFetching ? "조회 중..." : "양식 조회"}
-          </button>
-          <button
-            type="button"
-            onClick={handleDownload}
-            disabled={!clubCreationFormQuery.data || isDownloading}
-            className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isDownloading ? "다운로드 중..." : "다운로드"}
-          </button>
-          {clubCreationFormQuery.data && (
-            <button
-              type="button"
-              onClick={handlePreview}
-              disabled={!clubCreationFormQuery.data}
-              className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              미리보기
-            </button>
-          )}
-        </div>
+        {documentFilesQuery.isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={`document-file-skeleton-${index + 1}`}
+                className="animate-pulse rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="h-11 w-11 rounded-lg bg-gray-200" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-40 rounded bg-gray-200" />
+                    <div className="h-3 w-28 rounded bg-gray-100" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading && documentFilesQuery.isError ? (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-red-700 text-sm">
+            양식을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading &&
+        !documentFilesQuery.isError &&
+        documentFiles.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 border-dashed bg-gray-50 px-4 py-6 text-center text-gray-500 text-sm">
+            등록된 양식이 없습니다.
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading &&
+        !documentFilesQuery.isError &&
+        documentFiles.length > 0 ? (
+          <div className="space-y-3">
+            {documentFiles.map((file) => {
+              const downloadFileName = getDownloadFileName(
+                file.fileName,
+                file.fileUrl,
+              );
+              const fileExtensionLabel = getFileExtensionLabel(
+                file.fileName,
+                file.fileUrl,
+              );
+              const isDownloading =
+                downloadingFileId === file.clubCreationFormId;
+
+              return (
+                <article
+                  key={file.clubCreationFormId}
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
+                >
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
+                        {fileExtensionLabel}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="break-all font-medium text-gray-900 text-sm md:text-base">
+                          {downloadFileName}
+                        </p>
+                        <p className="mt-1 text-[12px] text-gray-500">
+                          동아리 개설 양식 문서
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(file)}
+                        disabled={downloadingFileId !== null}
+                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isDownloading ? "다운로드 중..." : "다운로드"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePreview(file)}
+                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                      >
+                        미리보기
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 
-  const previewOverlay =
-    isPreviewOpen && clubCreationFormQuery.data ? (
-      <div className="fixed inset-0 z-50 bg-black/45 p-4 md:p-8">
-        <button
-          type="button"
-          className="absolute inset-0"
-          onClick={() => setIsPreviewOpen(false)}
-          aria-label="미리보기 닫기"
-        />
+  const previewOverlay = previewFile ? (
+    <div className="fixed inset-0 z-50 bg-black/45 p-4 md:p-8">
+      <button
+        type="button"
+        className="absolute inset-0"
+        onClick={() => setPreviewFile(null)}
+        aria-label="미리보기 닫기"
+      />
 
-        <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[12px] bg-white shadow-2xl">
-          <div className="flex items-start justify-between gap-4 border-gray-200 border-b px-5 py-4 md:px-7">
-            <div>
-              <h3 className="font-semibold text-gray-900 text-xl">
-                PDF 미리보기
-              </h3>
-              <p className="mt-1 break-all text-gray-500 text-sm">
-                {previewPdfName}
+      <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[12px] bg-white shadow-2xl">
+        <div className="flex items-start justify-between gap-4 border-gray-200 border-b px-5 py-4 md:px-7">
+          <div>
+            <h3 className="font-semibold text-gray-900 text-xl">
+              PDF 미리보기
+            </h3>
+            <p className="mt-1 break-all text-gray-500 text-sm">
+              {getDownloadFileName(previewFile.fileName, previewFile.fileUrl)}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setPreviewFile(null)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
+            aria-label="미리보기 닫기"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="flex-1 bg-gray-50 p-3 md:p-5">
+          <object
+            data={previewPdfPath}
+            type="application/pdf"
+            className="h-full min-h-[70vh] w-full border border-gray-200 bg-white"
+          >
+            <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 rounded-2xl border border-gray-300 border-dashed bg-white px-6 text-center">
+              <p className="font-medium text-gray-900">
+                브라우저에서 PDF 미리보기를 표시하지 못했습니다.
               </p>
+              <a
+                href={previewPdfPath}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2.5 font-semibold text-sm text-white transition hover:bg-black"
+              >
+                새 탭에서 PDF 열기
+              </a>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setIsPreviewOpen(false)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
-              aria-label="미리보기 닫기"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div className="flex-1 bg-gray-50 p-3 md:p-5">
-            <object
-              data={previewPdfPath}
-              type="application/pdf"
-              className="h-full min-h-[70vh] w-full border border-gray-200 bg-white"
-            >
-              <div className="flex h-full min-h-[420px] flex-col items-center justify-center gap-3 rounded-2xl border border-gray-300 border-dashed bg-white px-6 text-center">
-                <p className="font-medium text-gray-900">
-                  브라우저에서 PDF 미리보기를 표시하지 못했습니다.
-                </p>
-                <a
-                  href={previewPdfPath}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2.5 font-semibold text-sm text-white transition hover:bg-black"
-                >
-                  새 탭에서 PDF 열기
-                </a>
-              </div>
-            </object>
-          </div>
+          </object>
         </div>
       </div>
-    ) : null;
+    </div>
+  ) : null;
 
   if (embedded) {
     return (

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   getApplicationFormDetail,
   getClubApplicationForms,
-  getClubCreationForm,
+  getDocumentFiles,
   getMyApplications,
   getMySubmissionHistory,
   getUserAlarms,
@@ -28,11 +28,10 @@ export const useGetApplicationFormDetailQuery = (applicationFormId: string) => {
   });
 };
 
-export const useGetClubCreationFormQuery = (enabled = false) => {
+export const useGetDocumentFilesQuery = () => {
   return useQuery({
-    queryKey: queryKeys.applicationForms.clubCreationForm.queryKey,
-    queryFn: getClubCreationForm,
-    enabled,
+    queryKey: queryKeys.applicationForms.files.queryKey,
+    queryFn: getDocumentFiles,
   });
 };
 

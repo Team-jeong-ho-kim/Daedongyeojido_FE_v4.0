@@ -8,10 +8,10 @@ import type {
   ApplicationFormsResponse,
   ApplicationSubmission,
   ApplicationSubmissionsResponse,
-  ClubCreationFormDownload,
   CreateApplicationFormRequest,
   CreateInterviewScheduleRequest,
   DecidePassRequest,
+  DocumentFilesResponse,
   InterviewScheduleDetail,
   MyApplication,
   MyApplicationsResponse,
@@ -53,13 +53,10 @@ export const getApplicationFormDetail = async (
   return response.data;
 };
 
-export const getClubCreationForm =
-  async (): Promise<ClubCreationFormDownload> => {
-    const response = await apiClient.get<ClubCreationFormDownload>(
-      "/club-creation-form",
-    );
-    return response.data;
-  };
+export const getDocumentFiles = async (): Promise<DocumentFilesResponse> => {
+  const response = await apiClient.get<DocumentFilesResponse>("/files");
+  return response.data;
+};
 
 export const deleteApplicationForm = async (
   applicationFormId: string,
