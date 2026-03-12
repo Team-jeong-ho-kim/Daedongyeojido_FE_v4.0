@@ -1,6 +1,6 @@
 import type { Page, Route } from "@playwright/test";
 
-type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
+type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER";
 type AlarmCategory = "COMMON" | "CLUB_MEMBER_APPLY" | "CLUB_ACCEPTED";
 
 type MockUser = {

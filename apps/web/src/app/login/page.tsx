@@ -15,7 +15,7 @@ const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
 
 const resolveServiceUrl = (
   envUrl: string | undefined,
-  service: "web" | "student" | "admin",
+  service: "web" | "student" | "admin" | "teacher",
 ) => {
   if (envUrl?.trim()) {
     return normalizeUrl(envUrl);
@@ -38,12 +38,14 @@ const resolveServiceUrl = (
     web: "http://localhost:3000",
     student: "http://localhost:3001",
     admin: "http://localhost:3002",
+    teacher: "http://localhost:3003",
   } satisfies Record<typeof service, string>;
 
   return localFallbackMap[service];
 };
 
 export default function LoginPage() {
+  const [division, setDivision] = useState<LoginRequest["division"]>("STUDENT");
   const userUrl = resolveServiceUrl(
     process.env.NEXT_PUBLIC_USER_URL,
     "student",
@@ -51,6 +53,10 @@ export default function LoginPage() {
   const adminUrl = resolveServiceUrl(
     process.env.NEXT_PUBLIC_ADMIN_URL,
     "admin",
+  );
+  const teacherUrl = resolveServiceUrl(
+    process.env.NEXT_PUBLIC_TEACHER_URL,
+    "teacher",
   );
 
   const accountIdInput = useId();
@@ -60,6 +66,16 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const isTeacherLogin = division === "TEACHER";
+
+  const title = isTeacherLogin ? "선생님 로그인" : "학생 로그인";
+  const description = isTeacherLogin
+    ? "지도 교사 전용 포털에 로그인해 동아리 운영 기능을 이용하세요."
+    : "대동여지도에서 다양한 동아리를 알아보고,\n나의 동아리를 찾아보세요!";
+  const accountIdLabel = isTeacherLogin ? "교사용 계정 ID" : "DSM 계정 ID";
+  const accountPlaceholder = isTeacherLogin
+    ? "교사용 계정 ID를 입력해주세요."
+    : "계정 ID를 입력해주세요.";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,6 +91,7 @@ export default function LoginPage() {
       const payload: LoginRequest = {
         accountId: accountId.trim(),
         password,
+        division,
       };
 
       const response = await apiClient.post<LoginResponse>(
@@ -86,6 +103,11 @@ export default function LoginPage() {
 
       if (response.data.role === "ADMIN") {
         window.location.href = adminUrl;
+        return;
+      }
+
+      if (response.data.role === "TEACHER") {
+        window.location.href = teacherUrl;
         return;
       }
 
@@ -138,12 +160,43 @@ export default function LoginPage() {
             />
           </div>
 
-          <h2 className="mb-4 font-bold text-3xl text-white">로그인</h2>
-          <p className="mb-8 text-gray-400 leading-8">
-            대동여지도에서 다양한 동아리를 알아보고,
-            <br />
-            나의 동아리를 찾아보세요!
-          </p>
+          <div className="mb-6 grid grid-cols-2 gap-2 rounded-2xl bg-[#111111] p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setDivision("STUDENT");
+                setErrorMessage("");
+              }}
+              className={`rounded-xl px-4 py-3 font-semibold text-sm transition ${
+                division === "STUDENT"
+                  ? "bg-[#F45F5F] text-white"
+                  : "text-gray-400 hover:bg-[#222222] hover:text-white"
+              }`}
+            >
+              학생 로그인
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDivision("TEACHER");
+                setErrorMessage("");
+              }}
+              className={`rounded-xl px-4 py-3 font-semibold text-sm transition ${
+                division === "TEACHER"
+                  ? "bg-[#F45F5F] text-white"
+                  : "text-gray-400 hover:bg-[#222222] hover:text-white"
+              }`}
+            >
+              선생님 로그인
+            </button>
+          </div>
+
+          <div className="mb-8 min-h-[128px] sm:min-h-[136px]">
+            <h2 className="mb-4 font-bold text-3xl text-white">{title}</h2>
+            <p className="whitespace-pre-line text-gray-400 leading-8">
+              {description}
+            </p>
+          </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
@@ -151,14 +204,14 @@ export default function LoginPage() {
                 className="mb-2 block text-gray-400 text-sm"
                 htmlFor={accountIdInput}
               >
-                DSM 계정 ID
+                {accountIdLabel}
               </label>
               <input
                 id={accountIdInput}
                 value={accountId}
                 onChange={(event) => setAccountId(event.target.value)}
                 className="w-full rounded-lg border border-transparent bg-[#2a2a2a] px-4 py-3.5 text-white placeholder-gray-500 focus:border-gray-600 focus:outline-none"
-                placeholder="계정 ID를 입력해주세요."
+                placeholder={accountPlaceholder}
                 autoComplete="username"
               />
             </div>
@@ -245,7 +298,7 @@ export default function LoginPage() {
             href="/"
             className="mt-3 block w-full py-1 text-center font-medium text-gray-400 text-xs underline underline-offset-4 transition hover:text-gray-200"
           >
-            홈으로 돌아가기
+            시작 화면으로 돌아가기
           </Link>
         </div>
       </div>

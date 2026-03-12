@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { LoginRequest, LoginResponse } from "utils";
+import type { LoginResponse } from "utils";
 import { clearTokens } from "utils";
 import { login, logout } from "@/api/auth";
 import { getMyInfo } from "@/api/user";
@@ -22,8 +22,13 @@ const moveToWebLogin = () => {
 };
 
 export const useLoginMutation = () => {
-  return useMutation<LoginResponse, Error, LoginRequest>({
-    mutationFn: ({ accountId, password }) => login({ accountId, password }),
+  return useMutation<
+    LoginResponse,
+    Error,
+    { accountId: string; password: string }
+  >({
+    mutationFn: ({ accountId, password }) =>
+      login({ accountId, password, division: "STUDENT" }),
     onSuccess: async (data) => {
       toast.success(`${data.userName}님, 환영합니다!`, { id: "login-success" });
 

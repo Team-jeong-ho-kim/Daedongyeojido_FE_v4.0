@@ -1,7 +1,7 @@
-// 사용자 권한 (도메인 모델)
-export type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER";
+// 사용자 권한
+export type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER";
 
-// 사용자 정보 (도메인 모델)
+// 사용자 정보
 export interface UserInfo {
   userName: string;
   classNumber: string;

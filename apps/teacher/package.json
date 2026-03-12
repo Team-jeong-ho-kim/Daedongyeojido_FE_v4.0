@@ -1,0 +1,37 @@
+{
+  "name": "teacher",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -o -e ../../.env.local -- next dev --port 3003",
+    "dev:stag": "dotenv -o -e ../../.env.stag -- next dev --port 3003",
+    "dev:prod": "dotenv -o -e ../../.env.prod -- next dev --port 3003",
+    "build": "dotenv -o -e ../../.env.prod -- next build && dotenv -o -e ../../.env.prod -- next-sitemap",
+    "build:stag": "dotenv -o -e ../../.env.stag -- next build && dotenv -o -e ../../.env.stag -- next-sitemap",
+    "pages:build": "dotenv -o -e ../../.env.prod -- npx @cloudflare/next-on-pages@1",
+    "pages:build:stag": "dotenv -o -e ../../.env.stag -- npx @cloudflare/next-on-pages@1",
+    "preview": "npx wrangler pages dev .vercel/output/static --port 3003",
+    "deploy": "npx wrangler pages deploy .vercel/output/static",
+    "start": "next start --port 3003",
+    "lint": "../../node_modules/.bin/biome check .",
+    "format": "../../node_modules/.bin/biome format --write ."
+  },
+  "dependencies": {
+    "config-tailwind": "workspace:*",
+    "next": "15.5.6",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/next-on-pages": "1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "next-sitemap": "^4.2.3",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vercel": "^50.15.1"
+  }
+}
