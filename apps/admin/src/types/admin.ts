@@ -39,18 +39,6 @@ export interface ClubDetailResponse {
   clubMembers: ClubMember[];
 }
 
-export interface ApplicationFormListItem {
-  applicationFormId: number;
-  applicationFormTitle: string;
-  clubName: string;
-  clubImage?: string;
-  submissionDuration?: [number, number, number] | string;
-}
-
-export interface ApplicationFormsResponse {
-  applicationForms: ApplicationFormListItem[];
-}
-
 export interface AdminAlarm {
   id: number;
   title: string;

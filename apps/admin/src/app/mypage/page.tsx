@@ -5,10 +5,7 @@ import { useLogoutMutation } from "@/hooks/mutations";
 import { useGetAdminOverviewQuery } from "@/hooks/querys";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";
-import type {
-  ApplicationFormListItem,
-  ResultDurationResponse,
-} from "@/types/admin";
+import type { ResultDurationResponse } from "@/types/admin";
 import {
   AdminProfileHeader,
   AdminSidebar,
@@ -31,8 +28,6 @@ export default function AdminMyPage() {
     "관리자 데이터를 불러오지 못했습니다.",
   );
 
-  const applicationForms =
-    overviewQuery.data?.applicationForms ?? ([] as ApplicationFormListItem[]);
   const resultDurationInfo =
     overviewQuery.data?.resultDurationInfo ??
     (null as ResultDurationResponse | null);
@@ -85,7 +80,6 @@ export default function AdminMyPage() {
             <div className="space-y-5">
               {activeTab === "overview" ? (
                 <OverviewTab
-                  applicationForms={applicationForms}
                   isRefreshingOverview={overviewQuery.isFetching}
                   onRefresh={() => {
                     void overviewQuery.refetch();

@@ -4,22 +4,21 @@ import { toast } from "sonner";
 import {
   useDecideClubApplicationMutation,
   useDeleteClubCreationFormMutation,
-  useGetClubCreationDownloadMutation,
   useUploadClubCreationFormMutation,
 } from "@/hooks/mutations";
 import { useGetClubCreationApplicationsQuery } from "@/hooks/querys";
-import { downloadFileFromUrl, toErrorMessage } from "../_lib";
-import { ClubCreationDownloadPreview } from "./ClubCreationDownloadPreview";
+import { toErrorMessage } from "../_lib";
+import { ClubCreationDownloadCard } from "./ClubCreationDownloadCard";
 import { PanelCard } from "./PanelCard";
 
 export function ClubCreationTab() {
   const decideClubApplicationMutation = useDecideClubApplicationMutation();
-
-  const clubCreationDownloadMutation = useGetClubCreationDownloadMutation();
-  const [isDownloadingClubCreationForm, setIsDownloadingClubCreationForm] =
-    useState(false);
   const clubCreationApplicationsQuery =
     useGetClubCreationApplicationsQuery(false);
+  const [clubCreationFormId, setClubCreationFormId] = useState<number | null>(
+    null,
+  );
+  const [downloadCardKey, setDownloadCardKey] = useState(0);
 
   const [uploadName, setUploadName] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -28,11 +27,7 @@ export function ClubCreationTab() {
 
   const deleteClubCreationFormMutation = useDeleteClubCreationFormMutation();
 
-  const downloadClubCreationForm = clubCreationDownloadMutation.data ?? null;
-  const clubCreationFormId =
-    downloadClubCreationForm?.clubCreationFormId ?? null;
   const clubCreationApplications = clubCreationApplicationsQuery.data ?? [];
-
   const handleDecideClubApplication = async (
     clubId: number,
     isOpen: boolean,
@@ -42,12 +37,6 @@ export function ClubCreationTab() {
         clubId: String(clubId),
         isOpen,
       });
-    } catch {}
-  };
-
-  const handleFetchDownloadClubCreationForm = async () => {
-    try {
-      await clubCreationDownloadMutation.mutateAsync();
     } catch {}
   };
 
@@ -65,26 +54,6 @@ export function ClubCreationTab() {
     }
 
     toast.success("동아리 개설 신청 목록을 조회했습니다.");
-  };
-
-  const handleDownloadClubCreationApplicationForm = async () => {
-    if (!downloadClubCreationForm) {
-      toast.error("먼저 개설 양식을 조회해 주세요.");
-      return;
-    }
-
-    setIsDownloadingClubCreationForm(true);
-    try {
-      const { fileName, fileUrl } = downloadClubCreationForm;
-      await downloadFileFromUrl(fileUrl, fileName);
-      toast.success("동아리 개설 신청 양식을 다운로드했습니다.");
-    } catch (error) {
-      toast.error(
-        toErrorMessage(error, "동아리 개설 신청 양식 다운로드에 실패했습니다."),
-      );
-    } finally {
-      setIsDownloadingClubCreationForm(false);
-    }
   };
 
   const handleUploadClubCreationForm = async () => {
@@ -107,7 +76,8 @@ export function ClubCreationTab() {
         fileUrl: uploadFile,
         fileName: uploadName.trim(),
       });
-      clubCreationDownloadMutation.reset();
+      setClubCreationFormId(null);
+      setDownloadCardKey((prev) => prev + 1);
       setUploadName("");
       setUploadFile(null);
       setUploadFileInputKey((prev) => prev + 1);
@@ -122,7 +92,8 @@ export function ClubCreationTab() {
 
     try {
       await deleteClubCreationFormMutation.mutateAsync(clubCreationFormId);
-      clubCreationDownloadMutation.reset();
+      setClubCreationFormId(null);
+      setDownloadCardKey((prev) => prev + 1);
     } catch {}
   };
 
@@ -228,29 +199,10 @@ export function ClubCreationTab() {
         ) : null}
       </PanelCard>
 
-      <PanelCard
-        title="동아리 개설 신청 양식 조회 및 다운로드"
-        description="신청 양식을 조회한 뒤 다운로드합니다."
-      >
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleFetchDownloadClubCreationForm}
-            disabled={clubCreationDownloadMutation.isPending}
-          >
-            {clubCreationDownloadMutation.isPending ? "조회 중..." : "조회"}
-          </button>
-        </div>
-
-        {downloadClubCreationForm ? (
-          <ClubCreationDownloadPreview
-            downloadClubCreationForm={downloadClubCreationForm}
-            isDownloadingClubCreationForm={isDownloadingClubCreationForm}
-            onDownload={handleDownloadClubCreationApplicationForm}
-          />
-        ) : null}
-      </PanelCard>
+      <ClubCreationDownloadCard
+        key={downloadCardKey}
+        onFetchedFormIdChange={setClubCreationFormId}
+      />
 
       <PanelCard
         title="동아리 개설 양식 업로드"
