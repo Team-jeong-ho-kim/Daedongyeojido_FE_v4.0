@@ -32,7 +32,6 @@ function Footer() {
 // src/components/common/header/LandingHeader.tsx
 import Image2 from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 // src/components/common/header/useHeaderVisibility.ts
 import { useEffect, useState } from "react";
@@ -61,8 +60,6 @@ function useHeaderVisibility() {
 import { jsx as jsx2, jsxs as jsxs2 } from "react/jsx-runtime";
 function LandingHeader() {
   const isVisible = useHeaderVisibility();
-  const pathname = usePathname();
-  const isFormsPage = pathname.startsWith("/forms");
   return /* @__PURE__ */ jsx2(
     "header",
     {
@@ -78,24 +75,14 @@ function LandingHeader() {
             className: "h-6"
           }
         ) }),
-        /* @__PURE__ */ jsxs2("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ jsx2(
-            Link,
-            {
-              href: "/forms",
-              className: `rounded-lg px-4 py-2 font-medium text-sm transition-colors md:px-5 md:text-[15px] ${isFormsPage ? "bg-[#fff1f1] text-[#f45f5f]" : "text-[#4a4444] hover:bg-[#f8f3f3]"}`,
-              children: "\uC591\uC2DD \uBAA8\uC74C"
-            }
-          ),
-          /* @__PURE__ */ jsx2(
-            Link,
-            {
-              href: `${process.env.NEXT_PUBLIC_USER_URL}`,
-              className: "rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80",
-              children: "\uC2DC\uC791\uD558\uAE30"
-            }
-          )
-        ] })
+        /* @__PURE__ */ jsx2("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ jsx2(
+          Link,
+          {
+            href: `${process.env.NEXT_PUBLIC_USER_URL}`,
+            className: "rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80",
+            children: "\uC2DC\uC791\uD558\uAE30"
+          }
+        ) })
       ] })
     }
   );
@@ -104,7 +91,7 @@ function LandingHeader() {
 // src/components/common/header/StudentHeader.tsx
 import Image3 from "next/image";
 import Link2 from "next/link";
-import { usePathname as usePathname2 } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect as useEffect2, useState as useState2 } from "react";
 import { useUserStore } from "shared";
 import { Fragment, jsx as jsx3, jsxs as jsxs3 } from "react/jsx-runtime";
@@ -122,7 +109,7 @@ function StudentHeader() {
   const isVisible = useHeaderVisibility();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState2(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState2(false);
-  const pathname = usePathname2();
+  const pathname = usePathname();
   const userInfo = useUserStore((state) => state.userInfo);
   const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000").trim().replace(/\/$/, "");
   const webLoginUrl = `${webUrl}/login`;

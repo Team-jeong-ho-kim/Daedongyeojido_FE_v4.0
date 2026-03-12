@@ -2,13 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useHeaderVisibility } from "./useHeaderVisibility";
 
 export function LandingHeader() {
   const isVisible = useHeaderVisibility();
-  const pathname = usePathname();
-  const isFormsPage = pathname.startsWith("/forms");
 
   return (
     <header
@@ -28,16 +25,6 @@ export function LandingHeader() {
         </Link>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/forms"
-            className={`rounded-lg px-4 py-2 font-medium text-sm transition-colors md:px-5 md:text-[15px] ${
-              isFormsPage
-                ? "bg-[#fff1f1] text-[#f45f5f]"
-                : "text-[#4a4444] hover:bg-[#f8f3f3]"
-            }`}
-          >
-            양식 모음
-          </Link>
           <Link
             href={`${process.env.NEXT_PUBLIC_USER_URL}`}
             className="rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80"

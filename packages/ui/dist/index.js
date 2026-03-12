@@ -99,7 +99,6 @@ function Footer() {
 // src/components/common/header/LandingHeader.tsx
 var import_image2 = __toESM(require("next/image"));
 var import_link = __toESM(require("next/link"));
-var import_navigation = require("next/navigation");
 
 // src/components/common/header/useHeaderVisibility.ts
 var import_react = require("react");
@@ -128,8 +127,6 @@ function useHeaderVisibility() {
 var import_jsx_runtime2 = require("react/jsx-runtime");
 function LandingHeader() {
   const isVisible = useHeaderVisibility();
-  const pathname = (0, import_navigation.usePathname)();
-  const isFormsPage = pathname.startsWith("/forms");
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
     "header",
     {
@@ -145,24 +142,14 @@ function LandingHeader() {
             className: "h-6"
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-            import_link.default,
-            {
-              href: "/forms",
-              className: `rounded-lg px-4 py-2 font-medium text-sm transition-colors md:px-5 md:text-[15px] ${isFormsPage ? "bg-[#fff1f1] text-[#f45f5f]" : "text-[#4a4444] hover:bg-[#f8f3f3]"}`,
-              children: "\uC591\uC2DD \uBAA8\uC74C"
-            }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-            import_link.default,
-            {
-              href: `${process.env.NEXT_PUBLIC_USER_URL}`,
-              className: "rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80",
-              children: "\uC2DC\uC791\uD558\uAE30"
-            }
-          )
-        ] })
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+          import_link.default,
+          {
+            href: `${process.env.NEXT_PUBLIC_USER_URL}`,
+            className: "rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80",
+            children: "\uC2DC\uC791\uD558\uAE30"
+          }
+        ) })
       ] })
     }
   );
@@ -171,7 +158,7 @@ function LandingHeader() {
 // src/components/common/header/StudentHeader.tsx
 var import_image3 = __toESM(require("next/image"));
 var import_link2 = __toESM(require("next/link"));
-var import_navigation2 = require("next/navigation");
+var import_navigation = require("next/navigation");
 var import_react2 = require("react");
 var import_shared = require("shared");
 var import_jsx_runtime3 = require("react/jsx-runtime");
@@ -189,7 +176,7 @@ function StudentHeader() {
   const isVisible = useHeaderVisibility();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react2.useState)(false);
   const [isDropdownOpen, setIsDropdownOpen] = (0, import_react2.useState)(false);
-  const pathname = (0, import_navigation2.usePathname)();
+  const pathname = (0, import_navigation.usePathname)();
   const userInfo = (0, import_shared.useUserStore)((state) => state.userInfo);
   const webUrl = (process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000").trim().replace(/\/$/, "");
   const webLoginUrl = `${webUrl}/login`;
