@@ -1,8 +1,6 @@
 export { AdminProfileHeader } from "./AdminProfileHeader";
 export type { AdminTab } from "./AdminSidebar";
 export { AdminSidebar } from "./AdminSidebar";
-export { ClubCreationDownloadCard } from "./ClubCreationDownloadCard";
-export { ClubCreationDownloadPreview } from "./ClubCreationDownloadPreview";
 export { ClubCreationTab } from "./ClubCreationTab";
 export { DissolutionTab } from "./DissolutionTab";
 export { OverviewTab } from "./OverviewTab";

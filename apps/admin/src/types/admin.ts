@@ -92,12 +92,6 @@ export interface AdminClubAnnouncementResponse {
   clubAnnouncements: AdminClubAnnouncement[];
 }
 
-export interface AdminClubCreationFormDownload {
-  clubCreationFormId?: number;
-  fileName: string;
-  fileUrl: string;
-}
-
 export interface AdminClubCreationApplication {
   clubId: number;
   clubName: string;

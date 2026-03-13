@@ -2,7 +2,6 @@ import { apiClient } from "utils";
 import type {
   AdminClubCreationApplication,
   AdminClubCreationApplicationsResponse,
-  AdminClubCreationFormDownload,
   ResultDurationResponse,
 } from "@/types/admin";
 
@@ -48,14 +47,6 @@ export const decideDissolution = async (
     data: { isDecision },
   });
 };
-
-export const downloadClubCreationApplicationForm =
-  async (): Promise<AdminClubCreationFormDownload> => {
-    const response = await apiClient.get<AdminClubCreationFormDownload>(
-      "/club-creation-form",
-    );
-    return response.data;
-  };
 
 export const getClubCreationApplications = async (): Promise<
   AdminClubCreationApplication[]

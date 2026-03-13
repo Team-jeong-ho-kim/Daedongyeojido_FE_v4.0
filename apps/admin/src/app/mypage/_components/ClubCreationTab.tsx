@@ -8,17 +8,13 @@ import {
 } from "@/hooks/mutations";
 import { useGetClubCreationApplicationsQuery } from "@/hooks/querys";
 import { toErrorMessage } from "../_lib";
-import { ClubCreationDownloadCard } from "./ClubCreationDownloadCard";
 import { PanelCard } from "./PanelCard";
 
 export function ClubCreationTab() {
   const decideClubApplicationMutation = useDecideClubApplicationMutation();
   const clubCreationApplicationsQuery =
     useGetClubCreationApplicationsQuery(false);
-  const [clubCreationFormId, setClubCreationFormId] = useState<number | null>(
-    null,
-  );
-  const [downloadCardKey, setDownloadCardKey] = useState(0);
+  const [clubCreationFormIdInput, setClubCreationFormIdInput] = useState("");
 
   const [uploadName, setUploadName] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -76,8 +72,6 @@ export function ClubCreationTab() {
         fileUrl: uploadFile,
         fileName: uploadName.trim(),
       });
-      setClubCreationFormId(null);
-      setDownloadCardKey((prev) => prev + 1);
       setUploadName("");
       setUploadFile(null);
       setUploadFileInputKey((prev) => prev + 1);
@@ -85,15 +79,22 @@ export function ClubCreationTab() {
   };
 
   const handleDeleteClubCreationForm = async () => {
-    if (!clubCreationFormId) {
-      toast.error("먼저 삭제할 개설 양식을 조회해 주세요.");
+    const parsedClubCreationFormId = Number(clubCreationFormIdInput.trim());
+
+    if (
+      !clubCreationFormIdInput.trim() ||
+      !Number.isInteger(parsedClubCreationFormId) ||
+      parsedClubCreationFormId <= 0
+    ) {
+      toast.error("삭제할 개설 양식 ID를 올바르게 입력해 주세요.");
       return;
     }
 
     try {
-      await deleteClubCreationFormMutation.mutateAsync(clubCreationFormId);
-      setClubCreationFormId(null);
-      setDownloadCardKey((prev) => prev + 1);
+      await deleteClubCreationFormMutation.mutateAsync(
+        parsedClubCreationFormId,
+      );
+      setClubCreationFormIdInput("");
     } catch {}
   };
 
@@ -199,11 +200,6 @@ export function ClubCreationTab() {
         ) : null}
       </PanelCard>
 
-      <ClubCreationDownloadCard
-        key={downloadCardKey}
-        onFetchedFormIdChange={setClubCreationFormId}
-      />
-
       <PanelCard
         title="동아리 개설 양식 업로드"
         description="한글(HWP) 또는 PDF 양식을 등록합니다."
@@ -240,21 +236,23 @@ export function ClubCreationTab() {
 
       <PanelCard
         title="동아리 개설 양식 삭제"
-        description="조회한 개설 양식을 바로 삭제합니다."
+        description="삭제할 개설 양식 ID를 직접 입력해 삭제합니다."
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-gray-600 text-sm">
-            {clubCreationFormId
-              ? `조회된 개설 양식 ID: ${clubCreationFormId}`
-              : "먼저 상단에서 개설 양식을 조회해 주세요."}
-          </p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <input
+            type="number"
+            min={1}
+            inputMode="numeric"
+            value={clubCreationFormIdInput}
+            onChange={(event) => setClubCreationFormIdInput(event.target.value)}
+            placeholder="개설 양식 ID"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 md:max-w-xs"
+          />
           <button
             type="button"
             className="rounded-lg bg-[#DC2626] px-4 py-2 font-medium text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
             onClick={handleDeleteClubCreationForm}
-            disabled={
-              deleteClubCreationFormMutation.isPending || !clubCreationFormId
-            }
+            disabled={deleteClubCreationFormMutation.isPending}
           >
             {deleteClubCreationFormMutation.isPending ? "삭제 중..." : "삭제"}
           </button>
