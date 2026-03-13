@@ -9,7 +9,7 @@ type ClubCreationFormSectionProps = {
   embedded?: boolean;
 };
 
-const previewPdfPath = encodeURI("/documents/2026 동아리 개설 양식.pdf");
+const previewPdfPath = "/documents/club-creation-form-preview.pdf";
 
 const getDownloadFileName = (fileName: string, fileUrl: string) => {
   const sanitizedFileName = fileName.trim();
