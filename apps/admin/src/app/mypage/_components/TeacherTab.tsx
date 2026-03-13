@@ -43,48 +43,52 @@ export function TeacherTab() {
         data-form-type="other"
         data-lpignore="true"
         data-1p-ignore="true"
-        className="grid gap-3"
+        className="space-y-3"
         onSubmit={handleAddTeacher}
       >
-        <input
-          value={teacherName}
-          onChange={(event) => setTeacherName(event.target.value)}
-          placeholder="지도 교사 이름"
-          autoComplete="off"
-          disabled={addTeacherMutation.isPending}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
-        />
-        <input
-          value={accountId}
-          onChange={(event) => setAccountId(event.target.value)}
-          placeholder="계정 ID"
-          autoComplete="off"
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          disabled={addTeacherMutation.isPending}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="비밀번호"
-          autoComplete="new-password"
-          data-form-type="other"
-          data-lpignore="true"
-          data-1p-ignore="true"
-          disabled={addTeacherMutation.isPending}
-          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
-        />
+        <div className="grid max-w-md gap-3">
+          <input
+            value={teacherName}
+            onChange={(event) => setTeacherName(event.target.value)}
+            placeholder="지도 교사 이름"
+            autoComplete="off"
+            disabled={addTeacherMutation.isPending}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+          />
+          <input
+            value={accountId}
+            onChange={(event) => setAccountId(event.target.value)}
+            placeholder="계정 ID"
+            autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            disabled={addTeacherMutation.isPending}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="비밀번호"
+            autoComplete="new-password"
+            data-form-type="other"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            disabled={addTeacherMutation.isPending}
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+          />
+        </div>
 
-        <button
-          type="submit"
-          className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={addTeacherMutation.isPending}
-        >
-          {addTeacherMutation.isPending ? "추가 중..." : "지도 교사 추가"}
-        </button>
+        <div className="mt-3">
+          <button
+            type="submit"
+            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={addTeacherMutation.isPending}
+          >
+            {addTeacherMutation.isPending ? "추가 중..." : "지도 교사 추가"}
+          </button>
+        </div>
       </form>
     </PanelCard>
   );
