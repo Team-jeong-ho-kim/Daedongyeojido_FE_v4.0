@@ -61,7 +61,20 @@ test.describe("Student documents", () => {
     await expect(page.getByText("HWP", { exact: true })).toBeVisible();
     await expect(page.getByText("PDF", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "다운로드" })).toHaveCount(2);
-    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(2);
+    await expect(page.getByText(/양식 ID #/)).toHaveCount(0);
+
+    await page.getByRole("button", { name: "미리보기" }).first().click();
+    await expect(
+      page.getByRole("heading", { name: "PDF 미리보기" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("2026 동아리 개설 신청 양식.hwp"),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("heading", { name: "PDF 미리보기" }),
+    ).toHaveCount(0);
 
     const downloadRequest = page.waitForRequest(
       "https://files.test/club-creation-form.hwp",

@@ -6,7 +6,7 @@ import ClubCreationFormSection from "@/components/main/documents/ClubCreationFor
 export const metadata: Metadata = {
   title: "양식 조회",
   description:
-    "동아리 개설 신청에 필요한 양식을 바로 확인하고 다운로드할 수 있습니다.",
+    "동아리 개설 신청에 필요한 양식을 확인하고 미리보기 또는 다운로드할 수 있습니다.",
 };
 
 export default function DocumentPage() {
@@ -17,9 +17,9 @@ export default function DocumentPage() {
           <div className="max-w-3xl">
             <h1 className="font-bold text-3xl text-gray-900">양식 조회</h1>
             <p className="mt-3 text-gray-600 text-sm leading-6 md:text-base">
-              현재는 동아리 개설 신청 양식을 제공합니다. 등록된 양식을 바로
-              다운로드한 뒤, 작성 완료 후 개설 신청 페이지에서 업로드해 제출할
-              수 있습니다.
+              현재는 동아리 개설 신청 양식을 제공합니다. 등록된 양식을
+              미리보거나 다운로드한 뒤, 작성 완료 후 개설 신청 페이지에서
+              업로드해 제출할 수 있습니다.
             </p>
           </div>
 
