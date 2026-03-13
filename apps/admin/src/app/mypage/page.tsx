@@ -14,6 +14,7 @@ import {
   DissolutionTab,
   OverviewTab,
   ResultDurationTab,
+  TeacherTab,
 } from "./_components";
 
 export default function AdminMyPage() {
@@ -95,6 +96,8 @@ export default function AdminMyPage() {
               {activeTab === "clubCreation" ? <ClubCreationTab /> : null}
 
               {activeTab === "dissolution" ? <DissolutionTab /> : null}
+
+              {activeTab === "teacher" ? <TeacherTab /> : null}
             </div>
           </section>
         </div>

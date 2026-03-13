@@ -2,7 +2,8 @@ export type AdminTab =
   | "overview"
   | "resultDuration"
   | "clubCreation"
-  | "dissolution";
+  | "dissolution"
+  | "teacher";
 
 type AdminSidebarProps = {
   activeTab: AdminTab;
@@ -16,6 +17,7 @@ const tabLabels: Array<{ tab: AdminTab; label: string }> = [
   { tab: "resultDuration", label: "결과 발표 기간" },
   { tab: "clubCreation", label: "동아리 개설" },
   { tab: "dissolution", label: "동아리 해체" },
+  { tab: "teacher", label: "지도 교사" },
 ];
 
 const getTabButtonClass = (activeTab: AdminTab, tab: AdminTab) =>

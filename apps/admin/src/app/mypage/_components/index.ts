@@ -8,3 +8,4 @@ export { DissolutionTab } from "./DissolutionTab";
 export { OverviewTab } from "./OverviewTab";
 export { PanelCard } from "./PanelCard";
 export { ResultDurationTab } from "./ResultDurationTab";
+export { TeacherTab } from "./TeacherTab";
