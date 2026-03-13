@@ -1,5 +1,4 @@
 export type AdminTab =
-  | "overview"
   | "resultDuration"
   | "clubCreation"
   | "dissolution"
@@ -13,7 +12,6 @@ type AdminSidebarProps = {
 };
 
 const tabLabels: Array<{ tab: AdminTab; label: string }> = [
-  { tab: "overview", label: "조회" },
   { tab: "resultDuration", label: "결과 발표 기간" },
   { tab: "clubCreation", label: "동아리 개설" },
   { tab: "dissolution", label: "동아리 해체" },

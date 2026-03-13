@@ -12,13 +12,12 @@ import {
   type AdminTab,
   ClubCreationTab,
   DissolutionTab,
-  OverviewTab,
   ResultDurationTab,
   TeacherTab,
 } from "./_components";
 
 export default function AdminMyPage() {
-  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
+  const [activeTab, setActiveTab] = useState<AdminTab>("resultDuration");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const logoutModalTitleId = useId();
   const { isAuthorized, isBooting, userInfo } = useAdminAuth();
@@ -79,16 +78,6 @@ export default function AdminMyPage() {
             />
 
             <div className="space-y-5">
-              {activeTab === "overview" ? (
-                <OverviewTab
-                  isRefreshingOverview={overviewQuery.isFetching}
-                  onRefresh={() => {
-                    void overviewQuery.refetch();
-                  }}
-                  resultDurationInfo={resultDurationInfo}
-                />
-              ) : null}
-
               {activeTab === "resultDuration" ? (
                 <ResultDurationTab resultDurationInfo={resultDurationInfo} />
               ) : null}

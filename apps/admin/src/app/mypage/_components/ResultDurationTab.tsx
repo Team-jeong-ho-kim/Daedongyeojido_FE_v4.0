@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { type ChangeEvent, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -170,6 +171,10 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
   const hasExistingResultDuration = Boolean(resultDurationInfo?.resultDuration);
   const resultDurationId = resultDurationInfo?.resultDurationId ?? null;
 
+  const formattedDate = dayjs(resultDurationInfo?.resultDuration).format(
+    "YYYY년 MM월 DD일 (HH:mm:ss)",
+  );
+
   const handleSetResultDuration = async () => {
     if (hasExistingResultDuration) {
       toast.error("이미 발표 기간이 존재합니다.");
@@ -213,7 +218,9 @@ export function ResultDurationTab(props: ResultDurationTabProps) {
         description="현재 결과 발표 기간입니다."
       >
         <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm">
-          {resultDurationInfo?.resultDuration || "설정된 발표 기간이 없습니다."}
+          {resultDurationInfo?.resultDuration
+            ? formattedDate
+            : "설정된 발표 기간이 없습니다."}
         </p>
       </PanelCard>
 
