@@ -77,7 +77,7 @@ export default function ClubCreationFormSection({
   }, [documentFilesQuery.error]);
 
   const handleDownload = async (file: DocumentFileItem) => {
-    setDownloadingFileId(file.clubCreationFormId);
+    setDownloadingFileId(file.fileId);
     try {
       await downloadFileFromUrl(file.fileUrl, file.fileName);
       toast.success("동아리 개설 양식을 다운로드했습니다.");
@@ -146,12 +146,11 @@ export default function ClubCreationFormSection({
                 file.fileName,
                 file.fileUrl,
               );
-              const isDownloading =
-                downloadingFileId === file.clubCreationFormId;
+              const isDownloading = downloadingFileId === file.fileId;
 
               return (
                 <article
-                  key={file.clubCreationFormId}
+                  key={file.fileId}
                   className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -164,7 +163,7 @@ export default function ClubCreationFormSection({
                           {downloadFileName}
                         </p>
                         <p className="mt-1 text-[12px] text-gray-500">
-                          동아리 개설 양식 문서
+                          양식 ID #{file.fileId}
                         </p>
                       </div>
                     </div>

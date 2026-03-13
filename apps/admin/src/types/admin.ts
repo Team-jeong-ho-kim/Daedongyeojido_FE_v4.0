@@ -105,7 +105,7 @@ export interface AdminClubCreationApplicationsResponse {
 }
 
 export interface DocumentFileItem {
-  clubCreationFormId: number;
+  fileId: number;
   fileName: string;
   fileUrl: string;
 }

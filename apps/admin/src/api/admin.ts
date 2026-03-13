@@ -64,11 +64,9 @@ export const uploadClubCreationForm = async (
   formData.append("fileUrl", payload.fileUrl, payload.fileUrl.name);
   formData.append("fileName", payload.fileName);
 
-  await apiClient.post("/admin/club-creation-form", formData);
+  await apiClient.post("/files", formData);
 };
 
-export const deleteClubCreationForm = async (
-  clubCreationFormId: number,
-): Promise<void> => {
-  await apiClient.delete(`/admin/club-creation-form/${clubCreationFormId}`);
+export const deleteClubCreationForm = async (fileId: number): Promise<void> => {
+  await apiClient.delete(`/files/${fileId}`);
 };

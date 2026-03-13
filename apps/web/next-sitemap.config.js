@@ -1,5 +1,5 @@
 /** @type {import('next-sitemap').IConfig} */
-module.exports = {
+const config = {
   siteUrl: process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000",
   generateRobotsTxt: true,
   generateIndexSitemap: false,
@@ -17,3 +17,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

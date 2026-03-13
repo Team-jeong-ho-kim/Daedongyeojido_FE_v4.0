@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "dotenv -o -e ../../.env.local -- next dev",
     "dev:stag": "dotenv -o -e ../../.env.stag -- next dev",

@@ -87,6 +87,12 @@ type MockAlarm = {
   isExecuted?: boolean;
 };
 
+type MockDocumentFile = {
+  fileId: number;
+  fileName: string;
+  fileUrl: string;
+};
+
 type RecordedRequest = {
   method: string;
   pathname: string;
@@ -114,6 +120,7 @@ type StudentApiMockOptions = {
   userAlarms?: MockAlarm[];
   clubAlarms?: MockAlarm[];
   clubAnnouncements?: MockAnnouncementListItem[];
+  documentFiles?: MockDocumentFile[];
 };
 
 const DEFAULT_USER: MockUser = {
@@ -216,6 +223,14 @@ const DEFAULT_CLUB_ALARMS: MockAlarm[] = [
     title: "동아리 공지",
     content: "다음 주 정기 회의가 예정되어 있습니다.",
     category: "COMMON",
+  },
+];
+
+const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
+  {
+    fileId: 1,
+    fileName: "2026 동아리 개설 신청 양식",
+    fileUrl: "https://files.test/club-creation-form.hwp",
   },
 ];
 
@@ -325,6 +340,7 @@ export async function installStudentApiMocks(
   const applicants = options.applicants ?? DEFAULT_APPLICANTS.slice();
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
+  const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
 
   const requests: RecordedRequest[] = [];
 
@@ -553,6 +569,18 @@ export async function installStudentApiMocks(
 
     await createJsonResponse(route, {
       alarms: clubAlarms,
+    });
+  });
+
+  await page.route(/.*\/files$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    await createJsonResponse(route, {
+      fileResponses: documentFiles,
     });
   });
 

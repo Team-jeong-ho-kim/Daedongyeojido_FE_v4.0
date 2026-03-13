@@ -29,7 +29,7 @@ export interface ApplicationFormsResponse {
 }
 
 export interface DocumentFileItem {
-  clubCreationFormId: number;
+  fileId: number;
   fileName: string;
   fileUrl: string;
 }
