@@ -85,6 +85,16 @@ export default function AdminHeader() {
               >
                 공고
               </Link>
+              <Link
+                href="/documents"
+                className={`text-[15px] transition-colors ${
+                  pathname?.startsWith("/documents")
+                    ? "font-semibold text-gray-900"
+                    : "font-normal text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                양식
+              </Link>
             </nav>
           </div>
 
@@ -182,6 +192,17 @@ export default function AdminHeader() {
             }`}
           >
             공고
+          </Link>
+          <Link
+            href="/documents"
+            onClick={handleLinkClick}
+            className={`border-gray-100 border-b py-4 text-[15px] transition-colors ${
+              pathname?.startsWith("/documents")
+                ? "font-semibold text-gray-900"
+                : "font-normal text-gray-600"
+            }`}
+          >
+            양식
           </Link>
           <div className="mt-6 flex flex-col gap-3">
             <Link

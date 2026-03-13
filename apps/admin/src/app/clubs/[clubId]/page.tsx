@@ -2,6 +2,7 @@
 
 export const runtime = "edge";
 
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import JobPostingItem from "@/components/club/item/JobPostingItem";
@@ -155,10 +156,12 @@ export default function AdminClubDetailPage() {
               <div className="flex items-center gap-4">
                 <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                   {clubDetail.club.clubImage ? (
-                    <img
+                    <Image
                       src={clubDetail.club.clubImage}
                       alt="동아리 이미지"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="80px"
+                      className="object-cover"
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-[12px] text-gray-400">

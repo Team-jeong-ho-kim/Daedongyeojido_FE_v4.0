@@ -1,6 +1,4 @@
 export {
-  downloadFileFromUrl,
-  getDownloadFileName,
   moveToWebLogin,
   toDateText,
   toErrorMessage,

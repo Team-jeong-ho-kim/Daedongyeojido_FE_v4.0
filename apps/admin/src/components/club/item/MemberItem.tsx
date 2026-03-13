@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface MemberItemProps {
   userName: string;
   majors: string[];
@@ -19,11 +21,19 @@ export default function MemberItem({
   return (
     <article className="group relative z-0 h-[250px] w-full select-none overflow-visible rounded-[14px] shadow-sm transition-all duration-300 hover:z-50 hover:shadow-xl md:h-[270px] md:rounded-[16px] lg:h-[285px] lg:w-[240px]">
       <div className="relative h-[140px] w-full overflow-hidden rounded-t-[14px] bg-gray-200 md:h-[155px] md:rounded-t-[16px] lg:h-[165px]">
-        <img
-          src={profileImage}
-          alt={`${userName} 프로필`}
-          className="h-full w-full object-cover"
-        />
+        {profileImage?.trim() ? (
+          <Image
+            src={profileImage}
+            alt={`${userName} 프로필`}
+            fill
+            sizes="240px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-[12px] text-gray-400">
+            No Image
+          </div>
+        )}
       </div>
 
       <div className="flex h-[110px] flex-col gap-1.5 rounded-b-[14px] bg-gray-50 p-3 transition-shadow duration-200 group-hover:shadow-xl md:h-[115px] md:rounded-b-[16px] md:p-4 lg:h-[120px]">

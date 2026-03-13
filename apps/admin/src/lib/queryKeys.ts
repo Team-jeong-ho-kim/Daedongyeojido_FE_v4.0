@@ -4,6 +4,7 @@ export const queryKeys = createQueryKeyStore({
   admin: {
     overview: null,
     resultDuration: null,
+    documentFiles: null,
     clubCreationApplications: null,
   },
   clubs: {

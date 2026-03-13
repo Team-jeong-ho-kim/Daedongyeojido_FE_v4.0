@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useGetDocumentFilesQuery } from "@/hooks/querys";
+import { downloadFileFromUrl, getDownloadFileName } from "@/lib";
+import type { DocumentFileItem } from "@/types/admin";
+
+const getFileExtensionLabel = (fileName: string, fileUrl: string) => {
+  const downloadFileName = getDownloadFileName(fileName, fileUrl);
+  const extension = downloadFileName.split(".").pop()?.trim();
+
+  return extension ? extension.toUpperCase() : "FILE";
+};
+
+export default function DocumentFilesSection() {
+  const documentFilesQuery = useGetDocumentFilesQuery();
+  const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
+    null,
+  );
+  const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
+
+  useEffect(() => {
+    if (!documentFilesQuery.error) {
+      return;
+    }
+
+    toast.error("동아리 개설 양식을 불러오지 못했습니다.");
+  }, [documentFilesQuery.error]);
+
+  const handleDownload = async (file: DocumentFileItem) => {
+    setDownloadingFileId(file.clubCreationFormId);
+    try {
+      await downloadFileFromUrl(file.fileUrl, file.fileName);
+      toast.success("동아리 개설 양식을 다운로드했습니다.");
+    } catch {
+      toast.error("동아리 개설 양식 다운로드에 실패했습니다.");
+    } finally {
+      setDownloadingFileId(null);
+    }
+  };
+
+  return (
+    <div className="overflow-hidden rounded-[5px] border border-gray-200 bg-white p-6 md:p-8">
+      <div className="flex flex-col gap-4">
+        {documentFilesQuery.isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={`admin-document-file-skeleton-${index + 1}`}
+                className="animate-pulse rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="h-11 w-11 rounded-lg bg-gray-200" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-40 rounded bg-gray-200" />
+                    <div className="h-3 w-28 rounded bg-gray-100" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading && documentFilesQuery.isError ? (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-red-700 text-sm">
+            양식을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading &&
+        !documentFilesQuery.isError &&
+        documentFiles.length === 0 ? (
+          <div className="rounded-xl border border-gray-200 border-dashed bg-gray-50 px-4 py-6 text-center text-gray-500 text-sm">
+            등록된 양식이 없습니다.
+          </div>
+        ) : null}
+
+        {!documentFilesQuery.isLoading &&
+        !documentFilesQuery.isError &&
+        documentFiles.length > 0 ? (
+          <div className="space-y-3">
+            {documentFiles.map((file) => {
+              const downloadFileName = getDownloadFileName(
+                file.fileName,
+                file.fileUrl,
+              );
+              const fileExtensionLabel = getFileExtensionLabel(
+                file.fileName,
+                file.fileUrl,
+              );
+              const isDownloading =
+                downloadingFileId === file.clubCreationFormId;
+
+              return (
+                <article
+                  key={file.clubCreationFormId}
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
+                >
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
+                        {fileExtensionLabel}
+                      </div>
+                      <div className="min-w-0 flex-1 break-all font-medium text-gray-900 text-sm md:text-base">
+                        {downloadFileName}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(file)}
+                        disabled={downloadingFileId !== null}
+                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isDownloading ? "다운로드 중..." : "다운로드"}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}

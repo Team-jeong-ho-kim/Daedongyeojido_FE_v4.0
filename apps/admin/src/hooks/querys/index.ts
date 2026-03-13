@@ -12,3 +12,4 @@ export {
   useGetClubAnnouncementsQuery,
   useGetClubDetailQuery,
 } from "./useClubQuery";
+export { useGetDocumentFilesQuery } from "./useDocumentQuery";
