@@ -4,7 +4,7 @@ import DocumentFilesSection from "@/components/documents/DocumentFilesSection";
 export const metadata: Metadata = {
   title: "양식 조회",
   description:
-    "등록된 동아리 개설 신청 양식을 확인하고 바로 다운로드할 수 있습니다.",
+    "등록된 동아리 개설 신청 양식을 확인하고 HWP 또는 PDF 문서를 바로 미리볼 수 있습니다.",
 };
 
 export default function DocumentsPage() {

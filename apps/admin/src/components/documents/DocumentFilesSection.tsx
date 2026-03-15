@@ -2,22 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { DocumentPreviewFallbackPanel, DocumentPreviewModal } from "ui";
+import {
+  buildDocumentPreviewSrc,
+  getDocumentFileExtensionLabel,
+  removeDocumentPreviewPayload,
+  saveDocumentPreviewPayload,
+} from "utils";
 import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import { downloadFileFromUrl, getDownloadFileName } from "@/lib";
 import type { DocumentFileItem } from "@/types/admin";
-
-const getFileExtensionLabel = (fileName: string, fileUrl: string) => {
-  const downloadFileName = getDownloadFileName(fileName, fileUrl);
-  const extension = downloadFileName.split(".").pop()?.trim();
-
-  return extension ? extension.toUpperCase() : "FILE";
-};
 
 export default function DocumentFilesSection() {
   const documentFilesQuery = useGetDocumentFilesQuery();
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
+  const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
 
   useEffect(() => {
@@ -27,6 +29,23 @@ export default function DocumentFilesSection() {
 
     toast.error("동아리 개설 양식을 불러오지 못했습니다.");
   }, [documentFilesQuery.error]);
+
+  useEffect(() => {
+    if (!previewFile) {
+      return;
+    }
+
+    const exists = documentFiles.some(
+      (file) => file.fileId === previewFile.fileId,
+    );
+    if (!exists) {
+      if (previewKey) {
+        removeDocumentPreviewPayload(previewKey);
+      }
+      setPreviewFile(null);
+      setPreviewKey(null);
+    }
+  }, [documentFiles, previewFile, previewKey]);
 
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
@@ -38,6 +57,29 @@ export default function DocumentFilesSection() {
     } finally {
       setDownloadingFileId(null);
     }
+  };
+
+  const closePreview = () => {
+    if (previewKey) {
+      removeDocumentPreviewPayload(previewKey);
+    }
+
+    setPreviewFile(null);
+    setPreviewKey(null);
+  };
+
+  const openPreview = (file: DocumentFileItem) => {
+    if (previewKey) {
+      removeDocumentPreviewPayload(previewKey);
+    }
+
+    const nextPreviewKey = saveDocumentPreviewPayload({
+      fileName: getDownloadFileName(file.fileName, file.fileUrl),
+      fileUrl: file.fileUrl,
+    });
+
+    setPreviewKey(nextPreviewKey);
+    setPreviewFile(file);
   };
 
   return (
@@ -85,7 +127,7 @@ export default function DocumentFilesSection() {
                 file.fileName,
                 file.fileUrl,
               );
-              const fileExtensionLabel = getFileExtensionLabel(
+              const fileExtensionLabel = getDocumentFileExtensionLabel(
                 file.fileName,
                 file.fileUrl,
               );
@@ -120,6 +162,13 @@ export default function DocumentFilesSection() {
                       >
                         {isDownloading ? "다운로드 중..." : "다운로드"}
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => openPreview(file)}
+                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                      >
+                        미리보기
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -128,6 +177,29 @@ export default function DocumentFilesSection() {
           </div>
         ) : null}
       </div>
+
+      <DocumentPreviewModal
+        fileName={
+          previewFile
+            ? getDownloadFileName(previewFile.fileName, previewFile.fileUrl)
+            : ""
+        }
+        isOpen={previewFile !== null}
+        onClose={closePreview}
+      >
+        {previewFile && previewKey ? (
+          <iframe
+            title="문서 미리보기"
+            src={buildDocumentPreviewSrc(previewKey)}
+            className="h-full min-h-[70vh] w-full bg-transparent"
+          />
+        ) : (
+          <DocumentPreviewFallbackPanel
+            message="문서 미리보기 경로를 확인할 수 없습니다."
+            minHeightClassName="min-h-[70vh]"
+          />
+        )}
+      </DocumentPreviewModal>
     </div>
   );
 }

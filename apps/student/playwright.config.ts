@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3001";
+const reuseExistingServer = process.env.PLAYWRIGHT_REUSE_SERVER === "1";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -22,10 +23,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-    url: baseURL,
-  },
+  webServer: reuseExistingServer
+    ? undefined
+    : {
+        command: "pnpm dev",
+        reuseExistingServer: false,
+        timeout: 120000,
+        url: baseURL,
+      },
 });

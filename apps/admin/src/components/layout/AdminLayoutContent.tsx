@@ -12,7 +12,9 @@ export default function AdminLayoutContent(props: AdminLayoutContentProps) {
   return (
     <>
       <AdminHeader />
-      <div className="pt-14">{children}</div>
+      <div className="pt-14" data-layout-content-offset>
+        {children}
+      </div>
     </>
   );
 }
