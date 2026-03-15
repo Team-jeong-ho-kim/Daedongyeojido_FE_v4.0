@@ -115,9 +115,14 @@ export const useDeleteClubCreationFormMutation = () => {
     mutationFn: (clubCreationFormId: number) =>
       deleteClubCreationForm(clubCreationFormId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.overview.queryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.overview.queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.documentFiles.queryKey,
+        }),
+      ]);
       toast.success("동아리 개설 양식을 삭제했습니다.");
     },
     onError: (error: unknown) => {
