@@ -9,6 +9,14 @@ export type DocumentPreviewPayload = {
   fileUrl: string;
 };
 
+export type DocumentPreviewFrameStatus = "loading" | "ready";
+
+export type DocumentPreviewFrameStatusMessage = {
+  previewKey: string;
+  source: "document-preview-frame-status";
+  status: DocumentPreviewFrameStatus;
+};
+
 const DOCUMENT_PREVIEW_STORAGE_KEY_PREFIX = "document-preview:";
 
 const getFileExtension = (
@@ -173,5 +181,42 @@ export const removeDocumentPreviewPayload = (previewKey: string) => {
 
   window.sessionStorage.removeItem(
     `${DOCUMENT_PREVIEW_STORAGE_KEY_PREFIX}${previewKey}`,
+  );
+};
+
+export const postDocumentPreviewFrameStatus = (
+  previewKey: string,
+  status: DocumentPreviewFrameStatus,
+) => {
+  if (
+    typeof window === "undefined" ||
+    !previewKey ||
+    window.parent === window
+  ) {
+    return;
+  }
+
+  const message: DocumentPreviewFrameStatusMessage = {
+    previewKey,
+    source: "document-preview-frame-status",
+    status,
+  };
+
+  window.parent.postMessage(message, window.location.origin);
+};
+
+export const isDocumentPreviewFrameStatusMessage = (
+  value: unknown,
+): value is DocumentPreviewFrameStatusMessage => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<DocumentPreviewFrameStatusMessage>;
+
+  return (
+    candidate.source === "document-preview-frame-status" &&
+    typeof candidate.previewKey === "string" &&
+    (candidate.status === "loading" || candidate.status === "ready")
   );
 };

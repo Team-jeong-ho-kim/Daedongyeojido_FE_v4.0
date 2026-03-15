@@ -7,6 +7,7 @@ import {
   buildDocumentPreviewSrc,
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
+  isDocumentPreviewFrameStatusMessage,
   removeDocumentPreviewPayload,
   saveDocumentPreviewPayload,
 } from "utils";
@@ -48,6 +49,7 @@ export function ClubCreationFormSection({
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
@@ -73,10 +75,34 @@ export function ClubCreationFormSection({
       if (previewKey) {
         removeDocumentPreviewPayload(previewKey);
       }
+      setIsPreviewLoading(false);
       setPreviewFile(null);
       setPreviewKey(null);
     }
   }, [documentFiles, previewFile, previewKey]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (!isDocumentPreviewFrameStatusMessage(event.data)) {
+        return;
+      }
+
+      if (!previewKey || event.data.previewKey !== previewKey) {
+        return;
+      }
+
+      setIsPreviewLoading(event.data.status === "loading");
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [previewKey]);
 
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
@@ -95,6 +121,7 @@ export function ClubCreationFormSection({
       removeDocumentPreviewPayload(previewKey);
     }
 
+    setIsPreviewLoading(false);
     setPreviewFile(null);
     setPreviewKey(null);
   };
@@ -109,6 +136,7 @@ export function ClubCreationFormSection({
       fileUrl: file.fileUrl,
     });
 
+    setIsPreviewLoading(true);
     setPreviewKey(nextPreviewKey);
     setPreviewFile(file);
   };
@@ -227,6 +255,9 @@ export function ClubCreationFormSection({
               previewFile.fileUrl,
             )
           : ""
+      }
+      hideHeader={
+        previewFile !== null && previewKey !== null && isPreviewLoading
       }
       isOpen={previewFile !== null}
       onClose={closePreview}

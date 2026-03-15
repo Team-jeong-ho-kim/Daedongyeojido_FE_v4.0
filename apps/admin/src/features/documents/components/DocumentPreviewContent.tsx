@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { DocumentPreviewViewport } from "ui";
-import { getDocumentPreviewMode } from "utils";
+import { getDocumentPreviewMode, postDocumentPreviewFrameStatus } from "utils";
 
 type DocumentPreviewContentProps = {
   fileName: string;
   fileUrl: string;
+  previewKey: string;
 };
 
 const PREVIEW_LAYOUT_STYLES = `
@@ -119,6 +120,7 @@ const withFilteredDebugLogs = <T,>(callback: () => T) => {
 export function DocumentPreviewContent({
   fileName,
   fileUrl,
+  previewKey,
 }: DocumentPreviewContentProps) {
   const previewMode = getDocumentPreviewMode(fileName, fileUrl);
   const [isLoading, setIsLoading] = useState(true);
@@ -226,6 +228,14 @@ export function DocumentPreviewContent({
       }
     };
   }, [fileName, fileUrl, previewMode]);
+
+  useEffect(() => {
+    if (!previewKey) {
+      return;
+    }
+
+    postDocumentPreviewFrameStatus(previewKey, isLoading ? "loading" : "ready");
+  }, [isLoading, previewKey]);
 
   return (
     <div data-doc-preview-page className="min-h-screen bg-gray-50 p-3 md:p-5">

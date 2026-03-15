@@ -6,6 +6,7 @@ import { DocumentPreviewFallbackPanel, DocumentPreviewModal } from "ui";
 import {
   buildDocumentPreviewSrc,
   getDocumentFileExtensionLabel,
+  isDocumentPreviewFrameStatusMessage,
   removeDocumentPreviewPayload,
   saveDocumentPreviewPayload,
 } from "utils";
@@ -18,6 +19,7 @@ export function DocumentFilesSection() {
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
   const [previewKey, setPreviewKey] = useState<string | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
@@ -42,10 +44,34 @@ export function DocumentFilesSection() {
       if (previewKey) {
         removeDocumentPreviewPayload(previewKey);
       }
+      setIsPreviewLoading(false);
       setPreviewFile(null);
       setPreviewKey(null);
     }
   }, [documentFiles, previewFile, previewKey]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (!isDocumentPreviewFrameStatusMessage(event.data)) {
+        return;
+      }
+
+      if (!previewKey || event.data.previewKey !== previewKey) {
+        return;
+      }
+
+      setIsPreviewLoading(event.data.status === "loading");
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [previewKey]);
 
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
@@ -64,6 +90,7 @@ export function DocumentFilesSection() {
       removeDocumentPreviewPayload(previewKey);
     }
 
+    setIsPreviewLoading(false);
     setPreviewFile(null);
     setPreviewKey(null);
   };
@@ -78,6 +105,7 @@ export function DocumentFilesSection() {
       fileUrl: file.fileUrl,
     });
 
+    setIsPreviewLoading(true);
     setPreviewKey(nextPreviewKey);
     setPreviewFile(file);
   };
@@ -183,6 +211,9 @@ export function DocumentFilesSection() {
           previewFile
             ? getDownloadFileName(previewFile.fileName, previewFile.fileUrl)
             : ""
+        }
+        hideHeader={
+          previewFile !== null && previewKey !== null && isPreviewLoading
         }
         isOpen={previewFile !== null}
         onClose={closePreview}
