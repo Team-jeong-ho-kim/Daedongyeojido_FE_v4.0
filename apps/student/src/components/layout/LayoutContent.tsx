@@ -10,7 +10,9 @@ export default function LayoutContent({
   return (
     <>
       <StudentHeaderWrapper />
-      <div className="pt-14">{children}</div>
+      <div className="pt-14" data-layout-content-offset>
+        {children}
+      </div>
     </>
   );
 }

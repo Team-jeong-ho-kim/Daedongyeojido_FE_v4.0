@@ -20,6 +20,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@ohah/hwpjs": "0.1.0-rc.8",
     "@lukemorales/query-key-factory": "^1.3.4",
     "@tanstack/react-query": "^5.62.14",
     "config-tailwind": "workspace:*",
