@@ -61,10 +61,10 @@ test.describe("Student documents", () => {
     await expect(page.getByText("HWP", { exact: true })).toBeVisible();
     await expect(page.getByText("PDF", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "다운로드" })).toHaveCount(2);
-    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(2);
+    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(1);
     await expect(page.getByText(/양식 ID #/)).toHaveCount(0);
 
-    await page.getByRole("button", { name: "미리보기" }).first().click();
+    await page.getByRole("button", { name: "미리보기" }).click();
     await expect(
       page.getByRole("heading", { name: "PDF 미리보기" }),
     ).toBeVisible();
