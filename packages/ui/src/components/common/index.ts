@@ -5,6 +5,7 @@ export { DocumentPreviewViewport } from "./DocumentPreviewViewport";
 export { default as Footer } from "./Footer";
 export { LandingHeader, StudentHeader } from "./Header";
 export { LoadingOverlay } from "./LoadingOverlay";
+export { ManualPdfPreviewModal } from "./ManualPdfPreviewModal";
 export {
   Skeleton,
   SkeletonAnnouncementCard,

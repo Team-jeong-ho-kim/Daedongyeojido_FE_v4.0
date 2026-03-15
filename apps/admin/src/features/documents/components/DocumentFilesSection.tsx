@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { DocumentPreviewFallbackPanel, DocumentPreviewModal } from "ui";
+import { ManualPdfPreviewModal } from "ui";
 import {
-  buildDocumentPreviewSrc,
   getDocumentFileExtensionLabel,
-  isDocumentPreviewFrameStatusMessage,
-  removeDocumentPreviewPayload,
-  saveDocumentPreviewPayload,
+  getDocumentPreviewPdfPath,
 } from "utils";
 import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import { downloadFileFromUrl, getDownloadFileName } from "@/lib";
@@ -19,10 +16,11 @@ export function DocumentFilesSection() {
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
-  const [previewKey, setPreviewKey] = useState<string | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
+  const previewPdfPath = previewFile
+    ? getDocumentPreviewPdfPath(previewFile.fileId)
+    : null;
 
   useEffect(() => {
     if (!documentFilesQuery.error) {
@@ -41,37 +39,15 @@ export function DocumentFilesSection() {
       (file) => file.fileId === previewFile.fileId,
     );
     if (!exists) {
-      if (previewKey) {
-        removeDocumentPreviewPayload(previewKey);
-      }
-      setIsPreviewLoading(false);
       setPreviewFile(null);
-      setPreviewKey(null);
     }
-  }, [documentFiles, previewFile, previewKey]);
+  }, [documentFiles, previewFile]);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      if (!isDocumentPreviewFrameStatusMessage(event.data)) {
-        return;
-      }
-
-      if (!previewKey || event.data.previewKey !== previewKey) {
-        return;
-      }
-
-      setIsPreviewLoading(event.data.status === "loading");
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, [previewKey]);
+    if (previewFile && !previewPdfPath) {
+      setPreviewFile(null);
+    }
+  }, [previewFile, previewPdfPath]);
 
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
@@ -86,27 +62,10 @@ export function DocumentFilesSection() {
   };
 
   const closePreview = () => {
-    if (previewKey) {
-      removeDocumentPreviewPayload(previewKey);
-    }
-
-    setIsPreviewLoading(false);
     setPreviewFile(null);
-    setPreviewKey(null);
   };
 
   const openPreview = (file: DocumentFileItem) => {
-    if (previewKey) {
-      removeDocumentPreviewPayload(previewKey);
-    }
-
-    const nextPreviewKey = saveDocumentPreviewPayload({
-      fileName: getDownloadFileName(file.fileName, file.fileUrl),
-      fileUrl: file.fileUrl,
-    });
-
-    setIsPreviewLoading(true);
-    setPreviewKey(nextPreviewKey);
     setPreviewFile(file);
   };
 
@@ -160,6 +119,7 @@ export function DocumentFilesSection() {
                 file.fileUrl,
               );
               const isDownloading = downloadingFileId === file.fileId;
+              const previewPath = getDocumentPreviewPdfPath(file.fileId);
 
               return (
                 <article
@@ -190,13 +150,15 @@ export function DocumentFilesSection() {
                       >
                         {isDownloading ? "다운로드 중..." : "다운로드"}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => openPreview(file)}
-                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
-                      >
-                        미리보기
-                      </button>
+                      {previewPath ? (
+                        <button
+                          type="button"
+                          onClick={() => openPreview(file)}
+                          className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                        >
+                          미리보기
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 </article>
@@ -206,31 +168,16 @@ export function DocumentFilesSection() {
         ) : null}
       </div>
 
-      <DocumentPreviewModal
+      <ManualPdfPreviewModal
         fileName={
           previewFile
             ? getDownloadFileName(previewFile.fileName, previewFile.fileUrl)
             : ""
         }
-        hideHeader={
-          previewFile !== null && previewKey !== null && isPreviewLoading
-        }
         isOpen={previewFile !== null}
         onClose={closePreview}
-      >
-        {previewFile && previewKey ? (
-          <iframe
-            title="문서 미리보기"
-            src={buildDocumentPreviewSrc(previewKey)}
-            className="h-full min-h-[70vh] w-full bg-transparent"
-          />
-        ) : (
-          <DocumentPreviewFallbackPanel
-            message="문서 미리보기 경로를 확인할 수 없습니다."
-            minHeightClassName="min-h-[70vh]"
-          />
-        )}
-      </DocumentPreviewModal>
+        pdfPath={previewPdfPath}
+      />
     </div>
   );
 }

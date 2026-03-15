@@ -33,18 +33,6 @@ test.describe("Student documents", () => {
       },
     );
 
-    await page.route(
-      "https://files.test/club-creation-form.pdf",
-      async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        await route.fulfill({
-          status: 200,
-          contentType: "application/pdf",
-          body: "mock-pdf",
-        });
-      },
-    );
-
     await page.goto("/documents");
 
     await expect(
@@ -62,21 +50,14 @@ test.describe("Student documents", () => {
     await expect(page.getByText("HWP", { exact: true })).toBeVisible();
     await expect(page.getByText("PDF", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "다운로드" })).toHaveCount(2);
-    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(2);
+    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(1);
     await expect(page.getByText(/양식 ID #/)).toHaveCount(0);
 
-    await page.getByRole("button", { name: "미리보기" }).nth(1).click();
+    await page.getByRole("button", { name: "미리보기" }).click();
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),
     ).toBeVisible();
-    const previewFrame = page.frameLocator('iframe[title="문서 미리보기"]');
-    await expect(page.locator('iframe[title="문서 미리보기"]')).toBeVisible();
-    await expect(
-      previewFrame.getByRole("status", { name: "문서 미리보기 로딩 중" }),
-    ).toBeVisible();
-    await expect(
-      previewFrame.locator('object[type="application/pdf"]'),
-    ).toBeVisible();
+    await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),

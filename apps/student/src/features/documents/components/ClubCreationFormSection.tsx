@@ -2,14 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { DocumentPreviewFallbackPanel, DocumentPreviewModal } from "ui";
+import { ManualPdfPreviewModal } from "ui";
 import {
-  buildDocumentPreviewSrc,
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
-  isDocumentPreviewFrameStatusMessage,
-  removeDocumentPreviewPayload,
-  saveDocumentPreviewPayload,
+  getDocumentPreviewPdfPath,
 } from "utils";
 import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import type { DocumentFileItem } from "@/types";
@@ -49,10 +46,11 @@ export function ClubCreationFormSection({
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
-  const [previewKey, setPreviewKey] = useState<string | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
+  const previewPdfPath = previewFile
+    ? getDocumentPreviewPdfPath(previewFile.fileId)
+    : null;
 
   useEffect(() => {
     if (!documentFilesQuery.error) {
@@ -72,37 +70,15 @@ export function ClubCreationFormSection({
     );
 
     if (!exists) {
-      if (previewKey) {
-        removeDocumentPreviewPayload(previewKey);
-      }
-      setIsPreviewLoading(false);
       setPreviewFile(null);
-      setPreviewKey(null);
     }
-  }, [documentFiles, previewFile, previewKey]);
+  }, [documentFiles, previewFile]);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      if (!isDocumentPreviewFrameStatusMessage(event.data)) {
-        return;
-      }
-
-      if (!previewKey || event.data.previewKey !== previewKey) {
-        return;
-      }
-
-      setIsPreviewLoading(event.data.status === "loading");
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, [previewKey]);
+    if (previewFile && !previewPdfPath) {
+      setPreviewFile(null);
+    }
+  }, [previewFile, previewPdfPath]);
 
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
@@ -117,27 +93,10 @@ export function ClubCreationFormSection({
   };
 
   const closePreview = () => {
-    if (previewKey) {
-      removeDocumentPreviewPayload(previewKey);
-    }
-
-    setIsPreviewLoading(false);
     setPreviewFile(null);
-    setPreviewKey(null);
   };
 
   const openPreview = (file: DocumentFileItem) => {
-    if (previewKey) {
-      removeDocumentPreviewPayload(previewKey);
-    }
-
-    const nextPreviewKey = saveDocumentPreviewPayload({
-      fileName: getDocumentDownloadFileName(file.fileName, file.fileUrl),
-      fileUrl: file.fileUrl,
-    });
-
-    setIsPreviewLoading(true);
-    setPreviewKey(nextPreviewKey);
     setPreviewFile(file);
   };
 
@@ -149,8 +108,8 @@ export function ClubCreationFormSection({
             동아리 개설 양식 목록
           </h2>
           <p className="text-gray-600 text-sm leading-6 md:text-base">
-            등록된 양식은 바로 다운로드할 수 있고, HWP나 PDF 문서는 브라우저에서
-            바로 미리보기로 확인할 수 있습니다.
+            등록된 양식은 바로 다운로드할 수 있고, 미리보기 PDF가 준비된 양식은
+            브라우저에서 바로 확인할 수 있습니다.
           </p>
         </div>
 
@@ -201,6 +160,7 @@ export function ClubCreationFormSection({
                 file.fileUrl,
               );
               const isDownloading = downloadingFileId === file.fileId;
+              const previewPath = getDocumentPreviewPdfPath(file.fileId);
 
               return (
                 <article
@@ -228,13 +188,15 @@ export function ClubCreationFormSection({
                       >
                         {isDownloading ? "다운로드 중..." : "다운로드"}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => openPreview(file)}
-                        className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
-                      >
-                        미리보기
-                      </button>
+                      {previewPath ? (
+                        <button
+                          type="button"
+                          onClick={() => openPreview(file)}
+                          className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                        >
+                          미리보기
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 </article>
@@ -247,7 +209,7 @@ export function ClubCreationFormSection({
   );
 
   const previewModal = (
-    <DocumentPreviewModal
+    <ManualPdfPreviewModal
       fileName={
         previewFile
           ? getDocumentDownloadFileName(
@@ -256,25 +218,10 @@ export function ClubCreationFormSection({
             )
           : ""
       }
-      hideHeader={
-        previewFile !== null && previewKey !== null && isPreviewLoading
-      }
       isOpen={previewFile !== null}
       onClose={closePreview}
-    >
-      {previewFile && previewKey ? (
-        <iframe
-          title="문서 미리보기"
-          src={buildDocumentPreviewSrc(previewKey)}
-          className="h-full min-h-[70vh] w-full bg-transparent"
-        />
-      ) : (
-        <DocumentPreviewFallbackPanel
-          message="문서 미리보기 경로를 확인할 수 없습니다."
-          minHeightClassName="min-h-[70vh]"
-        />
-      )}
-    </DocumentPreviewModal>
+      pdfPath={previewPdfPath}
+    />
   );
 
   if (embedded) {
