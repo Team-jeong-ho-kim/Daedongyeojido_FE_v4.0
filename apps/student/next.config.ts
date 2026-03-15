@@ -5,7 +5,8 @@ import type { NextConfig } from "next";
 
 const require = createRequire(import.meta.url);
 const hwpjsBrowserEntry = path.join(
-  path.dirname(require.resolve("@ohah/hwpjs-wasm32-wasi/package.json")),
+  path.dirname(require.resolve("@ohah/hwpjs/package.json")),
+  "dist",
   "hwpjs.wasi-browser.js",
 );
 
