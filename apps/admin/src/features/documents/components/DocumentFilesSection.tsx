@@ -13,7 +13,7 @@ import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import { downloadFileFromUrl, getDownloadFileName } from "@/lib";
 import type { DocumentFileItem } from "@/types/admin";
 
-export default function DocumentFilesSection() {
+export function DocumentFilesSection() {
   const documentFilesQuery = useGetDocumentFilesQuery();
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,

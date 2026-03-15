@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "ui";
-import ClubCreationFormSection from "@/components/main/documents/ClubCreationFormSection";
+import { ClubCreationFormSection } from "@/features/documents";
 
 export const metadata: Metadata = {
   title: "양식 조회",

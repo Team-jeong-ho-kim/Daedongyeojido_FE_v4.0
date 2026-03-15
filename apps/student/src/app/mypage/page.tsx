@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useUserStore } from "shared";
-import { useLogoutMutation } from "@/hooks/mutations/useAuth";
+import { useLogoutMutation } from "@/hooks/mutations";
 
 export default function MyPage() {
   const userInfo = useUserStore((state) => state.userInfo);

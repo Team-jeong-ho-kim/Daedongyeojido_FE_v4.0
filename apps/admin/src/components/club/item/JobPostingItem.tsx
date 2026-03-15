@@ -7,7 +7,7 @@ interface JobPostingItemProps {
   onClick?: () => void;
 }
 
-export default function JobPostingItem(props: JobPostingItemProps) {
+export function JobPostingItem(props: JobPostingItemProps) {
   const { status, title, date, onClick } = props;
 
   const statusLabel = status === "진행중" ? "OPEN" : "CLOSED";

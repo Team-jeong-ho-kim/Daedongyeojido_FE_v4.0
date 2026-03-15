@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "ui";
-import { AnimatedSection } from "@/components/landing/AnimatedSection";
-import { mobileCards } from "@/components/landing/data";
-import { FloatingCards } from "@/components/landing/FloatingCards";
-import { ImageCarousel } from "@/components/landing/ImageCarousel";
+import {
+  AnimatedSection,
+  FloatingCards,
+  ImageCarousel,
+  mobileCards,
+} from "@/components/landing";
 
 export default function Home() {
   return (

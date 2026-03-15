@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import DocumentFilesSection from "@/components/documents/DocumentFilesSection";
+import { DocumentFilesSection } from "@/features/documents";
 
 export const metadata: Metadata = {
   title: "양식 조회",

@@ -5,7 +5,7 @@ import {
   type ConfirmModalState,
   INITIAL_MODAL_STATE,
   MODAL_CONTENT_MAP,
-} from "../constants/notifications";
+} from "../constants";
 
 export const useNotificationModal = () => {
   const [confirmModal, setConfirmModal] =

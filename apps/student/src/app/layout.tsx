@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { Footer } from "ui";
 import LayoutContent from "@/components/layout/LayoutContent";
-import { QueryProvider } from "@/components/providers/QueryProvider";
-import { UserProvider } from "@/components/providers/UserProvider";
+import { QueryProvider, UserProvider } from "@/components/providers";
 import "./globals.css";
 
 const siteUrl = (

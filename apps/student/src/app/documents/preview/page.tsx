@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DocumentPreviewLoadingState } from "ui";
 import { getDocumentPreviewPayload, parseDocumentPreviewHash } from "utils";
-import DocumentPreviewContent from "@/components/main/documents/DocumentPreviewContent";
+import { DocumentPreviewContent } from "@/features/documents";
 
 export default function StudentDocumentPreviewPage() {
   const [fileName, setFileName] = useState("");

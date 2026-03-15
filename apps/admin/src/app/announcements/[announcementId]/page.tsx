@@ -5,7 +5,7 @@ export const runtime = "edge";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
-import ClubHeader from "@/components/common/ClubHeader";
+import { ClubHeader } from "@/components/common";
 import {
   useGetAnnouncementDetailQuery,
   useGetClubDetailQuery,

@@ -7,9 +7,8 @@ import { Pagination } from "@/components/common/Pagination";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { useGetUserAlarmsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { EmptyNotifications, NotificationItem } from "./components";
-import { ITEMS_PER_PAGE } from "./constants/notifications";
-import { useNotificationActions } from "./hooks/useNotificationActions";
-import { useNotificationModal } from "./hooks/useNotificationModal";
+import { ITEMS_PER_PAGE } from "./constants";
+import { useNotificationActions, useNotificationModal } from "./hooks";
 
 export default function NotificationsPage() {
   const [curPage, setCurPage] = useState(1);

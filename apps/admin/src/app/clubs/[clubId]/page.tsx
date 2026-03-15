@@ -5,10 +5,8 @@ export const runtime = "edge";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import JobPostingItem from "@/components/club/item/JobPostingItem";
-import MemberItem from "@/components/club/item/MemberItem";
-import ClubHeader from "@/components/common/ClubHeader";
-import Pagination from "@/components/common/Pagination";
+import { JobPostingItem, MemberItem } from "@/components/club/item";
+import { ClubHeader, Pagination } from "@/components/common";
 import {
   useGetClubAnnouncementsQuery,
   useGetClubDetailQuery,

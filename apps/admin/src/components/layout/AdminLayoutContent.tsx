@@ -1,12 +1,12 @@
 "use client";
 
-import AdminHeader from "./AdminHeader";
+import { AdminHeader } from "./AdminHeader";
 
 type AdminLayoutContentProps = {
   children: React.ReactNode;
 };
 
-export default function AdminLayoutContent(props: AdminLayoutContentProps) {
+export function AdminLayoutContent(props: AdminLayoutContentProps) {
   const { children } = props;
 
   return (

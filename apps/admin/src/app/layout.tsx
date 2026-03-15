@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-import AdminFooter from "@/components/layout/AdminFooter";
-import AdminLayoutContent from "@/components/layout/AdminLayoutContent";
+import { AdminFooter, AdminLayoutContent } from "@/components/layout";
 import { AdminProviders } from "@/components/providers";
 import "./globals.css";
 

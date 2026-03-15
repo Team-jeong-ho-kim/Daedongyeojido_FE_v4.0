@@ -3,8 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAccessToken } from "utils";
-import { useMyInfoQuery } from "@/hooks/querys/useMyInfoQuery";
-import { isOnboardingRequired } from "@/lib/onboarding";
+import { useMyInfoQuery } from "@/hooks/querys";
+import { isOnboardingRequired } from "@/lib";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [hasToken, setHasToken] = useState(false);

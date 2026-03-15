@@ -116,7 +116,7 @@ const withFilteredDebugLogs = <T,>(callback: () => T) => {
   }
 };
 
-export default function DocumentPreviewContent({
+export function DocumentPreviewContent({
   fileName,
   fileUrl,
 }: DocumentPreviewContentProps) {

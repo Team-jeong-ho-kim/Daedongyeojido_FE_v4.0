@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Pagination from "@/components/common/Pagination";
+import { Pagination } from "@/components/common";
 import { useGetAllClubsQuery } from "@/hooks/querys";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useQueryErrorToast } from "@/hooks/useQueryErrorToast";

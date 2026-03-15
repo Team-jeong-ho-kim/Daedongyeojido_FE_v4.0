@@ -7,7 +7,7 @@ type PaginationProps = {
   setCurPage: (page: number) => void;
 };
 
-export default function Pagination(props: PaginationProps) {
+export function Pagination(props: PaginationProps) {
   const { listLen, limit, curPage, setCurPage } = props;
   const paginationLimit = 8;
   const numPages = Math.ceil(listLen / limit);

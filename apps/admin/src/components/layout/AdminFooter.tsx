@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export default function AdminFooter() {
+export function AdminFooter() {
   return (
     <footer className="bg-gray-50 px-4 py-8 md:px-12 md:py-12 lg:px-24">
       <div className="mx-auto max-w-6xl">

@@ -10,7 +10,7 @@ import {
   removeDocumentPreviewPayload,
   saveDocumentPreviewPayload,
 } from "utils";
-import { useGetDocumentFilesQuery } from "@/hooks/querys/useApplicationFormQuery";
+import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import type { DocumentFileItem } from "@/types";
 
 type ClubCreationFormSectionProps = {
@@ -41,7 +41,7 @@ const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
   }, 1000);
 };
 
-export default function ClubCreationFormSection({
+export function ClubCreationFormSection({
   embedded = false,
 }: ClubCreationFormSectionProps) {
   const documentFilesQuery = useGetDocumentFilesQuery();

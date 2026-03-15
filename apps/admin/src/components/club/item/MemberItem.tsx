@@ -7,7 +7,7 @@ interface MemberItemProps {
   profileImage: string;
 }
 
-export default function MemberItem({
+export function MemberItem({
   userName,
   majors,
   introduction,
