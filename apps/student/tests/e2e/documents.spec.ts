@@ -71,7 +71,9 @@ test.describe("Student documents", () => {
     ).toBeVisible();
     const previewFrame = page.frameLocator('iframe[title="문서 미리보기"]');
     await expect(page.locator('iframe[title="문서 미리보기"]')).toBeVisible();
-    await expect(previewFrame.getByText("로딩 중...")).toBeVisible();
+    await expect(
+      previewFrame.getByRole("status", { name: "문서 미리보기 로딩 중" }),
+    ).toBeVisible();
     await expect(
       previewFrame.locator('object[type="application/pdf"]'),
     ).toBeVisible();
