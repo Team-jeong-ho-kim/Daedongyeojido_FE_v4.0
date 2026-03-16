@@ -72,6 +72,7 @@ export const useCreateClubApplicationMutation = () => {
       clubName,
       oneLiner,
       introduction,
+      teacherId,
       major,
       link,
       clubImage,
@@ -80,6 +81,7 @@ export const useCreateClubApplicationMutation = () => {
       clubName: string;
       oneLiner: string;
       introduction: string;
+      teacherId: number;
       major: string[];
       link: string[];
       clubImage: File;
@@ -89,6 +91,7 @@ export const useCreateClubApplicationMutation = () => {
         clubName,
         oneLiner,
         introduction,
+        teacherId,
         major,
         link,
         clubImage,

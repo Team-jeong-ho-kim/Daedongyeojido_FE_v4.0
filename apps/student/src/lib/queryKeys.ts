@@ -30,4 +30,7 @@ export const queryKeys = createQueryKeyStore({
   user: {
     me: null,
   },
+  teachers: {
+    all: null,
+  },
 });

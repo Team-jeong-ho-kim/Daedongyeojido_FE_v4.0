@@ -93,6 +93,11 @@ type MockDocumentFile = {
   fileUrl: string;
 };
 
+type MockTeacher = {
+  teacherId: number;
+  teacherName: string;
+};
+
 type RecordedRequest = {
   method: string;
   pathname: string;
@@ -121,6 +126,8 @@ type StudentApiMockOptions = {
   clubAlarms?: MockAlarm[];
   clubAnnouncements?: MockAnnouncementListItem[];
   documentFiles?: MockDocumentFile[];
+  teachers?: MockTeacher[];
+  teachersStatus?: number;
 };
 
 const DEFAULT_USER: MockUser = {
@@ -234,6 +241,25 @@ const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
   },
 ];
 
+const DEFAULT_TEACHERS: MockTeacher[] = [
+  {
+    teacherId: 4,
+    teacherName: "asdf",
+  },
+  {
+    teacherId: 3,
+    teacherName: "농구공",
+  },
+  {
+    teacherId: 1,
+    teacherName: "선생님",
+  },
+  {
+    teacherId: 2,
+    teacherName: "선생님",
+  },
+];
+
 const isApiDataRequest = (route: Route) => {
   const resourceType = route.request().resourceType();
   return resourceType === "fetch" || resourceType === "xhr";
@@ -341,6 +367,8 @@ export async function installStudentApiMocks(
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
   const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
+  const teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
+  const teachersStatus = options.teachersStatus ?? 200;
 
   const requests: RecordedRequest[] = [];
 
@@ -435,6 +463,27 @@ export async function installStudentApiMocks(
     await createJsonResponse(route, user);
   });
 
+  await page.route(/.*\/teachers$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    if (teachersStatus >= 400) {
+      await createJsonResponse(
+        route,
+        { message: "지도 교사 목록 조회에 실패했습니다." },
+        teachersStatus,
+      );
+      return;
+    }
+
+    await createJsonResponse(route, {
+      teachers,
+    });
+  });
+
   await page.route(/.*\/announcements\/open\/\d+$/, async (route) => {
     if (await handleApiFallback(route)) return;
     if (route.request().method() !== "PATCH") {
@@ -522,6 +571,17 @@ export async function installStudentApiMocks(
     }
 
     await createJsonResponse(route, clubDetail);
+  });
+
+  await page.route(/.*\/clubs\/applications$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "POST") {
+      await route.continue();
+      return;
+    }
+
+    recordRequest(route);
+    await createJsonResponse(route, { success: true }, 201);
   });
 
   await page.route(/.*\/clubs$/, async (route) => {
