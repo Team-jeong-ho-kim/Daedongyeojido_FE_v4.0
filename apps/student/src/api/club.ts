@@ -61,6 +61,7 @@ export const createClubApplication = async (
   clubName: string,
   oneLiner: string,
   introduction: string,
+  teacherId: number,
   major: string[],
   link: string[],
   clubImage: File,
@@ -71,6 +72,7 @@ export const createClubApplication = async (
   formData.append("clubName", clubName);
   formData.append("oneLiner", oneLiner);
   formData.append("introduction", introduction);
+  formData.append("teacherId", String(teacherId));
 
   major.forEach((m) => {
     formData.append("major", m);
