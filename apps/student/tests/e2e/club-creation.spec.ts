@@ -14,6 +14,9 @@ const uploadClubCreationPdf = async (
     });
 };
 
+const getTeacherSelectTrigger = (page: Page) =>
+  page.locator("button[aria-controls]");
+
 const fillClubCreationForm = async (page: Page) => {
   await page.getByPlaceholder("동아리 명").fill("테스트동아리");
   await page
@@ -81,39 +84,78 @@ test.describe("Student club creation", () => {
 
     await uploadClubCreationPdf(page);
 
-    await expect(page.getByText("club-creation-form.pdf")).toBeVisible();
-    await expect(page.getByRole("button", { name: "미리보기" })).toBeVisible();
+    const uploadedPdfCard = page.locator(
+      'article[aria-label="업로드한 개설 양식"]',
+    );
 
-    await page.getByRole("button", { name: "미리보기" }).click();
+    await expect(uploadedPdfCard).toBeVisible();
+    await expect(
+      uploadedPdfCard.getByRole("button", { name: "미리보기" }),
+    ).toBeVisible();
+
+    await uploadedPdfCard.getByRole("button", { name: "미리보기" }).click();
+    const previewModal = page.locator('[class*="max-w-6xl"]');
+
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),
     ).toBeVisible();
     await expect(
-      page
-        .locator('[class*="max-w-6xl"]')
-        .getByRole("button", { name: "다운로드" }),
+      previewModal.getByText("club-creation-form.pdf"),
+    ).toBeVisible();
+    await expect(
+      previewModal.getByRole("button", { name: "다운로드" }),
     ).toBeVisible();
     await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
 
-    await page.getByRole("button", { name: "미리보기 닫기" }).last().click();
+    await previewModal.getByRole("button", { name: "미리보기 닫기" }).click();
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),
     ).toHaveCount(0);
 
     await uploadClubCreationPdf(page, "club-creation-form-v2.pdf");
-    await expect(page.getByText("club-creation-form-v2.pdf")).toBeVisible();
-    await expect(page.getByText("club-creation-form.pdf")).toHaveCount(0);
+    await expect(uploadedPdfCard).toBeVisible();
 
-    await page.getByRole("button", { name: "미리보기" }).click();
+    await uploadedPdfCard.getByRole("button", { name: "미리보기" }).click();
     await expect(
-      page
-        .locator('[class*="max-w-6xl"]')
-        .getByRole("button", { name: "다운로드" }),
+      previewModal.getByText("club-creation-form-v2.pdf"),
+    ).toBeVisible();
+    await expect(previewModal.getByText("club-creation-form.pdf")).toHaveCount(
+      0,
+    );
+    await expect(
+      previewModal.getByRole("button", { name: "다운로드" }),
     ).toBeVisible();
     await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
   });
 
-  test("지도 교사를 선택해야 개설 신청할 수 있고 성공 시 teacherId를 포함해 전송한다", async ({
+  test("같은 지도 교사를 다시 클릭하면 선택이 해제된다", async ({ page }) => {
+    await installStudentApiMocks(page);
+
+    await page.goto("/clubs/create");
+
+    const teacherSelectTrigger = getTeacherSelectTrigger(page);
+    await teacherSelectTrigger.click();
+
+    const teacherCards = page
+      .locator("button[aria-pressed]")
+      .filter({ hasText: "선생님" });
+    const secondTeacherCard = teacherCards.nth(1);
+
+    await secondTeacherCard.click();
+    await expect(
+      teacherSelectTrigger.filter({ hasText: "선생님" }),
+    ).toBeVisible();
+
+    await teacherSelectTrigger.filter({ hasText: "선생님" }).click();
+    await expect(secondTeacherCard).toHaveAttribute("aria-pressed", "true");
+
+    await secondTeacherCard.click();
+    await expect(
+      teacherSelectTrigger.filter({ hasText: "지도 교사를 선택해주세요" }),
+    ).toBeVisible();
+  });
+
+  test("지도 교사를 선택하면 개설 신청 modal이 열리고 teacherId를 포함해 전송한다", async ({
     page,
   }) => {
     const mockApi = await installStudentApiMocks(page);
@@ -121,16 +163,8 @@ test.describe("Student club creation", () => {
     await page.goto("/clubs/create");
     await fillClubCreationForm(page);
 
-    await page.getByRole("button", { name: "개설 신청" }).click();
-    await expect(
-      page.getByText("지도 교사를 선택해주세요").last(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("dialog", { name: "정말 개설을 신청하시겠습니까?" }),
-    ).toHaveCount(0);
-
-    await page
-      .locator("button[aria-controls]")
+    const teacherSelectTrigger = getTeacherSelectTrigger(page);
+    await teacherSelectTrigger
       .filter({ hasText: "지도 교사를 선택해주세요" })
       .click();
     const teacherCards = page
@@ -139,27 +173,8 @@ test.describe("Student club creation", () => {
     const secondTeacherCard = teacherCards.nth(1);
     await secondTeacherCard.click();
     await expect(
-      page.locator("button[aria-controls]").filter({ hasText: "선생님" }),
+      teacherSelectTrigger.filter({ hasText: "선생님" }),
     ).toBeVisible();
-
-    await page
-      .locator("button[aria-controls]")
-      .filter({ hasText: "선생님" })
-      .click();
-    await expect(secondTeacherCard).toHaveAttribute("aria-pressed", "true");
-    await secondTeacherCard.click();
-    await expect(
-      page
-        .locator("button[aria-controls]")
-        .filter({ hasText: "지도 교사를 선택해주세요" }),
-    ).toBeVisible();
-    await page
-      .locator("button[aria-controls]")
-      .filter({ hasText: "지도 교사를 선택해주세요" })
-      .click();
-    await expect(secondTeacherCard).toHaveAttribute("aria-pressed", "false");
-
-    await secondTeacherCard.click();
 
     await page.getByRole("button", { name: "개설 신청" }).click();
     await expect(

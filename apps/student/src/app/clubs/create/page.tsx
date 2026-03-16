@@ -504,7 +504,10 @@ export default function ClubCreationPage() {
                 작성 완료한 양식을 업로드해주세요. (PDF)
               </p>
               {clubCreationFormFile ? (
-                <article className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+                <article
+                  aria-label="업로드한 개설 양식"
+                  className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
+                >
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-4">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">

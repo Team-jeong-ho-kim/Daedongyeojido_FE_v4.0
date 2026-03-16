@@ -9,13 +9,10 @@ export default function ClubItem({
   introduction,
   onClick,
 }: Omit<Club, "majors"> & { onClick?: () => void }) {
+  const rootClassName =
+    "group relative block h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl text-left";
   const content = (
-    <button
-      type="button"
-      id={`club-${clubId}`}
-      className="group relative h-[310px] w-[280px] cursor-pointer select-none overflow-hidden rounded-3xl text-left"
-      onClick={onClick}
-    >
+    <>
       <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 ease-out group-hover:h-[200px]">
         {clubImage && (
           <Image src={clubImage} alt={clubName} fill className="object-cover" />
@@ -37,8 +34,21 @@ export default function ClubItem({
           {introduction}
         </span>
       </div>
-    </button>
+    </>
   );
 
-  return clubId ? <Link href={`/clubs/${clubId}`}>{content}</Link> : content;
+  if (clubId) {
+    return (
+      <Link
+        href={`/clubs/${clubId}`}
+        id={`club-${clubId}`}
+        className={rootClassName}
+        onClick={onClick}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={rootClassName}>{content}</div>;
 }
