@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect } from "react";
 
 type DocumentPreviewModalProps = {
+  actions?: ReactNode;
   children: ReactNode;
   fileName: string;
   isOpen: boolean;
@@ -11,6 +12,7 @@ type DocumentPreviewModalProps = {
 };
 
 export function DocumentPreviewModal({
+  actions,
   children,
   fileName,
   isOpen,
@@ -51,33 +53,36 @@ export function DocumentPreviewModal({
         aria-label="미리보기 닫기"
       />
 
-      <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-[12px] bg-white shadow-2xl">
+      <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-lg bg-white shadow-2xl md:rounded-xl">
         <div className="flex items-start justify-between gap-4 border-gray-200 border-b px-5 py-4 md:px-7">
-          <div>
+          <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-gray-900 text-xl">{title}</h3>
             <p className="mt-1 break-all text-gray-500 text-sm">{fileName}</p>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
-            aria-label="미리보기 닫기"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          <div className="flex shrink-0 items-center gap-3">
+            {actions}
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition hover:bg-gray-50 hover:text-gray-900"
+              aria-label="미리보기 닫기"
             >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18" />
+                <path d="m6 6 12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 bg-gray-50 p-3 md:p-5">{children}</div>

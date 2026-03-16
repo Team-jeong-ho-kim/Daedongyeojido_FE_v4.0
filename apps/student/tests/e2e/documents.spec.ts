@@ -57,6 +57,11 @@ test.describe("Student documents", () => {
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),
     ).toBeVisible();
+    await expect(
+      page
+        .locator('[class*="max-w-6xl"]')
+        .getByRole("button", { name: "다운로드" }),
+    ).toBeVisible();
     await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(

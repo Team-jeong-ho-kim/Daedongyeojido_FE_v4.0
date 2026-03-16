@@ -6,6 +6,28 @@ type MockDocumentFile = {
   fileUrl: string;
 };
 
+type MockClubCreationApplication = {
+  clubId: number;
+  clubName: string;
+  clubImage: string;
+  introduction: string;
+  majors: string[];
+};
+
+type MockClubCreationApplicationDetail = {
+  club: {
+    clubName: string;
+    introduction: string;
+    oneLiner: string;
+    clubImage: string;
+    majors: string[];
+    links: string[];
+  };
+  userName: string;
+  classNumber: string;
+  clubCreationForm: string;
+};
+
 type RecordedRequest = {
   method: string;
   pathname: string;
@@ -21,6 +43,11 @@ export type AdminApiMockController = {
 
 type AdminApiMockOptions = {
   documentFiles?: MockDocumentFile[];
+  clubCreationApplications?: MockClubCreationApplication[];
+  clubCreationApplicationDetails?: Record<
+    number,
+    MockClubCreationApplicationDetail
+  >;
 };
 
 const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
@@ -30,6 +57,41 @@ const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
     fileUrl: "https://files.test/club-creation-form.hwp",
   },
 ];
+
+const DEFAULT_CLUB_CREATION_APPLICATIONS: MockClubCreationApplication[] = [
+  {
+    clubId: 5,
+    clubName: "발로란트",
+    clubImage:
+      "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-valorant.png",
+    introduction: "전략과 협업 중심으로 운영하는 게임 동아리입니다.",
+    majors: ["FE", "BE", "DESIGN"],
+  },
+];
+
+const DEFAULT_CLUB_CREATION_APPLICATION_DETAILS: Record<
+  number,
+  MockClubCreationApplicationDetail
+> = {
+  5: {
+    club: {
+      clubName: "발로란트",
+      introduction: "전략과 협업 중심으로 운영하는 게임 동아리입니다.",
+      oneLiner: "정승우",
+      clubImage:
+        "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-valorant.png",
+      majors: ["FE", "BE", "DESIGN"],
+      links: [
+        "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
+        "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
+        "https://daedongyeojido.site",
+      ],
+    },
+    userName: "정승우",
+    classNumber: "3212",
+    clubCreationForm: "/documents/previews/1.pdf",
+  },
+};
 
 const isApiDataRequest = (route: Route) => {
   const resourceType = route.request().resourceType();
@@ -53,6 +115,13 @@ export async function installAdminApiMocks(
   options: AdminApiMockOptions = {},
 ): Promise<AdminApiMockController> {
   let documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
+  const clubCreationApplications =
+    options.clubCreationApplications ??
+    DEFAULT_CLUB_CREATION_APPLICATIONS.slice();
+  const clubCreationApplicationDetails = {
+    ...DEFAULT_CLUB_CREATION_APPLICATION_DETAILS,
+    ...(options.clubCreationApplicationDetails ?? {}),
+  };
   const requests: RecordedRequest[] = [];
 
   const recordRequest = (route: Route) => {
@@ -98,6 +167,68 @@ export async function installAdminApiMocks(
     });
   });
 
+  await page.route(/.*\/result-duration$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    await createJsonResponse(route, {
+      resultDuration: "2026-03-31",
+      resultDurationId: 1,
+    });
+  });
+
+  await page.route(/.*\/admin\/club-creation-application$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    await createJsonResponse(route, {
+      clubs: clubCreationApplications,
+    });
+  });
+
+  await page.route(
+    /.*\/admin\/club-creation-application\/\d+$/,
+    async (route) => {
+      if (await handleApiFallback(route)) return;
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
+
+      recordRequest(route);
+      const clubId = Number(route.request().url().split("/").pop());
+      const detail = clubCreationApplicationDetails[clubId];
+
+      if (!detail) {
+        await createJsonResponse(
+          route,
+          { message: "개설 신청 상세 정보를 찾을 수 없습니다." },
+          404,
+        );
+        return;
+      }
+
+      await createJsonResponse(route, detail);
+    },
+  );
+
+  await page.route(/.*\/admin\/clubs\/applications\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "PATCH") {
+      await route.continue();
+      return;
+    }
+
+    recordRequest(route);
+    await route.fulfill({ status: 204, body: "" });
+  });
+
   return {
     requests,
     getLastRequest: (matcher, method) => {
@@ -125,6 +256,30 @@ export async function setAdminAuthSession(
   },
 ) {
   const userName = options?.userName ?? "관리자";
+  const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3002";
+
+  await page.context().addCookies([
+    {
+      name: "access_token",
+      value: "mock-access-token",
+      url: baseURL,
+    },
+    {
+      name: "refresh_token",
+      value: "mock-refresh-token",
+      url: baseURL,
+    },
+    {
+      name: "auth_role",
+      value: "ADMIN",
+      url: baseURL,
+    },
+    {
+      name: "auth_user_name",
+      value: userName,
+      url: baseURL,
+    },
+  ]);
 
   await page.addInitScript(
     ({ injectedUserName }) => {

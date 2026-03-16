@@ -88,6 +88,11 @@ test.describe("Student club creation", () => {
     await expect(
       page.getByRole("heading", { name: "문서 미리보기" }),
     ).toBeVisible();
+    await expect(
+      page
+        .locator('[class*="max-w-6xl"]')
+        .getByRole("button", { name: "다운로드" }),
+    ).toBeVisible();
     await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
 
     await page.getByRole("button", { name: "미리보기 닫기" }).last().click();
@@ -100,6 +105,11 @@ test.describe("Student club creation", () => {
     await expect(page.getByText("club-creation-form.pdf")).toHaveCount(0);
 
     await page.getByRole("button", { name: "미리보기" }).click();
+    await expect(
+      page
+        .locator('[class*="max-w-6xl"]')
+        .getByRole("button", { name: "다운로드" }),
+    ).toBeVisible();
     await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
   });
 

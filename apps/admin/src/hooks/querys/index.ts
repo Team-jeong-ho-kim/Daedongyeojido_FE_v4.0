@@ -1,5 +1,6 @@
 export {
   useGetAdminOverviewQuery,
+  useGetClubCreationApplicationDetailQuery,
   useGetClubCreationApplicationsQuery,
   useGetResultDurationQuery,
 } from "./useAdminQuery";

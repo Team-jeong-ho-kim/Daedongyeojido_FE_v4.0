@@ -36,6 +36,22 @@ test.describe("Admin documents", () => {
       page.getByText("2026 동아리 개설 신청서 PDF.pdf"),
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "삭제" })).toHaveCount(2);
+    await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(1);
+
+    await page.getByRole("button", { name: "미리보기" }).click();
+    await expect(
+      page.getByRole("heading", { name: "문서 미리보기" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator('[class*="max-w-6xl"]')
+        .getByRole("button", { name: "다운로드" }),
+    ).toBeVisible();
+    await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("heading", { name: "문서 미리보기" }),
+    ).toHaveCount(0);
 
     await page.getByRole("button", { name: "삭제" }).first().click();
 

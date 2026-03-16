@@ -1,5 +1,6 @@
 import { DocumentPreviewFallbackPanel } from "./DocumentPreviewFallbackPanel";
 import { DocumentPreviewLoadingState } from "./DocumentPreviewLoadingState";
+import { PdfPreviewEmbed } from "./PdfPreviewEmbed";
 
 type DocumentPreviewViewportProps = {
   errorMessage: string | null;
@@ -42,21 +43,11 @@ export function DocumentPreviewViewport({
 
   if (previewMode === "pdf" && previewObjectUrl) {
     return (
-      <div className="flex min-h-[100vh] w-full justify-center">
-        <object
-          data={previewObjectUrl}
-          type="application/pdf"
-          className="min-h-[100vh] w-full max-w-5xl bg-white"
-        >
-          <DocumentPreviewFallbackPanel
-            message="브라우저에서 PDF 미리보기를 표시하지 못했습니다."
-            href={previewObjectUrl}
-            linkLabel="새 탭에서 PDF 열기"
-            variant="neutral"
-            minHeightClassName="min-h-[100vh]"
-          />
-        </object>
-      </div>
+      <PdfPreviewEmbed
+        href={previewObjectUrl}
+        title={`${fileName} 미리보기`}
+        minHeightClassName="min-h-[100vh]"
+      />
     );
   }
 

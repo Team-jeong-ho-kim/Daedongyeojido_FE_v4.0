@@ -1,6 +1,7 @@
 import { apiClient } from "utils";
 import type {
   AdminClubCreationApplication,
+  AdminClubCreationApplicationDetailResponse,
   AdminClubCreationApplicationsResponse,
   ResultDurationResponse,
 } from "@/types/admin";
@@ -55,6 +56,16 @@ export const getClubCreationApplications = async (): Promise<
     "/admin/club-creation-application",
   );
   return response.data.clubs;
+};
+
+export const getClubCreationApplicationDetail = async (
+  clubId: string,
+): Promise<AdminClubCreationApplicationDetailResponse> => {
+  const response =
+    await apiClient.get<AdminClubCreationApplicationDetailResponse>(
+      `/admin/club-creation-application/${clubId}`,
+    );
+  return response.data;
 };
 
 export const uploadClubCreationForm = async (

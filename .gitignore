@@ -82,11 +82,13 @@ temp/
 # Playwright
 /test-results/
 /playwright-report/
+/playwright-report-admin/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
 **/test-results/
 **/playwright-report/
+**/playwright-report-admin/
 **/blob-report/
 **/playwright/.cache/
 **/playwright/.auth/

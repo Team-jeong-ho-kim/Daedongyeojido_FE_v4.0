@@ -104,6 +104,16 @@ export interface AdminClubCreationApplicationsResponse {
   clubs: AdminClubCreationApplication[];
 }
 
+export interface AdminClubCreationApplicationDetail {
+  club: ClubDetail;
+  userName: string;
+  classNumber: string;
+  clubCreationForm: string;
+}
+
+export interface AdminClubCreationApplicationDetailResponse
+  extends AdminClubCreationApplicationDetail {}
+
 export interface DocumentFileItem {
   fileId: number;
   fileName: string;
