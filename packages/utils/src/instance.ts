@@ -16,6 +16,40 @@ export const apiClient = axios.create({
   },
 });
 
+const normalizeUrl = (value: string) => value.trim().replace(/\/+$/, "");
+
+const resolveWebLoginUrl = () => {
+  const envWebUrl = process.env.NEXT_PUBLIC_WEB_URL?.trim();
+
+  if (!envWebUrl) {
+    return null;
+  }
+
+  const webUrl = normalizeUrl(envWebUrl);
+
+  try {
+    new URL(webUrl);
+  } catch {
+    return null;
+  }
+
+  return `${webUrl}/login`;
+};
+
+const redirectToWebLogin = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const loginUrl = resolveWebLoginUrl();
+
+  if (!loginUrl) {
+    return;
+  }
+
+  window.location.href = loginUrl;
+};
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -74,11 +108,7 @@ apiClient.interceptors.response.use(
 
         if (!refreshToken) {
           clearTokens();
-          if (typeof window !== "undefined") {
-            const webUrl =
-              process.env.NEXT_PUBLIC_WEB_URL || window.location.origin;
-            window.location.href = `${webUrl.replace(/\/$/, "")}/login`;
-          }
+          redirectToWebLogin();
           return Promise.reject(createApiError(error));
         }
 
@@ -105,11 +135,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         clearTokens();
-        if (typeof window !== "undefined") {
-          const webUrl =
-            process.env.NEXT_PUBLIC_WEB_URL || window.location.origin;
-          window.location.href = `${webUrl.replace(/\/$/, "")}/login`;
-        }
+        redirectToWebLogin();
         return Promise.reject(createApiError(refreshError));
       }
     }

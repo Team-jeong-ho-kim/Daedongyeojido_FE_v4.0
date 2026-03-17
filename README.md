@@ -79,6 +79,8 @@ cp .env.example .env.prod
 - `NEXT_PUBLIC_TEACHER_URL`
 - `NEXT_PUBLIC_API_BASE_URL`
 
+`NEXT_PUBLIC_*_URL` 값은 `http://localhost:3000` 형태의 절대 URL이어야 합니다.
+
 ## 로그인 분기
 - `web` 로그인 화면은 학생 로그인과 선생님 로그인 탭으로 분기됩니다.
 - 같은 `POST /auth/login`을 사용하고, 요청 body의 `division` 값으로 학생/선생님 로그인을 구분합니다.

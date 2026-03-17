@@ -7,16 +7,26 @@ import { getMyInfo } from "@/api/user";
 import { getErrorMessage } from "@/lib/error";
 import { isOnboardingRequired } from "@/lib/onboarding";
 
-const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
+const normalizeUrl = (value: string) => value.trim().replace(/\/+$/, "");
 
 const moveToWebLogin = () => {
-  const envWebUrl = process.env.NEXT_PUBLIC_WEB_URL;
-  const webUrl = envWebUrl?.trim()
-    ? normalizeUrl(envWebUrl)
-    : typeof window !== "undefined" &&
-        window.location.hostname.endsWith(".daedongyeojido.site")
-      ? `${window.location.protocol}//dsm.daedongyeojido.site`
-      : "http://localhost:3000";
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const envWebUrl = process.env.NEXT_PUBLIC_WEB_URL?.trim();
+
+  if (!envWebUrl) {
+    return;
+  }
+
+  const webUrl = normalizeUrl(envWebUrl);
+
+  try {
+    new URL(webUrl);
+  } catch {
+    return;
+  }
 
   window.location.href = `${webUrl}/login`;
 };
