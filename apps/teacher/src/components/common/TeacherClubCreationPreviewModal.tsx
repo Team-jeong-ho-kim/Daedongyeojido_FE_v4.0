@@ -10,6 +10,7 @@ import { BodyPortal } from "./BodyPortal";
 const teacherPreviewModalClassNames: DocumentPreviewModalClassNames = {
   actions: "gap-2 md:gap-3",
   closeButton: "h-9 w-9 md:h-10 md:w-10",
+  closeIcon: "h-4 w-4 md:h-[18px] md:w-[18px]",
   content: "p-2 sm:p-3 md:p-5",
   fileName: "mt-1 text-[12px] leading-5 md:text-sm",
   header: "gap-3 px-4 py-3 sm:px-5 sm:py-4 md:px-7",

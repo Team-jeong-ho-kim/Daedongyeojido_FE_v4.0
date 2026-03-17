@@ -7,6 +7,7 @@ export type DocumentPreviewModalClassNames = Partial<{
   content: string;
   actions: string;
   closeButton: string;
+  closeIcon: string;
   fileName: string;
   header: string;
   overlay: string;
@@ -121,7 +122,7 @@ export function DocumentPreviewModal({
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-5 w-5"
+                className={cn("h-5 w-5", classNames?.closeIcon)}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
