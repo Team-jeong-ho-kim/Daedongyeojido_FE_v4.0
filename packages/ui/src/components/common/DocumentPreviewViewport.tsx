@@ -21,6 +21,8 @@ export function DocumentPreviewViewport({
   previewMode,
   previewObjectUrl,
 }: DocumentPreviewViewportProps) {
+  const previewMinHeight = "100vh";
+
   if (isLoading) {
     return <DocumentPreviewLoadingState message="로딩 중..." />;
   }
@@ -46,18 +48,22 @@ export function DocumentPreviewViewport({
       <PdfPreviewEmbed
         href={previewObjectUrl}
         title={`${fileName} 미리보기`}
-        minHeightClassName="min-h-[100vh]"
+        minHeight={previewMinHeight}
       />
     );
   }
 
   if (previewMode === "hwp" && previewHtml) {
     return (
-      <div className="flex min-h-[100vh] w-full justify-center">
+      <div
+        style={{ minHeight: previewMinHeight }}
+        className="flex h-full min-h-0 w-full justify-center"
+      >
         <iframe
           title={`${fileName} 미리보기`}
           srcDoc={previewHtml}
-          className="min-h-[100vh] w-full max-w-5xl bg-white"
+          style={{ minHeight: previewMinHeight }}
+          className="h-full min-h-0 w-full max-w-5xl bg-white"
         />
       </div>
     );

@@ -6,7 +6,19 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["utils", "config-tailwind"],
+  transpilePackages: ["ui", "shared", "utils", "config-tailwind"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "daedong-bucket.s3.ap-northeast-2.amazonaws.com",
+      },
+    ],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

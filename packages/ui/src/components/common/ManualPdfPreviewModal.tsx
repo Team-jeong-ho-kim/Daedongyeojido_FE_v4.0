@@ -1,27 +1,36 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { cn } from "../../lib/utils";
 import { DocumentPreviewFallbackPanel } from "./DocumentPreviewFallbackPanel";
 import { DocumentPreviewLoadingState } from "./DocumentPreviewLoadingState";
-import { DocumentPreviewModal } from "./DocumentPreviewModal";
+import {
+  DocumentPreviewModal,
+  type DocumentPreviewModalClassNames,
+} from "./DocumentPreviewModal";
 import { PdfPreviewEmbed } from "./PdfPreviewEmbed";
 import { resolvePdfPreviewUrl } from "./resolvePdfPreviewUrl";
 
-type ManualPdfPreviewModalProps = {
+export type ManualPdfPreviewModalProps = {
+  downloadButtonClassName?: string;
   fileName: string;
   isOpen: boolean;
+  modalClassNames?: DocumentPreviewModalClassNames;
   onClose: () => void;
   pdfPath: string | null;
   title?: string;
 };
 
 export function ManualPdfPreviewModal({
+  downloadButtonClassName,
   fileName,
   isOpen,
+  modalClassNames,
   onClose,
   pdfPath,
   title,
 }: ManualPdfPreviewModalProps) {
+  const previewMinHeight = "70vh";
   const [resolvedPdfUrl, setResolvedPdfUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -108,11 +117,15 @@ export function ManualPdfPreviewModal({
           type="button"
           onClick={handleDownload}
           disabled={!resolvedPdfUrl || isLoading}
-          className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className={cn(
+            "inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50",
+            downloadButtonClassName,
+          )}
         >
           다운로드
         </button>
       }
+      classNames={modalClassNames}
       fileName={fileName}
       isOpen={isOpen}
       onClose={onClose}
@@ -121,26 +134,26 @@ export function ManualPdfPreviewModal({
       {!pdfPath ? (
         <DocumentPreviewFallbackPanel
           message="문서 미리보기 경로를 확인할 수 없습니다."
-          minHeightClassName="min-h-[70vh]"
+          minHeight={previewMinHeight}
         />
       ) : isLoading ? (
         <DocumentPreviewLoadingState
           message="PDF 미리보기를 불러오는 중..."
-          minHeightClassName="min-h-[70vh]"
+          minHeight={previewMinHeight}
         />
       ) : errorMessage || !resolvedPdfUrl ? (
         <DocumentPreviewFallbackPanel
           message={errorMessage ?? "문서 미리보기를 불러오지 못했습니다."}
           href={pdfPath}
           linkLabel="새 탭에서 PDF 열기"
-          minHeightClassName="min-h-[70vh]"
+          minHeight={previewMinHeight}
           variant="neutral"
         />
       ) : (
         <PdfPreviewEmbed
           href={resolvedPdfUrl}
           title={`${fileName} 미리보기`}
-          minHeightClassName="min-h-[70vh]"
+          minHeight={previewMinHeight}
         />
       )}
     </DocumentPreviewModal>

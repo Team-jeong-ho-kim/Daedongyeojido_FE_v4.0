@@ -4,7 +4,7 @@ type DocumentPreviewFallbackPanelProps = {
   message: string;
   href?: string;
   linkLabel?: string;
-  minHeightClassName?: string;
+  minHeight?: string;
   variant?: "error" | "neutral";
 };
 
@@ -12,14 +12,14 @@ export function DocumentPreviewFallbackPanel({
   message,
   href,
   linkLabel = "새 탭에서 문서 열기",
-  minHeightClassName = "min-h-[100vh]",
+  minHeight = "100vh",
   variant = "error",
 }: DocumentPreviewFallbackPanelProps) {
   return (
     <div
+      style={minHeight ? { minHeight } : undefined}
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-2xl bg-white px-6 text-center",
-        minHeightClassName,
+        "flex h-full min-h-0 w-full flex-col items-center justify-center gap-3 rounded-2xl bg-white px-6 text-center",
         variant === "error"
           ? "border border-red-100"
           : "border border-gray-300 border-dashed",
