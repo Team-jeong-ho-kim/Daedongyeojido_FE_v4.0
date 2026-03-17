@@ -6,6 +6,7 @@ import {
   getClubCreationApplications,
   getResultDuration,
 } from "@/api/admin";
+import { getAllTeachers } from "@/api/teacher";
 import { loadAdminOverviewData } from "@/app/mypage/_lib";
 import { queryKeys } from "@/lib";
 
@@ -22,6 +23,17 @@ export const useGetResultDurationQuery = (enabled = true) => {
     queryKey: queryKeys.admin.resultDuration.queryKey,
     queryFn: getResultDuration,
     enabled,
+  });
+};
+
+export const useGetAllTeachersQuery = (enabled = true) => {
+  return useQuery({
+    queryKey: queryKeys.admin.teachers.queryKey,
+    queryFn: getAllTeachers,
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    select: (teachers) =>
+      [...teachers].sort((a, b) => a.teacherId - b.teacherId),
   });
 };
 

@@ -28,6 +28,11 @@ type MockClubCreationApplicationDetail = {
   clubCreationForm: string;
 };
 
+type MockTeacher = {
+  teacherId: number;
+  teacherName: string;
+};
+
 type RecordedRequest = {
   method: string;
   pathname: string;
@@ -48,6 +53,7 @@ type AdminApiMockOptions = {
     number,
     MockClubCreationApplicationDetail
   >;
+  teachers?: MockTeacher[];
 };
 
 const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
@@ -93,6 +99,17 @@ const DEFAULT_CLUB_CREATION_APPLICATION_DETAILS: Record<
   },
 };
 
+const DEFAULT_TEACHERS: MockTeacher[] = [
+  {
+    teacherId: 1,
+    teacherName: "김현태",
+  },
+  {
+    teacherId: 2,
+    teacherName: "박교사",
+  },
+];
+
 const isApiDataRequest = (route: Route) => {
   const resourceType = route.request().resourceType();
   return resourceType === "fetch" || resourceType === "xhr";
@@ -115,6 +132,7 @@ export async function installAdminApiMocks(
   options: AdminApiMockOptions = {},
 ): Promise<AdminApiMockController> {
   let documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
+  let teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
   const clubCreationApplications =
     options.clubCreationApplications ??
     DEFAULT_CLUB_CREATION_APPLICATIONS.slice();
@@ -165,6 +183,39 @@ export async function installAdminApiMocks(
     await createJsonResponse(route, {
       fileResponses: documentFiles,
     });
+  });
+
+  await page.route(/.*\/teachers$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+
+    if (route.request().method() === "GET") {
+      recordRequest(route);
+      await createJsonResponse(route, { teachers });
+      return;
+    }
+
+    if (route.request().method() === "POST") {
+      recordRequest(route);
+      const requestBody = route.request().postDataJSON() as {
+        teacherName?: string;
+      };
+
+      teachers = [
+        ...teachers,
+        {
+          teacherId:
+            teachers.length > 0
+              ? Math.max(...teachers.map((teacher) => teacher.teacherId)) + 1
+              : 1,
+          teacherName: requestBody.teacherName ?? "새 지도 교사",
+        },
+      ];
+
+      await route.fulfill({ status: 201, body: "" });
+      return;
+    }
+
+    await route.continue();
   });
 
   await page.route(/.*\/result-duration$/, async (route) => {

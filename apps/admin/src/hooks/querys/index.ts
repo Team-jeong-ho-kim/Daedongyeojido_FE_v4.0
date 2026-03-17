@@ -1,5 +1,6 @@
 export {
   useGetAdminOverviewQuery,
+  useGetAllTeachersQuery,
   useGetClubCreationApplicationDetailQuery,
   useGetClubCreationApplicationsQuery,
   useGetResultDurationQuery,

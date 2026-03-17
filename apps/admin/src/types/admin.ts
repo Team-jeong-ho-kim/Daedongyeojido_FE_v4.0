@@ -114,6 +114,15 @@ export interface AdminClubCreationApplicationDetail {
 export interface AdminClubCreationApplicationDetailResponse
   extends AdminClubCreationApplicationDetail {}
 
+export interface AdminTeacher {
+  teacherId: number;
+  teacherName: string;
+}
+
+export interface AdminTeachersResponse {
+  teachers: AdminTeacher[];
+}
+
 export interface DocumentFileItem {
   fileId: number;
   fileName: string;
