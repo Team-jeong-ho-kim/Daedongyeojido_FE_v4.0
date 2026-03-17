@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TeacherLayoutContent } from "@/components/layout";
 import "./globals.css";
 
 const siteUrl = (
@@ -25,7 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <TeacherLayoutContent>{children}</TeacherLayoutContent>
+      </body>
     </html>
   );
 }

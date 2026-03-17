@@ -107,7 +107,7 @@ export default function LoginPage() {
       }
 
       if (response.data.role === "TEACHER") {
-        window.location.href = teacherUrl;
+        window.location.href = `${teacherUrl}/mypage`;
         return;
       }
 

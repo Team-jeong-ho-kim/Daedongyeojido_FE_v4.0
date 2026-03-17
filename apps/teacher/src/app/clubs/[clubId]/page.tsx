@@ -12,7 +12,7 @@ import {
   getSessionUser,
 } from "utils";
 import { getTeacherClubCreationApplicationDetail } from "@/api/teacher";
-import { TeacherClubCreationPreviewModal } from "@/components/common/TeacherClubCreationPreviewModal";
+import { TeacherClubCreationPreviewModal } from "@/components/common";
 import { moveToWebLogin } from "@/lib/auth";
 import type { TeacherClubCreationApplicationDetailResponse } from "@/types/teacher";
 
