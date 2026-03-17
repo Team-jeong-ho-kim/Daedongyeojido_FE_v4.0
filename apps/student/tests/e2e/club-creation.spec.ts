@@ -15,7 +15,7 @@ const uploadClubCreationPdf = async (
 };
 
 const getTeacherSelectTrigger = (page: Page) =>
-  page.locator("button[aria-controls]");
+  page.getByRole("button", { name: /Teacher/ });
 
 const fillClubCreationForm = async (page: Page) => {
   await page.getByPlaceholder("동아리 명").fill("테스트동아리");
@@ -84,16 +84,10 @@ test.describe("Student club creation", () => {
 
     await uploadClubCreationPdf(page);
 
-    const uploadedPdfCard = page.locator(
-      'article[aria-label="업로드한 개설 양식"]',
-    );
+    await expect(page.getByText("업로드한 개설 양식")).toBeVisible();
+    await expect(page.getByRole("button", { name: "미리보기" })).toBeVisible();
 
-    await expect(uploadedPdfCard).toBeVisible();
-    await expect(
-      uploadedPdfCard.getByRole("button", { name: "미리보기" }),
-    ).toBeVisible();
-
-    await uploadedPdfCard.getByRole("button", { name: "미리보기" }).click();
+    await page.getByRole("button", { name: "미리보기" }).click();
     const previewModal = page.locator('[class*="max-w-6xl"]');
 
     await expect(
@@ -113,9 +107,9 @@ test.describe("Student club creation", () => {
     ).toHaveCount(0);
 
     await uploadClubCreationPdf(page, "club-creation-form-v2.pdf");
-    await expect(uploadedPdfCard).toBeVisible();
+    await expect(page.getByText("업로드한 개설 양식")).toBeVisible();
 
-    await uploadedPdfCard.getByRole("button", { name: "미리보기" }).click();
+    await page.getByRole("button", { name: "미리보기" }).click();
     await expect(
       previewModal.getByText("club-creation-form-v2.pdf"),
     ).toBeVisible();
@@ -142,17 +136,15 @@ test.describe("Student club creation", () => {
     const secondTeacherCard = teacherCards.nth(1);
 
     await secondTeacherCard.click();
-    await expect(
-      teacherSelectTrigger.filter({ hasText: "선생님" }),
-    ).toBeVisible();
+    await expect(teacherSelectTrigger).toContainText("선생님");
 
-    await teacherSelectTrigger.filter({ hasText: "선생님" }).click();
+    await teacherSelectTrigger.click();
     await expect(secondTeacherCard).toHaveAttribute("aria-pressed", "true");
 
     await secondTeacherCard.click();
-    await expect(
-      teacherSelectTrigger.filter({ hasText: "지도 교사를 선택해주세요" }),
-    ).toBeVisible();
+    await expect(teacherSelectTrigger).toContainText(
+      "지도 교사를 선택해주세요",
+    );
   });
 
   test("지도 교사를 선택하면 개설 신청 modal이 열리고 teacherId를 포함해 전송한다", async ({
@@ -164,17 +156,13 @@ test.describe("Student club creation", () => {
     await fillClubCreationForm(page);
 
     const teacherSelectTrigger = getTeacherSelectTrigger(page);
-    await teacherSelectTrigger
-      .filter({ hasText: "지도 교사를 선택해주세요" })
-      .click();
+    await teacherSelectTrigger.click();
     const teacherCards = page
       .locator("button[aria-pressed]")
       .filter({ hasText: "선생님" });
     const secondTeacherCard = teacherCards.nth(1);
     await secondTeacherCard.click();
-    await expect(
-      teacherSelectTrigger.filter({ hasText: "선생님" }),
-    ).toBeVisible();
+    await expect(teacherSelectTrigger).toContainText("선생님");
 
     await page.getByRole("button", { name: "개설 신청" }).click();
     await expect(
@@ -210,7 +198,7 @@ test.describe("Student club creation", () => {
     await page.goto("/clubs/create");
     await expect(
       page
-        .locator("button[aria-controls]")
+        .getByRole("button", { name: /Teacher/ })
         .filter({ hasText: "지도 교사 목록을 불러오지 못했습니다" }),
     ).toBeDisabled();
 
@@ -227,6 +215,37 @@ test.describe("Student club creation", () => {
     ).toHaveCount(0);
   });
 
+  test("이미 개설 신청한 상태로 지도 교사 조회가 403이면 페이지에서 새 신청이 차단된다", async ({
+    page,
+  }) => {
+    const mockApi = await installStudentApiMocks(page, { teachersStatus: 403 });
+
+    await page.goto("/clubs/create");
+    await expect(
+      page.getByText(
+        "이미 동아리 개설 신청을 완료했습니다. 관리자 승인 전까지 새 신청을 진행할 수 없습니다.",
+      ),
+    ).toBeVisible();
+
+    await fillClubCreationForm(page);
+
+    await expect(getTeacherSelectTrigger(page)).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "개설 신청" }),
+    ).toBeDisabled();
+
+    await page
+      .getByRole("button", { name: "개설 신청" })
+      .evaluate((button: HTMLButtonElement) => button.click());
+
+    await expect(
+      page.getByRole("dialog", { name: "정말 개설을 신청하시겠습니까?" }),
+    ).toHaveCount(0);
+    expect(
+      mockApi.getLastRequest(/\/clubs\/applications$/, "POST"),
+    ).toBeUndefined();
+  });
+
   test("선택 가능한 지도 교사가 없으면 선택 UI가 비활성화되고 제출이 막힌다", async ({
     page,
   }) => {
@@ -235,7 +254,7 @@ test.describe("Student club creation", () => {
     await page.goto("/clubs/create");
     await expect(
       page
-        .locator("button[aria-controls]")
+        .getByRole("button", { name: /Teacher/ })
         .filter({ hasText: "선택 가능한 지도 교사가 없습니다" }),
     ).toBeDisabled();
 

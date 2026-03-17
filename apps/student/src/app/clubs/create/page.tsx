@@ -14,6 +14,7 @@ import {
   TextInput,
 } from "ui";
 import {
+  ApiError,
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
 } from "utils";
@@ -193,9 +194,39 @@ function TeacherSelectField(props: TeacherSelectFieldProps) {
   );
 }
 
+const CLUB_CREATION_FORBIDDEN_MESSAGE =
+  "이미 동아리 개설 신청을 완료했습니다. 관리자 승인 전까지 새 신청을 진행할 수 없습니다.";
+
+const getErrorStatus = (error: unknown): number | null => {
+  if (error instanceof ApiError) {
+    return error.status;
+  }
+
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  if ("status" in error && typeof error.status === "number") {
+    return error.status;
+  }
+
+  if (
+    "response" in error &&
+    error.response &&
+    typeof error.response === "object" &&
+    "status" in error.response &&
+    typeof error.response.status === "number"
+  ) {
+    return error.response.status;
+  }
+
+  return null;
+};
+
 export default function ClubCreationPage() {
   const { mutate: createClubMutate } = useCreateClubApplicationMutation();
   const teachersQuery = useGetAllTeachersQuery();
+  const hasShownForbiddenToastRef = useRef(false);
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
   const [clubCreationFormFile, setClubCreationFormFile] = useState<File | null>(
@@ -216,6 +247,8 @@ export default function ClubCreationPage() {
   const { show, toggleShow } = useModalStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const teachers = teachersQuery.data ?? [];
+  const teacherErrorStatus = getErrorStatus(teachersQuery.error);
+  const isTeacherRequestForbidden = teacherErrorStatus === 403;
   const isTeacherSelectDisabled =
     teachersQuery.isPending || teachersQuery.isError || teachers.length === 0;
 
@@ -233,6 +266,9 @@ export default function ClubCreationPage() {
   };
 
   const getTeacherValidationMessage = () => {
+    if (isTeacherRequestForbidden) {
+      return CLUB_CREATION_FORBIDDEN_MESSAGE;
+    }
     if (teachersQuery.isPending) {
       return "지도 교사 목록을 불러오는 중입니다. 잠시 후 다시 시도해주세요.";
     }
@@ -253,6 +289,20 @@ export default function ClubCreationPage() {
       setSelectedTeacherId(null);
     }
   }, [selectedTeacherId, teachers]);
+
+  useEffect(() => {
+    if (isTeacherRequestForbidden && !hasShownForbiddenToastRef.current) {
+      toast.error(CLUB_CREATION_FORBIDDEN_MESSAGE, {
+        id: "club-creation-forbidden",
+      });
+      hasShownForbiddenToastRef.current = true;
+      return;
+    }
+
+    if (!isTeacherRequestForbidden) {
+      hasShownForbiddenToastRef.current = false;
+    }
+  }, [isTeacherRequestForbidden]);
 
   useEffect(() => {
     if (!clubCreationFormFile) {
@@ -377,6 +427,10 @@ export default function ClubCreationPage() {
   };
 
   const handleOpenModal = () => {
+    if (isTeacherRequestForbidden) {
+      return;
+    }
+
     if (validateForm()) {
       toggleShow();
     } else {
@@ -385,6 +439,10 @@ export default function ClubCreationPage() {
   };
 
   const handleSubmit = () => {
+    if (isTeacherRequestForbidden) {
+      toggleShow();
+      return;
+    }
     if (!clubLogo) {
       toast.error("동아리 로고를 업로드해주세요.");
       toggleShow();
@@ -557,6 +615,7 @@ export default function ClubCreationPage() {
       <div className="flex justify-center py-16">
         <Button
           type="button"
+          disabled={isTeacherRequestForbidden}
           onClick={handleOpenModal}
           className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-primary-700 hover:text-gray-200"
         >

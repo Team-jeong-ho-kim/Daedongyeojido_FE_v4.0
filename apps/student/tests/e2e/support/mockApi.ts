@@ -277,6 +277,19 @@ const createJsonResponse = async (
   });
 };
 
+const createApiErrorResponse = (
+  description: string,
+  status: number,
+  message = "server fault",
+) => {
+  return {
+    description,
+    message,
+    status,
+    timestamp: "2026-03-17T00:00:00.000Z",
+  };
+};
+
 const parseRequestBody = (
   route: Route,
 ): {
@@ -471,9 +484,14 @@ export async function installStudentApiMocks(
     }
 
     if (teachersStatus >= 400) {
+      const errorDescription =
+        teachersStatus === 403
+          ? "이미 동아리 개설 신청을 완료했습니다. 관리자 승인 전까지 새 신청을 진행할 수 없습니다."
+          : "지도 교사 목록을 불러오지 못했습니다.";
+
       await createJsonResponse(
         route,
-        { message: "지도 교사 목록 조회에 실패했습니다." },
+        createApiErrorResponse(errorDescription, teachersStatus),
         teachersStatus,
       );
       return;
