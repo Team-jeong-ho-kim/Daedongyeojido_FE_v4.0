@@ -89,8 +89,13 @@ export default function TeacherMyPage() {
     );
   }
 
-  const hasMatchedClub =
-    teacherInfo?.clubId !== null && teacherInfo?.clubName !== null;
+  const matchedClubInfo =
+    teacherInfo && teacherInfo.clubId !== null && teacherInfo.clubName !== null
+      ? {
+          clubId: teacherInfo.clubId,
+          clubName: teacherInfo.clubName,
+        }
+      : null;
 
   return (
     <main className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
@@ -141,9 +146,9 @@ export default function TeacherMyPage() {
                   </p>
                 </div>
 
-                {hasMatchedClub ? (
+                {matchedClubInfo ? (
                   <Link
-                    href={`/clubs/${teacherInfo.clubId}`}
+                    href={`/clubs/${matchedClubInfo.clubId}`}
                     className="rounded-[20px] bg-[#f8f8f8] px-6 py-5 transition hover:bg-[#f2f2f2]"
                   >
                     <div className="flex items-start justify-between gap-4">
@@ -152,10 +157,10 @@ export default function TeacherMyPage() {
                           매칭 동아리
                         </p>
                         <p className="mt-3 font-semibold text-[20px] text-gray-900">
-                          {teacherInfo.clubName}
+                          {matchedClubInfo.clubName}
                         </p>
                         <p className="mt-2 text-gray-500 text-sm">
-                          동아리 ID: {teacherInfo.clubId}
+                          동아리 ID: {matchedClubInfo.clubId}
                         </p>
                         <p className="mt-4 text-[#E85D5D] text-sm">
                           클릭하여 개설 신청 상세를 확인할 수 있습니다.
