@@ -288,15 +288,15 @@ export function ClubCreationTab() {
           <button
             type="button"
             aria-label="상세 조회 오버레이 닫기"
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="pointer-events-auto absolute inset-0 bg-black/30 backdrop-blur-sm"
             onClick={handleCloseDetailOverlay}
           />
-          <div className="relative h-full overflow-y-auto">
+          <div className="pointer-events-none relative h-full overflow-y-auto">
             <div className="flex min-h-full items-start justify-center px-4 py-8 md:px-6">
               <section
                 role="dialog"
                 aria-modal="true"
-                className="relative z-10 w-full max-w-5xl overflow-hidden rounded-[12px] bg-white shadow-2xl"
+                className="pointer-events-auto relative z-10 w-full max-w-5xl overflow-hidden rounded-[12px] bg-white shadow-2xl"
               >
                 <div className="relative border-gray-100 border-b">
                   <ClubHeader
