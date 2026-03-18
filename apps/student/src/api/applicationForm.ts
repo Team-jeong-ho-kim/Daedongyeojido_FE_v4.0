@@ -58,6 +58,10 @@ export const getDocumentFiles = async (): Promise<DocumentFilesResponse> => {
   return response.data;
 };
 
+export const deleteDocumentFile = async (fileId: number): Promise<void> => {
+  await apiClient.delete(`/files/${fileId}`);
+};
+
 export const deleteApplicationForm = async (
   applicationFormId: string,
 ): Promise<void> => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { toast } from "sonner";
 import { LoadingState, ManualPdfPreviewModal } from "ui";
 import {
@@ -8,6 +8,7 @@ import {
   getDocumentFileExtensionLabel,
   getDocumentPreviewPdfPath,
 } from "utils";
+import { useDeleteDocumentFileMutation } from "@/hooks/mutations";
 import { useGetDocumentFilesQuery } from "@/hooks/querys";
 import type { DocumentFileItem } from "@/types";
 
@@ -43,10 +44,14 @@ export function ClubCreationFormSection({
   embedded = false,
 }: ClubCreationFormSectionProps) {
   const documentFilesQuery = useGetDocumentFilesQuery();
+  const deleteDocumentFileMutation = useDeleteDocumentFileMutation();
+  const deleteModalTitleId = useId();
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
   const [previewFile, setPreviewFile] = useState<DocumentFileItem | null>(null);
+  const [selectedDeleteFile, setSelectedDeleteFile] =
+    useState<DocumentFileItem | null>(null);
   const documentFiles = documentFilesQuery.data?.fileResponses ?? [];
   const previewPdfPath = previewFile
     ? getDocumentPreviewPdfPath(previewFile.fileId)
@@ -80,6 +85,20 @@ export function ClubCreationFormSection({
     }
   }, [previewFile, previewPdfPath]);
 
+  useEffect(() => {
+    if (!selectedDeleteFile) {
+      return;
+    }
+
+    const exists = documentFiles.some(
+      (file) => file.fileId === selectedDeleteFile.fileId,
+    );
+
+    if (!exists) {
+      setSelectedDeleteFile(null);
+    }
+  }, [documentFiles, selectedDeleteFile]);
+
   const handleDownload = async (file: DocumentFileItem) => {
     setDownloadingFileId(file.fileId);
     try {
@@ -98,6 +117,34 @@ export function ClubCreationFormSection({
 
   const openPreview = (file: DocumentFileItem) => {
     setPreviewFile(file);
+  };
+
+  const openDeleteModal = (file: DocumentFileItem) => {
+    setSelectedDeleteFile(file);
+  };
+
+  const closeDeleteModal = () => {
+    if (deleteDocumentFileMutation.isPending) {
+      return;
+    }
+
+    setSelectedDeleteFile(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedDeleteFile) {
+      return;
+    }
+
+    try {
+      await deleteDocumentFileMutation.mutateAsync(selectedDeleteFile.fileId);
+
+      if (previewFile?.fileId === selectedDeleteFile.fileId) {
+        setPreviewFile(null);
+      }
+
+      setSelectedDeleteFile(null);
+    } catch {}
   };
 
   const card = (
@@ -185,6 +232,14 @@ export function ClubCreationFormSection({
                           미리보기
                         </button>
                       ) : null}
+                      <button
+                        type="button"
+                        onClick={() => openDeleteModal(file)}
+                        disabled={deleteDocumentFileMutation.isPending}
+                        className="rounded-xl border border-[#F3C4C4] bg-white px-6 py-3 font-semibold text-[#DC2626] text-sm transition hover:border-[#E5A9A9] hover:bg-[#FEF2F2] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        삭제
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -197,19 +252,78 @@ export function ClubCreationFormSection({
   );
 
   const previewModal = (
-    <ManualPdfPreviewModal
-      fileName={
-        previewFile
-          ? getDocumentDownloadFileName(
-              previewFile.fileName,
-              previewFile.fileUrl,
-            )
-          : ""
-      }
-      isOpen={previewFile !== null}
-      onClose={closePreview}
-      pdfPath={previewPdfPath}
-    />
+    <>
+      <ManualPdfPreviewModal
+        fileName={
+          previewFile
+            ? getDocumentDownloadFileName(
+                previewFile.fileName,
+                previewFile.fileUrl,
+              )
+            : ""
+        }
+        isOpen={previewFile !== null}
+        onClose={closePreview}
+        pdfPath={previewPdfPath}
+      />
+
+      {selectedDeleteFile ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <button
+            type="button"
+            aria-label="양식 삭제 확인 모달 닫기"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={closeDeleteModal}
+            disabled={deleteDocumentFileMutation.isPending}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={deleteModalTitleId}
+            className="relative w-[90%] max-w-md rounded-2xl bg-white p-8 shadow-2xl"
+          >
+            <h2
+              id={deleteModalTitleId}
+              className="mb-2 font-bold text-[18px] text-gray-900"
+            >
+              양식을 삭제하시겠습니까?
+            </h2>
+            <p className="mb-4 text-gray-500 text-sm">
+              삭제 후에는 되돌릴 수 없습니다.
+            </p>
+            <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+              <p className="break-all font-medium text-gray-900 text-sm">
+                {getDocumentDownloadFileName(
+                  selectedDeleteFile.fileName,
+                  selectedDeleteFile.fileUrl,
+                )}
+              </p>
+              <p className="mt-1 text-[12px] text-gray-500">
+                양식 ID #{selectedDeleteFile.fileId}
+              </p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeDeleteModal}
+                disabled={deleteDocumentFileMutation.isPending}
+                className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 font-semibold text-gray-700 text-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={deleteDocumentFileMutation.isPending}
+                className="rounded-xl bg-[#DC2626] px-5 py-2.5 font-semibold text-sm text-white transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleteDocumentFileMutation.isPending ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 
   if (embedded) {

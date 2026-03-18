@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   decidePass,
   deleteApplicationForm,
+  deleteDocumentFile,
   deleteMySubmission,
   submitApplication,
   submitMySubmission,
@@ -34,6 +35,27 @@ export const useDeleteApplicationFormMutation = () => {
       const errorMessage = getErrorMessage(
         error,
         "지원서 폼 삭제에 실패했습니다.",
+      );
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useDeleteDocumentFileMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (fileId: number) => deleteDocumentFile(fileId),
+    onSuccess: () => {
+      toast.success("동아리 개설 양식을 삭제했습니다.");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applicationForms.files.queryKey,
+      });
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "동아리 개설 양식 삭제에 실패했습니다.",
       );
       toast.error(errorMessage);
     },
