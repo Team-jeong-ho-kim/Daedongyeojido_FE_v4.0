@@ -23,7 +23,7 @@ const actionItems = [
     description:
       "대동여지도 동아리에 대해 궁금하신가요? 이제 버튼을 눌러 소개 페이지로 안내에 이동하세요!",
     buttonText: "소개 페이지 바로가기",
-    href: "/about",
+    href: "/about/features",
   },
   {
     id: 4,
