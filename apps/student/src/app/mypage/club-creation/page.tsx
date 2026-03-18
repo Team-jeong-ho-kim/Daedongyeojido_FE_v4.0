@@ -10,7 +10,10 @@ import type {
   ClubCreationReviewDecision,
   ClubCreationReviewerType,
 } from "utils";
-import { getDocumentDownloadFileName, getDocumentFileExtensionLabel } from "utils";
+import {
+  getDocumentDownloadFileName,
+  getDocumentFileExtensionLabel,
+} from "utils";
 import { useGetMyClubCreationApplicationQuery } from "@/hooks/querys";
 
 const STATUS_LABELS: Record<ClubCreationApplicationStatus, string> = {
@@ -23,37 +26,51 @@ const STATUS_LABELS: Record<ClubCreationApplicationStatus, string> = {
 
 const STATUS_STYLES: Record<
   ClubCreationApplicationStatus,
-  { badge: string; panel: string; title: string; description: string }
+  {
+    badge: string;
+    panel: string;
+    title: string;
+    description: string;
+    timelineAccent: string;
+  }
 > = {
   SUBMITTED: {
     badge: "border-blue-200 bg-blue-50 text-blue-700",
-    panel: "border-blue-100 bg-blue-50/70",
+    panel: "border-blue-200 bg-[#f6f8ff]",
     title: "신청서가 정상적으로 제출되었습니다.",
     description: "관리자와 지도 교사의 검토가 모두 끝날 때까지 기다려 주세요.",
+    timelineAccent: "border-blue-200 bg-blue-50 text-blue-700",
   },
   UNDER_REVIEW: {
     badge: "border-blue-200 bg-blue-50 text-blue-700",
-    panel: "border-blue-100 bg-blue-50/70",
+    panel: "border-blue-200 bg-[#f6f8ff]",
     title: "현재 신청서가 검토 중입니다.",
-    description: "일부 리뷰가 등록되었을 수 있으며, 최종 상태는 아직 확정되지 않았습니다.",
+    description:
+      "일부 리뷰가 등록되었을 수 있으며, 최종 상태는 아직 확정되지 않았습니다.",
+    timelineAccent: "border-blue-200 bg-blue-50 text-blue-700",
   },
   CHANGES_REQUESTED: {
     badge: "border-amber-200 bg-amber-50 text-amber-700",
-    panel: "border-amber-100 bg-amber-50/80",
+    panel: "border-amber-200 bg-[#fff8ef]",
     title: "수정 요청이 도착했습니다.",
     description: "현재 리뷰를 확인한 뒤 신청서를 수정하고 다시 제출해 주세요.",
+    timelineAccent: "border-amber-200 bg-amber-50 text-amber-800",
   },
   APPROVED: {
     badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    panel: "border-emerald-100 bg-emerald-50/80",
+    panel: "border-emerald-200 bg-[#f4fbf6]",
     title: "개설 신청이 승인되었습니다.",
-    description: "관리자와 지도 교사의 승인이 모두 완료되어 기존 개설 성공 흐름으로 이어집니다.",
+    description:
+      "관리자와 지도 교사의 승인이 모두 완료되어 기존 개설 성공 흐름으로 이어집니다.",
+    timelineAccent: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   REJECTED: {
     badge: "border-red-200 bg-red-50 text-red-700",
-    panel: "border-red-100 bg-red-50/80",
+    panel: "border-red-200 bg-[#fff6f6]",
     title: "개설 신청이 반려되었습니다.",
-    description: "현재 revision의 검토 결과를 확인해 주세요. 이 신청은 더 이상 재제출할 수 없습니다.",
+    description:
+      "현재 revision의 검토 결과를 확인해 주세요. 이 신청은 더 이상 재제출할 수 없습니다.",
+    timelineAccent: "border-red-200 bg-red-50 text-red-700",
   },
 };
 
@@ -93,13 +110,55 @@ const formatDateTime = (value: string | null) => {
 
 const sortReviews = (reviews: ClubCreationApplicationReview[]) => {
   return [...reviews].sort((a, b) => {
-    return (
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 };
 
-function ReviewSection({
+const REVIEWER_ACCENT_STYLES: Record<ClubCreationReviewerType, string> = {
+  ADMIN: "border-violet-200 bg-violet-50 text-violet-700",
+  TEACHER: "border-sky-200 bg-sky-50 text-sky-700",
+};
+
+const getReviewerInitial = (reviewerType: ClubCreationReviewerType) => {
+  return REVIEWER_LABELS[reviewerType].slice(0, 1);
+};
+
+function SidebarCard({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-gray-200 border-b bg-[#f6f8fa] px-4 py-3">
+        <h2 className="font-semibold text-[14px] text-gray-900">{title}</h2>
+      </div>
+      <div className="px-4 py-4">{children}</div>
+    </section>
+  );
+}
+
+function DetailSection({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <section className="px-6 py-6">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="inline-flex h-2 w-2 rounded-full bg-gray-300" />
+        <h2 className="font-semibold text-[15px] text-gray-900">{title}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ReviewTimelineSection({
   highlightChangesRequested = false,
   reviews,
   title,
@@ -113,73 +172,104 @@ function ReviewSection({
   const sortedReviews = useMemo(() => sortReviews(reviews), [reviews]);
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-bold text-xl text-gray-900">{title}</h2>
-        <span className="text-gray-400 text-sm">
+    <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-gray-200 border-b bg-[#f6f8fa] px-5 py-4">
+        <div>
+          <h2 className="font-semibold text-[15px] text-gray-900">{title}</h2>
+          <p className="mt-1 text-[13px] text-gray-500">
+            리뷰 코멘트를 시간순으로 확인할 수 있습니다.
+          </p>
+        </div>
+        <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
           {sortedReviews.length}건
         </span>
       </div>
 
-      {sortedReviews.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-5 py-6 text-gray-500 text-sm">
-          {emptyMessage}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {sortedReviews.map((review) => {
-            const shouldHighlight =
-              highlightChangesRequested &&
-              review.decision === "CHANGES_REQUESTED";
+      <div className="px-5 py-5">
+        {sortedReviews.length === 0 ? (
+          <div className="rounded-lg border border-gray-200 border-dashed bg-[#f6f8fa] px-4 py-5 text-[14px] text-gray-500">
+            {emptyMessage}
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {sortedReviews.map((review, index) => {
+              const shouldHighlight =
+                highlightChangesRequested &&
+                review.decision === "CHANGES_REQUESTED";
 
-            return (
-              <article
-                key={review.reviewId}
-                className={`rounded-2xl border bg-white px-5 py-5 shadow-sm ${
-                  shouldHighlight
-                    ? "border-amber-300 ring-2 ring-amber-100"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 font-medium text-[12px] text-gray-600">
-                    {REVIEWER_LABELS[review.reviewerType]}
-                  </span>
-                  <span
-                    className={`rounded-full border px-3 py-1 font-medium text-[12px] ${DECISION_STYLES[review.decision]}`}
-                  >
-                    {DECISION_LABELS[review.decision]}
-                  </span>
-                  <span className="text-gray-400 text-xs">
-                    revision {review.revision}
-                  </span>
-                </div>
-
-                <div className="mt-3">
-                  <p className="font-semibold text-gray-900 text-sm">
-                    {review.reviewerName}
-                  </p>
-                  <p className="mt-1 text-gray-400 text-xs">
-                    {formatDateTime(review.updatedAt)}
-                  </p>
-                </div>
-
-                <div
-                  className={`mt-4 rounded-xl px-4 py-4 text-sm leading-7 ${
-                    shouldHighlight
-                      ? "bg-amber-50 text-amber-900"
-                      : "bg-gray-50 text-gray-700"
+              return (
+                <article
+                  key={review.reviewId}
+                  className={`relative pl-16 ${
+                    index === sortedReviews.length - 1 ? "" : "pb-6"
                   }`}
                 >
-                  {review.feedback?.trim()
-                    ? review.feedback
-                    : "남겨진 코멘트가 없습니다."}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
+                  {index !== sortedReviews.length - 1 ? (
+                    <span className="absolute top-11 bottom-0 left-5 w-px bg-gray-200" />
+                  ) : null}
+
+                  <div
+                    className={`absolute top-0 left-0 flex h-10 w-10 items-center justify-center rounded-full border bg-white font-semibold text-[13px] shadow-sm ${
+                      REVIEWER_ACCENT_STYLES[review.reviewerType]
+                    }`}
+                  >
+                    {getReviewerInitial(review.reviewerType)}
+                  </div>
+
+                  <div
+                    className={`overflow-hidden rounded-xl border bg-white shadow-sm ${
+                      shouldHighlight ? "border-amber-300" : "border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`flex flex-wrap items-center gap-2 border-b px-4 py-3 text-[13px] ${
+                        shouldHighlight
+                          ? "border-amber-200 bg-[#fff8ef]"
+                          : "border-gray-200 bg-[#f6f8fa]"
+                      }`}
+                    >
+                      <span className="font-semibold text-gray-900">
+                        {review.reviewerName}
+                      </span>
+                      <span className="text-gray-500">
+                        님이 코멘트를 남겼습니다
+                      </span>
+                      <span className="text-gray-300">•</span>
+                      <span className="text-gray-500">
+                        {formatDateTime(review.updatedAt)}
+                      </span>
+                      <span
+                        className={`ml-auto rounded-full border px-2.5 py-1 font-semibold text-[11px] ${DECISION_STYLES[review.decision]}`}
+                      >
+                        {DECISION_LABELS[review.decision]}
+                      </span>
+                      <span className="rounded-full border border-gray-200 bg-white px-2.5 py-1 font-medium text-[11px] text-gray-600">
+                        revision {review.revision}
+                      </span>
+                    </div>
+
+                    <div
+                      className={`px-4 py-4 text-[14px] leading-7 ${
+                        shouldHighlight
+                          ? "bg-amber-50/40 text-amber-950"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {review.feedback?.trim() ? (
+                        <p className="whitespace-pre-line">{review.feedback}</p>
+                      ) : (
+                        <p className="text-gray-400 italic">
+                          남겨진 코멘트가 없습니다.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -236,9 +326,9 @@ export default function ClubCreationApplicationDetailPage() {
     : "PDF";
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[#000000] selection:bg-primary-500 selection:text-white">
-      <div className="mx-auto max-w-[1000px] px-6 py-16">
-        <div className="mb-8 flex items-center gap-2 text-gray-400 text-sm">
+    <div className="min-h-screen bg-[#f6f8fa] font-sans text-[#1f2328] selection:bg-primary-500 selection:text-white">
+      <div className="mx-auto max-w-[1280px] px-6 py-10 lg:py-12">
+        <div className="mb-6 flex items-center gap-2 text-[13px] text-gray-500">
           <Link href="/mypage" className="hover:text-gray-600">
             마이페이지
           </Link>
@@ -246,163 +336,147 @@ export default function ClubCreationApplicationDetailPage() {
           <span className="text-gray-600">내 개설 신청</span>
         </div>
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h1 className="font-extrabold text-3xl tracking-tight">
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              <span
+                className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.badge}`}
+              >
+                {STATUS_LABELS[application.status]}
+              </span>
+              <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
+                revision {application.revision}
+              </span>
+            </div>
+            <h1 className="font-bold text-[32px] tracking-tight">
               내 개설 신청
             </h1>
-            <p className="mt-3 text-gray-500 text-sm">
-              신청 상태와 현재 리뷰를 한 곳에서 확인할 수 있습니다.
-            </p>
           </div>
-          <span
-            className={`inline-flex w-fit rounded-full border px-4 py-2 font-semibold text-sm ${statusConfig.badge}`}
-          >
-            {STATUS_LABELS[application.status]}
-          </span>
         </div>
 
-        <section
-          className={`mt-8 rounded-3xl border px-6 py-6 ${statusConfig.panel}`}
-        >
-          <h2 className="font-bold text-xl text-gray-900">
-            {statusConfig.title}
-          </h2>
-          <p className="mt-3 text-gray-600 text-sm leading-7">
-            {statusConfig.description}
-          </p>
-          {application.status === "CHANGES_REQUESTED" ? (
-            <div className="mt-5">
-              <Link href="/mypage/club-creation/edit">
-                <Button className="rounded-xl bg-primary-500 px-5 py-3 font-semibold text-sm text-white hover:bg-primary-600">
-                  수정 후 다시 제출하기
-                </Button>
-              </Link>
-            </div>
-          ) : null}
-        </section>
-
-        <div className="mt-10 space-y-10">
-          <ReviewSection
-            title="현재 리뷰"
-            reviews={application.currentReviews}
-            emptyMessage="아직 현재 revision에 등록된 리뷰가 없습니다."
-            highlightChangesRequested={application.status === "CHANGES_REQUESTED"}
-          />
-
-          <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-col gap-5 md:flex-row md:items-start">
-              <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-gray-100">
-                {application.clubImage ? (
-                  <Image
-                    src={application.clubImage}
-                    alt={application.clubName}
-                    fill
-                    className="object-cover"
-                    sizes="96px"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-gray-100 font-semibold text-gray-400 text-sm">
-                    No Image
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-1">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_320px]">
+          <main className="space-y-6">
+            <section
+              className={`overflow-hidden rounded-xl border shadow-sm ${statusConfig.panel}`}
+            >
+              <div className="border-gray-200/80 border-b bg-white/70 px-6 py-5">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="font-bold text-2xl text-gray-900">
-                    {application.clubName}
-                  </h2>
-                  <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-[12px] text-gray-500">
-                    revision {application.revision}
+                  <span
+                    className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.timelineAccent}`}
+                  >
+                    {STATUS_LABELS[application.status]}
                   </span>
+                  <p className="font-semibold text-[15px] text-gray-900">
+                    {statusConfig.title}
+                  </p>
                 </div>
-                <p className="mt-3 text-gray-600 text-sm leading-7">
-                  {application.oneLiner}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {application.majors.map((major) => (
-                    <span
-                      key={major}
-                      className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 font-medium text-[12px] text-primary-700"
-                    >
-                      {major}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl bg-gray-50 px-5 py-4">
-                <p className="text-gray-400 text-sm">신청자</p>
-                <p className="mt-2 font-semibold text-gray-900">
-                  {application.applicant.userName}
-                </p>
-                <p className="mt-1 text-gray-500 text-sm">
-                  {application.applicant.classNumber}
+                <p className="mt-3 max-w-3xl text-[14px] text-gray-600 leading-7">
+                  {statusConfig.description}
                 </p>
               </div>
-              <div className="rounded-2xl bg-gray-50 px-5 py-4">
-                <p className="text-gray-400 text-sm">최종 제출 시각</p>
-                <p className="mt-2 font-semibold text-gray-900">
-                  {formatDateTime(application.lastSubmittedAt)}
-                </p>
-                <p className="mt-1 text-gray-500 text-sm">
-                  최초 제출: {formatDateTime(application.submittedAt)}
-                </p>
-              </div>
-            </div>
 
-            <div className="mt-8 space-y-6">
-              <section>
-                <h3 className="font-bold text-lg text-gray-900">동아리 소개</h3>
-                <div className="mt-3 rounded-2xl bg-gray-50 px-5 py-5 text-gray-700 text-sm leading-7">
-                  {application.introduction}
+              {application.status === "CHANGES_REQUESTED" ? (
+                <div className="bg-white px-6 py-4">
+                  <Link href="/mypage/club-creation/edit">
+                    <Button className="rounded-lg border border-[#1f6feb]/20 bg-[#1f6feb] px-4 py-2.5 font-semibold text-[14px] text-white hover:bg-[#1a63d8]">
+                      수정 후 다시 제출하기
+                    </Button>
+                  </Link>
                 </div>
-              </section>
+              ) : null}
+            </section>
 
-              <section>
-                <h3 className="font-bold text-lg text-gray-900">
-                  동아리 관련 링크
-                </h3>
-                <div className="mt-3 rounded-2xl bg-gray-50 px-5 py-5">
+            <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="border-gray-200 border-b bg-[#f6f8fa] px-6 py-5">
+                <div className="flex flex-col gap-5 md:flex-row md:items-start">
+                  <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                    {application.clubImage ? (
+                      <Image
+                        src={application.clubImage}
+                        alt={application.clubName}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center font-semibold text-[12px] text-gray-400">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h2 className="truncate font-semibold text-[26px] text-gray-900">
+                        {application.clubName}
+                      </h2>
+                      <span className="rounded-md border border-gray-200 bg-white px-2.5 py-1 font-medium text-[12px] text-gray-600">
+                        revision {application.revision}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-[15px] text-gray-600 leading-7">
+                      {application.oneLiner}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {application.majors.map((major) => (
+                        <span
+                          key={major}
+                          className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-700"
+                        >
+                          {major}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="divide-y divide-gray-200">
+                <DetailSection title="개설 신청 상세 보기">
+                  <div className="rounded-lg border border-gray-200 bg-white px-4 py-4 text-[14px] text-gray-700 leading-7">
+                    <p className="whitespace-pre-line">
+                      {application.introduction}
+                    </p>
+                  </div>
+                </DetailSection>
+
+                <DetailSection title="동아리 관련 링크">
                   {application.links.length > 0 ? (
-                    <div className="space-y-3">
-                      {application.links.map((link) => (
+                    <div className="overflow-hidden rounded-lg border border-gray-200">
+                      {application.links.map((link, index) => (
                         <a
                           key={link}
                           href={link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block break-all text-gray-700 text-sm underline underline-offset-2 hover:text-gray-900"
+                          className={`flex items-center gap-3 bg-white px-4 py-3 text-[#0969da] text-[14px] transition hover:bg-[#f6f8fa] hover:text-[#0550ae] ${
+                            index === 0 ? "" : "border-gray-200 border-t"
+                          }`}
                         >
-                          {link}
+                          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-[#f6f8fa] font-semibold text-[11px] text-gray-600">
+                            URL
+                          </span>
+                          <span className="min-w-0 break-all">{link}</span>
                         </a>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-sm">
+                    <div className="rounded-lg border border-gray-200 border-dashed bg-[#f6f8fa] px-4 py-5 text-[14px] text-gray-500">
                       등록된 링크가 없습니다.
-                    </p>
+                    </div>
                   )}
-                </div>
-              </section>
+                </DetailSection>
 
-              <section>
-                <h3 className="font-bold text-lg text-gray-900">
-                  개설 신청 양식
-                </h3>
-                <div className="mt-3 rounded-2xl bg-gray-50 px-5 py-5">
+                <DetailSection title="개설 신청 양식">
                   {application.clubCreationForm ? (
-                    <article className="rounded-2xl border border-gray-200 bg-white px-4 py-4">
-                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
+                    <article className="rounded-lg border border-gray-200 bg-white">
+                      <div className="flex flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex min-w-0 items-center gap-4">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-[#f6f8fa] font-semibold text-[11px] text-gray-700">
                             {previewFileExtensionLabel}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="break-all font-medium text-gray-900 text-sm md:text-base">
+                            <p className="break-all font-medium text-[14px] text-gray-900 md:text-[15px]">
                               {previewFileName}
                             </p>
                             <p className="mt-1 text-[12px] text-gray-500">
@@ -414,27 +488,110 @@ export default function ClubCreationApplicationDetailPage() {
                         <button
                           type="button"
                           onClick={() => setIsPreviewOpen(true)}
-                          className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                          className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 font-semibold text-[14px] text-gray-900 transition hover:border-gray-400 hover:bg-[#f6f8fa]"
                         >
                           미리보기
                         </button>
                       </div>
                     </article>
                   ) : (
-                    <p className="text-gray-500 text-sm">
+                    <div className="rounded-lg border border-gray-200 border-dashed bg-[#f6f8fa] px-4 py-5 text-[14px] text-gray-500">
                       제출된 개설 신청 양식이 없습니다.
-                    </p>
+                    </div>
                   )}
-                </div>
-              </section>
-            </div>
-          </section>
+                </DetailSection>
+              </div>
+            </section>
 
-          <ReviewSection
-            title="리뷰 이력"
-            reviews={application.reviewHistory}
-            emptyMessage="과거 revision 리뷰 이력이 아직 없습니다."
-          />
+            <ReviewTimelineSection
+              title="최신 코멘트"
+              reviews={application.currentReviews}
+              emptyMessage="아직 현재 revision에 등록된 리뷰가 없습니다."
+              highlightChangesRequested={
+                application.status === "CHANGES_REQUESTED"
+              }
+            />
+
+            <ReviewTimelineSection
+              title="이전 revision 기록"
+              reviews={application.reviewHistory}
+              emptyMessage="과거 revision 리뷰 이력이 아직 없습니다."
+            />
+          </main>
+
+          <aside className="space-y-4">
+            <SidebarCard title="신청 메타데이터">
+              <div className="space-y-4 text-[14px]">
+                <div>
+                  <p className="font-medium text-[12px] text-gray-400">상태</p>
+                  <div className="mt-2">
+                    <span
+                      className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.badge}`}
+                    >
+                      {STATUS_LABELS[application.status]}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-gray-200 border-t pt-4">
+                  <p className="font-medium text-[12px] text-gray-400">
+                    신청자
+                  </p>
+                  <p className="mt-2 font-semibold text-gray-900">
+                    {application.applicant.userName}
+                  </p>
+                  <p className="mt-1 text-gray-500">
+                    {application.applicant.classNumber}
+                  </p>
+                </div>
+
+                <div className="border-gray-200 border-t pt-4">
+                  <p className="font-medium text-[12px] text-gray-400">
+                    제출 시각
+                  </p>
+                  <p className="mt-2 font-medium text-gray-900">
+                    {formatDateTime(application.lastSubmittedAt)}
+                  </p>
+                  <p className="mt-1 text-[13px] text-gray-500">
+                    최초 제출: {formatDateTime(application.submittedAt)}
+                  </p>
+                </div>
+
+                <div className="border-gray-200 border-t pt-4">
+                  <p className="font-medium text-[12px] text-gray-400">
+                    리뷰 현황
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-gray-200 bg-[#f6f8fa] px-3 py-3">
+                      <p className="text-[12px] text-gray-500">현재 리뷰</p>
+                      <p className="mt-1 font-semibold text-gray-900">
+                        {application.currentReviews.length}건
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-gray-200 bg-[#f6f8fa] px-3 py-3">
+                      <p className="text-[12px] text-gray-500">이전 기록</p>
+                      <p className="mt-1 font-semibold text-gray-900">
+                        {application.reviewHistory.length}건
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SidebarCard>
+
+            {application.status === "CHANGES_REQUESTED" ? (
+              <SidebarCard title="다음 단계">
+                <p className="text-[14px] text-gray-600 leading-7">
+                  최신 코멘트를 확인한 뒤 신청서를 수정하고 다시 제출하세요.
+                </p>
+                <Link href="/mypage/club-creation/edit" className="mt-4 block">
+                  <Button className="w-full rounded-lg border border-[#1f6feb]/20 bg-[#1f6feb] px-4 py-2.5 font-semibold text-[14px] text-white hover:bg-[#1a63d8]">
+                    수정 후 다시 제출하기
+                  </Button>
+                </Link>
+              </SidebarCard>
+            ) : null}
+          </aside>
         </div>
       </div>
 
