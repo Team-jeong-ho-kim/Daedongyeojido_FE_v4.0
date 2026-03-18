@@ -67,7 +67,12 @@ test.describe("Student my club creation detail", () => {
     await expect(
       page.getByText("현재 검토 차수 피드백입니다."),
     ).toBeVisible();
-    await expect(page.getByText("검토 차수 2차")).toBeVisible();
+    await expect(
+      page
+        .locator("article")
+        .filter({ hasText: "현재 검토 차수 피드백입니다." })
+        .getByText("검토 차수 2차"),
+    ).toBeVisible();
     await expect(page.getByText("현재 리뷰")).toHaveCount(0);
     await expect(page.getByText("이전 기록")).toHaveCount(0);
     await expect(page.getByText("리뷰 이력")).toHaveCount(2);
