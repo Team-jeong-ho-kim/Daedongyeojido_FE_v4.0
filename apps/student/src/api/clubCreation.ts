@@ -35,11 +35,16 @@ const appendStringArray = (
   );
 };
 
-const buildClubCreationFormData = (
-  payload: Omit<CreateClubCreationApplicationInput, "teacherId"> & {
-    teacherId?: number;
-  },
-) => {
+const buildClubCreationFormData = (payload: {
+  clubCreationForm?: File | null;
+  clubImage?: File | null;
+  clubName?: string;
+  introduction?: string;
+  link?: string[];
+  major?: string[];
+  oneLiner?: string;
+  teacherId?: number;
+}) => {
   const formData = new FormData();
 
   if (payload.clubName !== undefined) {
