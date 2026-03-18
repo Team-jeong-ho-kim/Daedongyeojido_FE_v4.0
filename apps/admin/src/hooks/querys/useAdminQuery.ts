@@ -42,17 +42,24 @@ export const useGetClubCreationApplicationsQuery = (enabled = true) => {
     queryKey: queryKeys.admin.clubCreationApplications.queryKey,
     queryFn: getClubCreationApplications,
     enabled,
-    select: (clubs) => [...clubs].sort((a, b) => b.clubId - a.clubId),
+    select: (applications) =>
+      [...applications].sort((a, b) => {
+        return (
+          new Date(b.lastSubmittedAt).getTime() -
+          new Date(a.lastSubmittedAt).getTime()
+        );
+      }),
   });
 };
 
 export const useGetClubCreationApplicationDetailQuery = (
-  clubId: string,
+  applicationId: string,
   enabled = true,
 ) => {
   return useQuery({
-    queryKey: queryKeys.admin.clubCreationApplicationDetail(clubId).queryKey,
-    queryFn: () => getClubCreationApplicationDetail(clubId),
-    enabled: enabled && !!clubId,
+    queryKey:
+      queryKeys.admin.clubCreationApplicationDetail(applicationId).queryKey,
+    queryFn: () => getClubCreationApplicationDetail(applicationId),
+    enabled: enabled && !!applicationId,
   });
 };

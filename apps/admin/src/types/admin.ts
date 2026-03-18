@@ -1,3 +1,10 @@
+import type {
+  ClubCreationApplicationDetail,
+  ClubCreationApplicationListItem,
+  ClubCreationApplicationListResponse,
+  ClubCreationApplicationReviewRequest,
+} from "utils";
+
 export type Role = "ADMIN" | "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | string;
 
 export interface AdminUserInfo {
@@ -92,27 +99,16 @@ export interface AdminClubAnnouncementResponse {
   clubAnnouncements: AdminClubAnnouncement[];
 }
 
-export interface AdminClubCreationApplication {
-  clubId: number;
-  clubName: string;
-  clubImage: string;
-  introduction: string;
-  majors: string[];
-}
+export type AdminClubCreationApplication = ClubCreationApplicationListItem;
 
-export interface AdminClubCreationApplicationsResponse {
-  clubs: AdminClubCreationApplication[];
-}
+export type AdminClubCreationApplicationsResponse =
+  ClubCreationApplicationListResponse;
 
-export interface AdminClubCreationApplicationDetail {
-  club: ClubDetail;
-  userName: string;
-  classNumber: string;
-  clubCreationForm: string;
-}
+export type AdminClubCreationApplicationDetailResponse =
+  ClubCreationApplicationDetail;
 
-export interface AdminClubCreationApplicationDetailResponse
-  extends AdminClubCreationApplicationDetail {}
+export type ReviewClubCreationApplicationRequest =
+  ClubCreationApplicationReviewRequest;
 
 export interface AdminTeacher {
   teacherId: number;

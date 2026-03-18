@@ -4,6 +4,7 @@ import type {
   AdminClubCreationApplicationDetailResponse,
   AdminClubCreationApplicationsResponse,
   ResultDurationResponse,
+  ReviewClubCreationApplicationRequest,
 } from "@/types/admin";
 
 type ResultDurationPayload = {
@@ -33,13 +34,6 @@ export const deleteResultDuration = async (
   await apiClient.delete(`/admin/result-duration/${resultDurationId}`);
 };
 
-export const decideClubApplication = async (
-  clubId: string,
-  isOpen: boolean,
-): Promise<void> => {
-  await apiClient.patch(`/admin/clubs/applications/${clubId}`, { isOpen });
-};
-
 export const decideDissolution = async (
   clubId: string,
   isDecision: boolean,
@@ -53,19 +47,29 @@ export const getClubCreationApplications = async (): Promise<
   AdminClubCreationApplication[]
 > => {
   const response = await apiClient.get<AdminClubCreationApplicationsResponse>(
-    "/admin/club-creation-application",
+    "/club-creation-applications",
   );
-  return response.data.clubs;
+  return response.data.applications;
 };
 
 export const getClubCreationApplicationDetail = async (
-  clubId: string,
+  applicationId: string,
 ): Promise<AdminClubCreationApplicationDetailResponse> => {
   const response =
     await apiClient.get<AdminClubCreationApplicationDetailResponse>(
-      `/admin/club-creation-application/${clubId}`,
+      `/club-creation-applications/${applicationId}`,
     );
   return response.data;
+};
+
+export const reviewClubCreationApplication = async (
+  applicationId: string,
+  payload: ReviewClubCreationApplicationRequest,
+): Promise<void> => {
+  await apiClient.put(
+    `/club-creation-applications/${applicationId}/review`,
+    payload,
+  );
 };
 
 export const uploadClubCreationForm = async (

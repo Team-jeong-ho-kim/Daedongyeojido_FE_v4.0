@@ -1,3 +1,13 @@
+import type {
+  ClubCreationApplicationDetail,
+  ClubCreationApplicationListItem,
+  ClubCreationApplicationListResponse,
+  ClubCreationApplicationReview,
+  ClubCreationReviewDecision,
+  ClubCreationReviewerType,
+  ClubCreationApplicationReviewRequest,
+} from "utils";
+
 export interface TeacherMyInfoResponse {
   accountId: string;
   teacherName: string;
@@ -5,18 +15,21 @@ export interface TeacherMyInfoResponse {
   clubName: string | null;
 }
 
-export interface TeacherClubCreationDetail {
-  clubName: string;
-  introduction: string;
-  oneLiner: string;
-  clubImage: string;
-  majors: string[];
-  links: string[];
-}
+export type TeacherClubCreationApplication = ClubCreationApplicationListItem;
 
-export interface TeacherClubCreationApplicationDetailResponse {
-  club: TeacherClubCreationDetail;
-  userName: string;
-  classNumber: string;
-  clubCreationForm: string;
-}
+export type TeacherClubCreationApplicationsResponse =
+  ClubCreationApplicationListResponse;
+
+export type TeacherClubCreationApplicationDetailResponse =
+  ClubCreationApplicationDetail;
+
+export type TeacherClubCreationReviewRequest =
+  ClubCreationApplicationReviewRequest;
+
+export type TeacherClubCreationReview = ClubCreationApplicationReview;
+
+export type TeacherClubCreationDecision = ClubCreationReviewDecision;
+
+export type TeacherClubCreationReviewerType = ClubCreationReviewerType;
+
+export type { ClubCreationReviewDecision, ClubCreationReviewerType };

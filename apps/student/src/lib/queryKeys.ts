@@ -1,6 +1,9 @@
 import { createQueryKeyStore } from "@lukemorales/query-key-factory";
 
 export const queryKeys = createQueryKeyStore({
+  clubCreationApplication: {
+    me: null,
+  },
   clubs: {
     all: null,
     detail: (clubId: string) => [clubId],
