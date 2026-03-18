@@ -1,5 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
-import { installStudentApiMocks, setAuthSession } from "./support/mockApi";
+import {
+  DEFAULT_MY_CLUB_CREATION_APPLICATION,
+  installStudentApiMocks,
+  setAuthSession,
+} from "./support/mockApi";
 
 const uploadClubCreationPdf = async (
   page: Page,
@@ -16,6 +20,25 @@ const uploadClubCreationPdf = async (
 
 const getTeacherSelectTrigger = (page: Page) =>
   page.getByRole("button", { name: /Teacher/ });
+
+const buildMyApplication = (
+  overrides: Partial<typeof DEFAULT_MY_CLUB_CREATION_APPLICATION> = {},
+) => {
+  return {
+    ...DEFAULT_MY_CLUB_CREATION_APPLICATION,
+    ...overrides,
+    applicant: {
+      ...DEFAULT_MY_CLUB_CREATION_APPLICATION.applicant,
+      ...(overrides.applicant ?? {}),
+    },
+    currentReviews:
+      overrides.currentReviews ??
+      DEFAULT_MY_CLUB_CREATION_APPLICATION.currentReviews,
+    reviewHistory:
+      overrides.reviewHistory ??
+      DEFAULT_MY_CLUB_CREATION_APPLICATION.reviewHistory,
+  };
+};
 
 const fillClubCreationForm = async (page: Page) => {
   await page.getByPlaceholder("동아리 명").fill("테스트동아리");
@@ -56,6 +79,44 @@ test.describe("Student club creation", () => {
   test.beforeEach(async ({ page }) => {
     await setAuthSession(page, { role: "STUDENT" });
   });
+
+  for (const blockedRole of ["CLUB_MEMBER", "CLUB_LEADER"] as const) {
+    test(`${blockedRole}는 생성 화면 대신 차단 안내 카드를 본다`, async ({
+      page,
+    }) => {
+      await setAuthSession(page, { role: blockedRole });
+      const mockApi = await installStudentApiMocks(page, {
+        user: { role: blockedRole },
+      });
+
+      await page.goto("/clubs/create");
+
+      await expect(
+        page.getByRole("heading", {
+          name: "새 동아리 개설 신청을 진행할 수 없습니다",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          "동아리원 및 동아리 리더는 현재 소속 동아리 활동 중인 상태이므로 새 동아리 개설 신청 대상이 아닙니다.",
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "마이페이지로 이동" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "개설 신청" }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: /Teacher/ }),
+      ).toHaveCount(0);
+
+      expect(
+        mockApi.getLastRequest("/club-creation-applications/me", "GET"),
+      ).toBeUndefined();
+      expect(mockApi.getLastRequest("/teachers", "GET")).toBeUndefined();
+    });
+  }
 
   test("PDF가 아닌 개설 양식 파일은 거부한다", async ({ page }) => {
     await installStudentApiMocks(page);
@@ -107,8 +168,6 @@ test.describe("Student club creation", () => {
     ).toHaveCount(0);
 
     await uploadClubCreationPdf(page, "club-creation-form-v2.pdf");
-    await expect(page.getByText("업로드한 개설 양식")).toBeVisible();
-
     await page.getByRole("button", { name: "미리보기" }).click();
     await expect(
       previewModal.getByText("club-creation-form-v2.pdf"),
@@ -116,15 +175,10 @@ test.describe("Student club creation", () => {
     await expect(previewModal.getByText("club-creation-form.pdf")).toHaveCount(
       0,
     );
-    await expect(
-      previewModal.getByRole("button", { name: "다운로드" }),
-    ).toBeVisible();
-    await expect(page.locator('object[type="application/pdf"]')).toBeVisible();
   });
 
   test("같은 지도 교사를 다시 클릭하면 선택이 해제된다", async ({ page }) => {
     await installStudentApiMocks(page);
-
     await page.goto("/clubs/create");
 
     const teacherSelectTrigger = getTeacherSelectTrigger(page);
@@ -160,9 +214,7 @@ test.describe("Student club creation", () => {
     const teacherCards = page
       .locator("button[aria-pressed]")
       .filter({ hasText: "선생님" });
-    const secondTeacherCard = teacherCards.nth(1);
-    await secondTeacherCard.click();
-    await expect(teacherSelectTrigger).toContainText("선생님");
+    await teacherCards.nth(1).click();
 
     await page.getByRole("button", { name: "개설 신청" }).click();
     await expect(
@@ -170,10 +222,9 @@ test.describe("Student club creation", () => {
     ).toBeVisible();
     await page.getByRole("button", { name: "신청하기" }).click();
 
+    await expect(page).toHaveURL(/\/mypage$/);
     await expect(
-      page.getByText(
-        "개설 신청이 완료되었습니다. 관리자에서 수락 시 동아리가 개설됩니다",
-      ),
+      page.getByRole("heading", { name: "마이페이지" }),
     ).toBeVisible();
 
     const submitRequest = mockApi.getLastRequest(
@@ -183,7 +234,6 @@ test.describe("Student club creation", () => {
     expect(submitRequest?.rawBody).toContain("테스트동아리");
     expect(submitRequest?.rawBody).toContain("같이 성장하는 동아리");
     expect(submitRequest?.rawBody).toContain("club-creation-form.pdf");
-    expect(submitRequest?.rawBody).toContain("clubCreationForm");
     expect(submitRequest?.rawBody).toContain('name="teacherId"');
     expect(getMultipartFieldValue(submitRequest?.rawBody, "teacherId")).toBe(
       "2",
@@ -215,37 +265,6 @@ test.describe("Student club creation", () => {
     ).toHaveCount(0);
   });
 
-  test("이미 개설 신청한 상태로 지도 교사 조회가 403이면 페이지에서 새 신청이 차단된다", async ({
-    page,
-  }) => {
-    const mockApi = await installStudentApiMocks(page, { teachersStatus: 403 });
-
-    await page.goto("/clubs/create");
-    await expect(
-      page.getByText(
-        "이미 동아리 개설 신청을 완료했습니다. 관리자 승인 전까지 새 신청을 진행할 수 없습니다.",
-      ),
-    ).toBeVisible();
-
-    await fillClubCreationForm(page);
-
-    await expect(getTeacherSelectTrigger(page)).toBeDisabled();
-    await expect(
-      page.getByRole("button", { name: "개설 신청" }),
-    ).toBeDisabled();
-
-    await page
-      .getByRole("button", { name: "개설 신청" })
-      .evaluate((button: HTMLButtonElement) => button.click());
-
-    await expect(
-      page.getByRole("dialog", { name: "정말 개설을 신청하시겠습니까?" }),
-    ).toHaveCount(0);
-    expect(
-      mockApi.getLastRequest(/\/clubs\/applications$/, "POST"),
-    ).toBeUndefined();
-  });
-
   test("선택 가능한 지도 교사가 없으면 선택 UI가 비활성화되고 제출이 막힌다", async ({
     page,
   }) => {
@@ -269,5 +288,123 @@ test.describe("Student club creation", () => {
     await expect(
       page.getByRole("dialog", { name: "정말 개설을 신청하시겠습니까?" }),
     ).toHaveCount(0);
+  });
+
+  test("이미 신청한 학생은 생성 페이지 대신 내 신청 상세로 이동한다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "UNDER_REVIEW",
+        currentReviews: [],
+      }),
+    });
+
+    await page.goto("/clubs/create");
+
+    await expect(page).toHaveURL(/\/mypage\/club-creation$/);
+    await expect(
+      page.getByText("현재 신청서가 검토 중입니다."),
+    ).toBeVisible();
+  });
+
+  for (const statusCase of [
+    {
+      status: "SUBMITTED",
+      title: "신청서가 정상적으로 제출되었습니다.",
+      hasEdit: false,
+    },
+    {
+      status: "UNDER_REVIEW",
+      title: "현재 신청서가 검토 중입니다.",
+      hasEdit: false,
+    },
+    {
+      status: "CHANGES_REQUESTED",
+      title: "수정 요청이 도착했습니다.",
+      hasEdit: true,
+    },
+    {
+      status: "APPROVED",
+      title: "개설 신청이 승인되었습니다.",
+      hasEdit: false,
+    },
+    {
+      status: "REJECTED",
+      title: "개설 신청이 반려되었습니다.",
+      hasEdit: false,
+    },
+  ] as const) {
+    test(`상태 ${statusCase.status}에 맞는 상세 UI를 노출한다`, async ({
+      page,
+    }) => {
+      await installStudentApiMocks(page, {
+        myClubCreationApplication: buildMyApplication({
+          status: statusCase.status,
+        }),
+      });
+
+      await page.goto("/mypage/club-creation");
+
+      await expect(
+        page.getByRole("heading", { name: "내 개설 신청" }),
+      ).toBeVisible();
+      await expect(page.getByText(statusCase.title)).toBeVisible();
+
+      if (statusCase.hasEdit) {
+        await expect(page.getByText("수정 후 다시 제출하기")).toBeVisible();
+      } else {
+        await expect(page.getByText("수정 후 다시 제출하기")).toHaveCount(0);
+      }
+    });
+  }
+
+  test("수정 요청 상태에서만 수정 페이지에 들어가 PATCH 후 재제출한다", async ({
+    page,
+  }) => {
+    const mockApi = await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "CHANGES_REQUESTED",
+      }),
+    });
+
+    await page.goto("/mypage/club-creation/edit");
+    await expect(
+      page.getByText("수정 요청 코멘트를 반영해 신청서를 다시 제출하세요"),
+    ).toBeVisible();
+
+    await page
+      .getByPlaceholder("동아리 한줄 소개를 작성해주세요.")
+      .fill("수정한 한줄 소개");
+    await uploadClubCreationPdf(page, "club-creation-form-v2.pdf");
+
+    await page.getByRole("button", { name: "수정 후 다시 제출" }).click();
+    await page.getByRole("button", { name: "다시 제출하기" }).click();
+
+    await expect(page).toHaveURL(/\/mypage$/);
+    expect(
+      mockApi.getLastRequest("/club-creation-applications/41", "PATCH"),
+    ).toBeTruthy();
+    expect(
+      mockApi.getLastRequest("/club-creation-applications/41/submit", "POST"),
+    ).toBeTruthy();
+  });
+
+  test("수정 요청이 아니면 수정 페이지 접근이 상세로 되돌려진다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "UNDER_REVIEW",
+        currentReviews: [],
+      }),
+    });
+
+    await page.goto("/mypage/club-creation/edit");
+
+    await expect(page).toHaveURL(/\/mypage\/club-creation$/);
+    await expect(
+      page.getByText("현재 신청서가 검토 중입니다."),
+    ).toBeVisible();
   });
 });

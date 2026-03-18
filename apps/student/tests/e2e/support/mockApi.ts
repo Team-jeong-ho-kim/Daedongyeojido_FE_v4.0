@@ -98,6 +98,43 @@ type MockTeacher = {
   teacherName: string;
 };
 
+type MockClubCreationReview = {
+  reviewId: number;
+  reviewerType: "ADMIN" | "TEACHER";
+  reviewerName: string;
+  revision: number;
+  decision: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+  feedback: string | null;
+  updatedAt: string;
+};
+
+type MockClubCreationApplicationDetail = {
+  applicationId: number;
+  status:
+    | "SUBMITTED"
+    | "UNDER_REVIEW"
+    | "CHANGES_REQUESTED"
+    | "APPROVED"
+    | "REJECTED";
+  revision: number;
+  clubName: string;
+  clubImage: string | null;
+  clubCreationForm: string | null;
+  oneLiner: string;
+  introduction: string;
+  majors: string[];
+  links: string[];
+  applicant: {
+    userId: number;
+    userName: string;
+    classNumber: string;
+  };
+  submittedAt: string | null;
+  lastSubmittedAt: string | null;
+  currentReviews: MockClubCreationReview[];
+  reviewHistory: MockClubCreationReview[];
+};
+
 type RecordedRequest = {
   method: string;
   pathname: string;
@@ -128,6 +165,8 @@ type StudentApiMockOptions = {
   documentFiles?: MockDocumentFile[];
   teachers?: MockTeacher[];
   teachersStatus?: number;
+  myClubCreationApplication?: MockClubCreationApplicationDetail | null;
+  myClubCreationApplicationStatus?: number;
 };
 
 const DEFAULT_USER: MockUser = {
@@ -260,6 +299,38 @@ const DEFAULT_TEACHERS: MockTeacher[] = [
   },
 ];
 
+export const DEFAULT_MY_CLUB_CREATION_APPLICATION: MockClubCreationApplicationDetail = {
+  applicationId: 41,
+  status: "CHANGES_REQUESTED",
+  revision: 2,
+  clubName: "테스트동아리",
+  clubImage: "/images/icons/profile.svg",
+  clubCreationForm: "/documents/previews/1.pdf",
+  oneLiner: "같이 성장하는 동아리",
+  introduction: "프로젝트와 협업 중심으로 운영하는 테스트 동아리입니다.",
+  majors: ["BE"],
+  links: ["https://example.com/club"],
+  applicant: {
+    userId: 10,
+    userName: "테스트유저",
+    classNumber: "2301",
+  },
+  submittedAt: "2026-03-18T09:00:00",
+  lastSubmittedAt: "2026-03-18T11:00:00",
+  currentReviews: [
+    {
+      reviewId: 900,
+      reviewerType: "TEACHER",
+      reviewerName: "선생님",
+      revision: 2,
+      decision: "CHANGES_REQUESTED",
+      feedback: "활동 계획을 조금 더 구체적으로 작성해주세요.",
+      updatedAt: "2026-03-18T12:00:00",
+    },
+  ],
+  reviewHistory: [],
+};
+
 const isApiDataRequest = (route: Route) => {
   const resourceType = route.request().resourceType();
   return resourceType === "fetch" || resourceType === "xhr";
@@ -313,6 +384,49 @@ const parseRequestBody = (
       rawBody,
     };
   }
+};
+
+const getMultipartFieldValues = (
+  rawBody: string | null | undefined,
+  fieldName: string,
+) => {
+  if (!rawBody) {
+    return [];
+  }
+
+  const escapedFieldName = fieldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const matches = rawBody.matchAll(
+    new RegExp(`name="${escapedFieldName}"\\r\\n\\r\\n([^\\r]+)`, "g"),
+  );
+
+  return [...matches].map((match) => match[1]).filter(Boolean);
+};
+
+const getMultipartFieldValue = (
+  rawBody: string | null | undefined,
+  fieldName: string,
+) => {
+  return getMultipartFieldValues(rawBody, fieldName)[0] ?? null;
+};
+
+const updateApplicationFromMultipart = (
+  application: MockClubCreationApplicationDetail,
+  rawBody: string | null,
+) => {
+  const clubName = getMultipartFieldValue(rawBody, "clubName");
+  const oneLiner = getMultipartFieldValue(rawBody, "oneLiner");
+  const introduction = getMultipartFieldValue(rawBody, "introduction");
+  const majors = getMultipartFieldValues(rawBody, "major");
+  const links = getMultipartFieldValues(rawBody, "link");
+
+  return {
+    ...application,
+    clubName: clubName ?? application.clubName,
+    oneLiner: oneLiner ?? application.oneLiner,
+    introduction: introduction ?? application.introduction,
+    majors: majors.length > 0 ? majors : application.majors,
+    links: links.length > 0 ? links : application.links,
+  };
 };
 
 export const buildAnnouncements = (
@@ -382,6 +496,13 @@ export async function installStudentApiMocks(
   const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
   const teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
   const teachersStatus = options.teachersStatus ?? 200;
+  let myClubCreationApplication =
+    options.myClubCreationApplication === undefined
+      ? null
+      : options.myClubCreationApplication;
+  let myClubCreationApplicationStatus =
+    options.myClubCreationApplicationStatus ??
+    (myClubCreationApplication ? 200 : 404);
 
   const requests: RecordedRequest[] = [];
 
@@ -474,6 +595,30 @@ export async function installStudentApiMocks(
     }
 
     await createJsonResponse(route, user);
+  });
+
+  await page.route(/.*\/club-creation-applications\/me$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    recordRequest(route);
+
+    if (myClubCreationApplicationStatus >= 400 || !myClubCreationApplication) {
+      await createJsonResponse(
+        route,
+        createApiErrorResponse(
+          "개설 신청 정보를 찾을 수 없습니다.",
+          myClubCreationApplicationStatus,
+        ),
+        myClubCreationApplicationStatus,
+      );
+      return;
+    }
+
+    await createJsonResponse(route, myClubCreationApplication);
   });
 
   await page.route(/.*\/teachers$/, async (route) => {
@@ -599,8 +744,78 @@ export async function installStudentApiMocks(
     }
 
     recordRequest(route);
+    const rawBody = route.request().postData() ?? null;
+    const now = "2026-03-18T13:00:00";
+
+    myClubCreationApplication = {
+      applicationId: 77,
+      status: "SUBMITTED",
+      revision: 1,
+      clubName: getMultipartFieldValue(rawBody, "clubName") ?? "테스트동아리",
+      clubImage: "/images/icons/profile.svg",
+      clubCreationForm: "/documents/previews/1.pdf",
+      oneLiner:
+        getMultipartFieldValue(rawBody, "oneLiner") ?? "같이 성장하는 동아리",
+      introduction:
+        getMultipartFieldValue(rawBody, "introduction") ??
+        "프로젝트와 협업 중심으로 운영하는 테스트 동아리입니다.",
+      majors: getMultipartFieldValues(rawBody, "major"),
+      links: getMultipartFieldValues(rawBody, "link"),
+      applicant: {
+        userId: 10,
+        userName: user.userName,
+        classNumber: user.classNumber,
+      },
+      submittedAt: now,
+      lastSubmittedAt: now,
+      currentReviews: [],
+      reviewHistory: [],
+    };
+    myClubCreationApplicationStatus = 200;
     await createJsonResponse(route, { success: true }, 201);
   });
+
+  await page.route(/.*\/club-creation-applications\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "PATCH") {
+      await route.continue();
+      return;
+    }
+
+    recordRequest(route);
+
+    if (myClubCreationApplication) {
+      myClubCreationApplication = updateApplicationFromMultipart(
+        myClubCreationApplication,
+        route.request().postData() ?? null,
+      );
+    }
+
+    await route.fulfill({ status: 204, body: "" });
+  });
+
+  await page.route(
+    /.*\/club-creation-applications\/\d+\/submit$/,
+    async (route) => {
+      if (await handleApiFallback(route)) return;
+      if (route.request().method() !== "POST") {
+        await route.continue();
+        return;
+      }
+
+      recordRequest(route);
+
+      if (myClubCreationApplication) {
+        myClubCreationApplication = {
+          ...myClubCreationApplication,
+          status: "UNDER_REVIEW",
+          lastSubmittedAt: "2026-03-18T14:00:00",
+        };
+      }
+
+      await route.fulfill({ status: 204, body: "" });
+    },
+  );
 
   await page.route(/.*\/clubs$/, async (route) => {
     if (await handleApiFallback(route)) return;

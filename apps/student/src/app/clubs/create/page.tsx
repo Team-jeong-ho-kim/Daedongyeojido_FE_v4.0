@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import {
   Button,
@@ -20,8 +22,11 @@ import {
 } from "utils";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
-import { useCreateClubApplicationMutation } from "@/hooks/mutations/useClub";
-import { useGetAllTeachersQuery } from "@/hooks/querys";
+import { useCreateClubCreationApplicationMutation } from "@/hooks/mutations";
+import {
+  useGetAllTeachersQuery,
+  useGetMyClubCreationApplicationQuery,
+} from "@/hooks/querys";
 import { useModalStore } from "@/stores/useModalStore";
 import type { Teacher } from "@/types";
 
@@ -194,9 +199,6 @@ function TeacherSelectField(props: TeacherSelectFieldProps) {
   );
 }
 
-const CLUB_CREATION_FORBIDDEN_MESSAGE =
-  "이미 동아리 개설 신청을 완료했습니다. 관리자 승인 전까지 새 신청을 진행할 수 없습니다.";
-
 const getErrorStatus = (error: unknown): number | null => {
   if (error instanceof ApiError) {
     return error.status;
@@ -224,9 +226,17 @@ const getErrorStatus = (error: unknown): number | null => {
 };
 
 export default function ClubCreationPage() {
-  const { mutate: createClubMutate } = useCreateClubApplicationMutation();
-  const teachersQuery = useGetAllTeachersQuery();
-  const hasShownForbiddenToastRef = useRef(false);
+  const router = useRouter();
+  const role = useUserStore((state) => state.userInfo?.role);
+  const isBlockedRole = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+  const { mutate: createClubMutate, isPending: isCreatePending } =
+    useCreateClubCreationApplicationMutation();
+  const myApplicationQuery = useGetMyClubCreationApplicationQuery({
+    enabled: !isBlockedRole,
+  });
+  const teachersQuery = useGetAllTeachersQuery({
+    enabled: !isBlockedRole,
+  });
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
   const [clubCreationFormFile, setClubCreationFormFile] = useState<File | null>(
@@ -247,39 +257,15 @@ export default function ClubCreationPage() {
   const { show, toggleShow } = useModalStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const teachers = teachersQuery.data ?? [];
-  const teacherErrorStatus = getErrorStatus(teachersQuery.error);
-  const isTeacherRequestForbidden = teacherErrorStatus === 403;
+  const myApplicationErrorStatus = getErrorStatus(myApplicationQuery.error);
   const isTeacherSelectDisabled =
     teachersQuery.isPending || teachersQuery.isError || teachers.length === 0;
 
-  const getTeacherFieldText = () => {
-    if (teachersQuery.isPending) {
-      return "지도 교사 목록을 불러오는 중입니다";
+  useEffect(() => {
+    if (myApplicationQuery.data) {
+      router.replace("/mypage/club-creation");
     }
-    if (teachersQuery.isError) {
-      return "지도 교사 목록을 불러오지 못했습니다";
-    }
-    if (teachers.length === 0) {
-      return "선택 가능한 지도 교사가 없습니다";
-    }
-    return "지도 교사를 선택해주세요";
-  };
-
-  const getTeacherValidationMessage = () => {
-    if (isTeacherRequestForbidden) {
-      return CLUB_CREATION_FORBIDDEN_MESSAGE;
-    }
-    if (teachersQuery.isPending) {
-      return "지도 교사 목록을 불러오는 중입니다. 잠시 후 다시 시도해주세요.";
-    }
-    if (teachersQuery.isError) {
-      return "지도 교사 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.";
-    }
-    if (teachers.length === 0) {
-      return "선택 가능한 지도 교사가 없습니다. 관리자에게 문의해주세요.";
-    }
-    return "지도 교사를 선택해주세요";
-  };
+  }, [myApplicationQuery.data, router]);
 
   useEffect(() => {
     if (
@@ -289,20 +275,6 @@ export default function ClubCreationPage() {
       setSelectedTeacherId(null);
     }
   }, [selectedTeacherId, teachers]);
-
-  useEffect(() => {
-    if (isTeacherRequestForbidden && !hasShownForbiddenToastRef.current) {
-      toast.error(CLUB_CREATION_FORBIDDEN_MESSAGE, {
-        id: "club-creation-forbidden",
-      });
-      hasShownForbiddenToastRef.current = true;
-      return;
-    }
-
-    if (!isTeacherRequestForbidden) {
-      hasShownForbiddenToastRef.current = false;
-    }
-  }, [isTeacherRequestForbidden]);
 
   useEffect(() => {
     if (!clubCreationFormFile) {
@@ -331,6 +303,32 @@ export default function ClubCreationPage() {
       URL.revokeObjectURL(nextPreviewUrl);
     };
   }, [clubCreationFormFile]);
+
+  const getTeacherFieldText = () => {
+    if (teachersQuery.isPending) {
+      return "지도 교사 목록을 불러오는 중입니다";
+    }
+    if (teachersQuery.isError) {
+      return "지도 교사 목록을 불러오지 못했습니다";
+    }
+    if (teachers.length === 0) {
+      return "선택 가능한 지도 교사가 없습니다";
+    }
+    return "지도 교사를 선택해주세요";
+  };
+
+  const getTeacherValidationMessage = () => {
+    if (teachersQuery.isPending) {
+      return "지도 교사 목록을 불러오는 중입니다. 잠시 후 다시 시도해주세요.";
+    }
+    if (teachersQuery.isError) {
+      return "지도 교사 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.";
+    }
+    if (teachers.length === 0) {
+      return "선택 가능한 지도 교사가 없습니다. 관리자에게 문의해주세요.";
+    }
+    return "지도 교사를 선택해주세요";
+  };
 
   const clubCreationFormDisplayName = clubCreationFormFile
     ? getDocumentDownloadFileName(
@@ -366,13 +364,16 @@ export default function ClubCreationPage() {
       newErrors.clubIntroDetail =
         "동아리 소개는 최대 500자까지 작성할 수 있습니다.";
     }
-    if (selectedFields.length === 0)
+    if (selectedFields.length === 0) {
       newErrors.selectedFields = "동아리 전공을 선택해주세요";
-    if (!clubCreationFormFile)
+    }
+    if (!clubCreationFormFile) {
       newErrors.clubCreationFormFile =
         "작성한 동아리 개설 양식 파일을 업로드해주세요";
-    if (selectedTeacherId === null)
+    }
+    if (selectedTeacherId === null) {
       newErrors.selectedTeacherId = getTeacherValidationMessage();
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -427,10 +428,6 @@ export default function ClubCreationPage() {
   };
 
   const handleOpenModal = () => {
-    if (isTeacherRequestForbidden) {
-      return;
-    }
-
     if (validateForm()) {
       toggleShow();
     } else {
@@ -439,15 +436,6 @@ export default function ClubCreationPage() {
   };
 
   const handleSubmit = () => {
-    if (isTeacherRequestForbidden) {
-      toggleShow();
-      return;
-    }
-    if (!clubLogo) {
-      toast.error("동아리 로고를 업로드해주세요.");
-      toggleShow();
-      return;
-    }
     if (!clubCreationFormFile) {
       toast.error("작성한 동아리 개설 양식 파일을 업로드해주세요.");
       toggleShow();
@@ -460,7 +448,7 @@ export default function ClubCreationPage() {
     }
 
     const links = [...new Set(clubLinks.map((link) => link.url.trim()))].filter(
-      (url) => url,
+      Boolean,
     );
 
     createClubMutate({
@@ -470,16 +458,76 @@ export default function ClubCreationPage() {
       teacherId: selectedTeacherId,
       major: selectedFields,
       link: links,
-      clubImage: clubLogo,
-      clubCreationFormFile,
+      clubImage: clubLogo ?? undefined,
+      clubCreationForm: clubCreationFormFile,
     });
     toggleShow();
   };
 
+  if (isBlockedRole) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-gray-50 px-6 py-8 text-center shadow-sm">
+          <h1 className="font-bold text-gray-900 text-xl">
+            새 동아리 개설 신청을 진행할 수 없습니다
+          </h1>
+          <p className="mt-3 text-gray-600 text-sm leading-6">
+            동아리원 및 동아리 리더는 현재 소속 동아리 활동 중인 상태이므로 새
+            동아리 개설 신청 대상이 아닙니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push("/mypage")}
+            className="mt-6 rounded-xl bg-primary-500 px-5 py-3 font-semibold text-sm text-white transition hover:bg-primary-600"
+          >
+            마이페이지로 이동
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (myApplicationQuery.isPending || myApplicationQuery.data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <p className="text-gray-500 text-sm">
+          내 개설 신청 상태를 확인하고 있습니다...
+        </p>
+      </div>
+    );
+  }
+
+  if (myApplicationQuery.error && myApplicationErrorStatus !== 404) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-red-50 px-6 py-8 text-center">
+          <h1 className="font-bold text-gray-900 text-xl">
+            개설 신청 화면을 열 수 없습니다
+          </h1>
+          <p className="mt-3 text-gray-600 text-sm leading-6">
+            내 개설 신청 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-6 rounded-xl bg-primary-500 px-5 py-3 font-semibold text-sm text-white transition hover:bg-primary-600"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-20 min-h-screen bg-white">
       <div className="bg-gray-50 py-16">
-        <h1 className="mb-12 text-center font-bold text-[26px]">동아리 생성</h1>
+        <h1 className="mb-3 text-center font-bold text-[26px]">
+          동아리 개설 신청
+        </h1>
+        <p className="mb-12 text-center text-gray-500 text-sm">
+          지도 교사를 먼저 선택하고, 개설 신청서를 작성해 제출하세요.
+        </p>
 
         <div className="mx-auto max-w-[1200px] space-y-0 px-4">
           <FormField label="동아리 명">
@@ -615,11 +663,11 @@ export default function ClubCreationPage() {
       <div className="flex justify-center py-16">
         <Button
           type="button"
-          disabled={isTeacherRequestForbidden}
+          disabled={isCreatePending}
           onClick={handleOpenModal}
-          className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-primary-700 hover:text-gray-200"
+          className="w-[500px] cursor-pointer rounded-lg bg-primary-500 py-6 font-medium text-[15px] text-white transition-colors hover:bg-primary-700 hover:text-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          개설 신청
+          {isCreatePending ? "신청 중..." : "개설 신청"}
         </Button>
       </div>
 
@@ -629,7 +677,7 @@ export default function ClubCreationPage() {
         onConfirm={handleSubmit}
         onBackdropClick={toggleShow}
         title="정말 개설을 신청하시겠습니까?"
-        description="이 작업은 되돌릴 수 없습니다."
+        description="제출 후에는 내 신청 상세 화면에서 상태를 확인할 수 있습니다."
         cancelText="닫기"
         confirmText="신청하기"
       />

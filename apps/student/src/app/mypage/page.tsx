@@ -109,6 +109,20 @@ export default function MyPage() {
               </Link>
             </div>
           </div>
+
+          <div className="mt-6">
+            <div className="flex min-h-[180px] flex-col justify-between rounded-2xl bg-gray-50 p-7 transition-colors hover:border-gray-200 md:max-w-[calc((100%-1.5rem)/3)]">
+              <h4 className="font-bold text-gray-800 text-lg">
+                내 개설 신청 바로가기
+              </h4>
+              <Link
+                href="/mypage/club-creation"
+                className="w-fit rounded-xl bg-primary-500 px-5 py-2.5 font-semibold text-sm text-white shadow-sm transition-all hover:bg-[#F96464] hover:shadow-md active:scale-95"
+              >
+                신청 상태 보기
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Footer Actions */}
