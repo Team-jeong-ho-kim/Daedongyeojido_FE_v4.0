@@ -1,12 +1,13 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useId, useMemo, useState } from "react";
 import { ManualPdfPreviewModal } from "ui";
+import type {
+  ClubCreationApplicationReview,
+  ClubCreationReviewDecision,
+  ClubCreationReviewerType,
+} from "utils";
 import { ClubHeader } from "@/components/common";
-import {
-  useDecideClubApplicationMutation,
-  useUploadClubCreationFormMutation,
-} from "@/hooks/mutations";
+import { useReviewClubCreationApplicationMutation } from "@/hooks/mutations";
 import {
   useGetClubCreationApplicationDetailQuery,
   useGetClubCreationApplicationsQuery,
@@ -15,111 +16,190 @@ import { getDownloadFileName } from "@/lib";
 import { toErrorMessage } from "../_lib";
 import { PanelCard } from "./PanelCard";
 
+const REVIEWER_LABELS: Record<ClubCreationReviewerType, string> = {
+  ADMIN: "관리자",
+  TEACHER: "지도 교사",
+};
+
+const DECISION_LABELS: Record<ClubCreationReviewDecision, string> = {
+  APPROVED: "승인",
+  CHANGES_REQUESTED: "수정 요청",
+  REJECTED: "반려",
+};
+
+const DECISION_STYLES: Record<ClubCreationReviewDecision, string> = {
+  APPROVED: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  CHANGES_REQUESTED: "border-amber-200 bg-amber-50 text-amber-700",
+  REJECTED: "border-red-200 bg-red-50 text-red-700",
+};
+
+const REVIEW_DECISION_OPTIONS = [
+  "APPROVED",
+  "CHANGES_REQUESTED",
+  "REJECTED",
+] as const;
+
+const STATUS_LABELS = {
+  APPROVED: "승인 완료",
+  CHANGES_REQUESTED: "수정 요청",
+  REJECTED: "반려",
+  SUBMITTED: "제출 완료",
+  UNDER_REVIEW: "검토 중",
+} as const;
+
+const formatDateTime = (value: string | null) => {
+  if (!value) {
+    return "-";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+};
+
+const sortReviews = (reviews: ClubCreationApplicationReview[]) =>
+  [...reviews].sort((a, b) => {
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
+
+function ReviewSection({
+  emptyMessage,
+  reviews,
+  title,
+}: {
+  emptyMessage: string;
+  reviews: ClubCreationApplicationReview[];
+  title: string;
+}) {
+  const sortedReviews = useMemo(() => sortReviews(reviews), [reviews]);
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h4 className="font-bold text-gray-900 text-lg">{title}</h4>
+        <span className="text-gray-400 text-sm">{sortedReviews.length}건</span>
+      </div>
+
+      {sortedReviews.length === 0 ? (
+        <div className="rounded-2xl border border-gray-200 border-dashed bg-gray-50 px-5 py-5 text-gray-500 text-sm">
+          {emptyMessage}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sortedReviews.map((review) => (
+            <article
+              key={review.reviewId}
+              className="rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 font-medium text-[12px] text-gray-600">
+                  {REVIEWER_LABELS[review.reviewerType]}
+                </span>
+                <span
+                  className={`rounded-full border px-3 py-1 font-medium text-[12px] ${DECISION_STYLES[review.decision]}`}
+                >
+                  {DECISION_LABELS[review.decision]}
+                </span>
+                <span className="text-gray-400 text-xs">
+                  revision {review.revision}
+                </span>
+              </div>
+
+              <div className="mt-3">
+                <p className="font-semibold text-gray-900 text-sm">
+                  {review.reviewerName}
+                </p>
+                <p className="mt-1 text-gray-400 text-xs">
+                  {formatDateTime(review.updatedAt)}
+                </p>
+              </div>
+
+              <div className="mt-4 rounded-xl bg-gray-50 px-4 py-4 text-gray-700 text-sm leading-7">
+                {review.feedback?.trim()
+                  ? review.feedback
+                  : "남겨진 코멘트가 없습니다."}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function ClubCreationTab() {
-  const decideClubApplicationMutation = useDecideClubApplicationMutation();
-  const clubCreationApplicationsQuery =
-    useGetClubCreationApplicationsQuery(false);
+  const reviewMutation = useReviewClubCreationApplicationMutation();
+  const clubCreationApplicationsQuery = useGetClubCreationApplicationsQuery();
+  const feedbackFieldId = useId();
   const [isDetailOverlayOpen, setIsDetailOverlayOpen] = useState(false);
-  const [selectedClubCreationId, setSelectedClubCreationId] = useState<
+  const [selectedApplicationId, setSelectedApplicationId] = useState<
     number | null
   >(null);
   const [isClubCreationFormPreviewOpen, setIsClubCreationFormPreviewOpen] =
     useState(false);
+  const [isReviewConfirmOpen, setIsReviewConfirmOpen] = useState(false);
+  const [decision, setDecision] = useState<ClubCreationReviewDecision | null>(
+    null,
+  );
+  const [feedback, setFeedback] = useState("");
+  const [reviewError, setReviewError] = useState("");
 
-  const [uploadName, setUploadName] = useState("");
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadFileInputKey, setUploadFileInputKey] = useState(0);
-  const uploadClubCreationFormMutation = useUploadClubCreationFormMutation();
-
-  const clubCreationApplications = clubCreationApplicationsQuery.data ?? [];
-  const selectedClubCreationIdValue = selectedClubCreationId
-    ? String(selectedClubCreationId)
+  const applications = clubCreationApplicationsQuery.data ?? [];
+  const selectedApplicationIdValue = selectedApplicationId
+    ? String(selectedApplicationId)
     : "";
-  const selectedClubCreationSummary =
-    clubCreationApplications.find(
-      (club) => club.clubId === selectedClubCreationId,
+  const selectedApplicationSummary =
+    applications.find(
+      (application) => application.applicationId === selectedApplicationId,
     ) ?? null;
-  const clubCreationDetailQuery = useGetClubCreationApplicationDetailQuery(
-    selectedClubCreationIdValue,
+  const detailQuery = useGetClubCreationApplicationDetailQuery(
+    selectedApplicationIdValue,
     isDetailOverlayOpen,
   );
-  const clubCreationDetail = clubCreationDetailQuery.data;
-  const uniqueLinks = clubCreationDetail
-    ? [...new Set(clubCreationDetail.club.links.map((link) => link.trim()))]
+  const applicationDetail = detailQuery.data;
+  const previewFileName = applicationDetail?.clubCreationForm
+    ? getDownloadFileName(
+        `${applicationDetail.clubName} 개설 신청 양식`,
+        applicationDetail.clubCreationForm,
+      )
+    : "";
+  const currentAdminReview =
+    applicationDetail?.currentReviews.find(
+      (review) => review.reviewerType === "ADMIN",
+    ) ?? null;
+  const hasSubmittedOwnReview = currentAdminReview !== null;
+  const uniqueLinks = applicationDetail
+    ? [...new Set(applicationDetail.links.map((link) => link.trim()))]
         .filter(Boolean)
         .sort()
     : [];
-  const previewFileName = clubCreationDetail?.clubCreationForm
-    ? getDownloadFileName(
-        `${clubCreationDetail.club.clubName} 개설 신청 양식`,
-        clubCreationDetail.clubCreationForm,
-      )
-    : "";
 
-  const handleDecideClubApplication = async (
-    clubId: number,
-    isOpen: boolean,
-  ) => {
-    try {
-      await decideClubApplicationMutation.mutateAsync({
-        clubId: String(clubId),
-        isOpen,
-      });
-    } catch {}
-  };
-
-  const handleFetchClubCreationApplications = async () => {
-    const result = await clubCreationApplicationsQuery.refetch();
-
-    if (result.error) {
-      toast.error(
-        toErrorMessage(
-          result.error,
-          "동아리 개설 신청 전체 조회에 실패했습니다.",
-        ),
-      );
+  useEffect(() => {
+    if (!applicationDetail) {
       return;
     }
 
-    toast.success("동아리 개설 신청 목록을 조회했습니다.");
-  };
+    setDecision(currentAdminReview?.decision ?? null);
+    setFeedback(currentAdminReview?.feedback ?? "");
+    setReviewError("");
+  }, [
+    applicationDetail,
+    currentAdminReview?.decision,
+    currentAdminReview?.feedback,
+  ]);
 
-  const handleOpenDetailOverlay = (clubId: number) => {
-    setSelectedClubCreationId(clubId);
-    setIsDetailOverlayOpen(true);
-  };
-
-  const handleUploadClubCreationForm = async () => {
-    if (!uploadName.trim() || !uploadFile) {
-      toast.error("양식 이름과 양식 파일을 입력해 주세요.");
-      return;
+  useEffect(() => {
+    if (!applicationDetail?.clubCreationForm) {
+      setIsClubCreationFormPreviewOpen(false);
     }
-
-    const lowerFileName = uploadFile.name.toLowerCase();
-    const isAllowedTemplateFile =
-      lowerFileName.endsWith(".pdf") || lowerFileName.endsWith(".hwp");
-
-    if (!isAllowedTemplateFile) {
-      toast.error("HWP/PDF 파일만 업로드할 수 있습니다.");
-      return;
-    }
-
-    try {
-      await uploadClubCreationFormMutation.mutateAsync({
-        fileUrl: uploadFile,
-        fileName: uploadName.trim(),
-      });
-      setUploadName("");
-      setUploadFile(null);
-      setUploadFileInputKey((prev) => prev + 1);
-    } catch {}
-  };
-
-  const handleCloseDetailOverlay = () => {
-    setIsDetailOverlayOpen(false);
-    setSelectedClubCreationId(null);
-    setIsClubCreationFormPreviewOpen(false);
-  };
+  }, [applicationDetail?.clubCreationForm]);
 
   useEffect(() => {
     if (!isDetailOverlayOpen) {
@@ -128,7 +208,7 @@ export function ClubCreationTab() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        handleCloseDetailOverlay();
+        setIsDetailOverlayOpen(false);
       }
     };
 
@@ -139,148 +219,176 @@ export function ClubCreationTab() {
     };
   }, [isDetailOverlayOpen]);
 
-  useEffect(() => {
-    if (!clubCreationDetail?.clubCreationForm) {
-      setIsClubCreationFormPreviewOpen(false);
+  const handleOpenDetailOverlay = (applicationId: number) => {
+    setSelectedApplicationId(applicationId);
+    setIsDetailOverlayOpen(true);
+  };
+
+  const handleCloseDetailOverlay = () => {
+    setIsDetailOverlayOpen(false);
+    setSelectedApplicationId(null);
+    setIsClubCreationFormPreviewOpen(false);
+    setIsReviewConfirmOpen(false);
+    setReviewError("");
+  };
+
+  const validateReviewForm = () => {
+    if (!selectedApplicationId) {
+      return false;
     }
-  }, [clubCreationDetail?.clubCreationForm]);
+
+    if (hasSubmittedOwnReview) {
+      setReviewError(
+        "리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다.",
+      );
+      return false;
+    }
+
+    const normalizedFeedback = feedback.trim();
+
+    if (decision === null) {
+      setReviewError("검토 결과를 선택해주세요.");
+      return false;
+    }
+
+    if (decision !== "APPROVED" && !normalizedFeedback) {
+      setReviewError(
+        "수정 요청 또는 반려일 때는 코멘트를 반드시 입력해주세요.",
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleOpenReviewConfirm = () => {
+    if (!validateReviewForm()) {
+      return;
+    }
+
+    setIsReviewConfirmOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!selectedApplicationId || decision === null || hasSubmittedOwnReview) {
+      setIsReviewConfirmOpen(false);
+      return;
+    }
+
+    const normalizedFeedback = feedback.trim();
+
+    try {
+      await reviewMutation.mutateAsync({
+        applicationId: String(selectedApplicationId),
+        payload: {
+          decision,
+          feedback: normalizedFeedback || undefined,
+        },
+      });
+      await detailQuery.refetch();
+      setReviewError("");
+    } catch {} finally {
+      setIsReviewConfirmOpen(false);
+    }
+  };
 
   return (
     <>
       <PanelCard
-        title="동아리 개설 신청 전체 조회"
-        description="현재 접수된 동아리 개설 신청 목록을 조회하고 바로 승인/거절합니다."
+        title="동아리 개설 신청 검토"
+        description="접수된 개설 신청을 확인하고 관리자 리뷰를 저장합니다."
       >
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            className="rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={handleFetchClubCreationApplications}
-            disabled={clubCreationApplicationsQuery.isFetching}
-          >
-            {clubCreationApplicationsQuery.isFetching ? "조회 중..." : "조회"}
-          </button>
-        </div>
+        {clubCreationApplicationsQuery.isLoading ? (
+          <div className="rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-gray-500 text-sm">
+            개설 신청 목록을 불러오는 중입니다...
+          </div>
+        ) : null}
 
-        {clubCreationApplicationsQuery.isFetched ? (
-          clubCreationApplications.length > 0 ? (
-            <div className="mt-4 space-y-3">
-              {clubCreationApplications.map((club) => (
-                <div
-                  key={club.clubId}
-                  className="rounded-xl border border-gray-200 bg-gray-50 p-4 transition"
-                >
-                  <button
-                    type="button"
-                    aria-label={`${club.clubName} 개설 신청 상세 조회`}
-                    className="w-full rounded-xl p-3 text-left transition hover:bg-white/70 focus:outline-none focus:ring-2 focus:ring-gray-200 md:p-4"
-                    onClick={() => handleOpenDetailOverlay(club.clubId)}
-                  >
-                    <div className="flex flex-col gap-4">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="flex items-start gap-4">
-                          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                            {club.clubImage ? (
-                              <Image
-                                src={club.clubImage}
-                                alt={`${club.clubName} 동아리 이미지`}
-                                fill
-                                className="object-cover"
-                                sizes="64px"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
-                                이미지 없음
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">
-                              {club.clubName}
-                            </p>
-                            <p className="mt-1 text-gray-500 text-xs">
-                              신청 ID #{club.clubId}
-                            </p>
-                          </div>
+        {clubCreationApplicationsQuery.isError ? (
+          <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-5 text-red-700 text-sm">
+            {toErrorMessage(
+              clubCreationApplicationsQuery.error,
+              "동아리 개설 신청 목록을 불러오지 못했습니다.",
+            )}
+          </div>
+        ) : null}
+
+        {!clubCreationApplicationsQuery.isLoading &&
+        !clubCreationApplicationsQuery.isError &&
+        applications.length === 0 ? (
+          <div className="rounded-2xl border border-gray-200 border-dashed bg-gray-50 px-5 py-6 text-gray-500 text-sm">
+            현재 검토할 동아리 개설 신청이 없습니다.
+          </div>
+        ) : null}
+
+        {!clubCreationApplicationsQuery.isLoading &&
+        !clubCreationApplicationsQuery.isError &&
+        applications.length > 0 ? (
+          <div className="space-y-3">
+            {applications.map((application) => (
+              <button
+                key={application.applicationId}
+                type="button"
+                className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-left transition hover:border-gray-300 hover:bg-white"
+                onClick={() =>
+                  handleOpenDetailOverlay(application.applicationId)
+                }
+              >
+                <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+                      {application.clubImage ? (
+                        <Image
+                          src={application.clubImage}
+                          alt={application.clubName}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-gray-400 text-xs">
+                          이미지 없음
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {club.majors.map((major) => (
-                            <span
-                              key={`${club.clubId}-${major}`}
-                              className="rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] text-gray-600"
-                            >
-                              {major}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  </button>
-                  <div className="mt-4 flex justify-end gap-2">
-                    <button
-                      type="button"
-                      className="rounded-lg bg-[#2563EB] px-3 py-1.5 font-medium text-white text-xs transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-60"
-                      onClick={() =>
-                        handleDecideClubApplication(club.clubId, true)
-                      }
-                      disabled={decideClubApplicationMutation.isPending}
-                    >
-                      수락
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-lg bg-[#DC2626] px-3 py-1.5 font-medium text-white text-xs transition hover:bg-[#B91C1C] disabled:cursor-not-allowed disabled:opacity-60"
-                      onClick={() =>
-                        handleDecideClubApplication(club.clubId, false)
-                      }
-                      disabled={decideClubApplicationMutation.isPending}
-                    >
-                      거절
-                    </button>
+
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-base text-gray-900">
+                          {application.clubName}
+                        </p>
+                        <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
+                          #{application.applicationId}
+                        </span>
+                        <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
+                          {STATUS_LABELS[application.status]}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-gray-500 text-sm">
+                        신청자 {application.applicantName} · revision{" "}
+                        {application.revision}
+                      </p>
+                      <p className="mt-1 text-gray-400 text-xs">
+                        최종 제출 {formatDateTime(application.lastSubmittedAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {application.majors.map((major) => (
+                      <span
+                        key={`${application.applicationId}-${major}`}
+                        className="rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] text-gray-600"
+                      >
+                        {major}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-4 rounded-xl bg-gray-50 px-4 py-3 text-gray-500 text-sm">
-              조회된 동아리 개설 신청이 없습니다.
-            </p>
-          )
+              </button>
+            ))}
+          </div>
         ) : null}
-      </PanelCard>
-
-      <PanelCard
-        title="동아리 개설 양식 업로드"
-        description="한글(HWP) 또는 PDF 양식을 등록합니다."
-      >
-        <div className="space-y-3">
-          <input
-            value={uploadName}
-            onChange={(event) => setUploadName(event.target.value)}
-            placeholder="양식 이름"
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-          <input
-            key={uploadFileInputKey}
-            type="file"
-            accept=".hwp,.pdf,application/x-hwp,application/haansofthwp,application/pdf"
-            onChange={(event) => setUploadFile(event.target.files?.[0] ?? null)}
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-gray-700 file:text-sm focus:border-gray-400"
-          />
-          <p className="text-gray-500 text-xs">
-            {uploadFile
-              ? `선택된 파일: ${uploadFile.name}`
-              : "HWP/PDF 파일을 선택해 주세요."}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="mt-3 rounded-lg bg-gray-900 px-4 py-2 font-medium text-sm text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={handleUploadClubCreationForm}
-          disabled={uploadClubCreationFormMutation.isPending}
-        >
-          {uploadClubCreationFormMutation.isPending ? "업로드 중..." : "업로드"}
-        </button>
       </PanelCard>
 
       {isDetailOverlayOpen ? (
@@ -301,23 +409,23 @@ export function ClubCreationTab() {
                 <div className="relative border-gray-100 border-b">
                   <ClubHeader
                     clubImage={
-                      clubCreationDetail?.club.clubImage ??
-                      selectedClubCreationSummary?.clubImage ??
+                      applicationDetail?.clubImage ??
+                      selectedApplicationSummary?.clubImage ??
                       ""
                     }
                     clubName={
-                      clubCreationDetail?.club.clubName ??
-                      selectedClubCreationSummary?.clubName ??
+                      applicationDetail?.clubName ??
+                      selectedApplicationSummary?.clubName ??
                       ""
                     }
                     title={
-                      clubCreationDetail?.club.clubName ??
-                      selectedClubCreationSummary?.clubName ??
+                      applicationDetail?.clubName ??
+                      selectedApplicationSummary?.clubName ??
                       "상세 정보를 불러오는 중..."
                     }
                     subtitle="동아리 개설 신청"
-                    metaText={`개설 신청 ID #${selectedClubCreationId ?? "-"}`}
-                    oneLiner={clubCreationDetail?.club.oneLiner}
+                    metaText={`신청 ID #${selectedApplicationId ?? "-"}`}
+                    oneLiner={applicationDetail?.oneLiner}
                   />
                   <button
                     type="button"
@@ -330,116 +438,76 @@ export function ClubCreationTab() {
                 </div>
 
                 <div className="bg-gray-50 px-6 py-8 md:px-10 md:py-10">
-                  {clubCreationDetailQuery.isPending ? (
+                  {detailQuery.isPending ? (
                     <div className="rounded-2xl border border-gray-200 bg-white px-6 py-12 text-center text-gray-500 text-sm">
                       상세 정보를 불러오는 중...
                     </div>
                   ) : null}
 
-                  {clubCreationDetailQuery.isError ? (
+                  {detailQuery.isError ? (
                     <div className="rounded-2xl border border-red-100 bg-red-50 px-6 py-12 text-center text-red-700 text-sm">
                       {toErrorMessage(
-                        clubCreationDetailQuery.error,
+                        detailQuery.error,
                         "상세 정보를 불러오지 못했습니다.",
                       )}
                     </div>
                   ) : null}
 
-                  {clubCreationDetail ? (
-                    <div className="flex flex-col gap-6">
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
-                          신청자 정보
-                        </h4>
-                        <div className="grid flex-1 gap-3 md:grid-cols-2">
-                          <div className="rounded-lg border border-gray-100 bg-white px-4 py-3">
-                            <p className="text-[12px] text-gray-400">이름</p>
-                            <p className="mt-1 text-[14px] text-gray-700 md:text-[15px]">
-                              {clubCreationDetail.userName || "-"}
-                            </p>
-                          </div>
-                          <div className="rounded-lg border border-gray-100 bg-white px-4 py-3">
-                            <p className="text-[12px] text-gray-400">학번</p>
-                            <p className="mt-1 text-[14px] text-gray-700 md:text-[15px]">
-                              {clubCreationDetail.classNumber || "-"}
-                            </p>
-                          </div>
-                        </div>
-                      </section>
-
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
-                          동아리 이미지
-                        </h4>
-                        <div className="flex items-center gap-4">
-                          <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                            {clubCreationDetail.club.clubImage ? (
-                              <Image
-                                src={clubCreationDetail.club.clubImage}
-                                alt={`${clubCreationDetail.club.clubName} 동아리 이미지`}
-                                fill
-                                className="object-cover"
-                                sizes="96px"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-[12px] text-gray-400">
-                                이미지 없음
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </section>
-
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
-                          동아리명
-                        </h4>
-                        <div className="flex flex-1 items-center rounded-lg border border-gray-100 bg-white px-4 py-3">
-                          <p className="text-[14px] text-gray-700 md:text-[15px]">
-                            {clubCreationDetail.club.clubName ?? "-"}
+                  {applicationDetail ? (
+                    <div className="space-y-8">
+                      <div className="grid gap-4 md:grid-cols-3">
+                        <div className="rounded-2xl bg-white px-5 py-5 shadow-sm">
+                          <p className="text-gray-400 text-sm">신청자</p>
+                          <p className="mt-2 font-semibold text-gray-900">
+                            {applicationDetail.applicant.userName}
+                          </p>
+                          <p className="mt-1 text-gray-500 text-sm">
+                            {applicationDetail.applicant.classNumber}
                           </p>
                         </div>
-                      </section>
-
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
-                          동아리 전공
-                        </h4>
-                        <div className="flex flex-1 flex-wrap gap-2">
-                          {clubCreationDetail.club.majors?.length ? (
-                            clubCreationDetail.club.majors.map((major) => (
-                              <span
-                                key={`${selectedClubCreationId}-${major}`}
-                                className="rounded-full border border-primary-300 px-3 py-1 text-[12px] text-primary-500 md:text-[13px]"
-                              >
-                                {major}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-[14px] text-gray-500 md:text-[15px]">
-                              전공 정보가 없습니다.
-                            </span>
-                          )}
+                        <div className="rounded-2xl bg-white px-5 py-5 shadow-sm">
+                          <p className="text-gray-400 text-sm">현재 상태</p>
+                          <p className="mt-2 font-semibold text-gray-900">
+                            {STATUS_LABELS[applicationDetail.status]}
+                          </p>
+                          <p className="mt-1 text-gray-500 text-sm">
+                            revision {applicationDetail.revision}
+                          </p>
                         </div>
-                      </section>
+                        <div className="rounded-2xl bg-white px-5 py-5 shadow-sm">
+                          <p className="text-gray-400 text-sm">
+                            최종 제출 시각
+                          </p>
+                          <p className="mt-2 font-semibold text-gray-900">
+                            {formatDateTime(applicationDetail.lastSubmittedAt)}
+                          </p>
+                        </div>
+                      </div>
 
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
+                      <section className="rounded-2xl bg-white px-6 py-6 shadow-sm">
+                        <h4 className="font-bold text-gray-900 text-lg">
                           동아리 소개
                         </h4>
-                        <div className="flex flex-1 items-start rounded-lg border border-gray-100 bg-white p-4">
-                          <p className="text-[14px] text-gray-700 leading-7 md:text-[15px]">
-                            {clubCreationDetail.club.introduction ||
-                              "소개가 없습니다."}
-                          </p>
-                        </div>
+                        <p className="mt-4 text-gray-700 text-sm leading-7">
+                          {applicationDetail.introduction}
+                        </p>
                       </section>
 
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
-                          동아리 관련 링크
+                      <section className="rounded-2xl bg-white px-6 py-6 shadow-sm">
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          전공 및 링크
                         </h4>
-                        <div className="flex flex-1 flex-col gap-3 rounded-lg border border-gray-100 bg-white p-4">
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {applicationDetail.majors.map((major) => (
+                            <span
+                              key={`${applicationDetail.applicationId}-${major}`}
+                              className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 font-medium text-[12px] text-primary-700"
+                            >
+                              {major}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="mt-5 space-y-3">
                           {uniqueLinks.length > 0 ? (
                             uniqueLinks.map((link) => (
                               <a
@@ -447,48 +515,163 @@ export function ClubCreationTab() {
                                 href={link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="break-all text-[14px] text-gray-600 underline underline-offset-2 hover:text-gray-900 md:text-[15px]"
+                                className="block break-all text-gray-700 text-sm underline underline-offset-2 hover:text-gray-900"
                               >
                                 {link}
                               </a>
                             ))
                           ) : (
-                            <p className="text-[14px] text-gray-500 md:text-[15px]">
+                            <p className="text-gray-500 text-sm">
                               등록된 링크가 없습니다.
                             </p>
                           )}
                         </div>
                       </section>
 
-                      <section className="flex flex-col gap-2 md:flex-row md:gap-0">
-                        <h4 className="font-medium text-[14px] md:w-[160px] md:text-[15px]">
+                      <section className="rounded-2xl bg-white px-6 py-6 shadow-sm">
+                        <h4 className="font-bold text-gray-900 text-lg">
                           개설 신청 양식
                         </h4>
-                        <div className="flex flex-1 flex-col gap-3 rounded-lg border border-gray-100 bg-white p-4">
-                          {clubCreationDetail.clubCreationForm ? (
-                            <>
-                              <p className="text-[14px] text-gray-700 md:text-[15px]">
-                                {previewFileName}
-                              </p>
-                              <div className="flex flex-wrap gap-3">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setIsClubCreationFormPreviewOpen(true)
-                                  }
-                                  className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
-                                >
-                                  미리보기
-                                </button>
+                        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-4">
+                          {applicationDetail.clubCreationForm ? (
+                            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                              <div>
+                                <p className="break-all font-medium text-gray-900 text-sm md:text-base">
+                                  {previewFileName}
+                                </p>
+                                <p className="mt-1 text-[12px] text-gray-500">
+                                  제출된 개설 신청 양식
+                                </p>
                               </div>
-                            </>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setIsClubCreationFormPreviewOpen(true)
+                                }
+                                className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-900 text-sm transition hover:border-gray-400 hover:bg-gray-50"
+                              >
+                                미리보기
+                              </button>
+                            </div>
                           ) : (
-                            <p className="text-[14px] text-gray-500 md:text-[15px]">
-                              등록된 양식이 없습니다.
+                            <p className="text-gray-500 text-sm">
+                              등록된 개설 신청 양식이 없습니다.
                             </p>
                           )}
                         </div>
                       </section>
+
+                      <ReviewSection
+                        title="현재 리뷰"
+                        reviews={applicationDetail.currentReviews}
+                        emptyMessage="현재 revision에 등록된 리뷰가 없습니다."
+                      />
+
+                      <section className="rounded-2xl bg-white px-6 py-6 shadow-sm">
+                        <h4 className="font-bold text-gray-900 text-lg">
+                          관리자 리뷰 저장
+                        </h4>
+                        {hasSubmittedOwnReview ? (
+                          <div className="mt-5 space-y-4">
+                            <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-5 py-4 text-gray-600 text-sm leading-6">
+                              리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다.
+                            </div>
+                            <div className="rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span
+                                  className={`rounded-full border px-3 py-1 font-medium text-[12px] ${DECISION_STYLES[currentAdminReview.decision]}`}
+                                >
+                                  {DECISION_LABELS[currentAdminReview.decision]}
+                                </span>
+                              </div>
+                              <div className="mt-4 rounded-xl bg-white px-4 py-4 text-gray-700 text-sm leading-7">
+                                {currentAdminReview.feedback?.trim()
+                                  ? currentAdminReview.feedback
+                                  : "남겨진 코멘트가 없습니다."}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="mt-5 grid gap-3 md:grid-cols-3">
+                              {REVIEW_DECISION_OPTIONS.map((option) => (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  onClick={() => {
+                                    setDecision(option);
+                                    setReviewError("");
+                                  }}
+                                  className={`rounded-2xl border px-4 py-4 text-left transition ${
+                                    decision === option
+                                      ? "border-primary-300 bg-primary-50"
+                                      : "border-gray-200 bg-white hover:border-gray-300"
+                                  }`}
+                                >
+                                  <p className="font-semibold text-gray-900 text-sm">
+                                    {DECISION_LABELS[option]}
+                                  </p>
+                                  <p className="mt-2 text-gray-500 text-xs leading-6">
+                                    {option === "APPROVED"
+                                      ? "피드백 없이도 저장할 수 있습니다."
+                                      : "피드백을 반드시 함께 남겨야 합니다."}
+                                  </p>
+                                </button>
+                              ))}
+                            </div>
+
+                            <div className="mt-5">
+                              <label
+                                htmlFor={feedbackFieldId}
+                                className="mb-2 block font-medium text-gray-700 text-sm"
+                              >
+                                코멘트
+                              </label>
+                              <textarea
+                                id={feedbackFieldId}
+                                value={feedback}
+                                onChange={(event) => {
+                                  setFeedback(event.target.value);
+                                  if (reviewError) {
+                                    setReviewError("");
+                                  }
+                                }}
+                                rows={5}
+                                placeholder="학생에게 전달할 코멘트를 입력해주세요."
+                                className={`w-full rounded-2xl border bg-white px-4 py-4 text-sm outline-none placeholder:text-gray-400 transition ${
+                                  reviewError
+                                    ? "border-red-300"
+                                    : "border-gray-200 focus:border-primary-300"
+                                }`}
+                              />
+                              {reviewError ? (
+                                <p className="mt-2 text-red-500 text-xs">
+                                  {reviewError}
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <div className="mt-5 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={handleOpenReviewConfirm}
+                                disabled={reviewMutation.isPending}
+                                className="rounded-xl bg-primary-500 px-6 py-3 font-semibold text-sm text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {reviewMutation.isPending
+                                  ? "저장 중..."
+                                  : "리뷰 저장"}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </section>
+
+                      <ReviewSection
+                        title="리뷰 이력"
+                        reviews={applicationDetail.reviewHistory}
+                        emptyMessage="과거 revision 리뷰 이력이 없습니다."
+                      />
                     </div>
                   ) : null}
                 </div>
@@ -502,8 +685,47 @@ export function ClubCreationTab() {
         fileName={previewFileName}
         isOpen={isClubCreationFormPreviewOpen}
         onClose={() => setIsClubCreationFormPreviewOpen(false)}
-        pdfPath={clubCreationDetail?.clubCreationForm ?? null}
+        pdfPath={applicationDetail?.clubCreationForm ?? null}
       />
+      {isReviewConfirmOpen ? (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <button
+            type="button"
+            aria-label="리뷰 저장 확인 닫기"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setIsReviewConfirmOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="relative z-10 w-[90%] max-w-md rounded-2xl bg-white p-8 shadow-2xl"
+          >
+            <h5 className="font-bold text-[18px] text-gray-900">
+              리뷰를 저장하시겠습니까?
+            </h5>
+            <p className="mt-2 text-gray-400 text-sm leading-6">
+              리뷰를 저장하면 수정할 수 없습니다.
+            </p>
+            <div className="mt-8 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsReviewConfirmOpen(false)}
+                className="rounded-[12px] bg-gray-400 px-8 py-3 font-medium text-white transition hover:bg-gray-500"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitReview}
+                disabled={reviewMutation.isPending}
+                className="rounded-[12px] bg-[#E85D5D] px-8 py-3 font-medium text-white transition hover:bg-[#d14d4d] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

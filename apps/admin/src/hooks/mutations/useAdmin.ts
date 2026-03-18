@@ -3,14 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
-  decideClubApplication,
   decideDissolution,
   deleteClubCreationForm,
   deleteResultDuration,
+  reviewClubCreationApplication,
   setResultDuration,
   uploadClubCreationForm,
 } from "@/api/admin";
 import { getErrorMessage, queryKeys } from "@/lib";
+import type { ReviewClubCreationApplicationRequest } from "@/types/admin";
 
 export const useSetResultDurationMutation = () => {
   const queryClient = useQueryClient();
@@ -58,32 +59,33 @@ export const useDeleteResultDurationMutation = () => {
   });
 };
 
-export const useDecideClubApplicationMutation = () => {
+export const useReviewClubCreationApplicationMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ clubId, isOpen }: { clubId: string; isOpen: boolean }) =>
-      decideClubApplication(clubId, isOpen),
+    mutationFn: ({
+      applicationId,
+      payload,
+    }: {
+      applicationId: string;
+      payload: ReviewClubCreationApplicationRequest;
+    }) => reviewClubCreationApplication(applicationId, payload),
     onSuccess: async (_, variables) => {
       await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.admin.overview.queryKey,
-        }),
         queryClient.invalidateQueries({
           queryKey: queryKeys.admin.clubCreationApplications.queryKey,
         }),
         queryClient.invalidateQueries({
-          queryKey: queryKeys.clubs.all.queryKey,
+          queryKey:
+            queryKeys.admin.clubCreationApplicationDetail(
+              variables.applicationId,
+            ).queryKey,
         }),
       ]);
-      toast.success(
-        variables.isOpen
-          ? "동아리 개설을 수락했습니다."
-          : "동아리 개설을 거절했습니다.",
-      );
+      toast.success("리뷰를 저장했습니다.");
     },
     onError: (error: unknown) => {
-      toast.error(getErrorMessage(error, "동아리 개설 처리에 실패했습니다."));
+      toast.error(getErrorMessage(error, "리뷰 저장에 실패했습니다."));
     },
   });
 };

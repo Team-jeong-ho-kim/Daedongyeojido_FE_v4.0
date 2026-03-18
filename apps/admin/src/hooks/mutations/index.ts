@@ -1,8 +1,8 @@
 export {
-  useDecideClubApplicationMutation,
   useDecideDissolutionMutation,
   useDeleteClubCreationFormMutation,
   useDeleteResultDurationMutation,
+  useReviewClubCreationApplicationMutation,
   useSetResultDurationMutation,
   useUploadClubCreationFormMutation,
 } from "./useAdmin";

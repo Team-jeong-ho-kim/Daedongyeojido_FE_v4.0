@@ -7,25 +7,63 @@ type MockDocumentFile = {
 };
 
 type MockClubCreationApplication = {
-  clubId: number;
+  applicationId: number;
   clubName: string;
-  clubImage: string;
+  clubImage: string | null;
   introduction: string;
+  status:
+    | "SUBMITTED"
+    | "UNDER_REVIEW"
+    | "CHANGES_REQUESTED"
+    | "APPROVED"
+    | "REJECTED";
+  revision: number;
   majors: string[];
+  applicantName: string;
+  lastSubmittedAt: string;
 };
 
 type MockClubCreationApplicationDetail = {
-  club: {
-    clubName: string;
-    introduction: string;
-    oneLiner: string;
-    clubImage: string;
-    majors: string[];
-    links: string[];
+  applicationId: number;
+  status:
+    | "SUBMITTED"
+    | "UNDER_REVIEW"
+    | "CHANGES_REQUESTED"
+    | "APPROVED"
+    | "REJECTED";
+  revision: number;
+  clubName: string;
+  clubImage: string | null;
+  clubCreationForm: string | null;
+  oneLiner: string;
+  introduction: string;
+  majors: string[];
+  links: string[];
+  applicant: {
+    userId: number;
+    userName: string;
+    classNumber: string;
   };
-  userName: string;
-  classNumber: string;
-  clubCreationForm: string;
+  submittedAt: string | null;
+  lastSubmittedAt: string | null;
+  currentReviews: Array<{
+    reviewId: number;
+    reviewerType: "ADMIN" | "TEACHER";
+    reviewerName: string;
+    revision: number;
+    decision: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+    feedback: string | null;
+    updatedAt: string;
+  }>;
+  reviewHistory: Array<{
+    reviewId: number;
+    reviewerType: "ADMIN" | "TEACHER";
+    reviewerName: string;
+    revision: number;
+    decision: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+    feedback: string | null;
+    updatedAt: string;
+  }>;
 };
 
 type MockTeacher = {
@@ -66,12 +104,16 @@ const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
 
 const DEFAULT_CLUB_CREATION_APPLICATIONS: MockClubCreationApplication[] = [
   {
-    clubId: 5,
+    applicationId: 5,
     clubName: "발로란트",
     clubImage:
       "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-valorant.png",
     introduction: "전략과 협업 중심으로 운영하는 게임 동아리입니다.",
+    status: "UNDER_REVIEW",
+    revision: 2,
     majors: ["FE", "BE", "DESIGN"],
+    applicantName: "정승우",
+    lastSubmittedAt: "2026-03-18T11:00:00",
   },
 ];
 
@@ -80,22 +122,50 @@ const DEFAULT_CLUB_CREATION_APPLICATION_DETAILS: Record<
   MockClubCreationApplicationDetail
 > = {
   5: {
-    club: {
-      clubName: "발로란트",
-      introduction: "전략과 협업 중심으로 운영하는 게임 동아리입니다.",
-      oneLiner: "정승우",
-      clubImage:
-        "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-valorant.png",
-      majors: ["FE", "BE", "DESIGN"],
-      links: [
-        "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
-        "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
-        "https://daedongyeojido.site",
-      ],
-    },
-    userName: "정승우",
-    classNumber: "3212",
+    applicationId: 5,
+    status: "UNDER_REVIEW",
+    revision: 2,
+    clubName: "발로란트",
+    clubImage:
+      "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-valorant.png",
     clubCreationForm: "/documents/previews/1.pdf",
+    oneLiner: "정승우",
+    introduction: "전략과 협업 중심으로 운영하는 게임 동아리입니다.",
+    majors: ["FE", "BE", "DESIGN"],
+    links: [
+      "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
+      "https://github.com/Team-jeong-ho-kim/Daedongyeojido_FE_v4.0",
+      "https://daedongyeojido.site",
+    ],
+    applicant: {
+      userId: 10,
+      userName: "정승우",
+      classNumber: "3212",
+    },
+    submittedAt: "2026-03-18T09:00:00",
+    lastSubmittedAt: "2026-03-18T11:00:00",
+    currentReviews: [
+      {
+        reviewId: 100,
+        reviewerType: "TEACHER",
+        reviewerName: "김교사",
+        revision: 2,
+        decision: "CHANGES_REQUESTED",
+        feedback: "활동 계획 보강 필요",
+        updatedAt: "2026-03-18T12:00:00",
+      },
+    ],
+    reviewHistory: [
+      {
+        reviewId: 90,
+        reviewerType: "ADMIN",
+        reviewerName: "관리자",
+        revision: 1,
+        decision: "CHANGES_REQUESTED",
+        feedback: "세부 계획을 조금 더 보강해주세요.",
+        updatedAt: "2026-03-17T17:00:00",
+      },
+    ],
   },
 };
 
@@ -136,7 +206,10 @@ export async function installAdminApiMocks(
   const clubCreationApplications =
     options.clubCreationApplications ??
     DEFAULT_CLUB_CREATION_APPLICATIONS.slice();
-  const clubCreationApplicationDetails = {
+  const clubCreationApplicationDetails: Record<
+    number,
+    MockClubCreationApplicationDetail
+  > = {
     ...DEFAULT_CLUB_CREATION_APPLICATION_DETAILS,
     ...(options.clubCreationApplicationDetails ?? {}),
   };
@@ -194,28 +267,33 @@ export async function installAdminApiMocks(
       return;
     }
 
-    if (route.request().method() === "POST") {
-      recordRequest(route);
-      const requestBody = route.request().postDataJSON() as {
-        teacherName?: string;
-      };
+    await route.continue();
+  });
 
-      teachers = [
-        ...teachers,
-        {
-          teacherId:
-            teachers.length > 0
-              ? Math.max(...teachers.map((teacher) => teacher.teacherId)) + 1
-              : 1,
-          teacherName: requestBody.teacherName ?? "새 지도 교사",
-        },
-      ];
-
-      await route.fulfill({ status: 201, body: "" });
+  await page.route(/.*\/admin\/teachers$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "POST") {
+      await route.continue();
       return;
     }
 
-    await route.continue();
+    recordRequest(route);
+    const requestBody = route.request().postDataJSON() as {
+      teacherName?: string;
+    };
+
+    teachers = [
+      ...teachers,
+      {
+        teacherId:
+          teachers.length > 0
+            ? Math.max(...teachers.map((teacher) => teacher.teacherId)) + 1
+            : 1,
+        teacherName: requestBody.teacherName ?? "새 지도 교사",
+      },
+    ];
+
+    await route.fulfill({ status: 201, body: "" });
   });
 
   await page.route(/.*\/result-duration$/, async (route) => {
@@ -231,20 +309,21 @@ export async function installAdminApiMocks(
     });
   });
 
-  await page.route(/.*\/admin\/club-creation-application$/, async (route) => {
+  await page.route(/.*\/club-creation-applications$/, async (route) => {
     if (await handleApiFallback(route)) return;
     if (route.request().method() !== "GET") {
       await route.continue();
       return;
     }
 
+    recordRequest(route);
     await createJsonResponse(route, {
-      clubs: clubCreationApplications,
+      applications: clubCreationApplications,
     });
   });
 
   await page.route(
-    /.*\/admin\/club-creation-application\/\d+$/,
+    /.*\/club-creation-applications\/\d+$/,
     async (route) => {
       if (await handleApiFallback(route)) return;
       if (route.request().method() !== "GET") {
@@ -253,8 +332,8 @@ export async function installAdminApiMocks(
       }
 
       recordRequest(route);
-      const clubId = Number(route.request().url().split("/").pop());
-      const detail = clubCreationApplicationDetails[clubId];
+      const applicationId = Number(route.request().url().split("/").pop());
+      const detail = clubCreationApplicationDetails[applicationId];
 
       if (!detail) {
         await createJsonResponse(
@@ -269,16 +348,65 @@ export async function installAdminApiMocks(
     },
   );
 
-  await page.route(/.*\/admin\/clubs\/applications\/\d+$/, async (route) => {
-    if (await handleApiFallback(route)) return;
-    if (route.request().method() !== "PATCH") {
-      await route.continue();
-      return;
-    }
+  await page.route(
+    /.*\/club-creation-applications\/\d+\/review$/,
+    async (route) => {
+      if (await handleApiFallback(route)) return;
+      if (route.request().method() !== "PUT") {
+        await route.continue();
+        return;
+      }
 
-    recordRequest(route);
-    await route.fulfill({ status: 204, body: "" });
-  });
+      recordRequest(route);
+      const requestBody = route.request().postDataJSON() as {
+        decision?: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+        feedback?: string;
+      };
+      const applicationId = Number(
+        route.request().url().split("/").slice(-2)[0],
+      );
+      const detail = clubCreationApplicationDetails[applicationId];
+
+      if (detail && requestBody.decision) {
+        const nextReview = {
+          reviewId:
+            detail.currentReviews.find((review) => review.reviewerType === "ADMIN")
+              ?.reviewId ?? 999,
+          reviewerType: "ADMIN" as const,
+          reviewerName: "관리자",
+          revision: detail.revision,
+          decision: requestBody.decision,
+          feedback: requestBody.feedback ?? null,
+          updatedAt: "2026-03-18T13:30:00",
+        };
+
+        detail.currentReviews = [
+          ...detail.currentReviews.filter(
+            (review) => review.reviewerType !== "ADMIN",
+          ),
+          nextReview,
+        ];
+
+        if (requestBody.decision === "CHANGES_REQUESTED") {
+          detail.status = "CHANGES_REQUESTED";
+        }
+        if (requestBody.decision === "REJECTED") {
+          detail.status = "REJECTED";
+        }
+
+        const listItem = clubCreationApplications.find(
+          (application) => application.applicationId === applicationId,
+        );
+
+        if (listItem) {
+          listItem.status = detail.status;
+          listItem.lastSubmittedAt = detail.lastSubmittedAt ?? listItem.lastSubmittedAt;
+        }
+      }
+
+      await route.fulfill({ status: 204, body: "" });
+    },
+  );
 
   return {
     requests,
