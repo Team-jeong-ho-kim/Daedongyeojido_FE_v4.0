@@ -69,7 +69,7 @@ const STATUS_STYLES: Record<
     panel: "border-red-200 bg-[#fff6f6]",
     title: "개설 신청이 반려되었습니다.",
     description:
-      "현재 revision의 검토 결과를 확인해 주세요. 이 신청은 더 이상 재제출할 수 없습니다.",
+      "현재 검토 차수의 결과를 확인해 주세요. 이 신청은 더 이상 재제출할 수 없습니다.",
     timelineAccent: "border-red-200 bg-red-50 text-red-700",
   },
 };
@@ -111,6 +111,30 @@ const formatDateTime = (value: string | null) => {
 const sortReviews = (reviews: ClubCreationApplicationReview[]) => {
   return [...reviews].sort((a, b) => {
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
+};
+
+const getReviewRenderKey = (review: ClubCreationApplicationReview) => {
+  return [
+    review.revision,
+    review.reviewId,
+    review.reviewerType,
+    review.updatedAt,
+  ].join(":");
+};
+
+const dedupeReviews = (reviews: ClubCreationApplicationReview[]) => {
+  const seenKeys = new Set<string>();
+
+  return reviews.filter((review) => {
+    const reviewKey = getReviewRenderKey(review);
+
+    if (seenKeys.has(reviewKey)) {
+      return false;
+    }
+
+    seenKeys.add(reviewKey);
+    return true;
   });
 };
 
@@ -160,16 +184,22 @@ function DetailSection({
 
 function ReviewTimelineSection({
   highlightChangesRequested = false,
+  highlightedReviewKeys = [],
   reviews,
   title,
   emptyMessage,
 }: {
   emptyMessage: string;
   highlightChangesRequested?: boolean;
+  highlightedReviewKeys?: string[];
   reviews: ClubCreationApplicationReview[];
   title: string;
 }) {
   const sortedReviews = useMemo(() => sortReviews(reviews), [reviews]);
+  const highlightedReviewKeySet = useMemo(
+    () => new Set(highlightedReviewKeys),
+    [highlightedReviewKeys],
+  );
 
   return (
     <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -193,13 +223,15 @@ function ReviewTimelineSection({
         ) : (
           <div className="space-y-0">
             {sortedReviews.map((review, index) => {
+              const reviewKey = getReviewRenderKey(review);
               const shouldHighlight =
                 highlightChangesRequested &&
+                highlightedReviewKeySet.has(reviewKey) &&
                 review.decision === "CHANGES_REQUESTED";
 
               return (
                 <article
-                  key={review.reviewId}
+                  key={reviewKey}
                   className={`relative pl-16 ${
                     index === sortedReviews.length - 1 ? "" : "pb-6"
                   }`}
@@ -244,7 +276,7 @@ function ReviewTimelineSection({
                         {DECISION_LABELS[review.decision]}
                       </span>
                       <span className="rounded-full border border-gray-200 bg-white px-2.5 py-1 font-medium text-[11px] text-gray-600">
-                        revision {review.revision}
+                        검토 차수 {review.revision}차
                       </span>
                     </div>
 
@@ -324,6 +356,11 @@ export default function ClubCreationApplicationDetailPage() {
         application.clubCreationForm,
       )
     : "PDF";
+  const combinedReviews = [
+    ...application.currentReviews,
+    ...application.reviewHistory,
+  ];
+  const dedupedReviews = dedupeReviews(combinedReviews);
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1f2328] selection:bg-primary-500 selection:text-white">
@@ -345,7 +382,7 @@ export default function ClubCreationApplicationDetailPage() {
                 {STATUS_LABELS[application.status]}
               </span>
               <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
-                revision {application.revision}
+                검토 차수 {application.revision}차
               </span>
             </div>
             <h1 className="font-bold text-[32px] tracking-tight">
@@ -401,7 +438,7 @@ export default function ClubCreationApplicationDetailPage() {
                         {application.clubName}
                       </h2>
                       <span className="rounded-md border border-gray-200 bg-white px-2.5 py-1 font-medium text-[12px] text-gray-600">
-                        revision {application.revision}
+                        검토 차수 {application.revision}차
                       </span>
                     </div>
                     <p className="mt-3 text-[15px] text-gray-600 leading-7">
@@ -494,18 +531,15 @@ export default function ClubCreationApplicationDetailPage() {
             </section>
 
             <ReviewTimelineSection
-              title="최신 코멘트"
-              reviews={application.currentReviews}
-              emptyMessage="아직 현재 revision에 등록된 리뷰가 없습니다."
+              title="리뷰 이력"
+              reviews={dedupedReviews}
+              emptyMessage="등록된 리뷰가 아직 없습니다."
               highlightChangesRequested={
                 application.status === "CHANGES_REQUESTED"
               }
-            />
-
-            <ReviewTimelineSection
-              title="이전 revision 기록"
-              reviews={application.reviewHistory}
-              emptyMessage="과거 revision 리뷰 이력이 아직 없습니다."
+              highlightedReviewKeys={application.currentReviews.map(
+                getReviewRenderKey,
+              )}
             />
           </main>
 
@@ -551,17 +585,11 @@ export default function ClubCreationApplicationDetailPage() {
                   <p className="font-medium text-[12px] text-gray-400">
                     리뷰 현황
                   </p>
-                  <div className="mt-2 grid grid-cols-2 gap-3">
+                  <div className="mt-2">
                     <div className="rounded-lg border border-gray-200 bg-[#f6f8fa] px-3 py-3">
-                      <p className="text-[12px] text-gray-500">현재 리뷰</p>
+                      <p className="text-[12px] text-gray-500">리뷰 이력</p>
                       <p className="mt-1 font-semibold text-gray-900">
-                        {application.currentReviews.length}건
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-gray-200 bg-[#f6f8fa] px-3 py-3">
-                      <p className="text-[12px] text-gray-500">이전 기록</p>
-                      <p className="mt-1 font-semibold text-gray-900">
-                        {application.reviewHistory.length}건
+                        {dedupedReviews.length}건
                       </p>
                     </div>
                   </div>
@@ -572,7 +600,7 @@ export default function ClubCreationApplicationDetailPage() {
             {application.status === "CHANGES_REQUESTED" ? (
               <SidebarCard title="다음 단계">
                 <p className="text-[14px] text-gray-600 leading-7">
-                  최신 코멘트를 확인한 뒤 신청서를 수정하고 다시 제출하세요.
+                  리뷰 이력을 확인한 뒤 신청서를 수정하고 다시 제출하세요.
                 </p>
                 <Link href="/mypage/club-creation/edit" className="mt-4 block">
                   <Button className="w-full rounded-lg border border-[#1f6feb]/20 bg-[#1f6feb] px-4 py-2.5 font-semibold text-[14px] text-white hover:bg-[#1a63d8]">

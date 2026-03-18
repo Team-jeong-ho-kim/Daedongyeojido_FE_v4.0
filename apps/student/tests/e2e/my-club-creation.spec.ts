@@ -32,19 +32,20 @@ test.describe("Student my club creation detail", () => {
   test("상세 정보와 GitHub 스타일 코멘트 타임라인을 보여준다", async ({
     page,
   }) => {
+    const duplicatedReview = {
+      reviewId: 1,
+      reviewerType: "TEACHER" as const,
+      reviewerName: "정은진",
+      revision: 2,
+      decision: "CHANGES_REQUESTED" as const,
+      feedback: "현재 검토 차수 피드백입니다.",
+      updatedAt: "2026-03-19T01:56:00",
+    };
+
     await installStudentApiMocks(page, {
       myClubCreationApplication: buildMyApplication({
-        reviewHistory: [
-          {
-            reviewId: 901,
-            reviewerType: "ADMIN",
-            reviewerName: "관리자",
-            revision: 1,
-            decision: "CHANGES_REQUESTED",
-            feedback: "이전 revision 피드백입니다.",
-            updatedAt: "2026-03-17T15:00:00",
-          },
-        ],
+        currentReviews: [duplicatedReview],
+        reviewHistory: [duplicatedReview],
       }),
     });
 
@@ -57,16 +58,23 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("heading", { name: "동아리 소개" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "최신 코멘트" }),
+      page.getByRole("heading", { name: "리뷰 이력" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "이전 revision 기록" }),
-    ).toBeVisible();
+      page.getByRole("heading", { name: "최신 코멘트" }),
+    ).toHaveCount(0);
     await expect(page.getByText("신청 메타데이터")).toBeVisible();
     await expect(
-      page.getByText("활동 계획을 조금 더 구체적으로 작성해주세요."),
+      page.getByText("현재 검토 차수 피드백입니다."),
     ).toBeVisible();
-    await expect(page.getByText("이전 revision 피드백입니다.")).toBeVisible();
+    await expect(page.getByText("검토 차수 2차")).toBeVisible();
+    await expect(page.getByText("현재 리뷰")).toHaveCount(0);
+    await expect(page.getByText("이전 기록")).toHaveCount(0);
+    await expect(page.getByText("리뷰 이력")).toHaveCount(2);
+    await expect(
+      page.locator("article").filter({ hasText: "현재 검토 차수 피드백입니다." }),
+    ).toHaveCount(1);
+    await expect(page.getByText("1건")).toHaveCount(2);
 
     const editLinks = page.getByRole("link", { name: "수정 후 다시 제출하기" });
     await expect(editLinks).toHaveCount(1);
@@ -94,10 +102,7 @@ test.describe("Student my club creation detail", () => {
     await page.goto("/mypage/club-creation");
 
     await expect(
-      page.getByText("아직 현재 revision에 등록된 리뷰가 없습니다."),
-    ).toBeVisible();
-    await expect(
-      page.getByText("과거 revision 리뷰 이력이 아직 없습니다."),
+      page.getByText("등록된 리뷰가 아직 없습니다."),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
