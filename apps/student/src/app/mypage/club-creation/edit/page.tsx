@@ -32,6 +32,7 @@ export default function EditClubCreationApplicationPage() {
   const updateMutation = useUpdateClubCreationApplicationMutation();
   const submitMutation = useSubmitClubCreationApplicationMutation();
   const hasInitializedRef = useRef(false);
+  const shouldRedirectToDetailRef = useRef(true);
 
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
@@ -50,6 +51,7 @@ export default function EditClubCreationApplicationPage() {
 
   useEffect(() => {
     if (
+      shouldRedirectToDetailRef.current &&
       applicationQuery.data &&
       applicationQuery.data.status !== "CHANGES_REQUESTED"
     ) {
@@ -194,6 +196,7 @@ export default function EditClubCreationApplicationPage() {
     );
 
     try {
+      shouldRedirectToDetailRef.current = false;
       await updateMutation.mutateAsync({
         applicationId: application.applicationId,
         clubName: clubName.trim(),

@@ -19,6 +19,7 @@ import {
   ApiError,
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
+  getSessionUser,
 } from "utils";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
@@ -227,15 +228,17 @@ const getErrorStatus = (error: unknown): number | null => {
 
 export default function ClubCreationPage() {
   const router = useRouter();
-  const role = useUserStore((state) => state.userInfo?.role);
+  const storeRole = useUserStore((state) => state.userInfo?.role);
+  const role = storeRole ?? getSessionUser()?.role ?? null;
   const isBlockedRole = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+  const shouldRedirectToDetailRef = useRef(true);
   const { mutate: createClubMutate, isPending: isCreatePending } =
     useCreateClubCreationApplicationMutation();
   const myApplicationQuery = useGetMyClubCreationApplicationQuery({
-    enabled: !isBlockedRole,
+    enabled: role !== null && !isBlockedRole,
   });
   const teachersQuery = useGetAllTeachersQuery({
-    enabled: !isBlockedRole,
+    enabled: role !== null && !isBlockedRole,
   });
   const [clubName, setClubName] = useState("");
   const [clubLogo, setClubLogo] = useState<File | null>(null);
@@ -262,7 +265,7 @@ export default function ClubCreationPage() {
     teachersQuery.isPending || teachersQuery.isError || teachers.length === 0;
 
   useEffect(() => {
-    if (myApplicationQuery.data) {
+    if (shouldRedirectToDetailRef.current && myApplicationQuery.data) {
       router.replace("/mypage/club-creation");
     }
   }, [myApplicationQuery.data, router]);
@@ -451,6 +454,7 @@ export default function ClubCreationPage() {
       Boolean,
     );
 
+    shouldRedirectToDetailRef.current = false;
     createClubMutate({
       clubName: clubName.trim(),
       oneLiner: clubIntro.trim(),
