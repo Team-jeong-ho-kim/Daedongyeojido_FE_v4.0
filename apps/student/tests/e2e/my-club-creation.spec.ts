@@ -54,7 +54,7 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("heading", { name: "내 개설 신청" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "개설 신청 상세 보기" }),
+      page.getByRole("heading", { name: "동아리 소개" }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "최신 코멘트" }),

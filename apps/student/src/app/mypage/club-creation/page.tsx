@@ -326,7 +326,7 @@ export default function ClubCreationApplicationDetailPage() {
     : "PDF";
 
   return (
-    <div className="min-h-screen bg-[#f6f8fa] font-sans text-[#1f2328] selection:bg-primary-500 selection:text-white">
+    <div className="min-h-screen bg-white font-sans text-[#1f2328] selection:bg-primary-500 selection:text-white">
       <div className="mx-auto max-w-[1280px] px-6 py-10 lg:py-12">
         <div className="mb-6 flex items-center gap-2 text-[13px] text-gray-500">
           <Link href="/mypage" className="hover:text-gray-600">
@@ -422,7 +422,7 @@ export default function ClubCreationApplicationDetailPage() {
               </div>
 
               <div className="divide-y divide-gray-200">
-                <DetailSection title="개설 신청 상세 보기">
+                <DetailSection title="동아리 소개">
                   <div className="rounded-lg border border-gray-200 bg-white px-4 py-4 text-[14px] text-gray-700 leading-7">
                     <p className="whitespace-pre-line">
                       {application.introduction}
