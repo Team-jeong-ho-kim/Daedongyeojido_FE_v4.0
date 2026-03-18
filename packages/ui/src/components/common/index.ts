@@ -8,6 +8,7 @@ export { DocumentPreviewViewport } from "./DocumentPreviewViewport";
 export { default as Footer } from "./Footer";
 export { LandingHeader, StudentHeader } from "./Header";
 export { LoadingOverlay } from "./LoadingOverlay";
+export { LoadingState } from "./LoadingState";
 export {
   ManualPdfPreviewModal,
   type ManualPdfPreviewModalProps,

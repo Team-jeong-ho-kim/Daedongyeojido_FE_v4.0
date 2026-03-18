@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ManualPdfPreviewModal } from "ui";
+import { LoadingState, ManualPdfPreviewModal } from "ui";
 import {
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
@@ -114,22 +114,10 @@ export function ClubCreationFormSection({
         </div>
 
         {documentFilesQuery.isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={`document-file-skeleton-${index + 1}`}
-                className="animate-pulse rounded-xl border border-gray-200 bg-gray-50 px-4 py-4"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="h-11 w-11 rounded-lg bg-gray-200" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 w-40 rounded bg-gray-200" />
-                    <div className="h-3 w-28 rounded bg-gray-100" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <LoadingState
+            message="동아리 개설 양식을 불러오고 있습니다"
+            description="잠시만 기다리면 다운로드 가능한 양식 목록을 보여드립니다."
+          />
         ) : null}
 
         {!documentFilesQuery.isLoading && documentFilesQuery.isError ? (

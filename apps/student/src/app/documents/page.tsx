@@ -13,7 +13,7 @@ export default function DocumentPage() {
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">
       <div className="container mx-auto max-w-7xl px-6 py-12">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="mb-10 flex flex-col gap-4 md:mb-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-3xl">
             <h1 className="font-bold text-3xl text-gray-900">양식 조회</h1>
             <p className="mt-3 text-gray-600 text-sm leading-6 md:text-base">
