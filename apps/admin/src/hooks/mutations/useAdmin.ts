@@ -76,10 +76,9 @@ export const useReviewClubCreationApplicationMutation = () => {
           queryKey: queryKeys.admin.clubCreationApplications.queryKey,
         }),
         queryClient.invalidateQueries({
-          queryKey:
-            queryKeys.admin.clubCreationApplicationDetail(
-              variables.applicationId,
-            ).queryKey,
+          queryKey: queryKeys.admin.clubCreationApplicationDetail(
+            variables.applicationId,
+          ).queryKey,
         }),
       ]);
       toast.success("리뷰를 저장했습니다.");
@@ -97,9 +96,14 @@ export const useUploadClubCreationFormMutation = () => {
     mutationFn: ({ fileName, fileUrl }: { fileName: string; fileUrl: File }) =>
       uploadClubCreationForm({ fileName, fileUrl }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.admin.overview.queryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.overview.queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.documentFiles.queryKey,
+        }),
+      ]);
       toast.success("동아리 개설 양식을 업로드했습니다.");
     },
     onError: (error: unknown) => {

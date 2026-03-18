@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useEffect, useId, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { ManualPdfPreviewModal } from "ui";
 import type {
   ClubCreationApplicationReview,
@@ -7,7 +8,10 @@ import type {
   ClubCreationReviewerType,
 } from "utils";
 import { ClubHeader } from "@/components/common";
-import { useReviewClubCreationApplicationMutation } from "@/hooks/mutations";
+import {
+  useReviewClubCreationApplicationMutation,
+  useUploadClubCreationFormMutation,
+} from "@/hooks/mutations";
 import {
   useGetClubCreationApplicationDetailQuery,
   useGetClubCreationApplicationsQuery,
@@ -136,8 +140,11 @@ function ReviewSection({
 
 export function ClubCreationTab() {
   const reviewMutation = useReviewClubCreationApplicationMutation();
+  const uploadClubCreationFormMutation = useUploadClubCreationFormMutation();
   const clubCreationApplicationsQuery = useGetClubCreationApplicationsQuery();
   const feedbackFieldId = useId();
+  const uploadFieldId = useId();
+  const uploadNameFieldId = useId();
   const [isDetailOverlayOpen, setIsDetailOverlayOpen] = useState(false);
   const [selectedApplicationId, setSelectedApplicationId] = useState<
     number | null
@@ -150,6 +157,11 @@ export function ClubCreationTab() {
   );
   const [feedback, setFeedback] = useState("");
   const [reviewError, setReviewError] = useState("");
+  const [clubCreationFormFile, setClubCreationFormFile] = useState<File | null>(
+    null,
+  );
+  const [clubCreationFormName, setClubCreationFormName] = useState("");
+  const [uploadInputKey, setUploadInputKey] = useState(0);
 
   const applications = clubCreationApplicationsQuery.data ?? [];
   const selectedApplicationIdValue = selectedApplicationId
@@ -238,9 +250,7 @@ export function ClubCreationTab() {
     }
 
     if (hasSubmittedOwnReview) {
-      setReviewError(
-        "리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다.",
-      );
+      setReviewError("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다.");
       return false;
     }
 
@@ -287,13 +297,141 @@ export function ClubCreationTab() {
       });
       await detailQuery.refetch();
       setReviewError("");
-    } catch {} finally {
+    } catch {
+    } finally {
       setIsReviewConfirmOpen(false);
     }
   };
 
+  const handleSelectClubCreationForm = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) {
+      setClubCreationFormFile(null);
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith(".hwp")) {
+      toast.error("HWP 파일만 업로드할 수 있습니다.");
+      event.currentTarget.value = "";
+      setClubCreationFormFile(null);
+      return;
+    }
+
+    setClubCreationFormFile(file);
+    setClubCreationFormName((current) => {
+      if (current.trim()) {
+        return current;
+      }
+
+      return file.name.replace(/\.[^.]+$/, "").trim();
+    });
+  };
+
+  const handleUploadClubCreationForm = async () => {
+    const normalizedFileName = clubCreationFormName.trim();
+
+    if (!clubCreationFormFile || !normalizedFileName) {
+      if (!normalizedFileName) {
+        toast.error("양식 이름을 입력해주세요.");
+      }
+      return;
+    }
+
+    try {
+      await uploadClubCreationFormMutation.mutateAsync({
+        fileName: normalizedFileName,
+        fileUrl: clubCreationFormFile,
+      });
+      setClubCreationFormFile(null);
+      setClubCreationFormName("");
+      setUploadInputKey((current) => current + 1);
+    } catch {}
+  };
+
   return (
     <>
+      <PanelCard
+        title="개설 양식 업로드"
+        description="학생이 내려받는 공용 HWP 양식을 등록합니다."
+      >
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <label
+              htmlFor={uploadNameFieldId}
+              className="block font-medium text-gray-700 text-sm"
+            >
+              양식 이름
+            </label>
+            <input
+              id={uploadNameFieldId}
+              type="text"
+              value={clubCreationFormName}
+              onChange={(event) => setClubCreationFormName(event.target.value)}
+              placeholder="학생에게 보여줄 양식 이름을 입력해주세요."
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none placeholder:text-gray-400 focus:border-primary-500"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor={uploadFieldId}
+              className="block font-medium text-gray-700 text-sm"
+            >
+              개설 양식 파일
+            </label>
+            <input
+              key={uploadInputKey}
+              id={uploadFieldId}
+              type="file"
+              accept=".hwp,application/x-hwp"
+              onChange={handleSelectClubCreationForm}
+              className="w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-gray-700 file:text-sm focus:border-primary-500"
+            />
+            <p className="text-gray-500 text-xs">
+              HWP 파일만 업로드할 수 있습니다.
+            </p>
+          </div>
+
+          {clubCreationFormFile ? (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white font-semibold text-[11px] text-gray-700">
+                  HWP
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="break-all font-medium text-gray-900 text-sm md:text-base">
+                    {clubCreationFormName.trim() || clubCreationFormFile.name}
+                  </p>
+                  <p className="mt-1 text-[12px] text-gray-500">
+                    원본 파일: {clubCreationFormFile.name}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleUploadClubCreationForm}
+              disabled={
+                !clubCreationFormFile ||
+                !clubCreationFormName.trim() ||
+                uploadClubCreationFormMutation.isPending
+              }
+              className="rounded-xl bg-primary-500 px-6 py-3 font-semibold text-sm text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {uploadClubCreationFormMutation.isPending
+                ? "업로드 중..."
+                : "양식 업로드"}
+            </button>
+          </div>
+        </div>
+      </PanelCard>
+
       <PanelCard
         title="동아리 개설 신청 검토"
         description="접수된 개설 신청을 확인하고 관리자 리뷰를 저장합니다."
@@ -573,8 +711,9 @@ export function ClubCreationTab() {
                         </h4>
                         {hasSubmittedOwnReview ? (
                           <div className="mt-5 space-y-4">
-                            <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-5 py-4 text-gray-600 text-sm leading-6">
-                              리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다.
+                            <div className="rounded-2xl border border-gray-200 border-dashed bg-gray-50 px-5 py-4 text-gray-600 text-sm leading-6">
+                              리뷰는 1회만 작성 가능하며 저장 후 수정할 수
+                              없습니다.
                             </div>
                             <div className="rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5">
                               <div className="flex flex-wrap items-center gap-2">
@@ -638,7 +777,7 @@ export function ClubCreationTab() {
                                 }}
                                 rows={5}
                                 placeholder="학생에게 전달할 코멘트를 입력해주세요."
-                                className={`w-full rounded-2xl border bg-white px-4 py-4 text-sm outline-none placeholder:text-gray-400 transition ${
+                                className={`w-full rounded-2xl border bg-white px-4 py-4 text-sm outline-none transition placeholder:text-gray-400 ${
                                   reviewError
                                     ? "border-red-300"
                                     : "border-gray-200 focus:border-primary-300"
