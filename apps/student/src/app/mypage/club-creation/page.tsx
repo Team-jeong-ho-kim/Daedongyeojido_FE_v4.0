@@ -374,16 +374,6 @@ export default function ClubCreationApplicationDetailPage() {
                   {statusConfig.description}
                 </p>
               </div>
-
-              {application.status === "CHANGES_REQUESTED" ? (
-                <div className="bg-white px-6 py-4">
-                  <Link href="/mypage/club-creation/edit">
-                    <Button className="rounded-lg border border-[#1f6feb]/20 bg-[#1f6feb] px-4 py-2.5 font-semibold text-[14px] text-white hover:bg-[#1a63d8]">
-                      수정 후 다시 제출하기
-                    </Button>
-                  </Link>
-                </div>
-              ) : null}
             </section>
 
             <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">

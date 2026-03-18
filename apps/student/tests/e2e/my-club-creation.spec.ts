@@ -69,7 +69,7 @@ test.describe("Student my club creation detail", () => {
     await expect(page.getByText("이전 revision 피드백입니다.")).toBeVisible();
 
     const editLinks = page.getByRole("link", { name: "수정 후 다시 제출하기" });
-    await expect(editLinks).toHaveCount(2);
+    await expect(editLinks).toHaveCount(1);
     await expect(editLinks.first()).toHaveAttribute(
       "href",
       "/mypage/club-creation/edit",
