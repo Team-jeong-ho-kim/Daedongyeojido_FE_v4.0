@@ -32,6 +32,9 @@ test.describe("Admin club creation tab", () => {
     await expect(page.getByText("신청자", { exact: true })).toBeVisible();
     await expect(page.getByText("3212")).toBeVisible();
     await expect(
+      page.locator("p").filter({ hasText: /^검토 차수 2차$/ }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("heading", { name: "현재 리뷰" }),
     ).toBeVisible();
     await expect(
@@ -99,7 +102,7 @@ test.describe("Admin club creation tab", () => {
     ).toBeUndefined();
 
     await page.getByRole("button", { name: "리뷰 저장" }).click();
-    await page.getByRole("button", { name: "확인" }).click();
+    await page.getByRole("button", { name: "확인", exact: true }).click();
 
     await expect(page.getByText("리뷰를 저장했습니다.")).toBeVisible();
     await expect(

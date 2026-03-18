@@ -265,7 +265,7 @@ export default function EditClubCreationApplicationPage() {
               수정 요청 코멘트를 반영해 신청서를 다시 제출하세요
             </h1>
             <p className="mt-3 text-gray-600 text-sm leading-7">
-              현재 revision {application.revision}에 대한 리뷰를 반영한 뒤
+              현재 검토 차수 {application.revision}차의 리뷰를 반영한 뒤
               재제출하면 검토 상태가 다시 갱신됩니다.
             </p>
           </div>

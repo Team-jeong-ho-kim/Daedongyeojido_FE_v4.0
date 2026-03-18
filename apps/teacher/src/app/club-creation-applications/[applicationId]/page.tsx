@@ -61,6 +61,15 @@ const sortReviews = (reviews: TeacherClubCreationReview[]) =>
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
+const getReviewRenderKey = (review: TeacherClubCreationReview) => {
+  return [
+    review.revision,
+    review.reviewId,
+    review.reviewerType,
+    review.updatedAt,
+  ].join(":");
+};
+
 const formatDateTime = (value: string | null) => {
   if (!value) {
     return "-";
@@ -104,7 +113,7 @@ function ReviewSection({
         <div className="space-y-4">
           {sortedReviews.map((review) => (
             <article
-              key={review.reviewId}
+              key={getReviewRenderKey(review)}
               className="rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm"
             >
               <div className="flex flex-wrap items-center gap-2">
@@ -117,7 +126,7 @@ function ReviewSection({
                   {DECISION_LABELS[review.decision]}
                 </span>
                 <span className="text-gray-400 text-xs">
-                  revision {review.revision}
+                  검토 차수 {review.revision}차
                 </span>
               </div>
 
@@ -400,7 +409,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
                 {STATUS_LABELS[detail.status]}
               </p>
               <p className="mt-1 text-gray-500 text-sm">
-                revision {detail.revision}
+                검토 차수 {detail.revision}차
               </p>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm">
@@ -481,7 +490,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
           <ReviewSection
             title="현재 리뷰"
             reviews={detail.currentReviews}
-            emptyMessage="현재 revision에 등록된 리뷰가 없습니다."
+            emptyMessage="현재 검토 차수에 등록된 리뷰가 없습니다."
           />
 
           <section className="rounded-2xl border border-gray-200 bg-white px-6 py-6 shadow-sm">
@@ -583,7 +592,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
           <ReviewSection
             title="리뷰 이력"
             reviews={detail.reviewHistory}
-            emptyMessage="과거 revision 리뷰 이력이 없습니다."
+            emptyMessage="이전 검토 차수의 리뷰 이력이 없습니다."
           />
         </div>
       </section>
