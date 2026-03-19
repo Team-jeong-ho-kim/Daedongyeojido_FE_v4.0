@@ -15,7 +15,7 @@ export default function MemberItem({
   onDelete,
 }: MemberItemProps) {
   return (
-    <article className="group relative flex h-full w-full select-none flex-col overflow-hidden rounded-[14px] bg-white shadow-sm transition-all duration-300 hover:shadow-lg md:rounded-[16px]">
+    <article className="group relative flex h-full min-w-0 w-full select-none flex-col overflow-hidden rounded-[14px] bg-white shadow-sm transition-all duration-300 hover:shadow-lg md:rounded-[16px]">
       {/* 삭제 버튼 */}
       {canDelete && (
         <button
@@ -55,7 +55,7 @@ export default function MemberItem({
 
       {/* 정보 영역 */}
       <div className="flex flex-1 flex-col gap-2 bg-gray-50 p-3 md:p-4">
-        <h3 className="font-semibold text-[14px] text-gray-900 md:text-[15px]">
+        <h3 className="min-w-0 font-semibold text-[14px] text-gray-900 md:text-[15px]">
           {userName}
         </h3>
         <p className="line-clamp-2 min-h-[2.75rem] overflow-hidden text-[12px] text-gray-600 leading-relaxed md:min-h-[3rem] md:text-[13px]">

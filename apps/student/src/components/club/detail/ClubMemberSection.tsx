@@ -80,7 +80,7 @@ export function ClubMemberSection({
         동아리 팀원
       </h2>
 
-      <div className="flex flex-col gap-6 md:gap-8">
+      <div className="flex min-w-0 flex-1 flex-col gap-6 md:gap-8">
         {/* 팀원 이름 나열 */}
         <div className="flex flex-wrap gap-2">
           {clubMembers.map((member, index) => (
@@ -105,7 +105,7 @@ export function ClubMemberSection({
           />
         )}
 
-        <div className="grid grid-cols-2 content-start items-start gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
+        <div className="grid w-full grid-cols-2 content-start items-start gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
           {pagedMembers.map((member) => (
             <MemberItem
               key={`${member.userId}-${member.userName}`}

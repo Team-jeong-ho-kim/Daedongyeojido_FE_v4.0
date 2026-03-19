@@ -24,7 +24,7 @@ export function AddMemberSection({
         </p>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <div className="relative flex-1">
           <input
             type="text"
@@ -70,7 +70,7 @@ export function AddMemberSection({
         <button
           type="button"
           onClick={onAddMemberRequest}
-          className="whitespace-nowrap rounded-lg bg-red-500 px-6 py-2.5 text-[14px] text-white hover:bg-red-600"
+          className="w-full whitespace-nowrap rounded-lg bg-red-500 px-6 py-2.5 text-[14px] text-white hover:bg-red-600 sm:w-auto"
         >
           팀원 추가 요청
         </button>

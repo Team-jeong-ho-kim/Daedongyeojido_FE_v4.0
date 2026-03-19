@@ -251,7 +251,7 @@ export default function AdminClubDetailPage() {
                 동아리 팀원
               </h2>
 
-              <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex min-w-0 flex-1 flex-col gap-6 md:gap-8">
                 <div className="flex flex-wrap gap-2">
                   {memberNames.map((member, index) => (
                     <span
@@ -264,7 +264,7 @@ export default function AdminClubDetailPage() {
                   ))}
                 </div>
 
-                <div className="grid min-h-[590px] grid-cols-2 content-start items-start gap-5 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid min-h-[590px] w-full grid-cols-2 content-start items-start gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
                   {pagedMembers.map((member) => (
                     <MemberItem
                       key={`${member.userId}-${member.userName}`}
