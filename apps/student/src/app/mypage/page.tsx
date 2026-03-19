@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUserStore } from "shared";
 import { useLogoutMutation } from "@/hooks/mutations";
+import { useMyInfoQuery } from "@/hooks/querys";
 
 export default function MyPage() {
+  useMyInfoQuery();
   const userInfo = useUserStore((state) => state.userInfo);
   const clearUser = useUserStore((state) => state.clearUser);
   const { mutate: logout } = useLogoutMutation(clearUser);
