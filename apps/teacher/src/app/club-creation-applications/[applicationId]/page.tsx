@@ -208,12 +208,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
     try {
       const response =
         await getTeacherClubCreationApplicationDetail(applicationId);
-      const latestTeacherReview =
-        getLatestClubCreationReviewsByReviewer(response).get("TEACHER") ?? null;
-
       setDetail(response);
-      setDecision(latestTeacherReview?.decision ?? null);
-      setFeedback(latestTeacherReview?.feedback ?? "");
       setReviewError("");
       setErrorMessage("");
     } catch {
@@ -267,6 +262,20 @@ export default function TeacherClubCreationApplicationDetailPage() {
         detail.clubCreationForm,
       )
     : "";
+
+  useEffect(() => {
+    if (!detail) {
+      return;
+    }
+
+    setDecision(currentTeacherReview?.decision ?? null);
+    setFeedback(currentTeacherReview?.feedback ?? "");
+    setReviewError("");
+  }, [
+    detail,
+    currentTeacherReview?.decision,
+    currentTeacherReview?.feedback,
+  ]);
 
   const validateReviewForm = () => {
     if (!detail || isReviewSubmitting) {

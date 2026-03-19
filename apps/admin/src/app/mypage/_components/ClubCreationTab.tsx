@@ -233,13 +233,13 @@ export function ClubCreationTab() {
       return;
     }
 
-    setDecision(latestAdminReview?.decision ?? null);
-    setFeedback(latestAdminReview?.feedback ?? "");
+    setDecision(currentAdminReview?.decision ?? null);
+    setFeedback(currentAdminReview?.feedback ?? "");
     setReviewError("");
   }, [
     applicationDetail,
-    latestAdminReview?.decision,
-    latestAdminReview?.feedback,
+    currentAdminReview?.decision,
+    currentAdminReview?.feedback,
   ]);
 
   useEffect(() => {

@@ -232,7 +232,15 @@ test.describe("Admin club creation tab", () => {
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toBeVisible();
+    await expect(
+      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
+    ).toHaveValue("");
+    await expect(
+      page.locator("button.border-primary-300.bg-primary-50"),
+    ).toHaveCount(0);
     await expect(page.getByText(submittedReviewLockMessage)).toHaveCount(0);
+    await page.getByRole("button", { name: "리뷰 저장" }).click();
+    await expect(page.getByText("검토 결과를 선택해주세요.")).toBeVisible();
 
     await page.getByRole("button", { name: "승인" }).click();
     await page.getByRole("button", { name: "리뷰 저장" }).click();
