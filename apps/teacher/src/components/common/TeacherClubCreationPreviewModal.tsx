@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  ManualPdfPreviewModal,
   type DocumentPreviewModalClassNames,
+  ManualPdfPreviewModal,
   type ManualPdfPreviewModalProps,
 } from "ui";
 import { BodyPortal } from "./BodyPortal";

@@ -84,7 +84,9 @@ test.describe("Admin club creation tab", () => {
     await page.getByRole("button", { name: "리뷰 저장" }).click();
 
     await expect(
-      page.getByText("수정 요청 또는 반려일 때는 코멘트를 반드시 입력해주세요."),
+      page.getByText(
+        "수정 요청 또는 반려일 때는 코멘트를 반드시 입력해주세요.",
+      ),
     ).toBeVisible();
 
     await page
@@ -112,13 +114,16 @@ test.describe("Admin club creation tab", () => {
         .getByText("활동 계획을 조금 더 구체적으로 작성해주세요."),
     ).toBeVisible();
     await expect(
-      page.getByText("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다."),
+      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toBeVisible();
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
+    ).toHaveValue("활동 계획을 조금 더 구체적으로 작성해주세요.");
+    await expect(
+      page.getByText("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다."),
     ).toHaveCount(0);
     await expect(page.getByRole("button", { name: "리뷰 저장" })).toHaveCount(
-      0,
+      1,
     );
     expect(
       controller.getLastRequest("/club-creation-applications/5/review", "PUT"),
@@ -130,5 +135,111 @@ test.describe("Admin club creation tab", () => {
           request.pathname.includes("/club-creation-applications/5/review"),
       ),
     ).toHaveLength(1);
+  });
+
+  test("이전 차수 admin 리뷰가 currentReviews에 섞여 있어도 현재 차수 리뷰 입력을 다시 노출한다", async ({
+    page,
+  }) => {
+    const controller = await installAdminApiMocks(page, {
+      clubCreationApplications: [
+        {
+          applicationId: 6,
+          clubName: "재제출 동아리",
+          clubImage:
+            "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-revision.png",
+          introduction: "이전 차수 피드백을 반영해 다시 제출한 동아리입니다.",
+          status: "UNDER_REVIEW",
+          revision: 3,
+          majors: ["BE"],
+          applicantName: "박태수",
+          lastSubmittedAt: "2026-03-19T10:00:00",
+        },
+      ],
+      clubCreationApplicationDetails: {
+        6: {
+          applicationId: 6,
+          status: "UNDER_REVIEW",
+          revision: 3,
+          clubName: "재제출 동아리",
+          clubImage:
+            "https://dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com/club-revision.png",
+          clubCreationForm: "/documents/previews/1.pdf",
+          oneLiner: "세 번째 차수 신청입니다.",
+          introduction: "이전 차수 피드백을 반영해 다시 제출한 동아리입니다.",
+          majors: ["BE"],
+          links: ["https://github.com/example/revision-club"],
+          applicant: {
+            userId: 1,
+            userName: "박태수",
+            classNumber: "3105",
+          },
+          submittedAt: "2026-03-19T10:00:00",
+          lastSubmittedAt: "2026-03-19T10:00:00",
+          currentReviews: [
+            {
+              reviewId: 21,
+              reviewerType: "ADMIN",
+              reviewerName: "최민수",
+              revision: 2,
+              decision: "CHANGES_REQUESTED",
+              feedback: "이전 차수 관리자 피드백",
+              updatedAt: "2026-03-19T08:53:04.686687",
+            },
+            {
+              reviewId: 22,
+              reviewerType: "TEACHER",
+              reviewerName: "정은진",
+              revision: 2,
+              decision: "APPROVED",
+              feedback: null,
+              updatedAt: "2026-03-19T08:54:03.332444",
+            },
+          ],
+          reviewHistory: [
+            {
+              reviewId: 21,
+              reviewerType: "ADMIN",
+              reviewerName: "최민수",
+              revision: 2,
+              decision: "CHANGES_REQUESTED",
+              feedback: "이전 차수 관리자 피드백",
+              updatedAt: "2026-03-19T08:53:04.686687",
+            },
+            {
+              reviewId: 22,
+              reviewerType: "TEACHER",
+              reviewerName: "정은진",
+              revision: 2,
+              decision: "APPROVED",
+              feedback: null,
+              updatedAt: "2026-03-19T08:54:03.332444",
+            },
+          ],
+        },
+      },
+    });
+
+    await page.goto("/mypage");
+    await page.getByRole("button", { name: "동아리 개설" }).click();
+    await page.getByRole("button", { name: /재제출 동아리/ }).click();
+
+    await expect(
+      page.getByText("현재 검토 차수에 등록된 리뷰가 없습니다."),
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
+    ).toBeVisible();
+    await expect(
+      page.getByText("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다."),
+    ).toHaveCount(0);
+
+    await page.getByRole("button", { name: "승인" }).click();
+    await page.getByRole("button", { name: "리뷰 저장" }).click();
+    await page.getByRole("button", { name: "확인", exact: true }).click();
+
+    await expect(page.getByText("리뷰를 저장했습니다.")).toBeVisible();
+    expect(
+      controller.getLastRequest("/club-creation-applications/6/review", "PUT"),
+    ).toBeTruthy();
   });
 });

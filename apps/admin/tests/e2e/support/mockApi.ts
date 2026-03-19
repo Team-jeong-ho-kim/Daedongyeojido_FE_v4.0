@@ -94,6 +94,48 @@ type AdminApiMockOptions = {
   teachers?: MockTeacher[];
 };
 
+const getCurrentRevisionReviews = (
+  detail: MockClubCreationApplicationDetail,
+) => {
+  return detail.currentReviews.filter(
+    (review) => review.revision === detail.revision,
+  );
+};
+
+const deriveApplicationStatus = (
+  detail: MockClubCreationApplicationDetail,
+): MockClubCreationApplicationDetail["status"] => {
+  const currentRevisionReviews = getCurrentRevisionReviews(detail);
+
+  if (currentRevisionReviews.length === 0) {
+    return "UNDER_REVIEW";
+  }
+
+  if (
+    currentRevisionReviews.length >= 2 &&
+    currentRevisionReviews.every((review) => review.decision === "APPROVED")
+  ) {
+    return "APPROVED";
+  }
+
+  if (
+    currentRevisionReviews.length >= 2 &&
+    currentRevisionReviews.every((review) => review.decision === "REJECTED")
+  ) {
+    return "REJECTED";
+  }
+
+  if (
+    currentRevisionReviews.some(
+      (review) => review.decision === "CHANGES_REQUESTED",
+    )
+  ) {
+    return "CHANGES_REQUESTED";
+  }
+
+  return "UNDER_REVIEW";
+};
+
 const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
   {
     fileId: 1,
@@ -322,31 +364,28 @@ export async function installAdminApiMocks(
     });
   });
 
-  await page.route(
-    /.*\/club-creation-applications\/\d+$/,
-    async (route) => {
-      if (await handleApiFallback(route)) return;
-      if (route.request().method() !== "GET") {
-        await route.continue();
-        return;
-      }
+  await page.route(/.*\/club-creation-applications\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
 
-      recordRequest(route);
-      const applicationId = Number(route.request().url().split("/").pop());
-      const detail = clubCreationApplicationDetails[applicationId];
+    recordRequest(route);
+    const applicationId = Number(route.request().url().split("/").pop());
+    const detail = clubCreationApplicationDetails[applicationId];
 
-      if (!detail) {
-        await createJsonResponse(
-          route,
-          { message: "개설 신청 상세 정보를 찾을 수 없습니다." },
-          404,
-        );
-        return;
-      }
+    if (!detail) {
+      await createJsonResponse(
+        route,
+        { message: "개설 신청 상세 정보를 찾을 수 없습니다." },
+        404,
+      );
+      return;
+    }
 
-      await createJsonResponse(route, detail);
-    },
-  );
+    await createJsonResponse(route, detail);
+  });
 
   await page.route(
     /.*\/club-creation-applications\/\d+\/review$/,
@@ -370,8 +409,9 @@ export async function installAdminApiMocks(
       if (detail && requestBody.decision) {
         const nextReview = {
           reviewId:
-            detail.currentReviews.find((review) => review.reviewerType === "ADMIN")
-              ?.reviewId ?? 999,
+            detail.currentReviews.find(
+              (review) => review.reviewerType === "ADMIN",
+            )?.reviewId ?? 999,
           reviewerType: "ADMIN" as const,
           reviewerName: "관리자",
           revision: detail.revision,
@@ -382,17 +422,15 @@ export async function installAdminApiMocks(
 
         detail.currentReviews = [
           ...detail.currentReviews.filter(
-            (review) => review.reviewerType !== "ADMIN",
+            (review) =>
+              !(
+                review.reviewerType === "ADMIN" &&
+                review.revision === detail.revision
+              ),
           ),
           nextReview,
         ];
-
-        if (requestBody.decision === "CHANGES_REQUESTED") {
-          detail.status = "CHANGES_REQUESTED";
-        }
-        if (requestBody.decision === "REJECTED") {
-          detail.status = "REJECTED";
-        }
+        detail.status = deriveApplicationStatus(detail);
 
         const listItem = clubCreationApplications.find(
           (application) => application.applicationId === applicationId,
@@ -400,7 +438,8 @@ export async function installAdminApiMocks(
 
         if (listItem) {
           listItem.status = detail.status;
-          listItem.lastSubmittedAt = detail.lastSubmittedAt ?? listItem.lastSubmittedAt;
+          listItem.lastSubmittedAt =
+            detail.lastSubmittedAt ?? listItem.lastSubmittedAt;
         }
       }
 

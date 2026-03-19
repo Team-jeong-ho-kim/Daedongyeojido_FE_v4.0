@@ -3,9 +3,9 @@ import type {
   ClubCreationApplicationListItem,
   ClubCreationApplicationListResponse,
   ClubCreationApplicationReview,
+  ClubCreationApplicationReviewRequest,
   ClubCreationReviewDecision,
   ClubCreationReviewerType,
-  ClubCreationApplicationReviewRequest,
 } from "utils";
 
 export interface TeacherMyInfoResponse {

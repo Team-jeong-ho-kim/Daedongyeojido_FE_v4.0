@@ -8,9 +8,8 @@ import type {
 } from "@/types/teacher";
 
 export const getTeacherMyInfo = async () => {
-  const response = await apiClient.get<TeacherMyInfoResponse>(
-    "/teachers/my-info",
-  );
+  const response =
+    await apiClient.get<TeacherMyInfoResponse>("/teachers/my-info");
 
   return response.data;
 };
