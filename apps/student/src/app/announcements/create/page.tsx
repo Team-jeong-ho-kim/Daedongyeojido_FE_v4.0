@@ -176,17 +176,17 @@ function CreateAnnouncementContent() {
             />
           </FormField>
 
-          <FormField label="일정 지정">
+          <FormField label="공고 지원 기간 설정">
             <div className="flex items-center justify-between">
               <p className="text-[14px] text-gray-700">
-                {deadline || "일정을 지정해주세요"}
+                {deadline || "공고 지원 기간을 지정해주세요"}
               </p>
               <Button
                 type="button"
                 onClick={() => setShowDeadlineModal(true)}
                 className="h-8 rounded-xl bg-gray-900 px-4 py-4 font-medium text-[12px] text-white hover:bg-gray-800"
               >
-                일정 지정하기
+                지원 기간 지정하기
               </Button>
             </div>
           </FormField>
