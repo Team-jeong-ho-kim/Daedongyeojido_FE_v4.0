@@ -144,4 +144,63 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(0);
   });
+
+  test("서로 다른 차수에서 각각 승인했더라도 두 리뷰어가 모두 승인하면 최종 승인으로 표시한다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "UNDER_REVIEW",
+        revision: 3,
+        currentReviews: [
+          {
+            reviewId: 5,
+            reviewerType: "TEACHER",
+            reviewerName: "정은진",
+            revision: 3,
+            decision: "APPROVED",
+            feedback: null,
+            updatedAt: "2026-03-19T10:47:00",
+          },
+        ],
+        reviewHistory: [
+          {
+            reviewId: 1,
+            reviewerType: "ADMIN",
+            reviewerName: "최민수",
+            revision: 1,
+            decision: "APPROVED",
+            feedback: "승인합니다.",
+            updatedAt: "2026-03-19T10:44:00",
+          },
+          {
+            reviewId: 2,
+            reviewerType: "TEACHER",
+            reviewerName: "정은진",
+            revision: 1,
+            decision: "CHANGES_REQUESTED",
+            feedback: "이건 아니죠",
+            updatedAt: "2026-03-19T10:44:00",
+          },
+          {
+            reviewId: 3,
+            reviewerType: "TEACHER",
+            reviewerName: "정은진",
+            revision: 2,
+            decision: "CHANGES_REQUESTED",
+            feedback: "잘되는",
+            updatedAt: "2026-03-19T10:46:00",
+          },
+        ],
+      }),
+    });
+
+    await page.goto("/mypage/club-creation");
+
+    await expect(page.getByText("개설 신청이 승인되었습니다.")).toBeVisible();
+    await expect(page.getByText("승인")).toHaveCount(2);
+    await expect(
+      page.getByRole("link", { name: "수정 후 다시 제출하기" }),
+    ).toHaveCount(0);
+  });
 });

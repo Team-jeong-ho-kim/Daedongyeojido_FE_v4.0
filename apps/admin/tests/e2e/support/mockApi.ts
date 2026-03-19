@@ -102,10 +102,66 @@ const getCurrentRevisionReviews = (
   );
 };
 
+const getReviewTimestamp = (
+  review:
+    | MockClubCreationApplicationDetail["currentReviews"][number]
+    | MockClubCreationApplicationDetail["reviewHistory"][number],
+) => {
+  const timestamp = Date.parse(review.updatedAt);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const getLatestReviewsByReviewer = (
+  detail: MockClubCreationApplicationDetail,
+) => {
+  const latestReviewByReviewer = new Map<
+    "ADMIN" | "TEACHER",
+    MockClubCreationApplicationDetail["currentReviews"][number]
+  >();
+
+  for (const review of [...detail.reviewHistory, ...detail.currentReviews]) {
+    const currentReview = latestReviewByReviewer.get(review.reviewerType);
+
+    if (!currentReview) {
+      latestReviewByReviewer.set(review.reviewerType, review);
+      continue;
+    }
+
+    if (review.revision !== currentReview.revision) {
+      if (review.revision > currentReview.revision) {
+        latestReviewByReviewer.set(review.reviewerType, review);
+      }
+      continue;
+    }
+
+    const reviewTimestamp = getReviewTimestamp(review);
+    const currentTimestamp = getReviewTimestamp(currentReview);
+
+    if (
+      reviewTimestamp > currentTimestamp ||
+      (reviewTimestamp === currentTimestamp &&
+        review.reviewId > currentReview.reviewId)
+    ) {
+      latestReviewByReviewer.set(review.reviewerType, review);
+    }
+  }
+
+  return latestReviewByReviewer;
+};
+
 const deriveApplicationStatus = (
   detail: MockClubCreationApplicationDetail,
 ): MockClubCreationApplicationDetail["status"] => {
   const currentRevisionReviews = getCurrentRevisionReviews(detail);
+  const latestReviewByReviewer = getLatestReviewsByReviewer(detail);
+
+  const hasAllReviewerApprovals =
+    latestReviewByReviewer.get("ADMIN")?.decision === "APPROVED" &&
+    latestReviewByReviewer.get("TEACHER")?.decision === "APPROVED";
+
+  if (hasAllReviewerApprovals) {
+    return "APPROVED";
+  }
 
   if (currentRevisionReviews.length === 0) {
     return "UNDER_REVIEW";
