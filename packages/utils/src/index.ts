@@ -8,6 +8,7 @@ export {
   saveTokens,
 } from "./auth-cookie";
 export { partitionClubCreationReviews } from "./clubCreationReviews";
+export { resolveClubCreationApplicationStatus } from "./clubCreationStatus";
 export {
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,

@@ -104,12 +104,12 @@ test.describe("Student club creation", () => {
       await expect(
         page.getByRole("button", { name: "마이페이지로 이동" }),
       ).toBeVisible();
-      await expect(
-        page.getByRole("button", { name: "개설 신청" }),
-      ).toHaveCount(0);
-      await expect(
-        page.getByRole("button", { name: /Teacher/ }),
-      ).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "개설 신청" })).toHaveCount(
+        0,
+      );
+      await expect(page.getByRole("button", { name: /Teacher/ })).toHaveCount(
+        0,
+      );
 
       expect(
         mockApi.getLastRequest("/club-creation-applications/me", "GET"),
@@ -303,9 +303,7 @@ test.describe("Student club creation", () => {
     await page.goto("/clubs/create");
 
     await expect(page).toHaveURL(/\/mypage\/club-creation$/);
-    await expect(
-      page.getByText("현재 신청서가 검토 중입니다."),
-    ).toBeVisible();
+    await expect(page.getByText("현재 신청서가 검토 중입니다.")).toBeVisible();
   });
 
   for (const statusCase of [
@@ -382,6 +380,11 @@ test.describe("Student club creation", () => {
     await page.getByRole("button", { name: "다시 제출하기" }).click();
 
     await expect(page).toHaveURL(/\/mypage$/);
+    await page.goto("/mypage/club-creation");
+    await expect(page.getByText("검토 차수 3차")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "수정 후 다시 제출하기" }),
+    ).toHaveCount(0);
     expect(
       mockApi.getLastRequest("/club-creation-applications/41", "PATCH"),
     ).toBeTruthy();
@@ -403,8 +406,6 @@ test.describe("Student club creation", () => {
     await page.goto("/mypage/club-creation/edit");
 
     await expect(page).toHaveURL(/\/mypage\/club-creation$/);
-    await expect(
-      page.getByText("현재 신청서가 검토 중입니다."),
-    ).toBeVisible();
+    await expect(page.getByText("현재 신청서가 검토 중입니다.")).toBeVisible();
   });
 });

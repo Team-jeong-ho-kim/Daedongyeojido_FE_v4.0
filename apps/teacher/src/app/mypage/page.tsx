@@ -3,8 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
-import { apiClient, clearTokens, getAccessToken, getSessionUser } from "utils";
 import {
+  apiClient,
+  clearTokens,
+  getAccessToken,
+  getSessionUser,
+  resolveClubCreationApplicationStatus,
+} from "utils";
+import {
+  getTeacherClubCreationApplicationDetail,
   getTeacherClubCreationApplications,
   getTeacherMyInfo,
 } from "@/api/teacher";
@@ -82,11 +89,28 @@ export default function TeacherMyPage() {
           getTeacherClubCreationApplications(),
         ]);
 
+        const resolvedApplications = await Promise.all(
+          applicationsResponse.map(async (application) => {
+            try {
+              const detail = await getTeacherClubCreationApplicationDetail(
+                String(application.applicationId),
+              );
+
+              return {
+                ...application,
+                status: resolveClubCreationApplicationStatus(detail),
+              };
+            } catch {
+              return application;
+            }
+          }),
+        );
+
         if (!isMounted) return;
 
         setTeacherInfo(teacherResponse);
         setApplications(
-          [...applicationsResponse].sort((a, b) => {
+          [...resolvedApplications].sort((a, b) => {
             return (
               new Date(b.lastSubmittedAt).getTime() -
               new Date(a.lastSubmittedAt).getTime()

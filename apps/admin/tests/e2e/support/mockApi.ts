@@ -111,17 +111,7 @@ const deriveApplicationStatus = (
     return "UNDER_REVIEW";
   }
 
-  if (
-    currentRevisionReviews.length >= 2 &&
-    currentRevisionReviews.every((review) => review.decision === "APPROVED")
-  ) {
-    return "APPROVED";
-  }
-
-  if (
-    currentRevisionReviews.length >= 2 &&
-    currentRevisionReviews.every((review) => review.decision === "REJECTED")
-  ) {
+  if (currentRevisionReviews.some((review) => review.decision === "REJECTED")) {
     return "REJECTED";
   }
 
@@ -131,6 +121,13 @@ const deriveApplicationStatus = (
     )
   ) {
     return "CHANGES_REQUESTED";
+  }
+
+  if (
+    currentRevisionReviews.length >= 2 &&
+    currentRevisionReviews.every((review) => review.decision === "APPROVED")
+  ) {
+    return "APPROVED";
   }
 
   return "UNDER_REVIEW";

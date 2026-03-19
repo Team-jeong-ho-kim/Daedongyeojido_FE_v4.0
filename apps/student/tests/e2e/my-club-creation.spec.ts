@@ -64,23 +64,23 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("heading", { name: "최신 코멘트" }),
     ).toHaveCount(0);
     await expect(page.getByText("신청 메타데이터")).toBeVisible();
-    await expect(
-      page.getByText("현재 검토 차수 피드백입니다."),
-    ).toBeVisible();
+    await expect(page.getByText("현재 검토 차수 피드백입니다.")).toBeVisible();
     await expect(
       page
         .locator("article")
         .filter({ hasText: "현재 검토 차수 피드백입니다." })
         .getByText("검토 차수 2차"),
     ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "현재 리뷰" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("heading", { name: "이전 기록" })).toHaveCount(
+      0,
+    );
     await expect(
-      page.getByRole("heading", { name: "현재 리뷰" }),
-    ).toHaveCount(0);
-    await expect(
-      page.getByRole("heading", { name: "이전 기록" }),
-    ).toHaveCount(0);
-    await expect(
-      page.locator("article").filter({ hasText: "현재 검토 차수 피드백입니다." }),
+      page
+        .locator("article")
+        .filter({ hasText: "현재 검토 차수 피드백입니다." }),
     ).toHaveCount(1);
     await expect(page.getByText("1건")).toHaveCount(2);
 
@@ -109,9 +109,37 @@ test.describe("Student my club creation detail", () => {
 
     await page.goto("/mypage/club-creation");
 
+    await expect(page.getByText("등록된 리뷰가 아직 없습니다.")).toBeVisible();
     await expect(
-      page.getByText("등록된 리뷰가 아직 없습니다."),
-    ).toBeVisible();
+      page.getByRole("link", { name: "수정 후 다시 제출하기" }),
+    ).toHaveCount(0);
+  });
+
+  test("현재 차수에 반려 리뷰가 하나라도 있으면 최종 상태를 반려로 표시한다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "UNDER_REVIEW",
+        currentReviews: [
+          {
+            reviewId: 3,
+            reviewerType: "TEACHER",
+            reviewerName: "정은진",
+            revision: 2,
+            decision: "REJECTED",
+            feedback: "이번 차수는 반려합니다.",
+            updatedAt: "2026-03-19T09:30:00",
+          },
+        ],
+        reviewHistory: [],
+      }),
+    });
+
+    await page.goto("/mypage/club-creation");
+
+    await expect(page.getByText("개설 신청이 반려되었습니다.")).toBeVisible();
+    await expect(page.getByText("이번 차수는 반려합니다.")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(0);

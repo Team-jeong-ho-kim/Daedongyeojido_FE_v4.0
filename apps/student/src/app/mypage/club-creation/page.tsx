@@ -13,6 +13,7 @@ import type {
 import {
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
+  resolveClubCreationApplicationStatus,
 } from "utils";
 import { useGetMyClubCreationApplicationQuery } from "@/hooks/querys";
 
@@ -343,7 +344,8 @@ export default function ClubCreationApplicationDetailPage() {
   }
 
   const application = myApplicationQuery.data;
-  const statusConfig = STATUS_STYLES[application.status];
+  const resolvedStatus = resolveClubCreationApplicationStatus(application);
+  const statusConfig = STATUS_STYLES[resolvedStatus];
   const previewFileName = application.clubCreationForm
     ? getDocumentDownloadFileName(
         `${application.clubName} 개설 신청 양식`,
@@ -379,7 +381,7 @@ export default function ClubCreationApplicationDetailPage() {
               <span
                 className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.badge}`}
               >
-                {STATUS_LABELS[application.status]}
+                {STATUS_LABELS[resolvedStatus]}
               </span>
               <span className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-600">
                 검토 차수 {application.revision}차
@@ -401,7 +403,7 @@ export default function ClubCreationApplicationDetailPage() {
                   <span
                     className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.timelineAccent}`}
                   >
-                    {STATUS_LABELS[application.status]}
+                    {STATUS_LABELS[resolvedStatus]}
                   </span>
                   <p className="font-semibold text-[15px] text-gray-900">
                     {statusConfig.title}
@@ -534,9 +536,7 @@ export default function ClubCreationApplicationDetailPage() {
               title="리뷰 이력"
               reviews={dedupedReviews}
               emptyMessage="등록된 리뷰가 아직 없습니다."
-              highlightChangesRequested={
-                application.status === "CHANGES_REQUESTED"
-              }
+              highlightChangesRequested={resolvedStatus === "CHANGES_REQUESTED"}
               highlightedReviewKeys={application.currentReviews.map(
                 getReviewRenderKey,
               )}
@@ -552,7 +552,7 @@ export default function ClubCreationApplicationDetailPage() {
                     <span
                       className={`inline-flex rounded-full border px-3 py-1 font-semibold text-[12px] ${statusConfig.badge}`}
                     >
-                      {STATUS_LABELS[application.status]}
+                      {STATUS_LABELS[resolvedStatus]}
                     </span>
                   </div>
                 </div>
@@ -597,7 +597,7 @@ export default function ClubCreationApplicationDetailPage() {
               </div>
             </SidebarCard>
 
-            {application.status === "CHANGES_REQUESTED" ? (
+            {resolvedStatus === "CHANGES_REQUESTED" ? (
               <SidebarCard title="다음 단계">
                 <p className="text-[14px] text-gray-600 leading-7">
                   리뷰 이력을 확인한 뒤 신청서를 수정하고 다시 제출하세요.

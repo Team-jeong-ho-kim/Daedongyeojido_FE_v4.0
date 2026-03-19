@@ -108,6 +108,15 @@ type MockClubCreationReview = {
   updatedAt: string;
 };
 
+const getReviewKey = (review: MockClubCreationReview) => {
+  return [
+    review.reviewId,
+    review.reviewerType,
+    review.revision,
+    review.updatedAt,
+  ].join(":");
+};
+
 type MockClubCreationApplicationDetail = {
   applicationId: number;
   status:
@@ -299,37 +308,38 @@ const DEFAULT_TEACHERS: MockTeacher[] = [
   },
 ];
 
-export const DEFAULT_MY_CLUB_CREATION_APPLICATION: MockClubCreationApplicationDetail = {
-  applicationId: 41,
-  status: "CHANGES_REQUESTED",
-  revision: 2,
-  clubName: "테스트동아리",
-  clubImage: "/images/icons/profile.svg",
-  clubCreationForm: "/documents/previews/1.pdf",
-  oneLiner: "같이 성장하는 동아리",
-  introduction: "프로젝트와 협업 중심으로 운영하는 테스트 동아리입니다.",
-  majors: ["BE"],
-  links: ["https://example.com/club"],
-  applicant: {
-    userId: 10,
-    userName: "테스트유저",
-    classNumber: "2301",
-  },
-  submittedAt: "2026-03-18T09:00:00",
-  lastSubmittedAt: "2026-03-18T11:00:00",
-  currentReviews: [
-    {
-      reviewId: 900,
-      reviewerType: "TEACHER",
-      reviewerName: "선생님",
-      revision: 2,
-      decision: "CHANGES_REQUESTED",
-      feedback: "활동 계획을 조금 더 구체적으로 작성해주세요.",
-      updatedAt: "2026-03-18T12:00:00",
+export const DEFAULT_MY_CLUB_CREATION_APPLICATION: MockClubCreationApplicationDetail =
+  {
+    applicationId: 41,
+    status: "CHANGES_REQUESTED",
+    revision: 2,
+    clubName: "테스트동아리",
+    clubImage: "/images/icons/profile.svg",
+    clubCreationForm: "/documents/previews/1.pdf",
+    oneLiner: "같이 성장하는 동아리",
+    introduction: "프로젝트와 협업 중심으로 운영하는 테스트 동아리입니다.",
+    majors: ["BE"],
+    links: ["https://example.com/club"],
+    applicant: {
+      userId: 10,
+      userName: "테스트유저",
+      classNumber: "2301",
     },
-  ],
-  reviewHistory: [],
-};
+    submittedAt: "2026-03-18T09:00:00",
+    lastSubmittedAt: "2026-03-18T11:00:00",
+    currentReviews: [
+      {
+        reviewId: 900,
+        reviewerType: "TEACHER",
+        reviewerName: "선생님",
+        revision: 2,
+        decision: "CHANGES_REQUESTED",
+        feedback: "활동 계획을 조금 더 구체적으로 작성해주세요.",
+        updatedAt: "2026-03-18T12:00:00",
+      },
+    ],
+    reviewHistory: [],
+  };
 
 const isApiDataRequest = (route: Route) => {
   const resourceType = route.request().resourceType();
@@ -427,6 +437,21 @@ const updateApplicationFromMultipart = (
     majors: majors.length > 0 ? majors : application.majors,
     links: links.length > 0 ? links : application.links,
   };
+};
+
+const dedupeReviews = (reviews: MockClubCreationReview[]) => {
+  const seenKeys = new Set<string>();
+
+  return reviews.filter((review) => {
+    const reviewKey = getReviewKey(review);
+
+    if (seenKeys.has(reviewKey)) {
+      return false;
+    }
+
+    seenKeys.add(reviewKey);
+    return true;
+  });
 };
 
 export const buildAnnouncements = (
@@ -806,10 +831,18 @@ export async function installStudentApiMocks(
       recordRequest(route);
 
       if (myClubCreationApplication) {
+        const nextRevision = myClubCreationApplication.revision + 1;
+
         myClubCreationApplication = {
           ...myClubCreationApplication,
+          revision: nextRevision,
           status: "UNDER_REVIEW",
           lastSubmittedAt: "2026-03-18T14:00:00",
+          currentReviews: [],
+          reviewHistory: dedupeReviews([
+            ...myClubCreationApplication.reviewHistory,
+            ...myClubCreationApplication.currentReviews,
+          ]),
         };
       }
 

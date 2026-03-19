@@ -7,6 +7,7 @@ import {
   type ClubCreationReviewDecision,
   type ClubCreationReviewerType,
   partitionClubCreationReviews,
+  resolveClubCreationApplicationStatus,
 } from "utils";
 import { ClubHeader } from "@/components/common";
 import {
@@ -186,6 +187,9 @@ export function ClubCreationTab() {
     isDetailOverlayOpen,
   );
   const applicationDetail = detailQuery.data;
+  const resolvedApplicationDetailStatus = applicationDetail
+    ? resolveClubCreationApplicationStatus(applicationDetail)
+    : null;
   const normalizedReviewBuckets = applicationDetail
     ? partitionClubCreationReviews(applicationDetail)
     : null;
@@ -201,6 +205,7 @@ export function ClubCreationTab() {
   const currentAdminReview =
     currentRevisionReviews.find((review) => review.reviewerType === "ADMIN") ??
     null;
+  const hasSubmittedCurrentAdminReview = currentAdminReview !== null;
   const uniqueLinks = applicationDetail
     ? [...new Set(applicationDetail.links.map((link) => link.trim()))]
         .filter(Boolean)
@@ -263,6 +268,11 @@ export function ClubCreationTab() {
       return false;
     }
 
+    if (hasSubmittedCurrentAdminReview) {
+      setReviewError("");
+      return false;
+    }
+
     const normalizedFeedback = feedback.trim();
 
     if (decision === null) {
@@ -289,7 +299,11 @@ export function ClubCreationTab() {
   };
 
   const handleSubmitReview = async () => {
-    if (!selectedApplicationId || decision === null) {
+    if (
+      !selectedApplicationId ||
+      decision === null ||
+      hasSubmittedCurrentAdminReview
+    ) {
       setIsReviewConfirmOpen(false);
       return;
     }
@@ -615,7 +629,9 @@ export function ClubCreationTab() {
                         <div className="rounded-2xl bg-white px-5 py-5 shadow-sm">
                           <p className="text-gray-400 text-sm">현재 상태</p>
                           <p className="mt-2 font-semibold text-gray-900">
-                            {STATUS_LABELS[applicationDetail.status]}
+                            {resolvedApplicationDetailStatus
+                              ? STATUS_LABELS[resolvedApplicationDetailStatus]
+                              : "-"}
                           </p>
                           <p className="mt-1 text-gray-500 text-sm">
                             검토 차수 {applicationDetail.revision}차
@@ -718,76 +734,85 @@ export function ClubCreationTab() {
                         <h4 className="font-bold text-gray-900 text-lg">
                           관리자 리뷰 저장
                         </h4>
-                        <div className="mt-5 grid gap-3 md:grid-cols-3">
-                          {REVIEW_DECISION_OPTIONS.map((option) => (
-                            <button
-                              key={option}
-                              type="button"
-                              onClick={() => {
-                                setDecision(option);
-                                setReviewError("");
-                              }}
-                              className={`rounded-2xl border px-4 py-4 text-left transition ${
-                                decision === option
-                                  ? "border-primary-300 bg-primary-50"
-                                  : "border-gray-200 bg-white hover:border-gray-300"
-                              }`}
-                            >
-                              <p className="font-semibold text-gray-900 text-sm">
-                                {DECISION_LABELS[option]}
-                              </p>
-                              <p className="mt-2 text-gray-500 text-xs leading-6">
-                                {option === "APPROVED"
-                                  ? "피드백 없이도 저장할 수 있습니다."
-                                  : "피드백을 반드시 함께 남겨야 합니다."}
-                              </p>
-                            </button>
-                          ))}
-                        </div>
+                        {hasSubmittedCurrentAdminReview ? (
+                          <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-gray-600 text-sm leading-7">
+                            현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후
+                            다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.
+                          </div>
+                        ) : (
+                          <>
+                            <div className="mt-5 grid gap-3 md:grid-cols-3">
+                              {REVIEW_DECISION_OPTIONS.map((option) => (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  onClick={() => {
+                                    setDecision(option);
+                                    setReviewError("");
+                                  }}
+                                  className={`rounded-2xl border px-4 py-4 text-left transition ${
+                                    decision === option
+                                      ? "border-primary-300 bg-primary-50"
+                                      : "border-gray-200 bg-white hover:border-gray-300"
+                                  }`}
+                                >
+                                  <p className="font-semibold text-gray-900 text-sm">
+                                    {DECISION_LABELS[option]}
+                                  </p>
+                                  <p className="mt-2 text-gray-500 text-xs leading-6">
+                                    {option === "APPROVED"
+                                      ? "피드백 없이도 저장할 수 있습니다."
+                                      : "피드백을 반드시 함께 남겨야 합니다."}
+                                  </p>
+                                </button>
+                              ))}
+                            </div>
 
-                        <div className="mt-5">
-                          <label
-                            htmlFor={feedbackFieldId}
-                            className="mb-2 block font-medium text-gray-700 text-sm"
-                          >
-                            코멘트
-                          </label>
-                          <textarea
-                            id={feedbackFieldId}
-                            value={feedback}
-                            onChange={(event) => {
-                              setFeedback(event.target.value);
-                              if (reviewError) {
-                                setReviewError("");
-                              }
-                            }}
-                            rows={5}
-                            placeholder="학생에게 전달할 코멘트를 입력해주세요."
-                            className={`w-full rounded-2xl border bg-white px-4 py-4 text-sm outline-none transition placeholder:text-gray-400 ${
-                              reviewError
-                                ? "border-red-300"
-                                : "border-gray-200 focus:border-primary-300"
-                            }`}
-                          />
-                          {reviewError ? (
-                            <p className="mt-2 text-red-500 text-xs">
-                              {reviewError}
-                            </p>
-                          ) : null}
-                        </div>
+                            <div className="mt-5">
+                              <label
+                                htmlFor={feedbackFieldId}
+                                className="mb-2 block font-medium text-gray-700 text-sm"
+                              >
+                                코멘트
+                              </label>
+                              <textarea
+                                id={feedbackFieldId}
+                                value={feedback}
+                                onChange={(event) => {
+                                  setFeedback(event.target.value);
+                                  if (reviewError) {
+                                    setReviewError("");
+                                  }
+                                }}
+                                rows={5}
+                                placeholder="학생에게 전달할 코멘트를 입력해주세요."
+                                className={`w-full rounded-2xl border bg-white px-4 py-4 text-sm outline-none transition placeholder:text-gray-400 ${
+                                  reviewError
+                                    ? "border-red-300"
+                                    : "border-gray-200 focus:border-primary-300"
+                                }`}
+                              />
+                              {reviewError ? (
+                                <p className="mt-2 text-red-500 text-xs">
+                                  {reviewError}
+                                </p>
+                              ) : null}
+                            </div>
 
-                        <div className="mt-5 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={handleOpenReviewConfirm}
-                            disabled={reviewMutation.isPending}
-                            className="rounded-xl bg-primary-500 px-6 py-3 font-semibold text-sm text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {reviewMutation.isPending
-                              ? "저장 중..."
-                              : "리뷰 저장"}
-                          </button>
-                        </div>
+                            <div className="mt-5 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={handleOpenReviewConfirm}
+                                disabled={reviewMutation.isPending}
+                                className="rounded-xl bg-primary-500 px-6 py-3 font-semibold text-sm text-white transition hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {reviewMutation.isPending
+                                  ? "저장 중..."
+                                  : "리뷰 저장"}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </section>
 
                       <ReviewSection

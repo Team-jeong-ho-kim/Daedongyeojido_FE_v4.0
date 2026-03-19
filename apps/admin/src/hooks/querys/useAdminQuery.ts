@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { resolveClubCreationApplicationStatus } from "utils";
 import {
   getClubCreationApplicationDetail,
   getClubCreationApplications,
@@ -40,7 +41,26 @@ export const useGetAllTeachersQuery = (enabled = true) => {
 export const useGetClubCreationApplicationsQuery = (enabled = true) => {
   return useQuery({
     queryKey: queryKeys.admin.clubCreationApplications.queryKey,
-    queryFn: getClubCreationApplications,
+    queryFn: async () => {
+      const applications = await getClubCreationApplications();
+
+      return Promise.all(
+        applications.map(async (application) => {
+          try {
+            const detail = await getClubCreationApplicationDetail(
+              String(application.applicationId),
+            );
+
+            return {
+              ...application,
+              status: resolveClubCreationApplicationStatus(detail),
+            };
+          } catch {
+            return application;
+          }
+        }),
+      );
+    },
     enabled,
     select: (applications) =>
       [...applications].sort((a, b) => {

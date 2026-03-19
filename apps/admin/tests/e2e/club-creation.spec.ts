@@ -115,15 +115,14 @@ test.describe("Admin club creation tab", () => {
     ).toBeVisible();
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
-    ).toBeVisible();
-    await expect(
-      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
-    ).toHaveValue("활동 계획을 조금 더 구체적으로 작성해주세요.");
-    await expect(
-      page.getByText("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다."),
     ).toHaveCount(0);
+    await expect(
+      page.getByText(
+        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
+      ),
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "리뷰 저장" })).toHaveCount(
-      1,
+      0,
     );
     expect(
       controller.getLastRequest("/club-creation-applications/5/review", "PUT"),
@@ -230,7 +229,9 @@ test.describe("Admin club creation tab", () => {
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toBeVisible();
     await expect(
-      page.getByText("리뷰는 1회만 작성 가능하며 저장 후 수정할 수 없습니다."),
+      page.getByText(
+        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
+      ),
     ).toHaveCount(0);
 
     await page.getByRole("button", { name: "승인" }).click();
@@ -238,8 +239,92 @@ test.describe("Admin club creation tab", () => {
     await page.getByRole("button", { name: "확인", exact: true }).click();
 
     await expect(page.getByText("리뷰를 저장했습니다.")).toBeVisible();
+    await expect(
+      page.getByText(
+        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
+    ).toHaveCount(0);
     expect(
       controller.getLastRequest("/club-creation-applications/6/review", "PUT"),
     ).toBeTruthy();
+  });
+
+  test("teacher가 반려하면 admin이 승인해도 최종 상태는 반려로 유지된다", async ({
+    page,
+  }) => {
+    await installAdminApiMocks(page, {
+      clubCreationApplications: [
+        {
+          applicationId: 7,
+          clubName: "반려 우선 동아리",
+          clubImage: null,
+          introduction: "지도 교사 반려가 이미 등록된 신청입니다.",
+          status: "UNDER_REVIEW",
+          revision: 2,
+          majors: ["BE"],
+          applicantName: "김학생",
+          lastSubmittedAt: "2026-03-19T13:00:00",
+        },
+      ],
+      clubCreationApplicationDetails: {
+        7: {
+          applicationId: 7,
+          status: "UNDER_REVIEW",
+          revision: 2,
+          clubName: "반려 우선 동아리",
+          clubImage: null,
+          clubCreationForm: "/documents/previews/1.pdf",
+          oneLiner: "teacher 반려가 먼저 등록된 상태입니다.",
+          introduction: "지도 교사 반려가 이미 등록된 신청입니다.",
+          majors: ["BE"],
+          links: [],
+          applicant: {
+            userId: 8,
+            userName: "김학생",
+            classNumber: "2308",
+          },
+          submittedAt: "2026-03-19T13:00:00",
+          lastSubmittedAt: "2026-03-19T13:00:00",
+          currentReviews: [
+            {
+              reviewId: 31,
+              reviewerType: "TEACHER",
+              reviewerName: "정은진",
+              revision: 2,
+              decision: "REJECTED",
+              feedback: "이번 차수는 반려합니다.",
+              updatedAt: "2026-03-19T13:30:00",
+            },
+          ],
+          reviewHistory: [],
+        },
+      },
+    });
+
+    await page.goto("/mypage");
+    await page.getByRole("button", { name: "동아리 개설" }).click();
+    await expect(
+      page.getByRole("button", { name: /반려 우선 동아리/ }).getByText("반려"),
+    ).toBeVisible();
+    await page.getByRole("button", { name: /반려 우선 동아리/ }).click();
+
+    const statusCard = page
+      .locator("div.rounded-2xl")
+      .filter({ has: page.getByText("현재 상태") })
+      .first();
+
+    await expect(statusCard).toBeVisible();
+    await expect(statusCard.getByText("반려")).toBeVisible();
+
+    await page.getByRole("button", { name: "승인" }).click();
+    await page.getByRole("button", { name: "리뷰 저장" }).click();
+    await page.getByRole("button", { name: "확인", exact: true }).click();
+
+    await expect(page.getByText("리뷰를 저장했습니다.")).toBeVisible();
+    await expect(statusCard).toBeVisible();
+    await expect(statusCard.getByText("반려")).toBeVisible();
   });
 });
