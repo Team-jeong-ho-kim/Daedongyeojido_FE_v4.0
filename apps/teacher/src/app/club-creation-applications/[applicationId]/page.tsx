@@ -10,6 +10,7 @@ import {
   clearTokens,
   getAccessToken,
   getDocumentDownloadFileName,
+  getLatestClubCreationReviewsByReviewer,
   getSessionUser,
   partitionClubCreationReviews,
   resolveClubCreationApplicationStatus,
@@ -57,6 +58,16 @@ const REVIEW_DECISION_OPTIONS = [
   "CHANGES_REQUESTED",
   "REJECTED",
 ] as const;
+
+const getReviewLockMessage = (
+  decision: ClubCreationReviewDecision | null | undefined,
+) => {
+  if (decision === "APPROVED") {
+    return "이미 승인한 리뷰가 유지되고 있어 현재 추가 리뷰를 남길 수 없습니다.";
+  }
+
+  return "이미 최신 리뷰가 반영되었습니다. 학생이 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.";
+};
 
 const sortReviews = (reviews: TeacherClubCreationReview[]) =>
   [...reviews].sort((a, b) => {
@@ -197,15 +208,12 @@ export default function TeacherClubCreationApplicationDetailPage() {
     try {
       const response =
         await getTeacherClubCreationApplicationDetail(applicationId);
-      const normalizedReviewBuckets = partitionClubCreationReviews(response);
-      const currentTeacherReview =
-        normalizedReviewBuckets.currentRevisionReviews.find(
-          (review) => review.reviewerType === "TEACHER",
-        ) ?? null;
+      const latestTeacherReview =
+        getLatestClubCreationReviewsByReviewer(response).get("TEACHER") ?? null;
 
       setDetail(response);
-      setDecision(currentTeacherReview?.decision ?? null);
-      setFeedback(currentTeacherReview?.feedback ?? "");
+      setDecision(latestTeacherReview?.decision ?? null);
+      setFeedback(latestTeacherReview?.feedback ?? "");
       setReviewError("");
       setErrorMessage("");
     } catch {
@@ -236,6 +244,9 @@ export default function TeacherClubCreationApplicationDetailPage() {
   const normalizedReviewBuckets = detail
     ? partitionClubCreationReviews(detail)
     : null;
+  const latestReviewsByReviewer = detail
+    ? getLatestClubCreationReviewsByReviewer(detail)
+    : null;
   const resolvedDetailStatus = detail
     ? resolveClubCreationApplicationStatus(detail)
     : null;
@@ -246,7 +257,10 @@ export default function TeacherClubCreationApplicationDetailPage() {
     currentRevisionReviews.find(
       (review) => review.reviewerType === "TEACHER",
     ) ?? null;
-  const hasSubmittedCurrentTeacherReview = currentTeacherReview !== null;
+  const latestTeacherReview = latestReviewsByReviewer?.get("TEACHER") ?? null;
+  const isTeacherReviewLocked =
+    currentTeacherReview !== null ||
+    latestTeacherReview?.decision === "APPROVED";
   const previewFileName = detail?.clubCreationForm
     ? getDocumentDownloadFileName(
         `${detail.clubName} 개설 신청 양식`,
@@ -259,7 +273,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
       return false;
     }
 
-    if (hasSubmittedCurrentTeacherReview) {
+    if (isTeacherReviewLocked) {
       setReviewError("");
       return false;
     }
@@ -294,7 +308,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
       !detail ||
       isReviewSubmitting ||
       decision === null ||
-      hasSubmittedCurrentTeacherReview
+      isTeacherReviewLocked
     ) {
       setIsReviewConfirmOpen(false);
       return;
@@ -511,10 +525,9 @@ export default function TeacherClubCreationApplicationDetailPage() {
             <h2 className="font-bold text-gray-900 text-xl">
               지도 교사 리뷰 저장
             </h2>
-            {hasSubmittedCurrentTeacherReview ? (
+            {isTeacherReviewLocked ? (
               <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-gray-600 text-sm leading-7">
-                현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시
-                제출하면 다음 차수에서 다시 리뷰할 수 있습니다.
+                {getReviewLockMessage(latestTeacherReview?.decision)}
               </div>
             ) : (
               <>

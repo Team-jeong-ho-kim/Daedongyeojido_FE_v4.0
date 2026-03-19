@@ -203,4 +203,48 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(0);
   });
+
+  test("이전 차수 승인 이력이 있어도 최신 결정 중 하나가 수정 요청이면 수정 요청 상태를 유지한다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      myClubCreationApplication: buildMyApplication({
+        status: "UNDER_REVIEW",
+        revision: 3,
+        currentReviews: [],
+        reviewHistory: [
+          {
+            reviewId: 11,
+            reviewerType: "ADMIN",
+            reviewerName: "최민수",
+            revision: 1,
+            decision: "APPROVED",
+            feedback: "승인합니다.",
+            updatedAt: "2026-03-19T10:44:00",
+          },
+          {
+            reviewId: 12,
+            reviewerType: "TEACHER",
+            reviewerName: "정은진",
+            revision: 2,
+            decision: "CHANGES_REQUESTED",
+            feedback: "보완 후 다시 제출해주세요.",
+            updatedAt: "2026-03-19T10:46:00",
+          },
+        ],
+      }),
+    });
+
+    await page.goto("/mypage/club-creation");
+
+    await expect(page.getByText("수정 요청이 도착했습니다.")).toBeVisible();
+    await expect(
+      page.getByText(
+        "수정 요청된 의견을 반영해 신청서를 수정하고 다시 제출해 주세요. 이미 승인된 리뷰는 유지될 수 있습니다.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "수정 후 다시 제출하기" }),
+    ).toHaveCount(1);
+  });
 });

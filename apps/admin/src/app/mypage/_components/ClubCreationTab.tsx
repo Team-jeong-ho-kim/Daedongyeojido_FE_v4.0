@@ -6,6 +6,7 @@ import {
   type ClubCreationApplicationReview,
   type ClubCreationReviewDecision,
   type ClubCreationReviewerType,
+  getLatestClubCreationReviewsByReviewer,
   partitionClubCreationReviews,
   resolveClubCreationApplicationStatus,
 } from "utils";
@@ -52,6 +53,16 @@ const STATUS_LABELS = {
   SUBMITTED: "제출 완료",
   UNDER_REVIEW: "검토 중",
 } as const;
+
+const getReviewLockMessage = (
+  decision: ClubCreationReviewDecision | null | undefined,
+) => {
+  if (decision === "APPROVED") {
+    return "이미 승인한 리뷰가 유지되고 있어 현재 추가 리뷰를 남길 수 없습니다.";
+  }
+
+  return "이미 최신 리뷰가 반영되었습니다. 학생이 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.";
+};
 
 const formatDateTime = (value: string | null) => {
   if (!value) {
@@ -193,6 +204,9 @@ export function ClubCreationTab() {
   const normalizedReviewBuckets = applicationDetail
     ? partitionClubCreationReviews(applicationDetail)
     : null;
+  const latestReviewsByReviewer = applicationDetail
+    ? getLatestClubCreationReviewsByReviewer(applicationDetail)
+    : null;
   const currentRevisionReviews =
     normalizedReviewBuckets?.currentRevisionReviews ?? [];
   const historicalReviews = normalizedReviewBuckets?.historicalReviews ?? [];
@@ -205,7 +219,9 @@ export function ClubCreationTab() {
   const currentAdminReview =
     currentRevisionReviews.find((review) => review.reviewerType === "ADMIN") ??
     null;
-  const hasSubmittedCurrentAdminReview = currentAdminReview !== null;
+  const latestAdminReview = latestReviewsByReviewer?.get("ADMIN") ?? null;
+  const isAdminReviewLocked =
+    currentAdminReview !== null || latestAdminReview?.decision === "APPROVED";
   const uniqueLinks = applicationDetail
     ? [...new Set(applicationDetail.links.map((link) => link.trim()))]
         .filter(Boolean)
@@ -217,13 +233,13 @@ export function ClubCreationTab() {
       return;
     }
 
-    setDecision(currentAdminReview?.decision ?? null);
-    setFeedback(currentAdminReview?.feedback ?? "");
+    setDecision(latestAdminReview?.decision ?? null);
+    setFeedback(latestAdminReview?.feedback ?? "");
     setReviewError("");
   }, [
     applicationDetail,
-    currentAdminReview?.decision,
-    currentAdminReview?.feedback,
+    latestAdminReview?.decision,
+    latestAdminReview?.feedback,
   ]);
 
   useEffect(() => {
@@ -268,7 +284,7 @@ export function ClubCreationTab() {
       return false;
     }
 
-    if (hasSubmittedCurrentAdminReview) {
+    if (isAdminReviewLocked) {
       setReviewError("");
       return false;
     }
@@ -299,11 +315,7 @@ export function ClubCreationTab() {
   };
 
   const handleSubmitReview = async () => {
-    if (
-      !selectedApplicationId ||
-      decision === null ||
-      hasSubmittedCurrentAdminReview
-    ) {
+    if (!selectedApplicationId || decision === null || isAdminReviewLocked) {
       setIsReviewConfirmOpen(false);
       return;
     }
@@ -734,10 +746,9 @@ export function ClubCreationTab() {
                         <h4 className="font-bold text-gray-900 text-lg">
                           관리자 리뷰 저장
                         </h4>
-                        {hasSubmittedCurrentAdminReview ? (
+                        {isAdminReviewLocked ? (
                           <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-gray-600 text-sm leading-7">
-                            현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후
-                            다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.
+                            {getReviewLockMessage(latestAdminReview?.decision)}
                           </div>
                         ) : (
                           <>

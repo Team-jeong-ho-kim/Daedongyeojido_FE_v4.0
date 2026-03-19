@@ -94,14 +94,6 @@ type AdminApiMockOptions = {
   teachers?: MockTeacher[];
 };
 
-const getCurrentRevisionReviews = (
-  detail: MockClubCreationApplicationDetail,
-) => {
-  return detail.currentReviews.filter(
-    (review) => review.revision === detail.revision,
-  );
-};
-
 const getReviewTimestamp = (
   review:
     | MockClubCreationApplicationDetail["currentReviews"][number]
@@ -152,8 +144,23 @@ const getLatestReviewsByReviewer = (
 const deriveApplicationStatus = (
   detail: MockClubCreationApplicationDetail,
 ): MockClubCreationApplicationDetail["status"] => {
-  const currentRevisionReviews = getCurrentRevisionReviews(detail);
   const latestReviewByReviewer = getLatestReviewsByReviewer(detail);
+
+  const hasRejectedReview =
+    latestReviewByReviewer.get("ADMIN")?.decision === "REJECTED" ||
+    latestReviewByReviewer.get("TEACHER")?.decision === "REJECTED";
+
+  if (hasRejectedReview) {
+    return "REJECTED";
+  }
+
+  const hasChangesRequestedReview =
+    latestReviewByReviewer.get("ADMIN")?.decision === "CHANGES_REQUESTED" ||
+    latestReviewByReviewer.get("TEACHER")?.decision === "CHANGES_REQUESTED";
+
+  if (hasChangesRequestedReview) {
+    return "CHANGES_REQUESTED";
+  }
 
   const hasAllReviewerApprovals =
     latestReviewByReviewer.get("ADMIN")?.decision === "APPROVED" &&
@@ -163,27 +170,8 @@ const deriveApplicationStatus = (
     return "APPROVED";
   }
 
-  if (currentRevisionReviews.length === 0) {
+  if (detail.currentReviews.length === 0 && detail.reviewHistory.length === 0) {
     return "UNDER_REVIEW";
-  }
-
-  if (currentRevisionReviews.some((review) => review.decision === "REJECTED")) {
-    return "REJECTED";
-  }
-
-  if (
-    currentRevisionReviews.some(
-      (review) => review.decision === "CHANGES_REQUESTED",
-    )
-  ) {
-    return "CHANGES_REQUESTED";
-  }
-
-  if (
-    currentRevisionReviews.length >= 2 &&
-    currentRevisionReviews.every((review) => review.decision === "APPROVED")
-  ) {
-    return "APPROVED";
   }
 
   return "UNDER_REVIEW";

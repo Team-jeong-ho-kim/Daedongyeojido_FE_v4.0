@@ -54,15 +54,15 @@ const STATUS_STYLES: Record<
     badge: "border-amber-200 bg-amber-50 text-amber-700",
     panel: "border-amber-200 bg-[#fff8ef]",
     title: "수정 요청이 도착했습니다.",
-    description: "현재 리뷰를 확인한 뒤 신청서를 수정하고 다시 제출해 주세요.",
+    description:
+      "수정 요청된 의견을 반영해 신청서를 수정하고 다시 제출해 주세요. 이미 승인된 리뷰는 유지될 수 있습니다.",
     timelineAccent: "border-amber-200 bg-amber-50 text-amber-800",
   },
   APPROVED: {
     badge: "border-emerald-200 bg-emerald-50 text-emerald-700",
     panel: "border-emerald-200 bg-[#f4fbf6]",
     title: "개설 신청이 승인되었습니다.",
-    description:
-      "관리자와 지도 교사의 승인이 모두 완료되어 기존 개설 성공 흐름으로 이어집니다.",
+    description: "관리자와 지도 교사의 최신 승인 결과가 모두 반영되었습니다.",
     timelineAccent: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   REJECTED: {
@@ -600,7 +600,8 @@ export default function ClubCreationApplicationDetailPage() {
             {resolvedStatus === "CHANGES_REQUESTED" ? (
               <SidebarCard title="다음 단계">
                 <p className="text-[14px] text-gray-600 leading-7">
-                  리뷰 이력을 확인한 뒤 신청서를 수정하고 다시 제출하세요.
+                  수정 요청된 리뷰를 확인한 뒤 신청서를 수정하고 다시
+                  제출하세요.
                 </p>
                 <Link href="/mypage/club-creation/edit" className="mt-4 block">
                   <Button className="w-full rounded-lg border border-[#1f6feb]/20 bg-[#1f6feb] px-4 py-2.5 font-semibold text-[14px] text-white hover:bg-[#1a63d8]">

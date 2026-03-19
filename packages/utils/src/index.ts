@@ -7,7 +7,10 @@ export {
   saveSessionUser,
   saveTokens,
 } from "./auth-cookie";
-export { partitionClubCreationReviews } from "./clubCreationReviews";
+export {
+  getLatestClubCreationReviewsByReviewer,
+  partitionClubCreationReviews,
+} from "./clubCreationReviews";
 export { resolveClubCreationApplicationStatus } from "./clubCreationStatus";
 export {
   getDocumentDownloadFileName,

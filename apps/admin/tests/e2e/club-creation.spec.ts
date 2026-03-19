@@ -2,6 +2,11 @@ import { expect, test } from "@playwright/test";
 import { installAdminApiMocks, setAdminAuthSession } from "./support/mockApi";
 
 test.describe("Admin club creation tab", () => {
+  const submittedReviewLockMessage =
+    "이미 최신 리뷰가 반영되었습니다. 학생이 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.";
+  const approvedReviewLockMessage =
+    "이미 승인한 리뷰가 유지되고 있어 현재 추가 리뷰를 남길 수 없습니다.";
+
   test.beforeEach(async ({ page }) => {
     await setAdminAuthSession(page);
   });
@@ -76,11 +81,14 @@ test.describe("Admin club creation tab", () => {
     await page.getByRole("button", { name: "동아리 개설" }).click();
     await page.getByRole("button", { name: /발로란트/ }).click();
 
-    await page.getByRole("button", { name: "리뷰 저장" }).click();
-
-    await expect(page.getByText("검토 결과를 선택해주세요.")).toBeVisible();
-
-    await page.getByRole("button", { name: "수정 요청" }).click();
+    await page
+      .getByRole("button", {
+        name: "수정 요청 피드백을 반드시 함께 남겨야 합니다",
+      })
+      .click();
+    await page
+      .getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요.")
+      .fill("");
     await page.getByRole("button", { name: "리뷰 저장" }).click();
 
     await expect(
@@ -116,11 +124,7 @@ test.describe("Admin club creation tab", () => {
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toHaveCount(0);
-    await expect(
-      page.getByText(
-        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
-      ),
-    ).toBeVisible();
+    await expect(page.getByText(submittedReviewLockMessage)).toBeVisible();
     await expect(page.getByRole("button", { name: "리뷰 저장" })).toHaveCount(
       0,
     );
@@ -228,28 +232,99 @@ test.describe("Admin club creation tab", () => {
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toBeVisible();
-    await expect(
-      page.getByText(
-        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
-      ),
-    ).toHaveCount(0);
+    await expect(page.getByText(submittedReviewLockMessage)).toHaveCount(0);
 
     await page.getByRole("button", { name: "승인" }).click();
     await page.getByRole("button", { name: "리뷰 저장" }).click();
     await page.getByRole("button", { name: "확인", exact: true }).click();
 
     await expect(page.getByText("리뷰를 저장했습니다.")).toBeVisible();
-    await expect(
-      page.getByText(
-        "현재 차수에는 이미 리뷰를 남겼습니다. 학생이 수정 후 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.",
-      ),
-    ).toBeVisible();
+    await expect(page.getByText(approvedReviewLockMessage)).toBeVisible();
     await expect(
       page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
     ).toHaveCount(0);
     expect(
       controller.getLastRequest("/club-creation-applications/6/review", "PUT"),
     ).toBeTruthy();
+  });
+
+  test("이전 차수에 승인한 관리자는 재제출 후에도 리뷰 입력이 다시 열리지 않는다", async ({
+    page,
+  }) => {
+    await installAdminApiMocks(page, {
+      clubCreationApplications: [
+        {
+          applicationId: 8,
+          clubName: "독립 승인 동아리",
+          clubImage: null,
+          introduction:
+            "관리자는 이미 승인 완료했고 지도 교사만 재검토 중입니다.",
+          status: "UNDER_REVIEW",
+          revision: 3,
+          majors: ["BE"],
+          applicantName: "최학생",
+          lastSubmittedAt: "2026-03-19T14:00:00",
+        },
+      ],
+      clubCreationApplicationDetails: {
+        8: {
+          applicationId: 8,
+          status: "UNDER_REVIEW",
+          revision: 3,
+          clubName: "독립 승인 동아리",
+          clubImage: null,
+          clubCreationForm: "/documents/previews/1.pdf",
+          oneLiner: "관리자는 이미 승인한 상태입니다.",
+          introduction:
+            "관리자는 이미 승인 완료했고 지도 교사만 재검토 중입니다.",
+          majors: ["BE"],
+          links: [],
+          applicant: {
+            userId: 11,
+            userName: "최학생",
+            classNumber: "3411",
+          },
+          submittedAt: "2026-03-19T14:00:00",
+          lastSubmittedAt: "2026-03-19T14:00:00",
+          currentReviews: [],
+          reviewHistory: [
+            {
+              reviewId: 41,
+              reviewerType: "ADMIN",
+              reviewerName: "최민수",
+              revision: 1,
+              decision: "APPROVED",
+              feedback: "승인합니다.",
+              updatedAt: "2026-03-19T10:44:00",
+            },
+            {
+              reviewId: 42,
+              reviewerType: "TEACHER",
+              reviewerName: "정은진",
+              revision: 2,
+              decision: "CHANGES_REQUESTED",
+              feedback: "보강이 더 필요합니다.",
+              updatedAt: "2026-03-19T11:00:00",
+            },
+          ],
+        },
+      },
+    });
+
+    await page.goto("/mypage");
+    await page.getByRole("button", { name: "동아리 개설" }).click();
+    await page.getByRole("button", { name: /독립 승인 동아리/ }).click();
+
+    await expect(
+      page.getByText("현재 검토 차수에 등록된 리뷰가 없습니다."),
+    ).toBeVisible();
+    await expect(page.getByText(approvedReviewLockMessage)).toBeVisible();
+    await expect(
+      page.getByPlaceholder("학생에게 전달할 코멘트를 입력해주세요."),
+    ).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "리뷰 저장" })).toHaveCount(
+      0,
+    );
   });
 
   test("teacher가 반려하면 admin이 승인해도 최종 상태는 반려로 유지된다", async ({
@@ -307,7 +382,10 @@ test.describe("Admin club creation tab", () => {
     await page.goto("/mypage");
     await page.getByRole("button", { name: "동아리 개설" }).click();
     await expect(
-      page.getByRole("button", { name: /반려 우선 동아리/ }).getByText("반려"),
+      page
+        .getByRole("button", { name: /반려 우선 동아리/ })
+        .locator("span")
+        .filter({ hasText: "반려" }),
     ).toBeVisible();
     await page.getByRole("button", { name: /반려 우선 동아리/ }).click();
 
