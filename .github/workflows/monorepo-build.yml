@@ -83,7 +83,11 @@ jobs:
           WEB_RESULT: ${{ needs.web.result }}
           BRANCH_NAME: ${{ github.ref_name }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_SHA: ${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPOSITORY: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          SERVER_URL: ${{ github.server_url }}
           WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           if [ -z "$WEBHOOK_URL" ]; then
@@ -110,17 +114,64 @@ jobs:
           ADMIN_LINE="$(format_line "daedongyeojido-admin" "$ADMIN_RESULT")"
           TEACHER_LINE="$(format_line "daedongyeojido-teacher" "$TEACHER_RESULT")"
           WEB_LINE="$(format_line "daedongyeojido-web" "$WEB_RESULT")"
+          SHORT_SHA="$(printf '%s' "$COMMIT_SHA" | cut -c1-7)"
+          COMMIT_URL="$SERVER_URL/$REPOSITORY/commit/$COMMIT_SHA"
+          TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-          CONTENT="$(printf '%s\n%s\n%s\n%s\n\n%s\n%s\n%s' \
+          if [ "$APP_MAIN_RESULT" = "failure" ] || [ "$ADMIN_RESULT" = "failure" ] || [ "$TEACHER_RESULT" = "failure" ] || [ "$WEB_RESULT" = "failure" ]; then
+            STATUS_TITLE="❌ 모노레포 빌드 실패"
+            STATUS_DESCRIPTION="하나 이상의 앱 빌드가 실패했습니다."
+            STATUS_COLOR=3447003
+          elif [ "$APP_MAIN_RESULT" = "cancelled" ] || [ "$ADMIN_RESULT" = "cancelled" ] || [ "$TEACHER_RESULT" = "cancelled" ] || [ "$WEB_RESULT" = "cancelled" ]; then
+            STATUS_TITLE="⚪ 모노레포 빌드 취소"
+            STATUS_DESCRIPTION="하나 이상의 앱 빌드가 취소되었습니다."
+            STATUS_COLOR=3447003
+          else
+            STATUS_TITLE="✅ 모노레포 빌드 성공"
+            STATUS_DESCRIPTION="모든 앱 빌드가 성공적으로 완료되었습니다."
+            STATUS_COLOR=3447003
+          fi
+
+          SUMMARY="$(printf '%s\n%s\n%s\n%s' \
             "$APP_MAIN_LINE" \
             "$ADMIN_LINE" \
             "$TEACHER_LINE" \
-            "$WEB_LINE" \
-            "브랜치: $BRANCH_NAME" \
-            "커밋: $COMMIT_MESSAGE" \
-            "링크: $RUN_URL")"
+            "$WEB_LINE")"
 
-          PAYLOAD=$(jq -n --arg content "$CONTENT" '{content: $content}')
+          PAYLOAD="$(jq -n \
+            --arg title "$STATUS_TITLE" \
+            --arg description "$STATUS_DESCRIPTION" \
+            --arg repository "$REPOSITORY" \
+            --arg branch "$BRANCH_NAME" \
+            --arg commit "$SHORT_SHA" \
+            --arg commit_url "$COMMIT_URL" \
+            --arg actor "$ACTOR" \
+            --arg details_url "$RUN_URL" \
+            --arg summary "$SUMMARY" \
+            --arg commit_message "$COMMIT_MESSAGE" \
+            --arg timestamp "$TIMESTAMP" \
+            --argjson color "$STATUS_COLOR" \
+            '{
+              username: "CI/CD Alert Bot",
+              embeds: [
+                {
+                  title: $title,
+                  description: $description,
+                  color: $color,
+                  fields: [
+                    {name: "Repository", value: $repository, inline: false},
+                    {name: "Branch", value: $branch, inline: true},
+                    {name: "Commit", value: "[\($commit)](\($commit_url))", inline: true},
+                    {name: "Triggered By", value: $actor, inline: true},
+                    {name: "Summary", value: $summary, inline: false},
+                    {name: "Message", value: $commit_message, inline: false},
+                    {name: "Details", value: "[Open GitHub Actions run](\($details_url))", inline: false}
+                  ],
+                  footer: {text: "Monorepo Build"},
+                  timestamp: $timestamp
+                }
+              ]
+            }')"
 
           curl --fail --show-error --silent \
             -H "Content-Type: application/json" \

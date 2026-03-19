@@ -55,6 +55,7 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           SERVER_URL: ${{ github.server_url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ACTOR: ${{ github.actor }}
         run: |
           if [ -z "$WEBHOOK_URL" ]; then
             echo "DISCORD_WEBHOOK_URL secret is not configured. Skipping notification."
@@ -80,27 +81,61 @@ jobs:
 
           case "$RESULT" in
             success)
-              STATUS_LINE="✅ $APP_NAME 배포 성공"
+              STATUS_TITLE="✅ 배포 성공"
+              STATUS_DESCRIPTION="$APP_NAME 배포가 성공적으로 완료되었습니다."
+              STATUS_COLOR=3447003
               ;;
             failure)
-              STATUS_LINE="❌ $APP_NAME 배포 실패"
+              STATUS_TITLE="❌ 배포 실패"
+              STATUS_DESCRIPTION="$APP_NAME 배포가 실패했습니다."
+              STATUS_COLOR=3447003
               ;;
             cancelled)
-              STATUS_LINE="⚪ $APP_NAME 배포 취소"
+              STATUS_TITLE="⚪ 배포 취소"
+              STATUS_DESCRIPTION="$APP_NAME 배포가 취소되었습니다."
+              STATUS_COLOR=3447003
               ;;
             *)
-              STATUS_LINE="⚠️ $APP_NAME 상태: ${RESULT:-unknown}"
+              STATUS_TITLE="⚠️ 배포 상태 알림"
+              STATUS_DESCRIPTION="$APP_NAME 상태: ${RESULT:-unknown}"
+              STATUS_COLOR=3447003
               ;;
           esac
 
-          CONTENT="$(printf '%s\n%s\n%s\n%s\n%s' \
-            "$STATUS_LINE" \
-            "브랜치: $DISPLAY_BRANCH" \
-            "커밋: $SHORT_SHA" \
-            "상세: $DETAILS_URL" \
-            "커밋 링크: $COMMIT_URL")"
+          TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-          PAYLOAD="$(jq -n --arg content "$CONTENT" '{content: $content}')"
+          PAYLOAD="$(jq -n \
+            --arg title "$STATUS_TITLE" \
+            --arg description "$STATUS_DESCRIPTION" \
+            --arg repository "$REPOSITORY" \
+            --arg branch "$DISPLAY_BRANCH" \
+            --arg commit "$SHORT_SHA" \
+            --arg commit_url "$COMMIT_URL" \
+            --arg actor "$ACTOR" \
+            --arg details_url "$DETAILS_URL" \
+            --arg timestamp "$TIMESTAMP" \
+            --arg app_name "$APP_NAME" \
+            --argjson color "$STATUS_COLOR" \
+            '{
+              username: "CI/CD Alert Bot",
+              embeds: [
+                {
+                  title: $title,
+                  description: $description,
+                  color: $color,
+                  fields: [
+                    {name: "App", value: $app_name, inline: true},
+                    {name: "Repository", value: $repository, inline: false},
+                    {name: "Branch", value: $branch, inline: true},
+                    {name: "Commit", value: "[\($commit)](\($commit_url))", inline: true},
+                    {name: "Triggered By", value: $actor, inline: true},
+                    {name: "Details", value: "[Open deployment details](\($details_url))", inline: false}
+                  ],
+                  footer: {text: "Cloudflare Pages"},
+                  timestamp: $timestamp
+                }
+              ]
+            }')"
 
           curl --fail --show-error --silent \
             -H "Content-Type: application/json" \
