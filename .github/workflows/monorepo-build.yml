@@ -89,6 +89,7 @@ jobs:
           ACTOR: ${{ github.actor }}
           SERVER_URL: ${{ github.server_url }}
           WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          AVATAR_URL: ${{ github.event.sender.avatar_url }}
         run: |
           if [ -z "$WEBHOOK_URL" ]; then
             echo "DISCORD_WEBHOOK_URL secret is not configured. Skipping notification."
@@ -117,6 +118,7 @@ jobs:
           SHORT_SHA="$(printf '%s' "$COMMIT_SHA" | cut -c1-7)"
           COMMIT_URL="$SERVER_URL/$REPOSITORY/commit/$COMMIT_SHA"
           TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          DISPLAY_AVATAR_URL="${AVATAR_URL:-https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png}"
 
           if [ "$APP_MAIN_RESULT" = "failure" ] || [ "$ADMIN_RESULT" = "failure" ] || [ "$TEACHER_RESULT" = "failure" ] || [ "$WEB_RESULT" = "failure" ]; then
             STATUS_TITLE="❌ 모노레포 빌드 실패"
@@ -150,9 +152,11 @@ jobs:
             --arg summary "$SUMMARY" \
             --arg commit_message "$COMMIT_MESSAGE" \
             --arg timestamp "$TIMESTAMP" \
+            --arg avatar_url "$DISPLAY_AVATAR_URL" \
             --argjson color "$STATUS_COLOR" \
             '{
               username: "CI/CD Alert Bot",
+              avatar_url: $avatar_url,
               embeds: [
                 {
                   title: $title,

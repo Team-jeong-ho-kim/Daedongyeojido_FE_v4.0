@@ -56,6 +56,7 @@ jobs:
           SERVER_URL: ${{ github.server_url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           ACTOR: ${{ github.actor }}
+          AVATAR_URL: ${{ github.event.sender.avatar_url }}
         run: |
           if [ -z "$WEBHOOK_URL" ]; then
             echo "DISCORD_WEBHOOK_URL secret is not configured. Skipping notification."
@@ -103,6 +104,7 @@ jobs:
           esac
 
           TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          DISPLAY_AVATAR_URL="${AVATAR_URL:-https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png}"
 
           PAYLOAD="$(jq -n \
             --arg title "$STATUS_TITLE" \
@@ -115,9 +117,11 @@ jobs:
             --arg details_url "$DETAILS_URL" \
             --arg timestamp "$TIMESTAMP" \
             --arg app_name "$APP_NAME" \
+            --arg avatar_url "$DISPLAY_AVATAR_URL" \
             --argjson color "$STATUS_COLOR" \
             '{
               username: "CI/CD Alert Bot",
+              avatar_url: $avatar_url,
               embeds: [
                 {
                   title: $title,
