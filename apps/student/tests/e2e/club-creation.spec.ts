@@ -24,6 +24,10 @@ const getTeacherSelectTrigger = (page: Page) =>
 const buildMyApplication = (
   overrides: Partial<typeof DEFAULT_MY_CLUB_CREATION_APPLICATION> = {},
 ) => {
+  const shouldResetReviews =
+    overrides.status !== undefined &&
+    overrides.status !== DEFAULT_MY_CLUB_CREATION_APPLICATION.status;
+
   return {
     ...DEFAULT_MY_CLUB_CREATION_APPLICATION,
     ...overrides,
@@ -33,10 +37,14 @@ const buildMyApplication = (
     },
     currentReviews:
       overrides.currentReviews ??
-      DEFAULT_MY_CLUB_CREATION_APPLICATION.currentReviews,
+      (shouldResetReviews
+        ? []
+        : DEFAULT_MY_CLUB_CREATION_APPLICATION.currentReviews),
     reviewHistory:
       overrides.reviewHistory ??
-      DEFAULT_MY_CLUB_CREATION_APPLICATION.reviewHistory,
+      (shouldResetReviews
+        ? []
+        : DEFAULT_MY_CLUB_CREATION_APPLICATION.reviewHistory),
   };
 };
 
@@ -347,7 +355,9 @@ test.describe("Student club creation", () => {
       await expect(
         page.getByRole("heading", { name: "내 개설 신청" }),
       ).toBeVisible();
-      await expect(page.getByText(statusCase.title)).toBeVisible();
+      await expect(
+        page.getByText(statusCase.title, { exact: true }),
+      ).toBeVisible();
 
       if (statusCase.hasEdit) {
         await expect(page.getByText("수정 후 다시 제출하기")).toBeVisible();
@@ -381,7 +391,9 @@ test.describe("Student club creation", () => {
 
     await expect(page).toHaveURL(/\/mypage$/);
     await page.goto("/mypage/club-creation");
-    await expect(page.getByText("검토 차수 3차")).toBeVisible();
+    await expect(
+      page.getByText("검토 차수 3차", { exact: true }).first(),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(0);

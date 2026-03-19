@@ -8,6 +8,10 @@ import {
 const buildMyApplication = (
   overrides: Partial<typeof DEFAULT_MY_CLUB_CREATION_APPLICATION> = {},
 ) => {
+  const shouldResetReviews =
+    overrides.status !== undefined &&
+    overrides.status !== DEFAULT_MY_CLUB_CREATION_APPLICATION.status;
+
   return {
     ...DEFAULT_MY_CLUB_CREATION_APPLICATION,
     ...overrides,
@@ -17,10 +21,14 @@ const buildMyApplication = (
     },
     currentReviews:
       overrides.currentReviews ??
-      DEFAULT_MY_CLUB_CREATION_APPLICATION.currentReviews,
+      (shouldResetReviews
+        ? []
+        : DEFAULT_MY_CLUB_CREATION_APPLICATION.currentReviews),
     reviewHistory:
       overrides.reviewHistory ??
-      DEFAULT_MY_CLUB_CREATION_APPLICATION.reviewHistory,
+      (shouldResetReviews
+        ? []
+        : DEFAULT_MY_CLUB_CREATION_APPLICATION.reviewHistory),
   };
 };
 
@@ -198,7 +206,7 @@ test.describe("Student my club creation detail", () => {
     await page.goto("/mypage/club-creation");
 
     await expect(page.getByText("개설 신청이 승인되었습니다.")).toBeVisible();
-    await expect(page.getByText("승인")).toHaveCount(2);
+    await expect(page.locator("article").getByText(/^승인$/)).toHaveCount(2);
     await expect(
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(0);
