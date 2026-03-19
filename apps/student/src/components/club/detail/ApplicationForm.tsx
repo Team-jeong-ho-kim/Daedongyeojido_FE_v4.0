@@ -116,7 +116,6 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
       return;
     }
 
-    // API 요청 데이터 구성
     const formData: CreateApplicationFormRequest = {
       applicationFormTitle: applicationTitle,
       content: questions.map((q) => q.text),

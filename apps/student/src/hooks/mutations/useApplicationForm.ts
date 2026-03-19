@@ -103,12 +103,12 @@ export const useSubmitApplicationMutation = (applicationFormId: string) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.applications.mine.queryKey,
       });
-      toast.success("지원서가 제출되었습니다.");
+      toast.success("지원서가 생성되었습니다.");
     },
     onError: (error: unknown) => {
       const errorMessage = getErrorMessage(
         error,
-        "지원서 제출에 실패했습니다. 다시 시도해주세요.",
+        "지원서 생성에 실패했습니다. 다시 시도해주세요.",
       );
       toast.error(errorMessage);
     },
