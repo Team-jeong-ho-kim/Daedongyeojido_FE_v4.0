@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { LoadingState, ManualPdfPreviewModal } from "ui";
 import {
@@ -43,6 +44,8 @@ const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
 export function ClubCreationFormSection({
   embedded = false,
 }: ClubCreationFormSectionProps) {
+  const role = useUserStore((state) => state.userInfo?.role);
+  const canDeleteDocument = role === "ADMIN";
   const documentFilesQuery = useGetDocumentFilesQuery();
   const deleteDocumentFileMutation = useDeleteDocumentFileMutation();
   const deleteModalTitleId = useId();
@@ -120,6 +123,10 @@ export function ClubCreationFormSection({
   };
 
   const openDeleteModal = (file: DocumentFileItem) => {
+    if (!canDeleteDocument) {
+      return;
+    }
+
     setSelectedDeleteFile(file);
   };
 
@@ -132,7 +139,7 @@ export function ClubCreationFormSection({
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedDeleteFile) {
+    if (!canDeleteDocument || !selectedDeleteFile) {
       return;
     }
 
@@ -232,14 +239,16 @@ export function ClubCreationFormSection({
                           미리보기
                         </button>
                       ) : null}
-                      <button
-                        type="button"
-                        onClick={() => openDeleteModal(file)}
-                        disabled={deleteDocumentFileMutation.isPending}
-                        className="rounded-xl border border-[#F3C4C4] bg-white px-6 py-3 font-semibold text-[#DC2626] text-sm transition hover:border-[#E5A9A9] hover:bg-[#FEF2F2] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        삭제
-                      </button>
+                      {canDeleteDocument ? (
+                        <button
+                          type="button"
+                          onClick={() => openDeleteModal(file)}
+                          disabled={deleteDocumentFileMutation.isPending}
+                          className="rounded-xl border border-[#F3C4C4] bg-white px-6 py-3 font-semibold text-[#DC2626] text-sm transition hover:border-[#E5A9A9] hover:bg-[#FEF2F2] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          삭제
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                 </article>

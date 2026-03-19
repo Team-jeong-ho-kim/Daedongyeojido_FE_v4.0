@@ -1,5 +1,10 @@
 // 사용자 권한
-export type UserRole = "STUDENT" | "CLUB_MEMBER" | "CLUB_LEADER" | "TEACHER";
+export type UserRole =
+  | "ADMIN"
+  | "STUDENT"
+  | "CLUB_MEMBER"
+  | "CLUB_LEADER"
+  | "TEACHER";
 
 // 사용자 정보
 export interface UserInfo {
