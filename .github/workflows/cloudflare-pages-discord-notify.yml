@@ -1,0 +1,109 @@
+name: Cloudflare Pages Discord Notify
+
+on:
+  check_run:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: Cloudflare Pages app name
+        required: true
+        default: daedongyeojido
+      conclusion:
+        description: Deployment result
+        required: true
+        default: success
+        type: choice
+        options:
+          - success
+          - failure
+          - cancelled
+      branch_name:
+        description: Branch name shown in Discord
+        required: true
+        default: main
+      details_url:
+        description: Optional details URL shown in Discord
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.check_run.name, 'Cloudflare Pages: ')
+      && github.event.check_run.check_suite.head_branch ==
+      github.event.repository.default_branch) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          INPUT_APP_NAME: ${{ inputs.app_name }}
+          INPUT_CONCLUSION: ${{ inputs.conclusion }}
+          INPUT_BRANCH_NAME: ${{ inputs.branch_name }}
+          INPUT_DETAILS_URL: ${{ inputs.details_url }}
+          CHECK_NAME: ${{ github.event.check_run.name }}
+          CHECK_CONCLUSION: ${{ github.event.check_run.conclusion }}
+          CHECK_DETAILS_URL: ${{ github.event.check_run.details_url }}
+          CHECK_HTML_URL: ${{ github.event.check_run.html_url }}
+          BRANCH_NAME: ${{ github.event.check_run.check_suite.head_branch }}
+          COMMIT_SHA: ${{ github.event.check_run.head_sha }}
+          REPOSITORY: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "DISCORD_WEBHOOK_URL secret is not configured. Skipping notification."
+            exit 0
+          fi
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            APP_NAME="$INPUT_APP_NAME"
+            RESULT="$INPUT_CONCLUSION"
+            DISPLAY_BRANCH="$INPUT_BRANCH_NAME"
+            DETAILS_URL="${INPUT_DETAILS_URL:-$RUN_URL}"
+            SHA_VALUE="${GITHUB_SHA}"
+          else
+            APP_NAME="${CHECK_NAME#Cloudflare Pages: }"
+            RESULT="$CHECK_CONCLUSION"
+            DISPLAY_BRANCH="${BRANCH_NAME:-unknown}"
+            DETAILS_URL="${CHECK_DETAILS_URL:-$CHECK_HTML_URL}"
+            SHA_VALUE="$COMMIT_SHA"
+          fi
+
+          SHORT_SHA="$(printf '%s' "$SHA_VALUE" | cut -c1-7)"
+          COMMIT_URL="$SERVER_URL/$REPOSITORY/commit/$SHA_VALUE"
+
+          case "$RESULT" in
+            success)
+              STATUS_LINE="✅ $APP_NAME 배포 성공"
+              ;;
+            failure)
+              STATUS_LINE="❌ $APP_NAME 배포 실패"
+              ;;
+            cancelled)
+              STATUS_LINE="⚪ $APP_NAME 배포 취소"
+              ;;
+            *)
+              STATUS_LINE="⚠️ $APP_NAME 상태: ${RESULT:-unknown}"
+              ;;
+          esac
+
+          CONTENT="$(printf '%s\n%s\n%s\n%s\n%s' \
+            "$STATUS_LINE" \
+            "브랜치: $DISPLAY_BRANCH" \
+            "커밋: $SHORT_SHA" \
+            "상세: $DETAILS_URL" \
+            "커밋 링크: $COMMIT_URL")"
+
+          PAYLOAD="$(jq -n --arg content "$CONTENT" '{content: $content}')"
+
+          curl --fail --show-error --silent \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d "$PAYLOAD" \
+            "$WEBHOOK_URL"
