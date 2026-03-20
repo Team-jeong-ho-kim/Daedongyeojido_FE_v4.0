@@ -36,6 +36,10 @@
     "format": {
       "outputs": []
     },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
+    },
     "type-check": {
       "dependsOn": ["^type-check"],
       "outputs": []
