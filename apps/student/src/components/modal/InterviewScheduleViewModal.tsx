@@ -5,6 +5,20 @@ import { toast } from "sonner";
 import { updateInterviewSchedule } from "@/api/applicationForm";
 import { getErrorMessage } from "@/lib/error";
 import type { InterviewScheduleDetail } from "@/types";
+import {
+  buildInterviewSchedulePayload,
+  formatInterviewDateForDisplay,
+  formatInterviewTimeForDisplay,
+  type InterviewPeriod,
+  isValidInterviewDate,
+  parseInterviewScheduleFormValues,
+  sanitizeDayInput,
+  sanitizeHourInput,
+  sanitizeMinuteInput,
+  sanitizeMonthInput,
+  sanitizeYearInput,
+  selectAllInputText,
+} from "./interviewScheduleTime";
 
 interface InterviewScheduleViewModalProps {
   isOpen: boolean;
@@ -34,7 +48,7 @@ export function InterviewScheduleViewModal({
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
-  const [period, setPeriod] = useState<"오전" | "오후">("오후");
+  const [period, setPeriod] = useState<InterviewPeriod>("오후");
   const [hour, setHour] = useState("12");
   const [minute, setMinute] = useState("00");
   const [place, setPlace] = useState("");
@@ -43,33 +57,18 @@ export function InterviewScheduleViewModal({
   useEffect(() => {
     if (!schedule) return;
 
-    const [y, m, d] = schedule.interviewSchedule.split("-");
-    setYear(y);
-    setMonth(m);
-    setDay(d);
+    const formValues = parseInterviewScheduleFormValues(
+      schedule.interviewSchedule,
+      schedule.interviewTime,
+    );
+
+    setYear(formValues.year);
+    setMonth(formValues.month);
+    setDay(formValues.day);
     setPlace(schedule.place);
-
-    const [hour24Str, min] = schedule.interviewTime.split(":");
-    const hour24 = Number.parseInt(hour24Str, 10);
-
-    let h = hour24;
-    let p: "오전" | "오후" = "오후";
-
-    if (hour24 === 0) {
-      h = 12;
-      p = "오전";
-    } else if (hour24 < 12) {
-      p = "오전";
-    } else if (hour24 === 12) {
-      p = "오후";
-    } else {
-      h = hour24 - 12;
-      p = "오후";
-    }
-
-    setHour(h.toString());
-    setMinute(min);
-    setPeriod(p);
+    setHour(formValues.hour);
+    setMinute(formValues.minute);
+    setPeriod(formValues.period);
   }, [schedule]);
 
   // 모달이 닫힐 때 편집 모드 해제
@@ -82,31 +81,12 @@ export function InterviewScheduleViewModal({
   // 날짜와 시간 포맷팅 (조회 모드용)
   const getFormattedDate = () => {
     if (!schedule) return "";
-    const [y, m, d] = schedule.interviewSchedule.split("-");
-    return `${y}.${m}.${d}`;
+    return formatInterviewDateForDisplay(schedule.interviewSchedule);
   };
 
   const getFormattedTime = () => {
     if (!schedule) return "";
-    const [hour24Str] = schedule.interviewTime.split(":");
-    const hour24 = Number.parseInt(hour24Str, 10);
-
-    let h = hour24;
-    let p = "오후";
-
-    if (hour24 === 0) {
-      h = 12;
-      p = "오전";
-    } else if (hour24 < 12) {
-      p = "오전";
-    } else if (hour24 === 12) {
-      p = "오후";
-    } else {
-      h = hour24 - 12;
-      p = "오후";
-    }
-
-    return `${p} ${h}시`;
+    return formatInterviewTimeForDisplay(schedule.interviewTime);
   };
 
   const handleEdit = () => {
@@ -116,40 +96,29 @@ export function InterviewScheduleViewModal({
   const handleCancel = () => {
     if (!schedule) return;
 
-    // 원래 값으로 복원
-    const [y, m, d] = schedule.interviewSchedule.split("-");
-    setYear(y);
-    setMonth(m);
-    setDay(d);
+    const formValues = parseInterviewScheduleFormValues(
+      schedule.interviewSchedule,
+      schedule.interviewTime,
+    );
+
+    setYear(formValues.year);
+    setMonth(formValues.month);
+    setDay(formValues.day);
     setPlace(schedule.place);
-
-    const [hour24Str, min] = schedule.interviewTime.split(":");
-    const hour24 = Number.parseInt(hour24Str, 10);
-
-    let h = hour24;
-    let p: "오전" | "오후" = "오후";
-
-    if (hour24 === 0) {
-      h = 12;
-      p = "오전";
-    } else if (hour24 < 12) {
-      p = "오전";
-    } else if (hour24 === 12) {
-      p = "오후";
-    } else {
-      h = hour24 - 12;
-      p = "오후";
-    }
-
-    setHour(h.toString());
-    setMinute(min);
-    setPeriod(p);
+    setHour(formValues.hour);
+    setMinute(formValues.minute);
+    setPeriod(formValues.period);
 
     setIsEditMode(false);
   };
 
   const handleSave = async () => {
     if (!schedule) return;
+
+    if (!isValidInterviewDate({ year, month, day })) {
+      toast.error("올바른 면접 일자를 입력해주세요.");
+      return;
+    }
 
     if (!place.trim()) {
       toast.error("면접 장소를 입력해주세요.");
@@ -158,16 +127,15 @@ export function InterviewScheduleViewModal({
 
     setIsSaving(true);
     try {
-      // 시간을 24시간 형식으로 변환
-      let hour24 = Number.parseInt(hour, 10);
-      if (period === "오후" && hour24 !== 12) {
-        hour24 += 12;
-      } else if (period === "오전" && hour24 === 12) {
-        hour24 = 0;
-      }
-
-      const interviewSchedule = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-      const interviewTime = `${hour24.toString().padStart(2, "0")}:${minute}`;
+      const { interviewSchedule, interviewTime } =
+        buildInterviewSchedulePayload({
+          year,
+          month,
+          day,
+          period,
+          hour,
+          minute,
+        });
 
       await updateInterviewSchedule(schedule.scheduleId.toString(), {
         interviewSchedule,
@@ -264,28 +232,33 @@ export function InterviewScheduleViewModal({
               </p>
               <div className="grid grid-cols-3 gap-4">
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={year}
-                  onChange={(e) => setYear(e.target.value)}
+                  onChange={(e) => setYear(sanitizeYearInput(e.target.value))}
+                  onFocus={(e) => selectAllInputText(e.currentTarget)}
                   placeholder="년도"
+                  maxLength={4}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-center text-gray-700 focus:border-primary-500 focus:outline-none"
                 />
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={month}
-                  onChange={(e) => setMonth(e.target.value)}
+                  onChange={(e) => setMonth(sanitizeMonthInput(e.target.value))}
+                  onFocus={(e) => selectAllInputText(e.currentTarget)}
                   placeholder="월"
-                  min="1"
-                  max="12"
+                  maxLength={2}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-center text-gray-700 focus:border-primary-500 focus:outline-none"
                 />
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={day}
-                  onChange={(e) => setDay(e.target.value)}
+                  onChange={(e) => setDay(sanitizeDayInput(e.target.value))}
+                  onFocus={(e) => selectAllInputText(e.currentTarget)}
                   placeholder="날짜"
-                  min="1"
-                  max="31"
+                  maxLength={2}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-center text-gray-700 focus:border-primary-500 focus:outline-none"
                 />
               </div>
@@ -306,21 +279,25 @@ export function InterviewScheduleViewModal({
                   <option value="오후">오후</option>
                 </select>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={hour}
-                  onChange={(e) => setHour(e.target.value)}
+                  onChange={(e) => setHour(sanitizeHourInput(e.target.value))}
+                  onFocus={(e) => selectAllInputText(e.currentTarget)}
                   placeholder="시"
-                  min="1"
-                  max="12"
+                  maxLength={2}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-center text-gray-700 focus:border-primary-500 focus:outline-none"
                 />
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   value={minute}
-                  onChange={(e) => setMinute(e.target.value.padStart(2, "0"))}
+                  onChange={(e) =>
+                    setMinute(sanitizeMinuteInput(e.target.value))
+                  }
+                  onFocus={(e) => selectAllInputText(e.currentTarget)}
                   placeholder="분"
-                  min="0"
-                  max="59"
+                  maxLength={2}
                   className="rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 text-center text-gray-700 focus:border-primary-500 focus:outline-none"
                 />
               </div>
