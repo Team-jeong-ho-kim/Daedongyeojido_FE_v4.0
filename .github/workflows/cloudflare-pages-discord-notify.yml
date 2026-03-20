@@ -33,9 +33,7 @@ jobs:
   notify:
     if: >-
       ${{ github.event_name == 'workflow_dispatch' ||
-      (startsWith(github.event.check_run.name, 'Cloudflare Pages: ')
-      && github.event.check_run.check_suite.head_branch ==
-      github.event.repository.default_branch) }}
+      startsWith(github.event.check_run.name, 'Cloudflare Pages: ') }}
     runs-on: ubuntu-latest
     steps:
       - name: Send Discord notification

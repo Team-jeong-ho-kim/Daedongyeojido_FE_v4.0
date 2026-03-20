@@ -12,7 +12,7 @@
     "pages:build": "dotenv -o -e ../../.env.prod -- npx @cloudflare/next-on-pages@1",
     "pages:build:stag": "dotenv -o -e ../../.env.stag -- npx @cloudflare/next-on-pages@1",
     "preview": "npx wrangler pages dev .vercel/output/static",
-    "deploy": "npx wrangler pages deploy .vercel/output/static",
+    "deploy": "node ../../scripts/deploy-with-discord.mjs daedongyeojido-web .vercel/output/static",
     "start": "next start",
     "lint": "../../node_modules/.bin/biome check .",
     "format": "../../node_modules/.bin/biome format --write .",
