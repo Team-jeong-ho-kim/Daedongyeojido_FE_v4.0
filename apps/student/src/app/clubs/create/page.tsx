@@ -157,9 +157,7 @@ function TeacherSelectField(props: TeacherSelectFieldProps) {
                   aria-disabled={isMatched}
                   onClick={() => {
                     if (isMatched) {
-                      toast.error(
-                        "이미 매칭된 지도교사는 선택할 수 없습니다.",
-                      );
+                      toast.error("이미 매칭된 지도교사는 선택할 수 없습니다.");
                       return;
                     }
                     onSelect(isSelected ? null : option.teacherId);
@@ -169,8 +167,8 @@ function TeacherSelectField(props: TeacherSelectFieldProps) {
                     isMatched
                       ? "cursor-not-allowed border-red-200 bg-red-50/40 hover:border-red-300"
                       : isSelected
-                      ? "border-primary-300 bg-white"
-                      : "border-gray-200 bg-white hover:border-primary-200 hover:bg-gray-50"
+                        ? "border-primary-300 bg-white"
+                        : "border-gray-200 bg-white hover:border-primary-200 hover:bg-gray-50"
                   }`}
                 >
                   <div className="min-w-0">
@@ -510,7 +508,7 @@ export default function ClubCreationPage() {
           </p>
           <button
             type="button"
-            onClick={() => router.push("/mypage")}
+            onClick={() => router.push("/mypage/club-creation")}
             className="mt-6 rounded-xl bg-primary-500 px-5 py-3 font-semibold text-sm text-white transition hover:bg-primary-600"
           >
             마이페이지로 이동
