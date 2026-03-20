@@ -4,45 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useId, useState } from "react";
 import type { LoginRequest, LoginResponse } from "utils";
-import { ApiError, apiClient, saveSessionUser, saveTokens } from "utils";
-
-const toErrorMessage = (error: unknown, fallback: string) => {
-  if (error instanceof ApiError) return error.description;
-  return fallback;
-};
-
-const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
-
-const resolveServiceUrl = (
-  envUrl: string | undefined,
-  service: "web" | "student" | "admin" | "teacher",
-) => {
-  if (envUrl?.trim()) {
-    return normalizeUrl(envUrl);
-  }
-
-  if (typeof window !== "undefined") {
-    const { protocol, hostname } = window.location;
-
-    if (hostname.endsWith(".daedongyeojido.site")) {
-      const serviceHost =
-        service === "web"
-          ? "dsm.daedongyeojido.site"
-          : `${service}.daedongyeojido.site`;
-
-      return `${protocol}//${serviceHost}`;
-    }
-  }
-
-  const localFallbackMap = {
-    web: "http://localhost:3000",
-    student: "http://localhost:3001",
-    admin: "http://localhost:3002",
-    teacher: "http://localhost:3003",
-  } satisfies Record<typeof service, string>;
-
-  return localFallbackMap[service];
-};
+import { apiClient, saveSessionUser, saveTokens } from "utils";
+import { resolveServiceUrl, toLoginErrorMessage } from "./login.utils";
 
 export default function LoginPage() {
   const [division, setDivision] = useState<LoginRequest["division"]>("STUDENT");
@@ -114,7 +77,7 @@ export default function LoginPage() {
       window.location.href = userUrl;
     } catch (error) {
       setErrorMessage(
-        toErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),
+        toLoginErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),
       );
     } finally {
       setPending(false);
