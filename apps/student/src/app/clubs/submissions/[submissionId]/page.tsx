@@ -12,6 +12,7 @@ import {
   getInterviewSchedule,
   getSubmissionDetail,
 } from "@/api/applicationForm";
+import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
 import { InterviewScheduleViewModal } from "@/components/modal/InterviewScheduleViewModal";
 import { getErrorMessage } from "@/lib/error";
@@ -34,6 +35,11 @@ export default function SubmissionDetailPage({
   const [scheduleDetail, setScheduleDetail] =
     useState<InterviewScheduleDetail | null>(null);
   const [isInterviewCompleted, setIsInterviewCompleted] = useState(false);
+  const [showPassConfirmModal, setShowPassConfirmModal] = useState(false);
+  const [pendingDecision, setPendingDecision] = useState<
+    "ACCEPTED" | "REJECTED" | null
+  >(null);
+  const [isDeciding, setIsDeciding] = useState(false);
   const [localPassStatus, setLocalPassStatus] = useState<
     "ACCEPTED" | "REJECTED" | null
   >(null);
@@ -127,18 +133,52 @@ export default function SubmissionDetailPage({
   };
 
   const handleDecidePass = async (isPassed: boolean) => {
+    setIsDeciding(true);
     try {
       await decidePass(submissionId, { isPassed });
       toast.success(isPassed ? "합격 처리되었습니다." : "탈락 처리되었습니다.");
       setLocalPassStatus(isPassed ? "ACCEPTED" : "REJECTED");
+      setShowPassConfirmModal(false);
+      setPendingDecision(null);
     } catch (error) {
       const errorMessage = getErrorMessage(
         error,
         "처리에 실패했습니다. 다시 시도해주세요.",
       );
       toast.error(errorMessage);
+    } finally {
+      setIsDeciding(false);
     }
   };
+
+  const handleOpenPassConfirmModal = (decision: "ACCEPTED" | "REJECTED") => {
+    setPendingDecision(decision);
+    setShowPassConfirmModal(true);
+  };
+
+  const handleClosePassConfirmModal = () => {
+    if (isDeciding) return;
+    setShowPassConfirmModal(false);
+    setPendingDecision(null);
+  };
+
+  const handleConfirmDecision = () => {
+    if (!pendingDecision || isDeciding) return;
+    handleDecidePass(pendingDecision === "ACCEPTED");
+  };
+
+  const passConfirmContent =
+    pendingDecision === "ACCEPTED"
+      ? {
+          title: "정말 합격 시키시겠습니까?",
+          description: "확인 후 지원자를 합격 처리합니다.",
+          confirmText: isDeciding ? "처리 중..." : "합격",
+        }
+      : {
+          title: "정말 불합격 시키시겠습니까?",
+          description: "확인 후 지원자를 불합격 처리합니다.",
+          confirmText: isDeciding ? "처리 중..." : "불합격",
+        };
 
   if (isLoading || !submission) {
     return (
@@ -276,15 +316,17 @@ export default function SubmissionDetailPage({
                     <>
                       <button
                         type="button"
-                        onClick={() => handleDecidePass(false)}
-                        className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-gray-500"
+                        onClick={() => handleOpenPassConfirmModal("REJECTED")}
+                        disabled={isDeciding}
+                        className="rounded-lg bg-gray-400 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         탈락
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDecidePass(true)}
-                        className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                        onClick={() => handleOpenPassConfirmModal("ACCEPTED")}
+                        disabled={isDeciding}
+                        className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         합격
                       </button>
@@ -298,6 +340,15 @@ export default function SubmissionDetailPage({
                           className="rounded-lg border border-gray-900 bg-white px-8 py-3 font-medium text-base text-gray-900 transition-colors hover:bg-gray-50"
                         >
                           면접 일정 조회
+                        </button>
+                      )}
+                      {hasSchedule && (
+                        <button
+                          type="button"
+                          onClick={handleInterviewComplete}
+                          className="rounded-lg bg-[#FF7575] px-8 py-3 font-medium text-base text-white transition-colors hover:bg-[#FF6464]"
+                        >
+                          면접완료
                         </button>
                       )}
                       {!hasSchedule && (
@@ -332,8 +383,18 @@ export default function SubmissionDetailPage({
         onBackdropClick={() => setShowViewScheduleModal(false)}
         schedule={scheduleDetail}
         onUpdate={handleScheduleUpdate}
-        onInterviewComplete={handleInterviewComplete}
         isClubLeader={isClubLeader}
+      />
+
+      <ApplicationConfirmModal
+        isOpen={showPassConfirmModal && pendingDecision !== null}
+        onClose={handleClosePassConfirmModal}
+        onConfirm={handleConfirmDecision}
+        onBackdropClick={handleClosePassConfirmModal}
+        title={passConfirmContent.title}
+        description={passConfirmContent.description}
+        cancelText="취소"
+        confirmText={passConfirmContent.confirmText}
       />
     </main>
   );

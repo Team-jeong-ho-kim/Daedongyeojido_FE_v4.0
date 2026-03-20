@@ -182,13 +182,24 @@ export default function ApplicationDetailPage() {
                     면접 일정 설정
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={handleShowDetail}
-                  className="h-10 rounded-lg bg-gray-900 px-5 font-semibold text-sm text-white shadow-sm hover:bg-gray-800"
-                >
-                  면접 일정 조회
-                </button>
+                {interviewSchedule && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleShowDetail}
+                      className="h-10 rounded-lg bg-gray-900 px-5 font-semibold text-sm text-white shadow-sm hover:bg-gray-800"
+                    >
+                      면접 일정 조회
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleInterviewComplete}
+                      className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
+                    >
+                      면접완료
+                    </button>
+                  </>
+                )}
               </>
             ) : (
               <>
@@ -224,7 +235,6 @@ export default function ApplicationDetailPage() {
         <InterviewDetailModal
           isOpen={showDetailModal}
           onClose={() => setShowDetailModal(false)}
-          onComplete={handleInterviewComplete}
           applicant={{
             name: mockData.name,
             studentId: mockData.studentId,

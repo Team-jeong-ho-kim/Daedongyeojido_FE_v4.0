@@ -3,7 +3,6 @@ import { Chip } from "../common";
 interface InterviewDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: () => void;
   applicant: {
     name: string;
     studentId: string;
@@ -19,7 +18,6 @@ interface InterviewDetailModalProps {
 export default function InterviewDetailModal({
   isOpen,
   onClose,
-  onComplete,
   applicant,
   interview,
 }: InterviewDetailModalProps) {
@@ -73,13 +71,6 @@ export default function InterviewDetailModal({
             className="flex-1 rounded-xl bg-gray-400 px-6 py-3 font-medium text-white transition-colors hover:bg-gray-500"
           >
             닫기
-          </button>
-          <button
-            type="button"
-            onClick={onComplete}
-            className="flex-1 rounded-xl bg-primary-500 px-6 py-3 font-medium text-white transition-colors hover:bg-primary-600"
-          >
-            면접완료
           </button>
         </div>
       </div>
