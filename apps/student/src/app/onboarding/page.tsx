@@ -24,7 +24,9 @@ export default function OnboardingPage() {
   const router = useRouter();
   const userInfo = useUserStore((state) => state.userInfo);
   const updateMyInfoMutation = useUpdateMyInfoMutation();
+  const isSubmitting = updateMyInfoMutation.isPending;
   const isInitializedRef = useRef(false);
+  const submitLockRef = useRef(false);
 
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [phone, setPhone] = useState("");
@@ -32,8 +34,6 @@ export default function OnboardingPage() {
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [introduction, setIntroduction] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const isSubmittingRef = useRef(false);
-
   // 페이지 이탈 방지
   useEffect(() => {
     // 입력이 시작되었거나 아직 제출하지 않은 경우 이탈 방지
@@ -44,7 +44,7 @@ export default function OnboardingPage() {
       selectedFields.length > 0 ||
       introduction.trim() !== "";
 
-    const shouldPreventLeave = hasAnyInput && !isSubmittingRef.current;
+    const shouldPreventLeave = hasAnyInput && !isSubmitting;
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (shouldPreventLeave) {
@@ -64,7 +64,6 @@ export default function OnboardingPage() {
             "입력한 내용이 저장되지 않습니다. 페이지를 떠나시겠습니까?",
           );
           if (confirmLeave) {
-            isSubmittingRef.current = true;
             router.push(new URL(link.href).pathname);
           }
         }
@@ -80,7 +79,15 @@ export default function OnboardingPage() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("click", handleClick, true);
     };
-  }, [profileFile, phone, links, selectedFields, introduction, router]);
+  }, [
+    profileFile,
+    phone,
+    links,
+    selectedFields,
+    introduction,
+    isSubmitting,
+    router,
+  ]);
 
   const handleProfileChange = (
     file: File | null,
@@ -201,20 +208,35 @@ export default function OnboardingPage() {
   };
 
   const handleSubmit = () => {
+    if (isSubmitting || submitLockRef.current) {
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
 
     const cleanedPhone = phone.replace(/-/g, "");
+    const normalizedMajors = [...new Set(selectedFields)];
+    const normalizedLinks = [
+      ...new Set(links.map((link) => link.url.trim())),
+    ].filter(Boolean);
 
-    isSubmittingRef.current = true;
-    updateMyInfoMutation.mutate({
-      introduction,
-      phoneNumber: cleanedPhone || undefined,
-      majors: selectedFields,
-      links: links.map((link) => link.url),
-      profileImage: profileFile,
-    });
+    submitLockRef.current = true;
+    updateMyInfoMutation.mutate(
+      {
+        introduction: introduction.trim(),
+        phoneNumber: cleanedPhone || undefined,
+        majors: normalizedMajors,
+        links: normalizedLinks,
+        profileImage: profileFile,
+      },
+      {
+        onError: () => {
+          submitLockRef.current = false;
+        },
+      },
+    );
   };
 
   return (
@@ -297,9 +319,10 @@ export default function OnboardingPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="rounded-lg bg-black px-6 py-2.5 text-white transition-colors hover:bg-gray-800"
+            disabled={isSubmitting}
+            className="rounded-lg bg-black px-6 py-2.5 text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            저장 완료
+            {isSubmitting ? "저장 중..." : "저장 완료"}
           </button>
         </div>
       </div>
