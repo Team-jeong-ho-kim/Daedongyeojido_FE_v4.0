@@ -17,6 +17,7 @@ export default function MyPageEdit() {
   const userInfo = useUserStore((state) => state.userInfo);
   const updateProfileMutation = useUpdateProfileMutation();
   const isSubmitting = updateProfileMutation.isPending;
+  const submitLockRef = useRef(false);
 
   // 초기값 저장
   const initialLinks = useRef<string[]>([]);
@@ -101,18 +102,35 @@ export default function MyPageEdit() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting || submitLockRef.current) {
+      return;
+    }
+
     if (!hasChanges()) {
       toast.info("변경된 내용이 없습니다");
       return;
     }
 
-    updateProfileMutation.mutate({
-      introduction,
-      majors: selectedFields,
-      links: links.map((link) => link.url),
-      profileImage,
-      existingImageUrl: userInfo?.profileImage || undefined,
-    });
+    const normalizedMajors = [...new Set(selectedFields)];
+    const normalizedLinks = [
+      ...new Set(links.map((link) => link.url.trim())),
+    ].filter(Boolean);
+
+    submitLockRef.current = true;
+    updateProfileMutation.mutate(
+      {
+        introduction: introduction.trim(),
+        majors: normalizedMajors,
+        links: normalizedLinks,
+        profileImage,
+        existingImageUrl: userInfo?.profileImage || undefined,
+      },
+      {
+        onError: () => {
+          submitLockRef.current = false;
+        },
+      },
+    );
   };
 
   return (
