@@ -51,20 +51,32 @@ export function TeacherTab() {
           </p>
         ) : teachersQuery.data && teachersQuery.data.length > 0 ? (
           <div className="overflow-hidden rounded-xl border border-gray-200">
-            <div className="grid grid-cols-[120px_1fr] bg-gray-50 px-4 py-3 font-medium text-gray-500 text-sm">
+            <div className="grid grid-cols-[120px_1fr_120px] bg-gray-50 px-4 py-3 font-medium text-gray-500 text-sm">
               <span>교사 ID</span>
               <span>지도 교사 이름</span>
+              <span className="text-right">매칭 여부</span>
             </div>
             <ul>
               {teachersQuery.data.map((teacher) => (
                 <li
                   key={teacher.teacherId}
-                  className="grid grid-cols-[120px_1fr] items-center border-gray-100 border-t px-4 py-3 text-sm"
+                  className="grid grid-cols-[120px_1fr_120px] items-center border-gray-100 border-t px-4 py-3 text-sm"
                 >
                   <span className="font-medium text-gray-600">
                     #{teacher.teacherId}
                   </span>
                   <span className="text-gray-900">{teacher.teacherName}</span>
+                  <div className="flex justify-end">
+                    <span
+                      className={`rounded-full border px-3 py-1 font-medium text-[12px] ${
+                        teacher.matched
+                          ? "border-red-200 bg-red-50 text-red-700"
+                          : "border-blue-200 bg-blue-50 text-blue-700"
+                      }`}
+                    >
+                      {teacher.matched ? "매칭됨" : "미매칭"}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>

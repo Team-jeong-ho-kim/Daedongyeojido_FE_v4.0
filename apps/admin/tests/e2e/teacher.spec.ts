@@ -11,8 +11,8 @@ test.describe("Admin teacher tab", () => {
   }) => {
     const controller = await installAdminApiMocks(page, {
       teachers: [
-        { teacherId: 3, teacherName: "농구공" },
-        { teacherId: 4, teacherName: "선생님" },
+        { teacherId: 3, teacherName: "농구공", matched: false },
+        { teacherId: 4, teacherName: "선생님", matched: true },
       ],
     });
 
@@ -24,8 +24,14 @@ test.describe("Admin teacher tab", () => {
     ).toBeVisible();
     await expect(page.getByText("#3")).toBeVisible();
     await expect(page.getByText("농구공")).toBeVisible();
+    await expect(
+      page.locator("li").filter({ hasText: "#3" }).getByText("미매칭"),
+    ).toBeVisible();
     await expect(page.getByText("#4")).toBeVisible();
     await expect(page.getByText("선생님")).toBeVisible();
+    await expect(
+      page.locator("li").filter({ hasText: "#4" }).getByText("매칭됨"),
+    ).toBeVisible();
     expect(controller.getLastRequest("/teachers", "GET")).toBeTruthy();
 
     await page.getByPlaceholder("지도 교사 이름").fill("새 지도 교사");
@@ -36,6 +42,9 @@ test.describe("Admin teacher tab", () => {
     await expect(page.getByText("지도 교사가 추가되었습니다.")).toBeVisible();
     await expect(page.getByText("#5")).toBeVisible();
     await expect(page.getByText("새 지도 교사")).toBeVisible();
+    await expect(
+      page.locator("li").filter({ hasText: "#5" }).getByText("미매칭"),
+    ).toBeVisible();
     expect(controller.getLastRequest("/admin/teachers", "POST")).toBeTruthy();
   });
 });

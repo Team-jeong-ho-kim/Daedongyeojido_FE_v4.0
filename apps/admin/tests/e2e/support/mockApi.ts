@@ -69,6 +69,7 @@ type MockClubCreationApplicationDetail = {
 type MockTeacher = {
   teacherId: number;
   teacherName: string;
+  matched: boolean;
 };
 
 type RecordedRequest = {
@@ -256,10 +257,12 @@ const DEFAULT_TEACHERS: MockTeacher[] = [
   {
     teacherId: 1,
     teacherName: "김현태",
+    matched: false,
   },
   {
     teacherId: 2,
     teacherName: "박교사",
+    matched: true,
   },
 ];
 
@@ -373,6 +376,7 @@ export async function installAdminApiMocks(
             ? Math.max(...teachers.map((teacher) => teacher.teacherId)) + 1
             : 1,
         teacherName: requestBody.teacherName ?? "새 지도 교사",
+        matched: false,
       },
     ];
 

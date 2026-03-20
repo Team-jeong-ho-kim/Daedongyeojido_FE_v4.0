@@ -209,6 +209,35 @@ test.describe("Student club creation", () => {
     );
   });
 
+  test("매칭된 지도 교사는 배지로 표시되고 선택할 수 없다", async ({ page }) => {
+    await installStudentApiMocks(page, {
+      teachers: [
+        { teacherId: 1, teacherName: "홍길동", matched: true },
+        { teacherId: 2, teacherName: "김선생", matched: false },
+      ],
+    });
+
+    await page.goto("/clubs/create");
+
+    const teacherSelectTrigger = getTeacherSelectTrigger(page);
+    await teacherSelectTrigger.click();
+
+    const matchedTeacherCard = page
+      .locator("button[aria-disabled='true']")
+      .filter({ hasText: "홍길동" });
+
+    await expect(matchedTeacherCard.getByText("매칭됨")).toBeVisible();
+    await matchedTeacherCard.click();
+
+    await expect(
+      page.getByText("이미 매칭된 지도교사는 선택할 수 없습니다."),
+    ).toBeVisible();
+    await expect(teacherSelectTrigger).toContainText(
+      "지도 교사를 선택해주세요",
+    );
+    await expect(matchedTeacherCard).toBeVisible();
+  });
+
   test("지도 교사를 선택하면 개설 신청 modal이 열리고 teacherId를 포함해 전송한다", async ({
     page,
   }) => {
@@ -284,6 +313,39 @@ test.describe("Student club creation", () => {
         .getByRole("button", { name: /Teacher/ })
         .filter({ hasText: "선택 가능한 지도 교사가 없습니다" }),
     ).toBeDisabled();
+
+    await fillClubCreationForm(page);
+    await page.getByRole("button", { name: "개설 신청" }).click();
+
+    await expect(
+      page.getByText(
+        "선택 가능한 지도 교사가 없습니다. 관리자에게 문의해주세요.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("dialog", { name: "정말 개설을 신청하시겠습니까?" }),
+    ).toHaveCount(0);
+  });
+
+  test("모든 지도 교사가 이미 매칭되어 있으면 목록은 열리지만 제출은 막힌다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      teachers: [
+        { teacherId: 1, teacherName: "홍길동", matched: true },
+        { teacherId: 2, teacherName: "김선생", matched: true },
+      ],
+    });
+
+    await page.goto("/clubs/create");
+
+    const teacherSelectTrigger = page
+      .getByRole("button", { name: /Teacher/ })
+      .filter({ hasText: "선택 가능한 지도 교사가 없습니다" });
+    await expect(teacherSelectTrigger).toBeEnabled();
+
+    await teacherSelectTrigger.click();
+    await expect(page.getByText("매칭됨")).toHaveCount(2);
 
     await fillClubCreationForm(page);
     await page.getByRole("button", { name: "개설 신청" }).click();

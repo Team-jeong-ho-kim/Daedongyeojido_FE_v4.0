@@ -96,6 +96,7 @@ type MockDocumentFile = {
 type MockTeacher = {
   teacherId: number;
   teacherName: string;
+  matched: boolean;
 };
 
 type MockClubCreationReview = {
@@ -293,18 +294,22 @@ const DEFAULT_TEACHERS: MockTeacher[] = [
   {
     teacherId: 4,
     teacherName: "asdf",
+    matched: false,
   },
   {
     teacherId: 3,
     teacherName: "농구공",
+    matched: true,
   },
   {
     teacherId: 1,
     teacherName: "선생님",
+    matched: false,
   },
   {
     teacherId: 2,
     teacherName: "선생님",
+    matched: false,
   },
 ];
 

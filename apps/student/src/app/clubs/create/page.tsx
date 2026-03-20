@@ -147,47 +147,70 @@ function TeacherSelectField(props: TeacherSelectFieldProps) {
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {options.map((option) => {
               const isSelected = option.teacherId === selectedTeacherId;
+              const isMatched = option.matched;
 
               return (
                 <button
                   key={option.teacherId}
                   type="button"
                   aria-pressed={isSelected}
+                  aria-disabled={isMatched}
                   onClick={() => {
+                    if (isMatched) {
+                      toast.error(
+                        "이미 매칭된 지도교사는 선택할 수 없습니다.",
+                      );
+                      return;
+                    }
                     onSelect(isSelected ? null : option.teacherId);
                     setIsOpen(false);
                   }}
                   className={`flex min-h-[72px] items-center justify-between gap-4 rounded-xl border px-4 py-4 text-left shadow-sm transition focus:outline-none focus:ring-2 focus:ring-primary-100 ${
-                    isSelected
+                    isMatched
+                      ? "cursor-not-allowed border-red-200 bg-red-50/40 hover:border-red-300"
+                      : isSelected
                       ? "border-primary-300 bg-white"
                       : "border-gray-200 bg-white hover:border-primary-200 hover:bg-gray-50"
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-[15px] text-gray-900">
-                      {option.teacherName}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="truncate font-semibold text-[15px] text-gray-900">
+                        {option.teacherName}
+                      </p>
+                      {isMatched ? (
+                        <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 font-semibold text-[11px] text-red-700">
+                          매칭됨
+                        </span>
+                      ) : null}
+                    </div>
                     <p
                       className={`mt-1 text-[12px] ${
-                        isSelected ? "text-primary-600" : "text-gray-500"
+                        isMatched
+                          ? "text-red-600"
+                          : isSelected
+                            ? "text-primary-600"
+                            : "text-gray-500"
                       }`}
                     >
-                      지도 교사
+                      {isMatched ? "선택 불가" : "지도 교사"}
                     </p>
                   </div>
 
-                  <span
-                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
-                      isSelected
-                        ? "border-primary-500 bg-primary-500 text-white"
-                        : "border-gray-300 bg-white text-transparent"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    <span className="font-bold text-[11px] leading-none">
-                      ✓
+                  {isMatched ? null : (
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition ${
+                        isSelected
+                          ? "border-primary-500 bg-primary-500 text-white"
+                          : "border-gray-300 bg-white text-transparent"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span className="font-bold text-[11px] leading-none">
+                        ✓
+                      </span>
                     </span>
-                  </span>
+                  )}
                 </button>
               );
             })}
@@ -260,6 +283,7 @@ export default function ClubCreationPage() {
   const { show, toggleShow } = useModalStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const teachers = teachersQuery.data ?? [];
+  const selectableTeachers = teachers.filter((teacher) => !teacher.matched);
   const myApplicationErrorStatus = getErrorStatus(myApplicationQuery.error);
   const isTeacherSelectDisabled =
     teachersQuery.isPending || teachersQuery.isError || teachers.length === 0;
@@ -271,10 +295,15 @@ export default function ClubCreationPage() {
   }, [myApplicationQuery.data, router]);
 
   useEffect(() => {
-    if (
-      selectedTeacherId !== null &&
-      teachers.every((teacher) => teacher.teacherId !== selectedTeacherId)
-    ) {
+    if (selectedTeacherId === null) {
+      return;
+    }
+
+    const selectedTeacher = teachers.find(
+      (teacher) => teacher.teacherId === selectedTeacherId,
+    );
+
+    if (!selectedTeacher || selectedTeacher.matched) {
       setSelectedTeacherId(null);
     }
   }, [selectedTeacherId, teachers]);
@@ -314,7 +343,7 @@ export default function ClubCreationPage() {
     if (teachersQuery.isError) {
       return "지도 교사 목록을 불러오지 못했습니다";
     }
-    if (teachers.length === 0) {
+    if (teachers.length === 0 || selectableTeachers.length === 0) {
       return "선택 가능한 지도 교사가 없습니다";
     }
     return "지도 교사를 선택해주세요";
@@ -327,7 +356,7 @@ export default function ClubCreationPage() {
     if (teachersQuery.isError) {
       return "지도 교사 목록을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.";
     }
-    if (teachers.length === 0) {
+    if (teachers.length === 0 || selectableTeachers.length === 0) {
       return "선택 가능한 지도 교사가 없습니다. 관리자에게 문의해주세요.";
     }
     return "지도 교사를 선택해주세요";

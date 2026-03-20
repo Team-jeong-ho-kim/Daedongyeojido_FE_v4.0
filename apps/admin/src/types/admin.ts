@@ -113,6 +113,7 @@ export type ReviewClubCreationApplicationRequest =
 export interface AdminTeacher {
   teacherId: number;
   teacherName: string;
+  matched: boolean;
 }
 
 export interface AdminTeachersResponse {
