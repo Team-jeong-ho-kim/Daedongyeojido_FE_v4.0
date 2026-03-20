@@ -15,7 +15,7 @@ export default function MemberItem({
   onDelete,
 }: MemberItemProps) {
   return (
-    <article className="group relative flex h-full min-w-0 w-full select-none flex-col overflow-hidden rounded-[14px] bg-white shadow-sm transition-all duration-300 hover:shadow-lg md:rounded-[16px]">
+    <article className="group relative flex h-full w-full min-w-0 select-none flex-col overflow-hidden rounded-[14px] bg-white shadow-sm transition-all duration-300 hover:shadow-lg md:rounded-[16px]">
       {/* 삭제 버튼 */}
       {canDelete && (
         <button

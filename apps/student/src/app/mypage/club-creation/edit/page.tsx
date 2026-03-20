@@ -15,7 +15,10 @@ import {
   TextArea,
   TextInput,
 } from "ui";
-import { getDocumentDownloadFileName, getDocumentFileExtensionLabel } from "utils";
+import {
+  getDocumentDownloadFileName,
+  getDocumentFileExtensionLabel,
+} from "utils";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import { FIELDS } from "@/constants/club";
 import {
@@ -106,7 +109,8 @@ export default function EditClubCreationApplicationPage() {
 
   const application = applicationQuery.data;
   const existingClubCreationFormUrl = application?.clubCreationForm ?? null;
-  const previewSource = clubCreationFormPreviewUrl ?? existingClubCreationFormUrl;
+  const previewSource =
+    clubCreationFormPreviewUrl ?? existingClubCreationFormUrl;
   const previewFileName = clubCreationFormFile
     ? getDocumentDownloadFileName(
         clubCreationFormFile.name,
@@ -191,9 +195,9 @@ export default function EditClubCreationApplicationPage() {
       return;
     }
 
-    const normalizedLinks = [...new Set(clubLinks.map((link) => link.url.trim()))].filter(
-      Boolean,
-    );
+    const normalizedLinks = [
+      ...new Set(clubLinks.map((link) => link.url.trim())),
+    ].filter(Boolean);
 
     try {
       shouldRedirectToDetailRef.current = false;
@@ -213,7 +217,11 @@ export default function EditClubCreationApplicationPage() {
     }
   };
 
-  if (applicationQuery.isPending || !application || !hasInitializedRef.current) {
+  if (
+    applicationQuery.isPending ||
+    !application ||
+    !hasInitializedRef.current
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6">
         <p className="text-gray-500 text-sm">
@@ -414,7 +422,7 @@ export default function EditClubCreationApplicationPage() {
       <div className="flex justify-center gap-3 py-16">
         <Link
           href="/mypage/club-creation"
-          className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-sm text-gray-700 transition hover:bg-gray-50"
+          className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 text-sm transition hover:bg-gray-50"
         >
           취소
         </Link>

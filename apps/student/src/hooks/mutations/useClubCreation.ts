@@ -46,9 +46,7 @@ export const useCreateClubCreationApplicationMutation = () => {
       router.replace("/mypage");
     },
     onError: (error: unknown) => {
-      toast.error(
-        getErrorMessage(error, "동아리 개설 신청에 실패했습니다."),
-      );
+      toast.error(getErrorMessage(error, "동아리 개설 신청에 실패했습니다."));
     },
   });
 };
