@@ -173,13 +173,15 @@ export default function ApplicationDetailPage() {
           <div className="mt-10 flex justify-end gap-3">
             {!isInterviewCompleted ? (
               <>
-                <button
-                  type="button"
-                  onClick={() => setShowInterviewModal(true)}
-                  className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
-                >
-                  면접 일정 설정
-                </button>
+                {!interviewSchedule && (
+                  <button
+                    type="button"
+                    onClick={() => setShowInterviewModal(true)}
+                    className="h-10 rounded-lg bg-primary-500 px-5 font-semibold text-sm text-white shadow-sm hover:bg-primary-600"
+                  >
+                    면접 일정 설정
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleShowDetail}
