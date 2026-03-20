@@ -21,84 +21,22 @@ import {
 } from "@/api/teacher";
 import { TeacherClubCreationPreviewModal } from "@/components/common";
 import { moveToWebLogin } from "@/lib/auth";
+import {
+  formatTeacherDateTime,
+  getTeacherReviewLockMessage,
+  getTeacherReviewRenderKey,
+  sortTeacherReviews,
+  TEACHER_DECISION_LABELS,
+  TEACHER_DECISION_STYLES,
+  TEACHER_REVIEW_DECISION_OPTIONS,
+  TEACHER_REVIEWER_LABELS,
+  TEACHER_STATUS_LABELS,
+} from "@/lib/clubCreation";
 import type {
   ClubCreationReviewDecision,
-  ClubCreationReviewerType,
   TeacherClubCreationApplicationDetailResponse,
   TeacherClubCreationReview,
 } from "@/types/teacher";
-
-const REVIEWER_LABELS: Record<ClubCreationReviewerType, string> = {
-  ADMIN: "관리자",
-  TEACHER: "지도 교사",
-};
-
-const DECISION_LABELS: Record<ClubCreationReviewDecision, string> = {
-  APPROVED: "승인",
-  CHANGES_REQUESTED: "수정 요청",
-  REJECTED: "반려",
-};
-
-const DECISION_STYLES: Record<ClubCreationReviewDecision, string> = {
-  APPROVED: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  CHANGES_REQUESTED: "border-amber-200 bg-amber-50 text-amber-700",
-  REJECTED: "border-red-200 bg-red-50 text-red-700",
-};
-
-const STATUS_LABELS = {
-  APPROVED: "승인 완료",
-  CHANGES_REQUESTED: "수정 요청",
-  REJECTED: "반려",
-  SUBMITTED: "제출 완료",
-  UNDER_REVIEW: "검토 중",
-} as const;
-
-const REVIEW_DECISION_OPTIONS = [
-  "APPROVED",
-  "CHANGES_REQUESTED",
-  "REJECTED",
-] as const;
-
-const getReviewLockMessage = (
-  decision: ClubCreationReviewDecision | null | undefined,
-) => {
-  if (decision === "APPROVED") {
-    return "이미 승인한 리뷰가 유지되고 있어 현재 추가 리뷰를 남길 수 없습니다.";
-  }
-
-  return "이미 최신 리뷰가 반영되었습니다. 학생이 다시 제출하면 다음 차수에서 다시 리뷰할 수 있습니다.";
-};
-
-const sortReviews = (reviews: TeacherClubCreationReview[]) =>
-  [...reviews].sort((a, b) => {
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
-
-const getReviewRenderKey = (review: TeacherClubCreationReview) => {
-  return [
-    review.revision,
-    review.reviewId,
-    review.reviewerType,
-    review.updatedAt,
-  ].join(":");
-};
-
-const formatDateTime = (value: string | null) => {
-  if (!value) {
-    return "-";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("ko-KR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
-};
 
 function ReviewSection({
   emptyMessage,
@@ -109,7 +47,7 @@ function ReviewSection({
   reviews: TeacherClubCreationReview[];
   title: string;
 }) {
-  const sortedReviews = useMemo(() => sortReviews(reviews), [reviews]);
+  const sortedReviews = useMemo(() => sortTeacherReviews(reviews), [reviews]);
 
   return (
     <section className="space-y-4">
@@ -126,17 +64,17 @@ function ReviewSection({
         <div className="space-y-4">
           {sortedReviews.map((review) => (
             <article
-              key={getReviewRenderKey(review)}
+              key={getTeacherReviewRenderKey(review)}
               className="rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 font-medium text-[12px] text-gray-600">
-                  {REVIEWER_LABELS[review.reviewerType]}
+                  {TEACHER_REVIEWER_LABELS[review.reviewerType]}
                 </span>
                 <span
-                  className={`rounded-full border px-3 py-1 font-medium text-[12px] ${DECISION_STYLES[review.decision]}`}
+                  className={`rounded-full border px-3 py-1 font-medium text-[12px] ${TEACHER_DECISION_STYLES[review.decision]}`}
                 >
-                  {DECISION_LABELS[review.decision]}
+                  {TEACHER_DECISION_LABELS[review.decision]}
                 </span>
                 <span className="text-gray-400 text-xs">
                   검토 차수 {review.revision}차
@@ -148,7 +86,7 @@ function ReviewSection({
                   {review.reviewerName}
                 </p>
                 <p className="mt-1 text-gray-400 text-xs">
-                  {formatDateTime(review.updatedAt)}
+                  {formatTeacherDateTime(review.updatedAt)}
                 </p>
               </div>
 
@@ -271,11 +209,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
     setDecision(currentTeacherReview?.decision ?? null);
     setFeedback(currentTeacherReview?.feedback ?? "");
     setReviewError("");
-  }, [
-    detail,
-    currentTeacherReview?.decision,
-    currentTeacherReview?.feedback,
-  ]);
+  }, [detail, currentTeacherReview?.decision, currentTeacherReview?.feedback]);
 
   const validateReviewForm = () => {
     if (!detail || isReviewSubmitting) {
@@ -442,7 +376,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
               <p className="text-gray-400 text-sm">현재 상태</p>
               <p className="mt-2 font-semibold text-gray-900">
                 {resolvedDetailStatus
-                  ? STATUS_LABELS[resolvedDetailStatus]
+                  ? TEACHER_STATUS_LABELS[resolvedDetailStatus]
                   : "-"}
               </p>
               <p className="mt-1 text-gray-500 text-sm">
@@ -452,7 +386,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
             <div className="rounded-2xl border border-gray-200 bg-white px-5 py-5 shadow-sm">
               <p className="text-gray-400 text-sm">최종 제출 시각</p>
               <p className="mt-2 font-semibold text-gray-900">
-                {formatDateTime(detail.lastSubmittedAt)}
+                {formatTeacherDateTime(detail.lastSubmittedAt)}
               </p>
             </div>
           </section>
@@ -536,12 +470,12 @@ export default function TeacherClubCreationApplicationDetailPage() {
             </h2>
             {isTeacherReviewLocked ? (
               <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 text-gray-600 text-sm leading-7">
-                {getReviewLockMessage(latestTeacherReview?.decision)}
+                {getTeacherReviewLockMessage(latestTeacherReview?.decision)}
               </div>
             ) : (
               <>
                 <div className="mt-5 grid gap-3 md:grid-cols-3">
-                  {REVIEW_DECISION_OPTIONS.map((option) => (
+                  {TEACHER_REVIEW_DECISION_OPTIONS.map((option) => (
                     <button
                       key={option}
                       type="button"
@@ -556,7 +490,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
                       }`}
                     >
                       <p className="font-semibold text-gray-900 text-sm">
-                        {DECISION_LABELS[option]}
+                        {TEACHER_DECISION_LABELS[option]}
                       </p>
                       <p className="mt-2 text-gray-500 text-xs leading-6">
                         {option === "APPROVED"
