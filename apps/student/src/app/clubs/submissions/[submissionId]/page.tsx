@@ -300,13 +300,15 @@ export default function SubmissionDetailPage({
                           면접 일정 조회
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => setShowSetScheduleModal(true)}
-                        className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
-                      >
-                        면접 일정 설정
-                      </button>
+                      {!hasSchedule && (
+                        <button
+                          type="button"
+                          onClick={() => setShowSetScheduleModal(true)}
+                          className="rounded-lg bg-primary-500 px-8 py-3 font-medium text-base text-white transition-colors hover:bg-primary-600"
+                        >
+                          면접 일정 설정
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
