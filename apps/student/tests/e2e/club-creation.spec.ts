@@ -209,7 +209,9 @@ test.describe("Student club creation", () => {
     );
   });
 
-  test("매칭된 지도 교사는 배지로 표시되고 선택할 수 없다", async ({ page }) => {
+  test("매칭된 지도 교사는 배지로 표시되고 선택할 수 없다", async ({
+    page,
+  }) => {
     await installStudentApiMocks(page, {
       teachers: [
         { teacherId: 1, teacherName: "홍길동", matched: true },
@@ -227,7 +229,7 @@ test.describe("Student club creation", () => {
       .filter({ hasText: "홍길동" });
 
     await expect(matchedTeacherCard.getByText("매칭됨")).toBeVisible();
-    await matchedTeacherCard.click();
+    await matchedTeacherCard.click({ force: true });
 
     await expect(
       page.getByText("이미 매칭된 지도교사는 선택할 수 없습니다."),
