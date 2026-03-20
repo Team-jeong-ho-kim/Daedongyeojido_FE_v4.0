@@ -37,7 +37,7 @@
       "outputs": []
     },
     "type-check": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^type-check"],
       "outputs": []
     },
     "dev": {
