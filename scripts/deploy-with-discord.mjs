@@ -106,16 +106,25 @@ const sendDiscordNotification = async ({ result, output }) => {
   };
 
   try {
-    const response = await fetch(webhookUrl, {
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-    });
-
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`Discord webhook failed (${response.status}): ${body}`);
-    }
+    execFileSync(
+      "curl",
+      [
+        "--fail",
+        "--silent",
+        "--show-error",
+        "-H",
+        "Content-Type: application/json",
+        "-X",
+        "POST",
+        "-d",
+        JSON.stringify(payload),
+        webhookUrl,
+      ],
+      {
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
+    console.log("[deploy-with-discord] Discord notification sent.");
   } catch (error) {
     console.warn(
       `[deploy-with-discord] Failed to send Discord notification: ${
@@ -160,4 +169,3 @@ child.on("close", async (code, signal) => {
 
   process.exit(code ?? 1);
 });
-
