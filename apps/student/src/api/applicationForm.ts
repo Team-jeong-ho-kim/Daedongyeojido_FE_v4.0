@@ -174,6 +174,12 @@ export const decidePass = async (
   await apiClient.patch(`/clubs/pass/${submissionId}`, data);
 };
 
+export const completeInterview = async (
+  submissionId: string,
+): Promise<void> => {
+  await apiClient.patch(`/clubs/interviews/${submissionId}/complete`);
+};
+
 export const getResultDuration =
   async (): Promise<ResultDurationResponse | null> => {
     try {

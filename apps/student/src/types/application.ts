@@ -90,6 +90,8 @@ export interface SubmissionDetail {
   major: string;
   answers: SubmissionAnswer[];
   hasInterviewSchedule: boolean;
+  interviewStatus?: "NOT_SCHEDULED" | "SCHEDULED" | "COMPLETED";
+  isInterviewCompleted?: boolean;
   clubApplicationStatus?: "SUBMITTED" | "WRITING" | "ACCEPTED" | "REJECTED";
 }
 
