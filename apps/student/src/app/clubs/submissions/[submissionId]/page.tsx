@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
+import { ApiError } from "utils";
 import {
+  completeInterview,
   createInterviewSchedule,
   decidePass,
   getInterviewSchedule,
@@ -22,6 +24,22 @@ interface SubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
 }
 
+const resolveInterviewStatus = (submission: SubmissionDetail) => {
+  if (submission.isInterviewCompleted) {
+    return "COMPLETED" as const;
+  }
+
+  if (
+    submission.hasInterviewSchedule ||
+    submission.interviewStatus === "SCHEDULED" ||
+    submission.interviewStatus === "COMPLETED"
+  ) {
+    return "SCHEDULED" as const;
+  }
+
+  return "NOT_SCHEDULED" as const;
+};
+
 export default function SubmissionDetailPage({
   params,
 }: SubmissionDetailPageProps) {
@@ -31,10 +49,9 @@ export default function SubmissionDetailPage({
   const [isLoading, setIsLoading] = useState(true);
   const [showSetScheduleModal, setShowSetScheduleModal] = useState(false);
   const [showViewScheduleModal, setShowViewScheduleModal] = useState(false);
-  const [hasSchedule, setHasSchedule] = useState(false);
   const [scheduleDetail, setScheduleDetail] =
     useState<InterviewScheduleDetail | null>(null);
-  const [isInterviewCompleted, setIsInterviewCompleted] = useState(false);
+  const [isCompletingInterview, setIsCompletingInterview] = useState(false);
   const [showPassConfirmModal, setShowPassConfirmModal] = useState(false);
   const [pendingDecision, setPendingDecision] = useState<
     "ACCEPTED" | "REJECTED" | null
@@ -54,7 +71,6 @@ export default function SubmissionDetailPage({
         setIsLoading(true);
         const data = await getSubmissionDetail(submissionId);
         setSubmission(data);
-        setHasSchedule(data.hasInterviewSchedule);
       } catch (error) {
         const errorMessage = getErrorMessage(
           error,
@@ -83,7 +99,15 @@ export default function SubmissionDetailPage({
     try {
       await createInterviewSchedule(submission.applicantId.toString(), data);
       toast.success("면접 일정이 설정되었습니다.");
-      setHasSchedule(true);
+      setSubmission((prev) =>
+        prev
+          ? {
+              ...prev,
+              hasInterviewSchedule: true,
+              interviewStatus: "SCHEDULED",
+            }
+          : prev,
+      );
       setShowSetScheduleModal(false);
     } catch (error) {
       const errorMessage = getErrorMessage(
@@ -128,8 +152,46 @@ export default function SubmissionDetailPage({
     }
   };
 
-  const handleInterviewComplete = () => {
-    setIsInterviewCompleted(true);
+  const handleInterviewComplete = async () => {
+    setIsCompletingInterview(true);
+
+    try {
+      await completeInterview(submissionId);
+      toast.success("면접 완료 처리되었습니다.");
+      setSubmission((prev) =>
+        prev
+          ? {
+              ...prev,
+              hasInterviewSchedule: true,
+              interviewStatus: "COMPLETED",
+              isInterviewCompleted: true,
+            }
+          : prev,
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        toast.success("이미 면접 완료 처리되었습니다.");
+        setSubmission((prev) =>
+          prev
+            ? {
+                ...prev,
+                hasInterviewSchedule: true,
+                interviewStatus: "COMPLETED",
+                isInterviewCompleted: true,
+              }
+            : prev,
+        );
+        return;
+      }
+
+      const errorMessage = getErrorMessage(
+        error,
+        "면접 완료 처리에 실패했습니다.",
+      );
+      toast.error(errorMessage);
+    } finally {
+      setIsCompletingInterview(false);
+    }
   };
 
   const handleDecidePass = async (isPassed: boolean) => {
@@ -197,6 +259,7 @@ export default function SubmissionDetailPage({
     typeof submission.major === "string"
       ? submission.major.split(",").map((m) => m.trim())
       : [submission.major];
+  const interviewStatus = resolveInterviewStatus(submission);
 
   return (
     <main className="min-h-screen bg-white">
@@ -312,7 +375,7 @@ export default function SubmissionDetailPage({
               submission.clubApplicationStatus !== "REJECTED" &&
               !localPassStatus && (
                 <div className="flex justify-end gap-4">
-                  {isInterviewCompleted && isClubLeader ? (
+                  {interviewStatus === "COMPLETED" && isClubLeader ? (
                     <>
                       <button
                         type="button"
@@ -333,7 +396,7 @@ export default function SubmissionDetailPage({
                     </>
                   ) : (
                     <>
-                      {hasSchedule && (
+                      {interviewStatus === "SCHEDULED" && (
                         <button
                           type="button"
                           onClick={handleViewSchedule}
@@ -342,16 +405,17 @@ export default function SubmissionDetailPage({
                           면접 일정 조회
                         </button>
                       )}
-                      {hasSchedule && (
+                      {interviewStatus === "SCHEDULED" && (
                         <button
                           type="button"
                           onClick={handleInterviewComplete}
-                          className="rounded-lg bg-[#FF7575] px-8 py-3 font-medium text-base text-white transition-colors hover:bg-[#FF6464]"
+                          disabled={isCompletingInterview}
+                          className="rounded-lg bg-[#FF7575] px-8 py-3 font-medium text-base text-white transition-colors hover:bg-[#FF6464] disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          면접완료
+                          {isCompletingInterview ? "처리 중..." : "면접완료"}
                         </button>
                       )}
-                      {!hasSchedule && (
+                      {interviewStatus === "NOT_SCHEDULED" && (
                         <button
                           type="button"
                           onClick={() => setShowSetScheduleModal(true)}
