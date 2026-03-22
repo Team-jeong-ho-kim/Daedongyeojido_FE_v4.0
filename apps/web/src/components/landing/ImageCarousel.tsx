@@ -42,7 +42,7 @@ export function ImageCarousel() {
         onClick={() =>
           setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
         }
-        className="-translate-y-1/2 -left-10 md:-left-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
+        className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full bg-gray-100 p-2 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:-left-14 md:p-3"
         aria-label="이전 슬라이드"
       >
         <svg
@@ -64,7 +64,7 @@ export function ImageCarousel() {
       <button
         type="button"
         onClick={() => setCurrentIndex((prev) => (prev + 1) % images.length)}
-        className="-translate-y-1/2 -right-10 md:-right-14 absolute top-1/2 rounded-full bg-gray-100 p-2.5 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:p-3"
+        className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full bg-gray-100 p-2 text-gray-500 shadow-md transition-colors hover:bg-gray-200 md:-right-14 md:p-3"
         aria-label="다음 슬라이드"
       >
         <svg
