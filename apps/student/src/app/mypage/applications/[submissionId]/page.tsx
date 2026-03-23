@@ -61,9 +61,9 @@ export default function MySubmissionDetailPage({
   };
 
   const fromHistory = searchParams.get("from") === "history";
-  const canEditSubmission = submission?.user_application_status === "WRITING";
-  const canCancelSubmission =
-    submission?.user_application_status === "SUBMITTED";
+  const showDraftActions = !fromHistory;
+  const showCancelAction =
+    fromHistory && submission?.user_application_status === "SUBMITTED";
 
   const handleSubmitApplication = async () => {
     try {
@@ -217,7 +217,7 @@ export default function MySubmissionDetailPage({
 
         {/* 하단 버튼 */}
         <div className="flex justify-center gap-4">
-          {canEditSubmission && !fromHistory && (
+          {showDraftActions && (
             <>
               <button
                 type="button"
@@ -246,7 +246,7 @@ export default function MySubmissionDetailPage({
               </button>
             </>
           )}
-          {canCancelSubmission && (
+          {showCancelAction && (
             <button
               type="button"
               onClick={() => setShowCancelModal(true)}
