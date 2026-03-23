@@ -6,38 +6,28 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SkeletonListItem, useDeferredLoading } from "ui";
 import { Pagination } from "@/components/common/Pagination";
-import { useGetMySubmissionHistoryQuery } from "@/hooks/querys/useApplicationFormQuery";
+import {
+  useGetMySubmissionHistoryQuery,
+  useResultDurationQuery,
+} from "@/hooks/querys/useApplicationFormQuery";
+import { useInvalidateQueriesAtResultTime } from "@/hooks/useInvalidateQueriesAtResultTime";
+import { queryKeys } from "@/lib/queryKeys";
+import type { ApplicationStatus } from "@/types";
 
 type ApplicationStatusLabel = "합격" | "제출됨" | "불합격" | "작성중";
 
-const getStatusStyle = (status: ApplicationStatusLabel) => {
-  switch (status) {
-    case "합격":
-      return "border-blue-500 text-blue-500";
-    case "불합격":
-      return "border-red-500 text-red-500";
-    case "작성중":
-      return "border-yellow-500 text-yellow-600";
-    case "제출됨":
-      return "border-gray-800 text-gray-800";
-    default:
-      return "border-gray-800 text-gray-800";
-  }
+const STATUS_STYLES: Record<ApplicationStatusLabel, string> = {
+  작성중: "border-yellow-500 text-yellow-600",
+  불합격: "border-red-500 text-red-500",
+  제출됨: "border-gray-800 text-gray-800",
+  합격: "border-blue-500 text-blue-500",
 };
 
-const getStatusLabel = (status: string): ApplicationStatusLabel => {
-  switch (status) {
-    case "SUBMITTED":
-      return "제출됨";
-    case "WRITING":
-      return "작성중";
-    case "ACCEPTED":
-      return "합격";
-    case "REJECTED":
-      return "불합격";
-    default:
-      return "제출됨";
-  }
+const STATUS_LABELS: Record<ApplicationStatus, ApplicationStatusLabel> = {
+  WRITING: "작성중",
+  SUBMITTED: "제출됨",
+  ACCEPTED: "합격",
+  REJECTED: "불합격",
 };
 
 export default function ApplicationHistoryPage() {
@@ -46,7 +36,16 @@ export default function ApplicationHistoryPage() {
   const limit = 5;
 
   const { data: submissionsData, isPending } = useGetMySubmissionHistoryQuery();
+  const { data: resultDurationData } = useResultDurationQuery();
   const showSkeleton = useDeferredLoading(isPending);
+
+  useInvalidateQueriesAtResultTime({
+    invalidateQueryKeys: [
+      queryKeys.applications.history.queryKey,
+      queryKeys.applications.mine.queryKey,
+    ],
+    resultDuration: resultDurationData?.resultDuration,
+  });
 
   const submissions = (submissionsData || []).sort(
     (a, b) => b.submissionId - a.submissionId,
@@ -55,13 +54,8 @@ export default function ApplicationHistoryPage() {
   const offset = (curPage - 1) * limit;
   const currentHistory = submissions.slice(offset, offset + limit);
 
-  const handleHistoryClick = (
-    submissionId: number,
-    user_application_status: string,
-  ) => {
-    router.push(
-      `/mypage/applications/${submissionId}?from=history&status=${user_application_status}`,
-    );
+  const handleHistoryClick = (submissionId: number) => {
+    router.push(`/mypage/applications/${submissionId}?from=history`);
   };
 
   return (
@@ -101,19 +95,13 @@ export default function ApplicationHistoryPage() {
           <>
             <div className="space-y-4">
               {currentHistory.map((history) => {
-                const statusLabel = getStatusLabel(
-                  history.user_application_status,
-                );
+                const statusLabel =
+                  STATUS_LABELS[history.user_application_status];
                 return (
                   <button
                     key={history.submissionId}
                     type="button"
-                    onClick={() =>
-                      handleHistoryClick(
-                        history.submissionId,
-                        history.user_application_status,
-                      )
-                    }
+                    onClick={() => handleHistoryClick(history.submissionId)}
                     className="flex w-full items-center gap-6 rounded-2xl bg-gray-50 px-8 py-6 transition-colors hover:bg-gray-100"
                   >
                     <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl">
@@ -140,7 +128,7 @@ export default function ApplicationHistoryPage() {
                       <div className="flex items-center gap-2 text-gray-600 text-sm">
                         <span className="font-normal">지원서 상태 :</span>
                         <span
-                          className={`rounded-full border px-3 py-1 text-xs ${getStatusStyle(statusLabel)}`}
+                          className={`rounded-full border px-3 py-1 text-xs ${STATUS_STYLES[statusLabel]}`}
                         >
                           {statusLabel}
                         </span>

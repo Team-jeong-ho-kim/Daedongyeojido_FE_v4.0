@@ -5,16 +5,19 @@ export const runtime = "edge";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { use, useEffect, useState } from "react";
-import { toast } from "sonner";
-import {
-  cancelMySubmission,
-  deleteMySubmission,
-  getMySubmissionDetail,
-  submitMySubmission,
-} from "@/api/applicationForm";
+import { use, useState } from "react";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
-import type { MySubmissionDetail } from "@/types";
+import {
+  useCancelMySubmissionMutation,
+  useDeleteMySubmissionMutation,
+  useSubmitMySubmissionMutation,
+} from "@/hooks/mutations/useApplicationForm";
+import {
+  useGetMySubmissionDetailQuery,
+  useResultDurationQuery,
+} from "@/hooks/querys/useApplicationFormQuery";
+import { useInvalidateQueriesAtResultTime } from "@/hooks/useInvalidateQueriesAtResultTime";
+import { queryKeys } from "@/lib/queryKeys";
 
 interface MySubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
@@ -26,32 +29,27 @@ export default function MySubmissionDetailPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { submissionId } = use(params);
-  const [submission, setSubmission] = useState<MySubmissionDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isCanceling, setIsCanceling] = useState(false);
+  const {
+    data: submission,
+    isError,
+    isPending,
+  } = useGetMySubmissionDetailQuery(submissionId);
+  const { data: resultDurationData } = useResultDurationQuery();
+  const submitMutation = useSubmitMySubmissionMutation();
+  const deleteMutation = useDeleteMySubmissionMutation();
+  const cancelMutation = useCancelMySubmissionMutation();
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  useEffect(() => {
-    const fetchSubmission = async () => {
-      try {
-        setIsLoading(true);
-        const data = await getMySubmissionDetail(submissionId);
-        setSubmission(data);
-      } catch (error) {
-        console.error("지원내역 조회 실패:", error);
-        toast.error("지원내역을 불러올 수 없습니다.");
-        router.back();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSubmission();
-  }, [submissionId, router]);
+  useInvalidateQueriesAtResultTime({
+    invalidateQueryKeys: [
+      queryKeys.applications.history.queryKey,
+      queryKeys.applications.mine.queryKey,
+      queryKeys.applications.mySubmission(submissionId).queryKey,
+    ],
+    resultDuration: resultDurationData?.resultDuration,
+  });
 
   const formatDeadline = (
     submissionDuration: string | [number, number, number],
@@ -63,64 +61,49 @@ export default function MySubmissionDetailPage({
   };
 
   const fromHistory = searchParams.get("from") === "history";
-  const statusParam = searchParams.get("status");
-  const isSubmitted =
-    statusParam === "SUBMITTED" ||
+  const canEditSubmission = submission?.user_application_status === "WRITING";
+  const canCancelSubmission =
     submission?.user_application_status === "SUBMITTED";
 
   const handleSubmitApplication = async () => {
-    setIsSubmitting(true);
     try {
-      await submitMySubmission(submissionId);
-      toast.success("지원서가 제출되었습니다.");
+      await submitMutation.mutateAsync(submissionId);
       setShowSubmitModal(false);
-      router.push("/mypage/history");
     } catch (error) {
       console.error("지원서 제출 실패:", error);
-      toast.error("지원서 제출에 실패했습니다.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const handleDeleteApplication = async () => {
-    setIsDeleting(true);
     try {
-      await deleteMySubmission(submissionId);
-      toast.success("지원서가 삭제되었습니다.");
+      await deleteMutation.mutateAsync(submissionId);
       setShowDeleteModal(false);
-      router.push("/mypage/applications");
     } catch (error) {
       console.error("지원서 삭제 실패:", error);
-      toast.error("지원서 삭제에 실패했습니다.");
-    } finally {
-      setIsDeleting(false);
     }
   };
 
   const handleCancelApplication = async () => {
-    setIsCanceling(true);
     try {
-      await cancelMySubmission(submissionId);
-      toast.success("지원이 취소되었습니다.");
+      await cancelMutation.mutateAsync(submissionId);
       setShowCancelModal(false);
-      router.push("/mypage/applications");
     } catch (error) {
       console.error("지원 취소 실패:", error);
-      toast.error("지원 취소에 실패했습니다.");
-    } finally {
-      setIsCanceling(false);
     }
   };
 
-  if (isLoading || !submission) {
+  if (isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <p className="text-gray-500 text-lg">
-          {isLoading
-            ? "지원내역을 불러오는 중..."
-            : "지원내역을 찾을 수 없습니다."}
-        </p>
+        <p className="text-gray-500 text-lg">지원내역을 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (isError || !submission) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">지원내역을 찾을 수 없습니다.</p>
       </div>
     );
   }
@@ -234,7 +217,7 @@ export default function MySubmissionDetailPage({
 
         {/* 하단 버튼 */}
         <div className="flex justify-center gap-4">
-          {!isSubmitted && !fromHistory && (
+          {canEditSubmission && !fromHistory && (
             <>
               <button
                 type="button"
@@ -248,38 +231,36 @@ export default function MySubmissionDetailPage({
               <button
                 type="button"
                 onClick={() => setShowSubmitModal(true)}
-                disabled={isSubmitting}
+                disabled={submitMutation.isPending}
                 className="rounded-xl bg-[#E85D5D] px-8 py-3 font-medium text-white transition-colors hover:bg-[#d14d4d] disabled:cursor-not-allowed disabled:bg-gray-400"
               >
-                {isSubmitting ? "제출 중..." : "제출하기"}
+                {submitMutation.isPending ? "제출 중..." : "제출하기"}
               </button>
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(true)}
-                disabled={isDeleting}
+                disabled={deleteMutation.isPending}
                 className="rounded-xl border border-red-500 bg-white px-8 py-3 font-medium text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
               >
-                {isDeleting ? "삭제 중..." : "삭제하기"}
+                {deleteMutation.isPending ? "삭제 중..." : "삭제하기"}
               </button>
             </>
           )}
-          {(isSubmitted || fromHistory) && (
+          {canCancelSubmission && (
             <button
               type="button"
               onClick={() => setShowCancelModal(true)}
-              disabled={isCanceling}
+              disabled={cancelMutation.isPending}
               className="rounded-xl border border-red-500 bg-white px-8 py-3 font-medium text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
             >
-              {isCanceling ? "취소 중..." : "제출 취소하기"}
+              {cancelMutation.isPending ? "취소 중..." : "제출 취소하기"}
             </button>
           )}
           <button
             type="button"
             onClick={() =>
               router.push(
-                fromHistory || isSubmitted
-                  ? "/mypage/history"
-                  : "/mypage/applications",
+                fromHistory ? "/mypage/history" : "/mypage/applications",
               )
             }
             className="rounded-xl border border-gray-300 bg-white px-8 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"

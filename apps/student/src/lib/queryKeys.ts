@@ -26,6 +26,9 @@ export const queryKeys = createQueryKeyStore({
     mySubmission: (submissionId: string) => [submissionId],
     history: null,
   },
+  result: {
+    duration: null,
+  },
   alarms: {
     user: null,
     club: null,
