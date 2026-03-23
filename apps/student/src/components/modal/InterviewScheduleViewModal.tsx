@@ -378,7 +378,7 @@ export function InterviewScheduleViewModal({
                 onClick={handleEdit}
                 className="flex-1 rounded-lg border border-primary-500 bg-white py-4 font-semibold text-lg text-primary-500 transition-colors duration-200 hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
-                수정
+                변경
               </button>
             )}
           </div>
