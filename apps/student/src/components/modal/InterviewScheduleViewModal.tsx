@@ -141,13 +141,13 @@ export function InterviewScheduleViewModal({
         interviewTime,
       });
 
-      toast.success("면접 일정이 수정되었습니다.");
+      toast.success("면접 일정이 변경되었습니다.");
       setIsEditMode(false);
       onUpdate?.();
     } catch (error) {
       const errorMessage = getErrorMessage(
         error,
-        "면접 일정 수정에 실패했습니다.",
+        "면접 일정 변경에 실패했습니다.",
       );
       toast.error(errorMessage);
     } finally {
