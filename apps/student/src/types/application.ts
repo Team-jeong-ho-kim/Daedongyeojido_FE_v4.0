@@ -6,6 +6,17 @@ export interface CreateApplicationFormRequest {
   majors: string[];
 }
 
+export type ApplicationStatus =
+  | "WRITING"
+  | "SUBMITTED"
+  | "ACCEPTED"
+  | "REJECTED";
+
+export type DraftApplicationStatus = Extract<
+  ApplicationStatus,
+  "WRITING" | "SUBMITTED"
+>;
+
 export interface ApplicationForm {
   id: number;
   applicationFormTitle: string;
@@ -69,7 +80,7 @@ export interface ApplicationSubmission {
   userName: string;
   classNumber: string;
   major: string[] | string;
-  clubApplicationStatus?: "SUBMITTED" | "WRITING" | "ACCEPTED" | "REJECTED";
+  clubApplicationStatus?: ApplicationStatus;
 }
 
 export interface ApplicationSubmissionsResponse {
@@ -92,7 +103,7 @@ export interface SubmissionDetail {
   hasInterviewSchedule: boolean;
   interviewStatus?: "NOT_SCHEDULED" | "SCHEDULED" | "COMPLETED";
   isInterviewCompleted?: boolean;
-  clubApplicationStatus?: "SUBMITTED" | "WRITING" | "ACCEPTED" | "REJECTED";
+  clubApplicationStatus?: ApplicationStatus;
 }
 
 // My Application Types
@@ -100,7 +111,7 @@ export interface MyApplication {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  user_application_status: "WRITING" | "SUBMITTED";
+  user_application_status: DraftApplicationStatus;
   submissionDuration: string | [number, number, number];
 }
 
@@ -112,12 +123,20 @@ export interface MySubmissionHistoryItem {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  user_application_status: string;
+  user_application_status: ApplicationStatus;
+  submissionDuration: string | [number, number, number];
+}
+
+export interface MySubmissionHistoryResponseItem {
+  submissionId: number;
+  clubName: string;
+  clubImage?: string;
+  applicationStatus: ApplicationStatus;
   submissionDuration: string | [number, number, number];
 }
 
 export interface MySubmissionHistoryResponse {
-  submissions: MySubmissionHistoryItem[];
+  submissions: MySubmissionHistoryResponseItem[];
 }
 
 export interface MySubmissionAnswer {
@@ -137,7 +156,7 @@ export interface MySubmissionDetail {
   availableMajors?: string[];
   contents: MySubmissionAnswer[];
   submissionDuration: string | [number, number, number];
-  user_application_status?: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";
+  user_application_status?: ApplicationStatus;
 }
 
 export interface UpdateMySubmissionRequest {

@@ -6,7 +6,9 @@ import {
   getClubApplicationForms,
   getDocumentFiles,
   getMyApplications,
+  getMySubmissionDetail,
   getMySubmissionHistory,
+  getResultDuration,
   getUserAlarms,
 } from "@/api/applicationForm";
 import { queryKeys } from "@/lib/queryKeys";
@@ -46,6 +48,21 @@ export const useGetMySubmissionHistoryQuery = () => {
   return useQuery({
     queryKey: queryKeys.applications.history.queryKey,
     queryFn: () => getMySubmissionHistory(),
+  });
+};
+
+export const useGetMySubmissionDetailQuery = (submissionId: string) => {
+  return useQuery({
+    queryKey: queryKeys.applications.mySubmission(submissionId).queryKey,
+    queryFn: () => getMySubmissionDetail(submissionId),
+    enabled: !!submissionId,
+  });
+};
+
+export const useResultDurationQuery = () => {
+  return useQuery({
+    queryKey: queryKeys.result.duration.queryKey,
+    queryFn: () => getResultDuration(),
   });
 };
 

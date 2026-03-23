@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
+  cancelMySubmission,
   decidePass,
   deleteApplicationForm,
   deleteDocumentFile,
@@ -151,7 +152,7 @@ export const useSubmitMySubmissionMutation = () => {
 
   return useMutation({
     mutationFn: (submissionId: string) => submitMySubmission(submissionId),
-    onSuccess: () => {
+    onSuccess: (_, submissionId) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.applications.all.queryKey,
       });
@@ -160,6 +161,9 @@ export const useSubmitMySubmissionMutation = () => {
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.applications.history.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mySubmission(submissionId).queryKey,
       });
       toast.success("지원서가 제출되었습니다.");
       router.push("/mypage/history");
@@ -180,12 +184,18 @@ export const useDeleteMySubmissionMutation = () => {
 
   return useMutation({
     mutationFn: (submissionId: string) => deleteMySubmission(submissionId),
-    onSuccess: () => {
+    onSuccess: (_, submissionId) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.applications.all.queryKey,
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.applications.mine.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.history.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mySubmission(submissionId).queryKey,
       });
       toast.success("지원서가 삭제되었습니다.");
       router.push("/mypage/applications");
@@ -194,6 +204,38 @@ export const useDeleteMySubmissionMutation = () => {
       const errorMessage = getErrorMessage(
         error,
         "지원서 삭제에 실패했습니다. 다시 시도해주세요.",
+      );
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useCancelMySubmissionMutation = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  return useMutation({
+    mutationFn: (submissionId: string) => cancelMySubmission(submissionId),
+    onSuccess: (_, submissionId) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.all.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mine.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.history.queryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.applications.mySubmission(submissionId).queryKey,
+      });
+      toast.success("지원이 취소되었습니다.");
+      router.push("/mypage/applications");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getErrorMessage(
+        error,
+        "지원 취소에 실패했습니다. 다시 시도해주세요.",
       );
       toast.error(errorMessage);
     },

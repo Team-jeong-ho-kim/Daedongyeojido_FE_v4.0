@@ -3,37 +3,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getResultDuration } from "@/api/applicationForm";
+import { useResultDurationQuery } from "@/hooks/querys";
+
+const formatResultPeriod = (resultDuration?: string | null) => {
+  if (!resultDuration) {
+    return "동아리 면접 결과 발표일 기간이 설정되지 않았습니다";
+  }
+
+  const date = new Date(resultDuration);
+  if (Number.isNaN(date.getTime())) {
+    return "발표 기간 미정";
+  }
+
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hour24 = date.getHours();
+  const minute = date.getMinutes();
+  const period = hour24 < 12 ? "오전" : "오후";
+  const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
+
+  return `동아리 면접 결과 발표일: ${month}월 ${day}일 ${period} ${hour12}시${minute > 0 ? ` ${minute}분` : ""}`;
+};
 
 export default function MainBanner() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [resultPeriod, setResultPeriod] = useState<string>("발표 기간 미정");
-
-  useEffect(() => {
-    const fetchResultDuration = async () => {
-      const data = await getResultDuration();
-      if (data?.resultDuration) {
-        // 날짜 및 시간 포맷팅 (예: "2026-08-01T17:30:00" -> "8월 1일 오후 5시 30분")
-        const date = new Date(data.resultDuration);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const hour24 = date.getHours();
-        const minute = date.getMinutes();
-
-        // 12시간 형식으로 변환
-        const period = hour24 < 12 ? "오전" : "오후";
-        const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
-
-        setResultPeriod(
-          `동아리 면접 결과 발표일: ${month}월 ${day}일 ${period} ${hour12}시${minute > 0 ? ` ${minute}분` : ""}`,
-        );
-      } else {
-        setResultPeriod("동아리 면접 결과 발표일 기간이 설정되지 않았습니다");
-      }
-    };
-
-    fetchResultDuration();
-  }, []);
+  const { data: resultDurationData } = useResultDurationQuery();
+  const resultPeriod = formatResultPeriod(resultDurationData?.resultDuration);
 
   const slides = [
     {

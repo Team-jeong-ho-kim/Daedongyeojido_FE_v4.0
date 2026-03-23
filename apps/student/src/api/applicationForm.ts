@@ -18,6 +18,7 @@ import type {
   MySubmissionDetail,
   MySubmissionHistoryItem,
   MySubmissionHistoryResponse,
+  MySubmissionHistoryResponseItem,
   ResultDurationResponse,
   SubmissionDetail,
   SubmitApplicationRequest,
@@ -107,7 +108,15 @@ export const getMySubmissionHistory = async (): Promise<
 > => {
   const response =
     await apiClient.get<MySubmissionHistoryResponse>("/users/submissions");
-  return response.data.submissions;
+  return response.data.submissions.map(
+    ({
+      applicationStatus,
+      ...submission
+    }: MySubmissionHistoryResponseItem): MySubmissionHistoryItem => ({
+      ...submission,
+      user_application_status: applicationStatus,
+    }),
+  );
 };
 
 export const getMySubmissionDetail = async (
