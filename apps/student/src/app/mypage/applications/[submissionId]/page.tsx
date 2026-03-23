@@ -62,8 +62,13 @@ export default function MySubmissionDetailPage({
 
   const fromHistory = searchParams.get("from") === "history";
   const showDraftActions = !fromHistory;
+  const hasFinalDecision =
+    submission?.clubApplicationStatus === "ACCEPTED" ||
+    submission?.clubApplicationStatus === "REJECTED";
   const showCancelAction =
-    fromHistory && submission?.user_application_status === "SUBMITTED";
+    fromHistory &&
+    !hasFinalDecision &&
+    submission?.userApplicationStatus === "SUBMITTED";
 
   const handleSubmitApplication = async () => {
     try {
@@ -196,7 +201,7 @@ export default function MySubmissionDetailPage({
           <div className="space-y-6">
             {submission.contents.map((item, index) => (
               <div
-                key={item.applicationQuestionId}
+                key={item.applicationQuestionId ?? `${item.question}-${index}`}
                 className="rounded-2xl border border-gray-200 bg-white p-6"
               >
                 <div className="mb-4 flex items-start gap-3">

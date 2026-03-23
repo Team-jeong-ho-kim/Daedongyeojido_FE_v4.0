@@ -16,6 +16,7 @@ import type {
   MyApplication,
   MyApplicationsResponse,
   MySubmissionDetail,
+  MySubmissionDetailResponse,
   MySubmissionHistoryItem,
   MySubmissionHistoryResponse,
   MySubmissionHistoryResponseItem,
@@ -109,12 +110,8 @@ export const getMySubmissionHistory = async (): Promise<
   const response =
     await apiClient.get<MySubmissionHistoryResponse>("/users/submissions");
   return response.data.submissions.map(
-    ({
-      applicationStatus,
-      ...submission
-    }: MySubmissionHistoryResponseItem): MySubmissionHistoryItem => ({
+    (submission: MySubmissionHistoryResponseItem): MySubmissionHistoryItem => ({
       ...submission,
-      user_application_status: applicationStatus,
     }),
   );
 };
@@ -122,7 +119,7 @@ export const getMySubmissionHistory = async (): Promise<
 export const getMySubmissionDetail = async (
   submissionId: string,
 ): Promise<MySubmissionDetail> => {
-  const response = await apiClient.get<MySubmissionDetail>(
+  const response = await apiClient.get<MySubmissionDetailResponse>(
     `/applications/${submissionId}`,
   );
   return response.data;

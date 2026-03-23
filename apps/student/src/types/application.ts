@@ -111,7 +111,7 @@ export interface MyApplication {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  user_application_status: DraftApplicationStatus;
+  userApplicationStatus: DraftApplicationStatus;
   submissionDuration: string | [number, number, number];
 }
 
@@ -123,7 +123,7 @@ export interface MySubmissionHistoryItem {
   submissionId: number;
   clubName: string;
   clubImage?: string;
-  user_application_status: ApplicationStatus;
+  applicationStatus: ApplicationStatus;
   submissionDuration: string | [number, number, number];
 }
 
@@ -140,10 +140,28 @@ export interface MySubmissionHistoryResponse {
 }
 
 export interface MySubmissionAnswer {
-  applicationQuestionId: number;
+  applicationQuestionId?: number;
   question: string;
-  applicationAnswerId: number;
+  applicationAnswerId?: number;
   answer: string;
+}
+
+export interface MySubmissionDetailResponse {
+  clubName: string;
+  clubImage?: string;
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  userApplicationStatus?: ApplicationStatus;
+  clubApplicationStatus?: ApplicationStatus;
+  contents: Array<{
+    question: string;
+    answer: string;
+    applicationQuestionId?: number;
+    applicationAnswerId?: number;
+  }>;
+  submissionDuration: string | [number, number, number];
 }
 
 export interface MySubmissionDetail {
@@ -156,7 +174,8 @@ export interface MySubmissionDetail {
   availableMajors?: string[];
   contents: MySubmissionAnswer[];
   submissionDuration: string | [number, number, number];
-  user_application_status?: ApplicationStatus;
+  userApplicationStatus?: ApplicationStatus;
+  clubApplicationStatus?: ApplicationStatus;
 }
 
 export interface UpdateMySubmissionRequest {

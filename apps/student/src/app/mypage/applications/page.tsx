@@ -115,9 +115,9 @@ export default function MyApplicationsPage() {
                           {application.clubName}
                         </span>
                         <span
-                          className={`rounded-md border px-2 py-0.5 font-medium text-xs ${getStatusColor(application.user_application_status)}`}
+                          className={`rounded-md border px-2 py-0.5 font-medium text-xs ${getStatusColor(application.userApplicationStatus)}`}
                         >
-                          {getStatusText(application.user_application_status)}
+                          {getStatusText(application.userApplicationStatus)}
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-gray-600 text-sm">
