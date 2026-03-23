@@ -105,15 +105,18 @@ export default function LinkInput({
           {links.map((link) => (
             <div
               key={link.id}
-              className="flex items-center gap-2 rounded-full border border-[#D5D5D5] bg-white px-4 py-2"
+              className="flex min-w-0 max-w-full items-start gap-2 rounded-2xl border border-[#D5D5D5] bg-white px-4 py-2"
             >
-              <span className="whitespace-nowrap text-[#666666] text-[13px]">
+              <span
+                className="min-w-0 flex-1 break-all text-[#666666] text-[13px]"
+                title={link.url}
+              >
                 {link.url}
               </span>
               <button
                 type="button"
                 onClick={() => removeLink(link.id)}
-                className="text-[#999999] hover:text-[#666666]"
+                className="shrink-0 text-[#999999] hover:text-[#666666]"
                 aria-label="링크 삭제"
               >
                 <svg
