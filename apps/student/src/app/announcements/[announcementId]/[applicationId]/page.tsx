@@ -11,7 +11,7 @@ import {
   InterviewScheduleModal,
 } from "@/components";
 
-// Mock data - 실제로는 서버에서 받아올 데이터
+// Mock data
 const mockData = {
   name: "박태수",
   studentId: "2107",
@@ -64,7 +64,6 @@ export default function ApplicationDetailPage() {
     setInterviewSchedule(schedule);
     console.log("면접 일정 저장:", schedule);
     toast.success(`${mockData.name}님의 면접 일정이 설정되었습니다.`);
-    // TODO: API 호출
   };
 
   const handleShowDetail = () => {
@@ -84,17 +83,14 @@ export default function ApplicationDetailPage() {
     setIsInterviewCompleted(true);
     setShowConfirmModal(false);
     toast.success("면접이 완료되었습니다.");
-    // TODO: API 호출
   };
 
   const handleReject = () => {
     toast.success("지원자를 탈락 처리했습니다.");
-    // TODO: API 호출
   };
 
   const handleAccept = () => {
     toast.success("지원자를 합격 처리했습니다.");
-    // TODO: API 호출
   };
   return (
     <main className="min-h-screen bg-white">

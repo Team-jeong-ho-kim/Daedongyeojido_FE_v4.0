@@ -126,7 +126,7 @@ export default function ApplyDetailPage({
         ),
       };
       await submitApplication(applicationFormId, submitData);
-      toast.success("지원서가 제출되었습니다.");
+      toast.success("지원서가 생성되었습니다.");
       // 성공 시 임시저장 데이터 삭제
       localStorage.removeItem(`apply_${announcementId}`);
       return true;
