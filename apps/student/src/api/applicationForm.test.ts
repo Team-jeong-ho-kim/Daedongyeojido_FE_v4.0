@@ -1,5 +1,8 @@
 import { apiClient } from "utils";
-import { getMySubmissionHistory } from "./applicationForm";
+import {
+  getMySubmissionDetail,
+  getMySubmissionHistory,
+} from "./applicationForm";
 
 vi.mock("utils", () => ({
   apiClient: {
@@ -8,7 +11,7 @@ vi.mock("utils", () => ({
 }));
 
 describe("getMySubmissionHistory", () => {
-  it("maps applicationStatus from the server response to user_application_status", async () => {
+  it("keeps applicationStatus from the server response", async () => {
     vi.mocked(apiClient.get).mockResolvedValue({
       data: {
         submissions: [
@@ -29,8 +32,50 @@ describe("getMySubmissionHistory", () => {
         clubName: "coehgns",
         submissionDuration: "2026-12-23",
         submissionId: 6,
-        user_application_status: "SUBMITTED",
+        applicationStatus: "SUBMITTED",
       },
     ]);
+  });
+});
+
+describe("getMySubmissionDetail", () => {
+  it("keeps userApplicationStatus and clubApplicationStatus from the server response", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: {
+        classNumber: "2101",
+        clubApplicationStatus: "ACCEPTED",
+        clubImage: "https://example.com/image.jpeg",
+        clubName: "백로란트",
+        contents: [
+          {
+            answer: "...",
+            question: "지원 동기",
+          },
+        ],
+        introduction: "안녕하세요",
+        major: "FE",
+        submissionDuration: "2026-03-30",
+        userApplicationStatus: "SUBMITTED",
+        userName: "홍길동",
+      },
+    });
+
+    await expect(getMySubmissionDetail("6")).resolves.toEqual({
+      classNumber: "2101",
+      clubApplicationStatus: "ACCEPTED",
+      clubImage: "https://example.com/image.jpeg",
+      clubName: "백로란트",
+      contents: [
+        {
+          answer: "...",
+          question: "지원 동기",
+        },
+      ],
+      introduction: "안녕하세요",
+      major: "FE",
+      submissionDuration: "2026-03-30",
+      userName: "홍길동",
+      userApplicationStatus: "SUBMITTED",
+    });
   });
 });

@@ -95,8 +95,7 @@ export default function ApplicationHistoryPage() {
           <>
             <div className="space-y-4">
               {currentHistory.map((history) => {
-                const statusLabel =
-                  STATUS_LABELS[history.user_application_status];
+                const statusLabel = STATUS_LABELS[history.applicationStatus];
                 return (
                   <button
                     key={history.submissionId}
