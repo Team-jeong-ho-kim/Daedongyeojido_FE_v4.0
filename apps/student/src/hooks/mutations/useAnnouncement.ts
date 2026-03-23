@@ -19,7 +19,7 @@ export const useCreateAnnouncementMutation = (clubId?: string) => {
     mutationFn: (data: AnnouncementCreate) => createAnnouncement(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.announcements._def });
-      toast.success("공고 등록이 완료되었습니다");
+      toast.success("공고 생성이 완료되었습니다");
       setTimeout(() => {
         if (clubId) {
           router.push(`/clubs/${clubId}?tab=history&subtab=posting`);
