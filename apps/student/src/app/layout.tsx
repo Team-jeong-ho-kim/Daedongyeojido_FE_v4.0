@@ -4,6 +4,7 @@ import { Footer } from "ui";
 import LayoutContent from "@/components/layout/LayoutContent";
 import { QueryProvider, UserProvider } from "@/components/providers";
 import "./globals.css";
+import { ChannelTalkProvider } from "@/components/providers/ChannelTalkProvider";
 
 const siteUrl = (
   process.env.NEXT_PUBLIC_USER_URL || "http://localhost:3001"
@@ -138,6 +139,7 @@ export default function RootLayout(props: RootLayoutProps) {
         />
         <QueryProvider>
           <UserProvider>
+            <ChannelTalkProvider />
             <Toaster position="top-right" duration={3000} richColors />
             <LayoutContent>
               <main>{children}</main>

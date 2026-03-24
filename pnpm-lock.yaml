@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@channel.io/channel-web-sdk-loader':
+        specifier: ^2.0.2
+        version: 2.0.2
       dayjs:
         specifier: ^1.11.20
         version: 1.11.20
@@ -600,6 +603,9 @@ packages:
 
   '@bytecodealliance/preview2-shim@0.17.6':
     resolution: {integrity: sha512-n3cM88gTen5980UOBAD6xDcNNL3ocTK8keab21bpx1ONdA+ARj7uD1qoFxOWCyKlkpSi195FH+GeAut7Oc6zZw==}
+
+  '@channel.io/channel-web-sdk-loader@2.0.2':
+    resolution: {integrity: sha512-43xRJX+BUjb5vRw5A/LDkgE9syJYTPERf7xo49Fz5MMpA9UtzPWHWyzN2QU1/tTT2uu5tpxapT2BgMx6FfP2qg==}
 
   '@cloudflare/kv-asset-handler@0.4.2':
     resolution: {integrity: sha512-SIOD2DxrRRwQ+jgzlXCqoEFiKOFqaPjhnNTGKXSRLvp1HiOvapLaFG2kEr9dYQTYe8rKrd9uvDUzmAITeNyaHQ==}
@@ -4672,6 +4678,8 @@ snapshots:
     optional: true
 
   '@bytecodealliance/preview2-shim@0.17.6': {}
+
+  '@channel.io/channel-web-sdk-loader@2.0.2': {}
 
   '@cloudflare/kv-asset-handler@0.4.2': {}
 

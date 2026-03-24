@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import "./globals.css";
 
 const siteUrl = (
@@ -134,7 +135,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <ChannelTalkProvider />
+        {children}
+      </body>
     </html>
   );
 }

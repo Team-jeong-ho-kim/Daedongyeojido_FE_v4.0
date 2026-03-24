@@ -46,6 +46,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@channel.io/channel-web-sdk-loader": "^2.0.2",
     "dayjs": "^1.11.20",
     "sonner": "^2.0.7",
     "zustand": "^5.0.9"

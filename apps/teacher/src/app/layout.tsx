@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import { TeacherLayoutContent } from "@/components/layout";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <ChannelTalkProvider />
         <TeacherLayoutContent>{children}</TeacherLayoutContent>
       </body>
     </html>
