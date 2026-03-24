@@ -26,7 +26,7 @@ export function LandingHeader() {
 
         <div className="flex items-center gap-3">
           <Link
-            href={`${process.env.NEXT_PUBLIC_USER_URL}`}
+            href="/login"
             className="rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80"
           >
             시작하기

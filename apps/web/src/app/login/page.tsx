@@ -14,29 +14,27 @@ import { getErrorMessage } from "@/lib/error";
 
 const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
 
-const requirePublicUrl = (value: string | undefined, envName: string) => {
-  if (!value?.trim()) {
-    throw new Error(`${envName} is required`);
+const readPublicUrl = (value: string | undefined) =>
+  value?.trim() ? normalizeUrl(value) : null;
+
+const getRedirectUrl = (role: LoginResponse["role"]) => {
+  const userUrl = readPublicUrl(process.env.NEXT_PUBLIC_USER_URL);
+  const adminUrl = readPublicUrl(process.env.NEXT_PUBLIC_ADMIN_URL);
+  const teacherUrl = readPublicUrl(process.env.NEXT_PUBLIC_TEACHER_URL);
+
+  if (role === "ADMIN") {
+    return adminUrl;
   }
 
-  return normalizeUrl(value);
+  if (role === "TEACHER") {
+    return teacherUrl ? `${teacherUrl}/mypage` : null;
+  }
+
+  return userUrl;
 };
 
 export default function LoginPage() {
   const [division, setDivision] = useState<LoginRequest["division"]>("STUDENT");
-  const userUrl = requirePublicUrl(
-    process.env.NEXT_PUBLIC_USER_URL,
-    "NEXT_PUBLIC_USER_URL",
-  );
-  const adminUrl = requirePublicUrl(
-    process.env.NEXT_PUBLIC_ADMIN_URL,
-    "NEXT_PUBLIC_ADMIN_URL",
-  );
-  const teacherUrl = requirePublicUrl(
-    process.env.NEXT_PUBLIC_TEACHER_URL,
-    "NEXT_PUBLIC_TEACHER_URL",
-  );
-
   const accountIdInput = useId();
   const passwordInput = useId();
   const [accountId, setAccountId] = useState("");
@@ -76,20 +74,19 @@ export default function LoginPage() {
         "/auth/login",
         payload,
       );
+
+      const redirectUrl = getRedirectUrl(response.data.role);
+
+      if (!redirectUrl) {
+        setErrorMessage(
+          "서비스 주소가 설정되지 않았습니다. 관리자에게 문의해주세요.",
+        );
+        return;
+      }
+
       saveTokens(response.data);
       saveSessionUser(response.data);
-
-      if (response.data.role === "ADMIN") {
-        window.location.href = adminUrl;
-        return;
-      }
-
-      if (response.data.role === "TEACHER") {
-        window.location.href = `${teacherUrl}/mypage`;
-        return;
-      }
-
-      window.location.href = userUrl;
+      window.location.href = redirectUrl;
     } catch (error) {
       setErrorMessage(
         getErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),

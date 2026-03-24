@@ -158,11 +158,33 @@ describe("LoginPage", () => {
     ).toBeVisible();
   });
 
-  it("fails fast when a required public url is missing", () => {
-    process.env.NEXT_PUBLIC_USER_URL = "";
+  it("shows a configuration error when a public url is missing", async () => {
+    const user = userEvent.setup();
 
-    expect(() => render(<LoginPage />)).toThrow(
-      "NEXT_PUBLIC_USER_URL is required",
-    );
+    process.env.NEXT_PUBLIC_USER_URL = "";
+    loginPageMocks.apiPost.mockResolvedValueOnce({
+      data: {
+        accessToken: "access",
+        classNumber: "0000",
+        refreshToken: "refresh",
+        role: "STUDENT",
+        userName: "학생",
+      },
+    });
+
+    render(<LoginPage />);
+
+    await user.type(screen.getByLabelText("DSM 계정 ID"), "student-account");
+    await user.type(screen.getByLabelText("비밀번호"), "password");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+
+    expect(
+      await screen.findByText(
+        "서비스 주소가 설정되지 않았습니다. 관리자에게 문의해주세요.",
+      ),
+    ).toBeVisible();
+    expect(loginPageMocks.saveTokens).not.toHaveBeenCalled();
+    expect(loginPageMocks.saveSessionUser).not.toHaveBeenCalled();
+    expect(window.location.href).toBe("http://localhost/login");
   });
 });
