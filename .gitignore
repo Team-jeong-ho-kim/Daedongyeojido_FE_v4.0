@@ -75,6 +75,8 @@ tmp/
 temp/
 .aider*
 /docs/
+!/docs/
+!/docs/cloudflare-pages.md
 
 # Generated sitemap files
 **/public/sitemap*.xml

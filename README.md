@@ -81,6 +81,10 @@ cp .env.example .env.prod
 
 `NEXT_PUBLIC_*_URL` 값은 `http://localhost:3000` 형태의 절대 URL이어야 합니다.
 
+## Cloudflare Pages
+- 앱별 Cloudflare Pages 운영 기준은 [docs/cloudflare-pages.md](docs/cloudflare-pages.md)에 정리되어 있습니다.
+- 같은 Pages 프로젝트에서 `main`은 Production, `develop`은 Preview로 운영합니다.
+
 ## 로그인 분기
 - `web` 로그인 화면은 학생 로그인과 선생님 로그인 탭으로 분기됩니다.
 - 같은 `POST /auth/login`을 사용하고, 요청 body의 `division` 값으로 학생/선생님 로그인을 구분합니다.
