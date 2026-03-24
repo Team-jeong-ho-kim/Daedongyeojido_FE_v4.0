@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { getSessionUser } from "utils";
-import ChannelService from "../channelTalk";
+import ChannelService from "@/components/channelTalk";
 
 export function ChannelTalkProvider() {
   const pluginKey = process.env.NEXT_PUBLIC_CHANNEL_PLUGIN_KEY;
@@ -20,7 +20,7 @@ export function ChannelTalkProvider() {
       memberId: sessionUser?.userName,
       profile: {
         name: sessionUser?.userName,
-        role: sessionUser?.role ?? "STUDENT",
+        role: sessionUser?.role ?? "TEACHER",
       },
     });
 
