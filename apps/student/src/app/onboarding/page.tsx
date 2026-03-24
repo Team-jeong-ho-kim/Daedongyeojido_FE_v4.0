@@ -34,6 +34,7 @@ export default function OnboardingPage() {
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [introduction, setIntroduction] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+
   // 페이지 이탈 방지
   useEffect(() => {
     // 입력이 시작되었거나 아직 제출하지 않은 경우 이탈 방지
@@ -57,12 +58,15 @@ export default function OnboardingPage() {
       if (shouldPreventLeave) {
         const target = e.target as HTMLElement;
         const link = target.closest("a");
+
         if (link?.href && !link.href.includes("/onboarding")) {
           e.preventDefault();
           e.stopPropagation();
+
           const confirmLeave = window.confirm(
             "입력한 내용이 저장되지 않습니다. 페이지를 떠나시겠습니까?",
           );
+
           if (confirmLeave) {
             router.push(new URL(link.href).pathname);
           }
@@ -128,6 +132,7 @@ export default function OnboardingPage() {
           url,
         })),
     );
+
     setSelectedFields(userInfo.major || []);
     setIntroduction(userInfo.introduction || "");
     isInitializedRef.current = true;
@@ -135,6 +140,7 @@ export default function OnboardingPage() {
 
   const handlePhoneChange = (value: string) => {
     setPhone(formatPhoneNumber(value));
+
     if (errors.phone && value) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -146,13 +152,6 @@ export default function OnboardingPage() {
 
   const handleLinksChange = (newLinks: LinkItem[]) => {
     setLinks(newLinks);
-    if (errors.links && newLinks.length > 0) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.links;
-        return newErrors;
-      });
-    }
   };
 
   const validateForm = (): boolean => {
@@ -164,9 +163,6 @@ export default function OnboardingPage() {
     }
     if (phone.trim() && phone.replace(/-/g, "").length !== 11) {
       newErrors.phone = "올바른 전화번호 형식이 아닙니다";
-    }
-    if (links.length === 0) {
-      newErrors.links = "최소 1개 이상의 링크를 추가해주세요";
     }
     if (selectedFields.length === 0) {
       newErrors.fields = "전공을 선택해주세요";
@@ -272,7 +268,7 @@ export default function OnboardingPage() {
             />
           </FormField>
 
-          <FormField label="관련 링크" alignTop required>
+          <FormField label="관련 링크" alignTop>
             <LinkInput
               links={links}
               onLinksChange={handleLinksChange}

@@ -20,14 +20,13 @@ test.describe("Student onboarding", () => {
     await page.getByRole("button", { name: "저장 완료" }).click();
 
     await expect(page.getByText("프로필 사진을 업로드해주세요")).toBeVisible();
-    await expect(
-      page.getByText("최소 1개 이상의 링크를 추가해주세요"),
-    ).toBeVisible();
     await expect(page.getByText("전공을 선택해주세요")).toBeVisible();
     await expect(page.getByText("한줄 소개를 입력해주세요")).toBeVisible();
   });
 
-  test("필수 정보를 제출하면 마이페이지로 이동한다", async ({ page }) => {
+  test("링크 없이 필수 정보를 제출하면 마이페이지로 이동한다", async ({
+    page,
+  }) => {
     const mockApi = await installStudentApiMocks(page, {
       user: {
         introduction: null,
@@ -36,7 +35,7 @@ test.describe("Student onboarding", () => {
       },
       updatedUser: {
         introduction: "대동여지도 테스트 소개",
-        link: ["https://github.com/daedong-test"],
+        link: [],
         major: ["BE"],
         profileImage: "/images/icons/profile.svg",
       },
@@ -49,10 +48,6 @@ test.describe("Student onboarding", () => {
       mimeType: "image/png",
       buffer: Buffer.from("playwright-profile-image"),
     });
-    await page
-      .getByPlaceholder("링크 추가하기")
-      .fill("https://github.com/daedong-test");
-    await page.getByPlaceholder("링크 추가하기").press("Enter");
     await page.getByPlaceholder("010-xxxx-xxxx").fill("01012341234");
     await page.getByRole("button", { name: "BE", exact: true }).click();
     await page
@@ -68,14 +63,11 @@ test.describe("Student onboarding", () => {
       page.getByRole("heading", { name: "마이페이지" }),
     ).toBeVisible();
     await expect(page.getByText("대동여지도 테스트 소개")).toBeVisible();
-    await expect(
-      page.getByText("https://github.com/daedong-test"),
-    ).toBeVisible();
 
     const submitRequest = mockApi.getLastRequest(/\/users\/my-info$/, "PATCH");
     expect(submitRequest?.rawBody).toContain("01012341234");
     expect(submitRequest?.rawBody).toContain("대동여지도 테스트 소개");
-    expect(submitRequest?.rawBody).toContain("https://github.com/daedong-test");
     expect(submitRequest?.rawBody).toContain("BE");
+    expect(submitRequest?.rawBody).not.toContain('name="links"');
   });
 });
