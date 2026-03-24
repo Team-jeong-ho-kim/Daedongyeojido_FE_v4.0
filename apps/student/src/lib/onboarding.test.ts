@@ -18,12 +18,21 @@ describe("isOnboardingRequired", () => {
     expect(isOnboardingRequired(createUser())).toBe(false);
   });
 
+  it("returns false when links are empty but other required fields are filled", () => {
+    expect(
+      isOnboardingRequired(
+        createUser({
+          link: [],
+        }),
+      ),
+    ).toBe(false);
+  });
+
   it("returns true when required fields are empty", () => {
     expect(
       isOnboardingRequired(
         createUser({
           introduction: " ",
-          link: [""],
           major: [],
           profileImage: null,
         }),
