@@ -22,23 +22,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter student pages:build
-
-      - name: Deploy to Cloudflare Pages (prod)
-        if: github.ref_name == 'main'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/student/.vercel/output/static --project-name=daedongyeojido --branch=main
-
-      - name: Deploy to Cloudflare Pages (stag)
-        if: github.ref_name == 'develop'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/student/.vercel/output/static --project-name=daedongyeojido --branch=develop
+      - name: Validate student Cloudflare build
+        run: |
+          set -a
+          source ./.env.example
+          set +a
+          pnpm --filter student pages:build
 
   admin:
     name: daedongyeojido-admin
@@ -57,23 +46,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter admin pages:build
-
-      - name: Deploy to Cloudflare Pages (prod)
-        if: github.ref_name == 'main'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/admin/.vercel/output/static --project-name=daedongyeojido-admin --branch=main
-
-      - name: Deploy to Cloudflare Pages (stag)
-        if: github.ref_name == 'develop'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/admin/.vercel/output/static --project-name=daedongyeojido-admin --branch=develop
+      - name: Validate admin Cloudflare build
+        run: |
+          set -a
+          source ./.env.example
+          set +a
+          pnpm --filter admin pages:build
 
   teacher:
     name: daedongyeojido-teacher
@@ -92,23 +70,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter teacher pages:build
-
-      - name: Deploy to Cloudflare Pages (prod)
-        if: github.ref_name == 'main'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/teacher/.vercel/output/static --project-name=daedongyeojido-teacher --branch=main
-
-      - name: Deploy to Cloudflare Pages (stag)
-        if: github.ref_name == 'develop'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/teacher/.vercel/output/static --project-name=daedongyeojido-teacher --branch=develop
+      - name: Validate teacher Cloudflare build
+        run: |
+          set -a
+          source ./.env.example
+          set +a
+          pnpm --filter teacher pages:build
 
   web:
     name: daedongyeojido-web
@@ -127,23 +94,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter web pages:build
-
-      - name: Deploy to Cloudflare Pages (prod)
-        if: github.ref_name == 'main'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/.vercel/output/static --project-name=daedongyeojido-web --branch=main
-
-      - name: Deploy to Cloudflare Pages (stag)
-        if: github.ref_name == 'develop'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/.vercel/output/static --project-name=daedongyeojido-web --branch=develop
+      - name: Validate web Cloudflare build
+        run: |
+          set -a
+          source ./.env.example
+          set +a
+          pnpm --filter web pages:build
 
   notify:
     name: Discord Notify

@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build:prod-local",
     "build:stag": "turbo run build:stag",
-    "build:prod": "turbo run build",
+    "build:prod": "turbo run build:prod-local",
     "dev": "turbo run dev",
     "dev:stag": "turbo run dev:stag",
     "dev:prod": "turbo run dev:prod",
@@ -40,8 +40,7 @@
     "msw": "^2.11.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "turbo": "^2.5.8"
-    ,
+    "turbo": "^2.5.8",
     "vite": "^7.1.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
