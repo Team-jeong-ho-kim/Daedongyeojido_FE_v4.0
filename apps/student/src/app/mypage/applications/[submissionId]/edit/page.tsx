@@ -19,6 +19,10 @@ interface MySubmissionEditPageProps {
   params: Promise<{ submissionId: string }>;
 }
 
+const hasQuestionId = (
+  applicationQuestionId: number | undefined,
+): applicationQuestionId is number => typeof applicationQuestionId === "number";
+
 export default function MySubmissionEditPage({
   params,
 }: MySubmissionEditPageProps) {
@@ -48,6 +52,10 @@ export default function MySubmissionEditPage({
           introduction: data.introduction || "",
           major: data.major || "",
           answers: data.contents.reduce<Record<number, string>>((acc, item) => {
+            if (!hasQuestionId(item.applicationQuestionId)) {
+              return acc;
+            }
+
             acc[item.applicationQuestionId] = item.answer || "";
             return acc;
           }, {}),
@@ -121,6 +129,10 @@ export default function MySubmissionEditPage({
     }
 
     submission?.contents.forEach((question, index) => {
+      if (!hasQuestionId(question.applicationQuestionId)) {
+        return;
+      }
+
       if (!formData.answers[question.applicationQuestionId]?.trim()) {
         newErrors[`answer_${question.applicationQuestionId}`] =
           `질문 ${index + 1}의 답변을 입력해주세요`;
@@ -144,10 +156,18 @@ export default function MySubmissionEditPage({
         classNumber: submission.classNumber,
         introduction: formData.introduction,
         major: formData.major,
-        answer: submission.contents.map((question) => ({
-          applicationQuestionId: question.applicationQuestionId,
-          answer: formData.answers[question.applicationQuestionId] || "",
-        })),
+        answer: submission.contents.flatMap((question) => {
+          if (!hasQuestionId(question.applicationQuestionId)) {
+            return [];
+          }
+
+          return [
+            {
+              applicationQuestionId: question.applicationQuestionId,
+              answer: formData.answers[question.applicationQuestionId] || "",
+            },
+          ];
+        }),
       });
       toast.success("지원서가 수정되었습니다.");
       router.push(`/mypage/applications/${submissionId}`);
@@ -280,10 +300,13 @@ export default function MySubmissionEditPage({
           <h2 className="mb-6 font-bold text-xl">질문 답변</h2>
           <div className="space-y-6">
             {submission.contents.map((item, index) => {
-              const errorKey = `answer_${item.applicationQuestionId}`;
+              const questionId = item.applicationQuestionId;
+              const errorKey = hasQuestionId(questionId)
+                ? `answer_${questionId}`
+                : undefined;
               return (
                 <div
-                  key={item.applicationQuestionId}
+                  key={questionId ?? `${item.question}-${index}`}
                   className="rounded-2xl border border-gray-200 bg-white p-6"
                 >
                   <div className="mb-4 flex items-start gap-3">
@@ -297,11 +320,17 @@ export default function MySubmissionEditPage({
                   <div className="ml-9">
                     <TextArea
                       placeholder="질문의 답변을 작성해주세요."
-                      value={formData.answers[item.applicationQuestionId] || ""}
-                      onChange={(value) =>
-                        handleAnswerChange(item.applicationQuestionId, value)
+                      value={
+                        hasQuestionId(questionId)
+                          ? formData.answers[questionId] || ""
+                          : item.answer || ""
                       }
-                      error={errors[errorKey]}
+                      onChange={(value) => {
+                        if (hasQuestionId(questionId)) {
+                          handleAnswerChange(questionId, value);
+                        }
+                      }}
+                      error={errorKey ? errors[errorKey] : undefined}
                     />
                   </div>
                 </div>

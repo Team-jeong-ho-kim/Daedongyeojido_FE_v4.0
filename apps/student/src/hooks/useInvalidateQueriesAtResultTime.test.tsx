@@ -8,6 +8,10 @@ import type { ReactNode } from "react";
 import { act } from "react";
 import { useInvalidateQueriesAtResultTime } from "./useInvalidateQueriesAtResultTime";
 
+interface ResultDurationProps {
+  resultDuration: string | null;
+}
+
 const createWrapper = (queryClient: QueryClient) => {
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -76,13 +80,13 @@ describe("useInvalidateQueriesAtResultTime", () => {
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
 
     const { rerender } = renderHook(
-      ({ resultDuration }: { resultDuration: string | null }) =>
+      ({ resultDuration }: ResultDurationProps) =>
         useInvalidateQueriesAtResultTime({
           invalidateQueryKeys: [["applications", "history"]],
           resultDuration,
         }),
       {
-        initialProps: { resultDuration: null },
+        initialProps: { resultDuration: null } as ResultDurationProps,
         wrapper: createWrapper(queryClient),
       },
     );

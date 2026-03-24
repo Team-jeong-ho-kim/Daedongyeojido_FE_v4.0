@@ -3,23 +3,38 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useId, useState } from "react";
-import type { LoginRequest, LoginResponse } from "utils";
-import { apiClient, saveSessionUser, saveTokens } from "utils";
-import { resolveServiceUrl, toLoginErrorMessage } from "./login.utils";
+import {
+  apiClient,
+  type LoginRequest,
+  type LoginResponse,
+  saveSessionUser,
+  saveTokens,
+} from "utils";
+import { getErrorMessage } from "@/lib/error";
+
+const normalizeUrl = (value: string) => value.trim().replace(/\/$/, "");
+
+const requirePublicUrl = (value: string | undefined, envName: string) => {
+  if (!value?.trim()) {
+    throw new Error(`${envName} is required`);
+  }
+
+  return normalizeUrl(value);
+};
 
 export default function LoginPage() {
   const [division, setDivision] = useState<LoginRequest["division"]>("STUDENT");
-  const userUrl = resolveServiceUrl(
+  const userUrl = requirePublicUrl(
     process.env.NEXT_PUBLIC_USER_URL,
-    "student",
+    "NEXT_PUBLIC_USER_URL",
   );
-  const adminUrl = resolveServiceUrl(
+  const adminUrl = requirePublicUrl(
     process.env.NEXT_PUBLIC_ADMIN_URL,
-    "admin",
+    "NEXT_PUBLIC_ADMIN_URL",
   );
-  const teacherUrl = resolveServiceUrl(
+  const teacherUrl = requirePublicUrl(
     process.env.NEXT_PUBLIC_TEACHER_URL,
-    "teacher",
+    "NEXT_PUBLIC_TEACHER_URL",
   );
 
   const accountIdInput = useId();
@@ -77,7 +92,7 @@ export default function LoginPage() {
       window.location.href = userUrl;
     } catch (error) {
       setErrorMessage(
-        toLoginErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),
+        getErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),
       );
     } finally {
       setPending(false);

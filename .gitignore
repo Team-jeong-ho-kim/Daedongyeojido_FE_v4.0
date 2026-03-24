@@ -74,6 +74,7 @@ logs
 tmp/
 temp/
 .aider*
+/docs/
 
 # Generated sitemap files
 **/public/sitemap*.xml
