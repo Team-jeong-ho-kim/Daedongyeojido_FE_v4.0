@@ -69,6 +69,18 @@ type MockApplicationForm = {
   submissionDuration: string | [number, number, number];
 };
 
+type MockApplicationFormDetail = {
+  applicationFormTitle: string;
+  clubName: string;
+  clubImage: string | null;
+  content: Array<{
+    applicationQuestionId: number;
+    content: string;
+  }>;
+  submissionDuration: string | [number, number, number];
+  major: string[];
+};
+
 type MockApplicant = {
   submissionId: number;
   userName: string;
@@ -168,6 +180,7 @@ type StudentApiMockOptions = {
   clubs?: MockClubListItem[];
   clubDetail?: Partial<MockClubDetail>;
   applicationForms?: MockApplicationForm[];
+  applicationFormDetail?: Partial<MockApplicationFormDetail>;
   applicants?: MockApplicant[];
   userAlarms?: MockAlarm[];
   clubAlarms?: MockAlarm[];
@@ -252,6 +265,20 @@ const DEFAULT_APPLICATION_FORMS: MockApplicationForm[] = [
     submissionDuration: "2026-12-31",
   },
 ];
+
+const DEFAULT_APPLICATION_FORM_DETAIL: MockApplicationFormDetail = {
+  applicationFormTitle: "2026 백엔드 지원서",
+  clubName: "테스트동아리",
+  clubImage: "/images/icons/profile.svg",
+  content: [
+    {
+      applicationQuestionId: 1,
+      content: "지원 동기를 작성해주세요.",
+    },
+  ],
+  submissionDuration: "2026-12-31",
+  major: ["BE"],
+};
 
 const DEFAULT_APPLICANTS: MockApplicant[] = [
   {
@@ -520,6 +547,10 @@ export async function installStudentApiMocks(
   };
   const applicationForms =
     options.applicationForms ?? DEFAULT_APPLICATION_FORMS.slice();
+  const applicationFormDetail: MockApplicationFormDetail = {
+    ...DEFAULT_APPLICATION_FORM_DETAIL,
+    ...options.applicationFormDetail,
+  };
   const applicants = options.applicants ?? DEFAULT_APPLICANTS.slice();
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
@@ -877,6 +908,27 @@ export async function installStudentApiMocks(
     await createJsonResponse(route, {
       applicationForms,
     });
+  });
+
+  await page.route(/.*\/application-forms\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    await createJsonResponse(route, applicationFormDetail);
+  });
+
+  await page.route(/.*\/applications\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "POST") {
+      await route.continue();
+      return;
+    }
+
+    recordRequest(route);
+    await route.fulfill({ status: 204, body: "" });
   });
 
   await page.route(/.*\/alarms\/users$/, async (route) => {
