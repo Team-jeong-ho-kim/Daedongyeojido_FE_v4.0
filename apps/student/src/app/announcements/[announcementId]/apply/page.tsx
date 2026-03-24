@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
-import type { ApiError } from "utils";
+import { ApiError } from "utils";
 import { getDetailAnnouncement } from "@/api/announcement";
 import {
   getApplicationFormDetail,
@@ -211,7 +211,15 @@ export default function ApplyDetailPage({
         }
       } catch (error) {
         console.error("데이터 조회 실패:", error);
-        toast.error("데이터를 불러올 수 없습니다.");
+        if (error instanceof ApiError) {
+          toast.error(
+            error.status === 401
+              ? "로그인 후 이용해주세요."
+              : error.description,
+          );
+        } else {
+          toast.error("데이터를 불러올 수 없습니다.");
+        }
         router.push(`/announcements/${announcementId}`);
       } finally {
         setIsLoading(false);
