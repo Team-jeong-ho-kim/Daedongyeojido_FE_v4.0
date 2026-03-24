@@ -29,6 +29,7 @@ export default function ApplyDetailPage({
   const [applicationFormId, setApplicationFormId] = useState<string | null>(
     null,
   );
+  const [clubId, setClubId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<{
@@ -195,6 +196,7 @@ export default function ApplyDetailPage({
           return;
         }
 
+        setClubId(String(announcement.clubId));
         setApplicationFormId(String(announcement.applicationFormId));
 
         // 2. 지원서 폼 조회
@@ -272,6 +274,10 @@ export default function ApplyDetailPage({
         clubImage={applicationForm.clubImage}
         clubName={applicationForm.clubName}
         title={applicationForm.applicationFormTitle}
+        headerHref={clubId ? `/clubs/${clubId}` : undefined}
+        headerLinkLabel={`${applicationForm.clubName} 동아리 상세로 이동`}
+        buttonText="동아리 소개 보러가기"
+        buttonHref={clubId ? `/clubs/${clubId}` : undefined}
       />
       <div className="mt-7 bg-gray-50 px-6 py-8 md:px-12 md:py-10 lg:px-24">
         <h2 className="mb-8 font-bold text-gray-900 text-xl">인적 사항</h2>

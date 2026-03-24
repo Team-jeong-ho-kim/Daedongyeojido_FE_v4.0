@@ -213,7 +213,10 @@ export default function AnnouncementDetailPage({
         clubName={clubData.club.clubName}
         title={`${clubData.club.clubName} - ${announcement.title}`}
         oneLiner={clubData.club.oneLiner}
+        headerHref={`/clubs/${clubId}`}
+        headerLinkLabel={`${clubData.club.clubName} 동아리 상세로 이동`}
         buttonText="동아리 소개 보러가기"
+        buttonHref={`/clubs/${clubId}`}
       />
 
       {/* 탭 */}
