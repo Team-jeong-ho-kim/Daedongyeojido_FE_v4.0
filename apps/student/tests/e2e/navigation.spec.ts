@@ -138,6 +138,11 @@ test.describe("Student discovery flows", () => {
       clubDetail: {
         club: {
           clubName: "테스트동아리",
+          introduction: "테스트 소개",
+          oneLiner: "테스트 한 줄 소개",
+          clubImage: "/images/icons/profile.svg",
+          majors: ["BE"],
+          links: ["https://example.com/club"],
         },
       },
       announcementDetail: {
@@ -177,5 +182,45 @@ test.describe("Student discovery flows", () => {
     await expect(page).toHaveURL(/\/announcements\/1$/);
     await page.getByRole("link", { name: "지원서 작성하기" }).click();
     await expect(page).toHaveURL(/\/announcements\/1\/apply$/);
+  });
+
+  test("학생은 공고 상세 헤더와 CTA로 동아리 상세로 이동할 수 있다", async ({
+    page,
+  }) => {
+    await setAuthSession(page);
+    await installStudentApiMocks(page);
+
+    await page.goto("/announcements/1");
+
+    await page
+      .getByRole("link", { name: "테스트동아리 동아리 상세로 이동" })
+      .click();
+    await expect(page).toHaveURL(/\/clubs\/1$/);
+
+    await page.goto("/announcements/1");
+    await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
+    await expect(page).toHaveURL(/\/clubs\/1$/);
+  });
+
+  test("학생은 공고 지원서 페이지 헤더와 CTA로 동아리 상세로 이동할 수 있다", async ({
+    page,
+  }) => {
+    await setAuthSession(page);
+    await installStudentApiMocks(page, {
+      announcementDetail: {
+        status: "OPEN",
+      },
+    });
+
+    await page.goto("/announcements/1/apply");
+
+    await page
+      .getByRole("link", { name: "테스트동아리 동아리 상세로 이동" })
+      .click();
+    await expect(page).toHaveURL(/\/clubs\/1$/);
+
+    await page.goto("/announcements/1/apply");
+    await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
+    await expect(page).toHaveURL(/\/clubs\/1$/);
   });
 });
