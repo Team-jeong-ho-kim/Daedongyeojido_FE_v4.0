@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { useAddTeacher } from "@/hooks/mutations";
@@ -10,6 +11,7 @@ export function TeacherTab() {
   const [teacherName, setTeacherName] = useState("");
   const [accountId, setAccountId] = useState("");
   const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const handleAddTeacher = async (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -32,6 +34,7 @@ export function TeacherTab() {
       setTeacherName("");
       setAccountId("");
       setPassword("");
+      setIsPasswordVisible(false);
     } catch {}
   };
 
@@ -118,18 +121,36 @@ export function TeacherTab() {
               disabled={addTeacherMutation.isPending}
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
             />
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="비밀번호"
-              autoComplete="new-password"
-              data-form-type="other"
-              data-lpignore="true"
-              data-1p-ignore="true"
-              disabled={addTeacherMutation.isPending}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={isPasswordVisible ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="비밀번호"
+                autoComplete="new-password"
+                data-form-type="other"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                disabled={addTeacherMutation.isPending}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 pr-11 text-sm outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+              />
+              <button
+                type="button"
+                aria-label={
+                  isPasswordVisible ? "비밀번호 숨기기" : "비밀번호 표시"
+                }
+                aria-pressed={isPasswordVisible}
+                onClick={() => setIsPasswordVisible((prev) => !prev)}
+                disabled={addTeacherMutation.isPending}
+                className="-translate-y-1/2 absolute top-1/2 right-3 text-gray-500 transition hover:text-gray-700 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-300"
+              >
+                {isPasswordVisible ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="mt-3">
