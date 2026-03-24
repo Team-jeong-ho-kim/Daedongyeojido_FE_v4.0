@@ -126,6 +126,40 @@ test.describe("Student discovery flows", () => {
     await expect(page.getByText("박디자인")).toBeVisible();
   });
 
+  test("타 동아리 리더는 다른 동아리 공고에서 관리 버튼을 보지 않는다", async ({
+    page,
+  }) => {
+    await setAuthSession(page, { role: "CLUB_LEADER" });
+    await installStudentApiMocks(page, {
+      user: {
+        role: "CLUB_LEADER",
+        clubName: "다른동아리",
+      },
+      clubDetail: {
+        club: {
+          clubName: "테스트동아리",
+        },
+      },
+      announcementDetail: {
+        status: "CLOSED",
+        applicationFormId: 11,
+      },
+    });
+
+    await page.goto("/announcements/1");
+
+    await expect(page.getByRole("button", { name: "지원내역" })).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "공고 게시하기" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "공고 수정하기" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("button", { name: "공고 삭제하기" }),
+    ).toHaveCount(0);
+  });
+
   test("학생은 공고 카드에서 지원 페이지로 이동할 수 있다", async ({
     page,
   }) => {

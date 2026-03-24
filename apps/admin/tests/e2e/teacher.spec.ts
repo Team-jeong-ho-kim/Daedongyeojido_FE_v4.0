@@ -36,7 +36,17 @@ test.describe("Admin teacher tab", () => {
 
     await page.getByPlaceholder("지도 교사 이름").fill("새 지도 교사");
     await page.getByPlaceholder("계정 ID").fill("teacher-new");
-    await page.getByPlaceholder("비밀번호").fill("teacher-password");
+    const passwordInput = page.getByPlaceholder("비밀번호");
+
+    await expect(passwordInput).toHaveAttribute("type", "password");
+    await page.getByRole("button", { name: "비밀번호 표시" }).click();
+    await expect(passwordInput).toHaveAttribute("type", "text");
+    await page.getByRole("button", { name: "비밀번호 숨기기" }).click();
+    await expect(passwordInput).toHaveAttribute("type", "password");
+
+    await page.getByRole("button", { name: "비밀번호 표시" }).click();
+    await expect(passwordInput).toHaveAttribute("type", "text");
+    await passwordInput.fill("teacher-password");
     await page.getByRole("button", { name: "지도 교사 추가" }).click();
 
     await expect(page.getByText("지도 교사가 추가되었습니다.")).toBeVisible();
@@ -45,6 +55,8 @@ test.describe("Admin teacher tab", () => {
     await expect(
       page.locator("li").filter({ hasText: "#5" }).getByText("미매칭"),
     ).toBeVisible();
+    await expect(passwordInput).toHaveValue("");
+    await expect(passwordInput).toHaveAttribute("type", "password");
     expect(controller.getLastRequest("/admin/teachers", "POST")).toBeTruthy();
   });
 });

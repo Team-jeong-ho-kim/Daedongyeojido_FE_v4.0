@@ -120,9 +120,13 @@ export default function AnnouncementDetailPage({
   const [isLoadingApplicants, setIsLoadingApplicants] = useState(false);
 
   const role = useUserStore((state) => state.userInfo?.role);
+  const userClubName = useUserStore((state) => state.userInfo?.clubName);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const announcement = announcementData;
+  const isMyClub = isClubMember && userClubName === clubData?.club.clubName;
+  const canManageAnnouncement = isMyClub;
+  const canViewAnnouncementApplications = isMyClub;
   const formattedDeadline = formatDeadline(announcement?.deadline ?? "");
   const formattedPhoneNumber = formatPhoneNumber(
     announcement?.phoneNumber ?? "",
@@ -184,10 +188,14 @@ export default function AnnouncementDetailPage({
       }
     };
 
-    if (activeTab === "applications" && isClubMember) {
+    if (activeTab === "applications" && canViewAnnouncementApplications) {
       fetchApplicants();
     }
-  }, [activeTab, announcement?.applicationFormId, isClubMember]);
+  }, [
+    activeTab,
+    announcement?.applicationFormId,
+    canViewAnnouncementApplications,
+  ]);
 
   if (!announcement || !clubData) {
     return (
@@ -222,7 +230,7 @@ export default function AnnouncementDetailPage({
           >
             공고 내용
           </button>
-          {isClubMember && (
+          {canViewAnnouncementApplications && (
             <button
               type="button"
               onClick={() => setActiveTab("applications")}
@@ -364,7 +372,7 @@ export default function AnnouncementDetailPage({
               </p>
             </section>
 
-            {isClubMember && activeTab === "details" && (
+            {canManageAnnouncement && activeTab === "details" && (
               <div className="flex justify-end gap-3 pt-6">
                 {announcement.status === "CLOSED" && (
                   <button
@@ -420,7 +428,7 @@ export default function AnnouncementDetailPage({
       )}
 
       {/* 지원내역 탭 */}
-      {activeTab === "applications" && isClubMember && (
+      {activeTab === "applications" && canViewAnnouncementApplications && (
         <div className="mb-16 bg-gray-50 px-6 py-8 md:mb-20 md:px-12 md:py-12 lg:mb-30 lg:px-24 lg:py-16">
           <div className="min-h-[450px]">
             {isLoadingApplicants ? (
