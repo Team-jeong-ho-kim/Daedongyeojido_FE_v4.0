@@ -26,12 +26,18 @@ import {
   useUpdateClubCreationApplicationMutation,
 } from "@/hooks/mutations";
 import { useGetMyClubCreationApplicationQuery } from "@/hooks/querys";
+import { useResolvedUserRole } from "@/hooks/useResolvedUserRole";
 import { useModalStore } from "@/stores/useModalStore";
+import { ClubCreationAccessBlocked } from "../components/ClubCreationAccessBlocked";
 
 export default function EditClubCreationApplicationPage() {
   const router = useRouter();
+  const { isResolved: isRoleResolved, role } = useResolvedUserRole();
+  const isBlockedRole = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
   const { show, toggleShow } = useModalStore();
-  const applicationQuery = useGetMyClubCreationApplicationQuery();
+  const applicationQuery = useGetMyClubCreationApplicationQuery({
+    enabled: isRoleResolved && !isBlockedRole,
+  });
   const updateMutation = useUpdateClubCreationApplicationMutation();
   const submitMutation = useSubmitClubCreationApplicationMutation();
   const hasInitializedRef = useRef(false);
@@ -106,6 +112,20 @@ export default function EditClubCreationApplicationPage() {
       URL.revokeObjectURL(nextPreviewUrl);
     };
   }, [clubCreationFormFile]);
+
+  if (!isRoleResolved) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <p className="text-gray-500 text-sm">
+          권한 정보를 확인하고 있습니다...
+        </p>
+      </div>
+    );
+  }
+
+  if (isBlockedRole) {
+    return <ClubCreationAccessBlocked />;
+  }
 
   const application = applicationQuery.data;
   const existingClubCreationFormUrl = application?.clubCreationForm ?? null;

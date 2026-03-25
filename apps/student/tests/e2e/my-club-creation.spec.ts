@@ -255,4 +255,76 @@ test.describe("Student my club creation detail", () => {
       page.getByRole("link", { name: "수정 후 다시 제출하기" }),
     ).toHaveCount(1);
   });
+
+  for (const blockedRole of ["CLUB_MEMBER", "CLUB_LEADER"] as const) {
+    test(`${blockedRole}는 마이페이지에서 내 개설 신청 바로가기를 보지 않는다`, async ({
+      page,
+    }) => {
+      await setAuthSession(page, { role: blockedRole });
+      await installStudentApiMocks(page, {
+        user: { role: blockedRole },
+      });
+
+      await page.goto("/mypage");
+
+      await expect(page.getByText("내 개설 신청 바로가기")).toHaveCount(0);
+      await expect(
+        page.getByRole("link", { name: "신청 상태 보기" }),
+      ).toHaveCount(0);
+    });
+
+    test(`${blockedRole}는 내 개설 신청 상세 직접 접근 시 차단된다`, async ({
+      page,
+    }) => {
+      await setAuthSession(page, { role: blockedRole });
+      const mockApi = await installStudentApiMocks(page, {
+        user: { role: blockedRole },
+      });
+
+      await page.goto("/mypage/club-creation");
+
+      await expect(
+        page.getByRole("heading", {
+          name: "내 개설 신청을 조회할 수 없습니다",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "마이페이지로 이동" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "내 개설 신청", exact: true }),
+      ).toHaveCount(0);
+
+      expect(
+        mockApi.getLastRequest("/club-creation-applications/me", "GET"),
+      ).toBeUndefined();
+    });
+
+    test(`${blockedRole}는 내 개설 신청 수정 직접 접근 시 차단된다`, async ({
+      page,
+    }) => {
+      await setAuthSession(page, { role: blockedRole });
+      const mockApi = await installStudentApiMocks(page, {
+        user: { role: blockedRole },
+      });
+
+      await page.goto("/mypage/club-creation/edit");
+
+      await expect(
+        page.getByRole("heading", {
+          name: "내 개설 신청을 조회할 수 없습니다",
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "마이페이지로 이동" }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("수정 요청 코멘트를 반영해 신청서를 다시 제출하세요"),
+      ).toHaveCount(0);
+
+      expect(
+        mockApi.getLastRequest("/club-creation-applications/me", "GET"),
+      ).toBeUndefined();
+    });
+  }
 });

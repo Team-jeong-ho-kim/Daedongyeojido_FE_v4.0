@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Button } from "ui";
-import { ClubCreationFormSection } from "@/features/documents";
+import {
+  ClubCreationApplyCta,
+  ClubCreationFormSection,
+} from "@/features/documents";
 
 export const metadata: Metadata = {
   title: "양식 조회",
@@ -24,16 +25,7 @@ export default function DocumentPage() {
             </p>
           </div>
 
-          <div className="flex shrink-0">
-            <Link href="/clubs/create" className="inline-flex">
-              <Button
-                variant="ghost"
-                className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:text-white hover:shadow-lg"
-              >
-                동아리 개설 신청하기
-              </Button>
-            </Link>
-          </div>
+          <ClubCreationApplyCta />
         </div>
 
         <ClubCreationFormSection embedded />

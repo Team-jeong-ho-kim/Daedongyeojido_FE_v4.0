@@ -91,4 +91,32 @@ test.describe("Student documents", () => {
     ).toBeVisible();
     await expect(page.getByText("등록된 양식이 없습니다.")).toBeVisible();
   });
+
+  test("학생은 양식 조회 페이지에서 개설 신청 CTA를 본다", async ({ page }) => {
+    await setAuthSession(page, { role: "STUDENT" });
+    await installStudentApiMocks(page);
+
+    await page.goto("/documents");
+
+    await expect(
+      page.getByRole("link", { name: "동아리 개설 신청하기" }),
+    ).toBeVisible();
+  });
+
+  for (const blockedRole of ["CLUB_MEMBER", "CLUB_LEADER"] as const) {
+    test(`${blockedRole}는 양식 조회 페이지에서 개설 신청 CTA를 보지 않는다`, async ({
+      page,
+    }) => {
+      await setAuthSession(page, { role: blockedRole });
+      await installStudentApiMocks(page, {
+        user: { role: blockedRole },
+      });
+
+      await page.goto("/documents");
+
+      await expect(
+        page.getByRole("link", { name: "동아리 개설 신청하기" }),
+      ).toHaveCount(0);
+    });
+  }
 });
