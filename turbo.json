@@ -23,15 +23,12 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
     "build:prod-local": {
-      "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
     "build:stag": {
-      "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
     "lint": {

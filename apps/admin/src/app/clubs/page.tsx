@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { stripMarkdownToPlainText } from "ui";
 import { Pagination } from "@/components/common";
 import { useGetAllClubsQuery } from "@/hooks/querys";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -77,7 +78,7 @@ export default function AdminClubsPage() {
                       동아리 ID: {club.clubId}
                     </p>
                     <p className="line-clamp-1 text-gray-500 text-sm opacity-70 transition-opacity delay-150 duration-300 ease-out group-hover:line-clamp-none group-hover:opacity-100">
-                      {club.introduction}
+                      {stripMarkdownToPlainText(club.introduction)}
                     </p>
                   </section>
                 </article>

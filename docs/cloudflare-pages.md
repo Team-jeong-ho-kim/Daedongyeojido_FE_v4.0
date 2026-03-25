@@ -49,6 +49,10 @@
 - 로컬 prod 빌드: `pnpm --filter <app> build:prod-local`
 - 로컬 stag 빌드: `pnpm --filter <app> build:stag`
 - Cloudflare 빌드: `pnpm --filter <app> pages:build`
+- 루트 단축 명령:
+  - `pnpm build:student|admin|teacher|web`
+  - `pnpm pages:build:student|admin|teacher|web`
+  - `pnpm deploy:student|admin|teacher|web`
 
 Cloudflare에서 `pages:build`는 대시보드에 입력된 env만 사용합니다.
 

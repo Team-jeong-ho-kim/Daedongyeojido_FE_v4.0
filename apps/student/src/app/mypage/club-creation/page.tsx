@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Button, ManualPdfPreviewModal } from "ui";
+import { Button, ManualPdfPreviewModal, MarkdownContent } from "ui";
 import type {
   ClubCreationApplicationReview,
   ClubCreationApplicationStatus,
@@ -462,10 +462,8 @@ export default function ClubCreationApplicationDetailPage() {
 
               <div className="divide-y divide-gray-200">
                 <DetailSection title="동아리 소개">
-                  <div className="rounded-lg border border-gray-200 bg-white px-4 py-4 text-[14px] text-gray-700 leading-7">
-                    <p className="whitespace-pre-line">
-                      {application.introduction}
-                    </p>
+                  <div className="rounded-lg border border-gray-200 bg-white px-4 py-4">
+                    <MarkdownContent content={application.introduction} />
                   </div>
                 </DetailSection>
 
