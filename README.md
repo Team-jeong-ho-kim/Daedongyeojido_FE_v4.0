@@ -48,6 +48,15 @@ pnpm build
 pnpm lint
 ```
 
+단일 앱만 수정했으면 전체 `pnpm build` 대신 아래 앱 전용 명령을 사용합니다.
+
+```bash
+pnpm build:student
+pnpm build:admin
+pnpm build:web
+pnpm build:teacher
+```
+
 ### 앱별 실행
 ```bash
 pnpm --filter web dev
@@ -84,6 +93,7 @@ cp .env.example .env.prod
 ## Cloudflare Pages
 - 앱별 Cloudflare Pages 운영 기준은 [docs/cloudflare-pages.md](docs/cloudflare-pages.md)에 정리되어 있습니다.
 - 같은 Pages 프로젝트에서 `main`은 Production, `develop`은 Preview로 운영합니다.
+- 로컬 재배포가 필요하면 전체 빌드 대신 `pnpm deploy:student`, `pnpm deploy:admin`, `pnpm deploy:web`, `pnpm deploy:teacher`처럼 앱 단위 명령을 우선 사용합니다.
 
 ## 로그인 분기
 - `web` 로그인 화면은 학생 로그인과 선생님 로그인 탭으로 분기됩니다.
