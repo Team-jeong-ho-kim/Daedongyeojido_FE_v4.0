@@ -8,6 +8,9 @@ export function ChannelTalkProvider() {
 
   useEffect(() => {
     if (!pluginKey) {
+      console.warn(
+        "[ChannelTalk] NEXT_PUBLIC_CHANNEL_PLUGIN_KEY is missing. ChannelTalk boot skipped.",
+      );
       return;
     }
 
