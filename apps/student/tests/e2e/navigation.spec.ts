@@ -184,6 +184,31 @@ test.describe("Student discovery flows", () => {
     await expect(page).toHaveURL(/\/announcements\/1\/apply$/);
   });
 
+  test("비로그인 사용자는 공고 상세에서 지원서 작성하기 클릭 시 로그인 토스트를 본다", async ({
+    page,
+  }) => {
+    await installStudentApiMocks(page, {
+      announcementDetail: {
+        status: "OPEN",
+      },
+    });
+
+    await page.goto("/announcements/1");
+
+    await expect(page.getByText("대표자 연락처")).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "지원서 작성하기" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "지원서 작성하기 (종료)" }),
+    ).toHaveCount(0);
+
+    await page.getByRole("link", { name: "지원서 작성하기" }).click();
+
+    await expect(page).toHaveURL(/\/announcements\/1$/);
+    await expect(page.getByText("로그인 후 이용해주세요.")).toBeVisible();
+  });
+
   test("학생은 공고 상세 헤더와 CTA로 동아리 상세로 이동할 수 있다", async ({
     page,
   }) => {
@@ -222,6 +247,27 @@ test.describe("Student discovery flows", () => {
     await page.goto("/announcements/1/apply");
     await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
     await expect(page).toHaveURL(/\/clubs\/1$/);
+  });
+
+  test("동아리 소속 사용자는 지원서 작성 페이지에서 지원하기 버튼을 보지 않는다", async ({
+    page,
+  }) => {
+    await setAuthSession(page, { role: "CLUB_MEMBER" });
+    await installStudentApiMocks(page, {
+      user: {
+        role: "CLUB_MEMBER",
+        clubName: "테스트동아리",
+      },
+      announcementDetail: {
+        status: "OPEN",
+      },
+    });
+
+    await page.goto("/announcements/1/apply");
+
+    await expect(page.getByText("인적 사항")).toBeVisible();
+    await expect(page.getByText("질문 답변")).toBeVisible();
+    await expect(page.getByRole("button", { name: "지원하기" })).toHaveCount(0);
   });
 
   test("학생은 지원서 자기소개와 질문 답변을 글자수 제한 내로만 작성할 수 있다", async ({

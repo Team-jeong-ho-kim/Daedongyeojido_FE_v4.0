@@ -7,7 +7,13 @@ import { useRouter } from "next/navigation";
 import { type MouseEvent, use, useEffect, useState } from "react";
 import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
-import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
+import {
+  CalendarIcon,
+  CheckIcon,
+  InterviewIcon,
+  MarkdownContent,
+  NoteIcon,
+} from "ui";
 import { getAccessToken } from "utils";
 import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
@@ -155,9 +161,7 @@ export default function AnnouncementDetailPage({
   };
 
   const handleApplyClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (getAccessToken()) {
-      return;
-    }
+    if (getAccessToken()) return;
 
     event.preventDefault();
     toast.error("로그인 후 이용해주세요.");
@@ -318,9 +322,9 @@ export default function AnnouncementDetailPage({
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
                 공고 소개
               </h2>
-              <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.introduction}
-              </p>
+              <div className="max-w-[700px]">
+                <MarkdownContent content={announcement.introduction} />
+              </div>
             </section>
 
             {/* 지원 마감일 */}
@@ -338,9 +342,9 @@ export default function AnnouncementDetailPage({
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
                 인재상
               </h2>
-              <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.talentDescription}
-              </p>
+              <div className="max-w-[700px]">
+                <MarkdownContent content={announcement.talentDescription} />
+              </div>
             </section>
 
             {/* 과제 */}
@@ -348,9 +352,9 @@ export default function AnnouncementDetailPage({
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
                 과제
               </h2>
-              <p className="text-[14px] text-gray-700 md:text-[15px]">
-                {announcement.assignment}
-              </p>
+              <div className="max-w-[700px]">
+                <MarkdownContent content={announcement.assignment} />
+              </div>
             </section>
 
             {/* 면접 절차 */}
