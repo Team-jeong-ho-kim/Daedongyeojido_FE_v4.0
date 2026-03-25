@@ -17,6 +17,8 @@ import {
   resolveClubCreationApplicationStatus,
 } from "utils";
 import { useGetMyClubCreationApplicationQuery } from "@/hooks/querys";
+import { useResolvedUserRole } from "@/hooks/useResolvedUserRole";
+import { ClubCreationAccessBlocked } from "./components/ClubCreationAccessBlocked";
 
 const STATUS_LABELS: Record<ClubCreationApplicationStatus, string> = {
   SUBMITTED: "제출 완료",
@@ -309,8 +311,26 @@ function ReviewTimelineSection({
 }
 
 export default function ClubCreationApplicationDetailPage() {
-  const myApplicationQuery = useGetMyClubCreationApplicationQuery();
+  const { isResolved: isRoleResolved, role } = useResolvedUserRole();
+  const isBlockedRole = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+  const myApplicationQuery = useGetMyClubCreationApplicationQuery({
+    enabled: isRoleResolved && !isBlockedRole,
+  });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  if (!isRoleResolved) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <p className="text-gray-500 text-sm">
+          권한 정보를 확인하고 있습니다...
+        </p>
+      </div>
+    );
+  }
+
+  if (isBlockedRole) {
+    return <ClubCreationAccessBlocked />;
+  }
 
   if (myApplicationQuery.isPending) {
     return (
