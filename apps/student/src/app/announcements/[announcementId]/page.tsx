@@ -155,9 +155,7 @@ export default function AnnouncementDetailPage({
   };
 
   const handleApplyClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (getAccessToken()) {
-      return;
-    }
+    if (getAccessToken()) return;
 
     event.preventDefault();
     toast.error("로그인 후 이용해주세요.");

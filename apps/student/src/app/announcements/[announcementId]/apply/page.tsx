@@ -4,10 +4,10 @@ export const runtime = "edge";
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
-import { getMajorLabel } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
-import { ApiError } from "utils";
+import { ApiError, getSessionUser } from "utils";
 import { getDetailAnnouncement } from "@/api/announcement";
 import {
   getApplicationFormDetail,
@@ -34,6 +34,9 @@ export default function ApplyDetailPage({
   const { announcementId } = use(params);
   const router = useRouter();
   const id = useId();
+  const storeRole = useUserStore((state) => state.userInfo?.role);
+  const role = storeRole ?? getSessionUser()?.role ?? null;
+  const isClubAffiliated = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const [applicationForm, setApplicationForm] = useState<any>(null);
   const [applicationFormId, setApplicationFormId] = useState<string | null>(
@@ -433,16 +436,18 @@ export default function ApplyDetailPage({
         </div>
       </div>
 
-      <div className="flex justify-center bg-gray-50 px-6 pt-6 pb-12 md:px-12 lg:px-24">
-        <button
-          type="button"
-          onClick={handleOpenModal}
-          disabled={isSubmitting}
-          className="w-full max-w-md rounded-lg bg-[#FF7575] py-4 font-medium text-base text-white transition-colors hover:bg-[#FF6464] disabled:cursor-not-allowed disabled:bg-gray-400"
-        >
-          {isSubmitting ? "제출 중..." : "지원하기"}
-        </button>
-      </div>
+      {!isClubAffiliated ? (
+        <div className="flex justify-center bg-gray-50 px-6 pt-6 pb-12 md:px-12 lg:px-24">
+          <button
+            type="button"
+            onClick={handleOpenModal}
+            disabled={isSubmitting}
+            className="w-full max-w-md rounded-lg bg-[#FF7575] py-4 font-medium text-base text-white transition-colors hover:bg-[#FF6464] disabled:cursor-not-allowed disabled:bg-gray-400"
+          >
+            {isSubmitting ? "제출 중..." : "지원하기"}
+          </button>
+        </div>
+      ) : null}
 
       <ApplicationConfirmModal
         isOpen={show}
