@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
-import type { ApiError } from "utils";
+import { ApiError } from "utils";
 import { getDetailAnnouncement } from "@/api/announcement";
 import {
   getApplicationFormDetail,
@@ -14,6 +14,7 @@ import {
 } from "@/api/applicationForm";
 import { ClubHeader } from "@/components";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
+import { hasAccessToken } from "@/lib/auth";
 import { useModalStore } from "@/stores/useModalStore";
 
 export default function ApplyDetailPage({
@@ -31,6 +32,7 @@ export default function ApplyDetailPage({
   );
   const [clubId, setClubId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -173,6 +175,13 @@ export default function ApplyDetailPage({
 
   // 공고 및 지원서 폼 조회
   useEffect(() => {
+    if (!hasAccessToken()) {
+      toast.error("로그인 후 이용해주세요.");
+      setIsUnauthorized(true);
+      setIsLoading(false);
+      return;
+    }
+
     let isMounted = true;
 
     const fetchData = async () => {
@@ -211,7 +220,11 @@ export default function ApplyDetailPage({
         }
       } catch (error) {
         console.error("데이터 조회 실패:", error);
-        toast.error("데이터를 불러올 수 없습니다.");
+        if (error instanceof ApiError) {
+          toast.error(error.description);
+        } else {
+          toast.error("데이터를 불러올 수 없습니다.");
+        }
         router.push(`/announcements/${announcementId}`);
       } finally {
         setIsLoading(false);
@@ -255,6 +268,14 @@ export default function ApplyDetailPage({
 
     return () => clearTimeout(timer);
   }, [formData, announcementId]);
+
+  if (isUnauthorized) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">로그인 후 이용해주세요.</p>
+      </main>
+    );
+  }
 
   if (isLoading || !applicationForm) {
     return (
