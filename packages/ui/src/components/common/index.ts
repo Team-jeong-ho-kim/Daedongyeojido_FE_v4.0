@@ -1,3 +1,4 @@
+export { CloudflareAnalytics } from "./CloudflareAnalytics";
 export { DocumentPreviewFallbackPanel } from "./DocumentPreviewFallbackPanel";
 export { DocumentPreviewLoadingState } from "./DocumentPreviewLoadingState";
 export {
