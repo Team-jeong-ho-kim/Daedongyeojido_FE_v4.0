@@ -323,6 +323,8 @@ test.describe("Student club creation", () => {
       .filter({ hasText: "홍길동" });
 
     await expect(matchedTeacherCard.getByText("매칭됨")).toBeVisible();
+    await expect(matchedTeacherCard).toHaveAttribute("aria-disabled", "true");
+    // Disabled cards still surface the toast through React's click handler.
     await matchedTeacherCard.dispatchEvent("click");
 
     await expect(
