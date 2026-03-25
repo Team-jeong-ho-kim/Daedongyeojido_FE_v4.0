@@ -2,8 +2,9 @@
 
 export const runtime = "edge";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { type MouseEvent, use, useEffect, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
@@ -153,12 +154,12 @@ export default function AnnouncementDetailPage({
     });
   };
 
-  const handleApplyClick = () => {
+  const handleApplyClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (getAccessToken()) {
-      router.push(`/announcements/${announcementId}/apply`);
       return;
     }
 
+    event.preventDefault();
     toast.error("로그인 후 이용해주세요.");
   };
 
@@ -426,13 +427,13 @@ export default function AnnouncementDetailPage({
                     지원서 작성하기 (종료)
                   </button>
                 ) : (
-                  <button
-                    type="button"
+                  <Link
+                    href={`/announcements/${announcementId}/apply`}
                     onClick={handleApplyClick}
                     className="w-full max-w-md cursor-pointer rounded-lg bg-primary-500 py-3 text-center font-medium text-[15px] text-white contain-paint hover:bg-primary-400 md:text-[16px]"
                   >
                     지원서 작성하기
-                  </button>
+                  </Link>
                 )}
               </div>
             )}
