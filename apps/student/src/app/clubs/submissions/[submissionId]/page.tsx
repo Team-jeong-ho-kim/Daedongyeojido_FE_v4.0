@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
-import { useUserStore } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
 import { ApiError } from "utils";
 import {
@@ -321,7 +321,7 @@ export default function SubmissionDetailPage({
                     : "border border-gray-300 bg-white text-gray-700"
                 }`}
               >
-                {major}
+                {getMajorLabel(major)}
               </span>
             ))}
           </div>

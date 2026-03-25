@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { ApiError } from "utils";
 import { createApplicationForm } from "@/api/applicationForm";
@@ -172,7 +173,7 @@ export default function ApplicationForm({ onExit }: ApplicationFormProps) {
                           : "border-gray-300 bg-white text-gray-500"
                       }`}
                     >
-                      {field}
+                      {getMajorLabel(field)}
                     </button>
                   ))}
                 </div>

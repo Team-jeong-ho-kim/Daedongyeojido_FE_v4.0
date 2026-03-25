@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
+import { getMajorLabel } from "shared";
 import {
   apiClient,
   clearTokens,
@@ -312,7 +313,7 @@ export default function TeacherMyPage() {
                                   key={`${application.applicationId}-${major}`}
                                   className="rounded-full border border-gray-200 bg-white px-2.5 py-1 font-medium text-[11px] text-gray-600"
                                 >
-                                  {major}
+                                  {getMajorLabel(major)}
                                 </span>
                               ))}
                             </div>

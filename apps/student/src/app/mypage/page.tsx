@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useUserStore } from "shared";
+import { formatMajorList, useUserStore } from "shared";
 import { useLogoutMutation } from "@/hooks/mutations";
 import { useMyInfoQuery } from "@/hooks/querys";
 
@@ -37,7 +37,9 @@ export default function MyPage() {
               <span>{userInfo?.clubName ?? "무소속"}</span>
               <span className="text-gray-400">|</span>
               <span className="rounded-full border border-primary-500 px-3 py-0.5 font-semibold text-primary-500 text-xs tracking-wide">
-                {userInfo?.major?.join(", ") || "미정"}
+                {userInfo?.major?.length
+                  ? formatMajorList(userInfo.major)
+                  : "미정"}
               </span>
             </div>
           </div>

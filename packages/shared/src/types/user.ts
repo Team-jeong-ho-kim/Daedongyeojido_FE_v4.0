@@ -1,3 +1,5 @@
+import type { Major } from "./major";
+
 // 사용자 권한
 export type UserRole =
   | "ADMIN"
@@ -13,7 +15,7 @@ export interface UserInfo {
   phoneNumber?: string | null;
   introduction: string | null;
   clubName: string | null;
-  major: string[];
+  major: Major[];
   link: string[];
   profileImage: string | null;
   role: UserRole;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { updateInterviewSchedule } from "@/api/applicationForm";
 import { getErrorMessage } from "@/lib/error";
@@ -215,7 +216,7 @@ export function InterviewScheduleViewModal({
             <div className="flex items-center gap-2">
               <span>지원 전공:</span>
               <span className="rounded-full border border-primary-500 bg-white px-4 py-1 font-medium text-primary-500 text-sm">
-                {schedule.major}
+                {getMajorLabel(schedule.major)}
               </span>
             </div>
           </div>

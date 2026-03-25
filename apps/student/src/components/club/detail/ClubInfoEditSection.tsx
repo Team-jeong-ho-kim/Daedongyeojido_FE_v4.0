@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { MarkdownContent } from "ui";
 import { FIELDS } from "@/constants/club";
@@ -291,7 +292,7 @@ export function ClubInfoEditSection({
                       : "border-gray-300 text-gray-500"
                   }`}
                 >
-                  {field}
+                  {getMajorLabel(field)}
                 </button>
               ))
             : [...new Set(club.majors)].map((major) => (
@@ -299,7 +300,7 @@ export function ClubInfoEditSection({
                   key={major}
                   className="rounded-full border border-primary-300 px-3 py-1 text-[12px] text-primary-500 md:text-[13px]"
                 >
-                  {major}
+                  {getMajorLabel(major)}
                 </span>
               ))}
         </div>

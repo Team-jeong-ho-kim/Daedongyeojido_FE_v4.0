@@ -5,7 +5,7 @@ export const runtime = "edge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type MouseEvent, use, useEffect, useState } from "react";
-import { useUserStore } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import { getAccessToken } from "utils";
@@ -307,16 +307,16 @@ export default function AnnouncementDetailPage({
                     key={major}
                     className="rounded-full border border-red-300 px-3 py-1 text-[12px] text-red-500 md:text-[13px]"
                   >
-                    {major}
+                    {getMajorLabel(major)}
                   </span>
                 ))}
               </div>
             </section>
 
-            {/* 동아리 소개 */}
+            {/* 공고 소개 */}
             <section className="flex flex-col gap-2 md:flex-row md:gap-0">
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-                동아리 소개
+                공고 소개
               </h2>
               <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
                 {announcement.introduction}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { formatMajorList, getMajorLabel } from "shared";
 import { Chip } from "../../common/Chip";
 
 interface Applicant {
@@ -33,8 +34,8 @@ export default function ApplicantCard({
     applicant.classNumber || applicant.studentId || "학번 없음";
   const displayMajor = applicant.major
     ? Array.isArray(applicant.major)
-      ? applicant.major.join(", ")
-      : String(applicant.major)
+      ? formatMajorList(applicant.major)
+      : getMajorLabel(String(applicant.major))
     : applicant.position || "전공 없음";
   const displayInterviewDate = applicant.interviewDate || "-";
   const hasNavigationData =

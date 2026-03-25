@@ -4,6 +4,7 @@ export const runtime = "edge";
 
 import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { ClubHeader } from "@/components/common";
 import {
@@ -284,7 +285,7 @@ export default function AdminAnnouncementDetailPage() {
                   key={major}
                   className="rounded-full border border-red-300 px-3 py-1 text-[12px] text-red-500 md:text-[13px]"
                 >
-                  {major}
+                  {getMajorLabel(major)}
                 </span>
               ))}
             </div>

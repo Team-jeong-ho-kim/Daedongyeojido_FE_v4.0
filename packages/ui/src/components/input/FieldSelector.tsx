@@ -1,5 +1,6 @@
 "use client";
 
+import { getMajorLabel } from "shared";
 import ErrorMessage from "./ErrorMessage";
 
 interface FieldSelectorProps {
@@ -37,7 +38,7 @@ export default function FieldSelector({
                 : "border-[#D5D5D5] bg-white text-[#666666] hover:border-[#BBBBBB]"
             }`}
           >
-            {field}
+            {getMajorLabel(field)}
           </button>
         ))}
       </div>

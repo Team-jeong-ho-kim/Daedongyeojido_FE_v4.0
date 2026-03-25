@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getMajorLabel } from "shared";
 
 interface MemberItemProps {
   userName: string;
@@ -52,7 +53,7 @@ export function MemberItem({
                     key={major}
                     className="flex h-7 w-auto items-center rounded-[100px] border-[0.1px] px-[10px]"
                   >
-                    # {major}
+                    # {getMajorLabel(major)}
                   </span>
                 ))}
                 {hasMoreMajors && (
@@ -75,7 +76,7 @@ export function MemberItem({
                   key={major}
                   className="flex h-7 w-auto items-center rounded-full border border-primary-200 bg-primary-50 px-3 font-medium text-primary-600 text-xs shadow-sm"
                 >
-                  # {major}
+                  # {getMajorLabel(major)}
                 </span>
               ))}
             </div>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useEffect, useId, useMemo, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { ManualPdfPreviewModal, MarkdownContent } from "ui";
 import {
@@ -553,7 +554,7 @@ export function ClubCreationTab() {
                         key={`${application.applicationId}-${major}`}
                         className="rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] text-gray-600"
                       >
-                        {major}
+                        {getMajorLabel(major)}
                       </span>
                     ))}
                   </div>
@@ -679,7 +680,7 @@ export function ClubCreationTab() {
                               key={`${applicationDetail.applicationId}-${major}`}
                               className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 font-medium text-[12px] text-primary-700"
                             >
-                              {major}
+                              {getMajorLabel(major)}
                             </span>
                           ))}
                         </div>
