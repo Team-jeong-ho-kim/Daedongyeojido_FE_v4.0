@@ -223,4 +223,103 @@ test.describe("Student discovery flows", () => {
     await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
     await expect(page).toHaveURL(/\/clubs\/1$/);
   });
+
+  test("학생은 지원서 자기소개와 질문 답변을 글자수 제한 내로만 작성할 수 있다", async ({
+    page,
+  }) => {
+    await setAuthSession(page);
+    const mockApi = await installStudentApiMocks(page, {
+      announcementDetail: {
+        status: "OPEN",
+      },
+    });
+
+    const shortAnswer = "짧은 답변입니다.";
+    const longAnswer = "가".repeat(210);
+    const limitedAnswer = longAnswer.slice(0, 200);
+    const multilineAnswer = Array.from(
+      { length: 8 },
+      (_, index) => `답변 ${index + 1}줄`,
+    ).join("\n");
+    const shortIntroduction = "짧은 자기소개입니다.";
+    const longIntroduction = "나".repeat(320);
+    const limitedIntroduction = longIntroduction.slice(0, 300);
+    const multilineIntroduction = Array.from(
+      { length: 10 },
+      (_, index) => `자기소개 ${index + 1}줄`,
+    ).join("\n");
+    const introductionField = page.getByLabel("자기소개");
+    const answerField = page.getByLabel("Q1. 지원 동기를 작성해주세요.");
+
+    await page.goto("/announcements/1/apply");
+
+    const introductionInitialHeight = await introductionField.evaluate(
+      (element) => element.clientHeight,
+    );
+    await introductionField.fill(multilineIntroduction);
+    await expect(introductionField).toHaveValue(multilineIntroduction);
+    await expect
+      .poll(() => introductionField.evaluate((element) => element.clientHeight))
+      .toBeGreaterThan(introductionInitialHeight);
+
+    await introductionField.fill(shortIntroduction);
+    await expect(introductionField).toHaveValue(shortIntroduction);
+    await expect(
+      page.getByText(`${shortIntroduction.length}/300`, { exact: true }),
+    ).toBeVisible();
+
+    await introductionField.fill(longIntroduction);
+    await expect(introductionField).toHaveValue(limitedIntroduction);
+    await expect(page.getByText("300/300", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("자기소개는 300자까지 입력 가능합니다"),
+    ).toBeVisible();
+
+    const answerInitialHeight = await answerField.evaluate(
+      (element) => element.clientHeight,
+    );
+    await answerField.fill(multilineAnswer);
+    await expect(answerField).toHaveValue(multilineAnswer);
+    await expect
+      .poll(() => answerField.evaluate((element) => element.clientHeight))
+      .toBeGreaterThan(answerInitialHeight);
+
+    await answerField.fill(shortAnswer);
+    await expect(answerField).toHaveValue(shortAnswer);
+    await expect(
+      page.getByText(`${shortAnswer.length}/200`, { exact: true }),
+    ).toBeVisible();
+
+    await answerField.fill(longAnswer);
+    await expect(answerField).toHaveValue(limitedAnswer);
+    await expect(page.getByText("200/200", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("질문 답변은 200자까지 입력 가능합니다"),
+    ).toBeVisible();
+
+    await page.getByLabel("이름").fill("홍길동");
+    await page.getByLabel("학번").fill("2401");
+
+    await page.getByRole("button", { name: "지원하기" }).click();
+    await page.getByRole("button", { name: "생성하기" }).click();
+
+    const submitRequest = mockApi.getLastRequest(/\/applications\/11$/, "POST");
+    const submitBody = submitRequest?.body as
+      | {
+          introduction?: string;
+          answer?: Array<{
+            applicationQuestionId: number;
+            answer: string;
+          }>;
+        }
+      | undefined;
+
+    expect(submitBody?.introduction).toBe(limitedIntroduction);
+    expect(submitBody?.introduction).toHaveLength(300);
+    expect(submitBody?.answer?.[0]).toEqual({
+      applicationQuestionId: 1,
+      answer: limitedAnswer,
+    });
+    expect(submitBody?.answer?.[0]?.answer).toHaveLength(200);
+  });
 });
