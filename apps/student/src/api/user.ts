@@ -2,6 +2,20 @@ import type { UserInfo } from "shared";
 import { apiClient } from "utils";
 import type { UpdateMyInfoRequest, UpdateProfileRequest } from "@/types";
 
+const appendArrayField = (
+  formData: FormData,
+  key: string,
+  values: string[],
+) => {
+  const normalizedValues = [
+    ...new Set(values.map((value) => value.trim())),
+  ].filter(Boolean);
+
+  for (const value of normalizedValues) {
+    formData.append(key, value);
+  }
+};
+
 export const getMyInfo = async () => {
   const response = await apiClient.get<UserInfo>("/users");
   return response.data;
@@ -16,13 +30,8 @@ export const updateMyInfo = async (data: UpdateMyInfoRequest) => {
     formData.append("phoneNumber", data.phoneNumber);
   }
 
-  for (const major of data.majors) {
-    formData.append("majors", major);
-  }
-
-  for (const link of data.links) {
-    formData.append("links", link);
-  }
+  appendArrayField(formData, "majors", data.majors);
+  appendArrayField(formData, "links", data.links);
 
   if (data.profileImage) {
     formData.append("profileImage", data.profileImage);
@@ -42,13 +51,8 @@ export const updateProfile = async (data: UpdateProfileRequest) => {
 
   formData.append("introduction", data.introduction);
 
-  for (const major of data.majors) {
-    formData.append("majors", major);
-  }
-
-  for (const link of data.links) {
-    formData.append("links", link);
-  }
+  appendArrayField(formData, "majors", data.majors);
+  appendArrayField(formData, "links", data.links);
 
   if (data.profileImage) {
     formData.append("profileImage", data.profileImage);

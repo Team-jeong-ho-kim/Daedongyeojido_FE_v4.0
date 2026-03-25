@@ -40,6 +40,7 @@ export default function MyPageEdit() {
   const [introduction, setIntroduction] = useState(
     userInfo?.introduction || "",
   );
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // userInfo 변경 시 상태 업데이트
   useEffect(() => {
@@ -72,6 +73,18 @@ export default function MyPageEdit() {
       return;
     }
     setIntroduction(value);
+  };
+
+  const handleFieldsChange = (fields: string[]) => {
+    setSelectedFields(fields);
+
+    if (errors.fields && fields.length > 0) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.fields;
+        return next;
+      });
+    }
   };
 
   const hasChanges = (): boolean => {
@@ -115,6 +128,14 @@ export default function MyPageEdit() {
     const normalizedLinks = [
       ...new Set(links.map((link) => link.url.trim())),
     ].filter(Boolean);
+
+    if (normalizedMajors.length === 0) {
+      setErrors((prev) => ({
+        ...prev,
+        fields: "전공을 1개 이상 선택해주세요",
+      }));
+      return;
+    }
 
     submitLockRef.current = true;
     updateProfileMutation.mutate(
@@ -203,7 +224,8 @@ export default function MyPageEdit() {
               <FieldSelector
                 fields={FIELDS}
                 selectedFields={selectedFields}
-                onSelectionChange={setSelectedFields}
+                onSelectionChange={handleFieldsChange}
+                error={errors.fields}
               />
             </div>
 
