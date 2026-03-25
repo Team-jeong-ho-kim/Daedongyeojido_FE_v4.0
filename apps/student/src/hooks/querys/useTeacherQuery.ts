@@ -12,7 +12,8 @@ export const useGetAllTeachersQuery = (options?: UseGetAllTeachersOptions) => {
   return useQuery({
     queryKey: queryKeys.teachers.all.queryKey,
     queryFn: getAllTeachers,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: "always",
     enabled: options?.enabled ?? true,
   });
 };

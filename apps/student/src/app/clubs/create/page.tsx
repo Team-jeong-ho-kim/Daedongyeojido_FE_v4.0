@@ -307,6 +307,32 @@ export default function ClubCreationPage() {
   }, [selectedTeacherId, teachers]);
 
   useEffect(() => {
+    if (role === null || isBlockedRole) {
+      return;
+    }
+
+    const handleTeacherListRefresh = () => {
+      void teachersQuery.refetch();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      void teachersQuery.refetch();
+    };
+
+    window.addEventListener("focus", handleTeacherListRefresh);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", handleTeacherListRefresh);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isBlockedRole, role, teachersQuery]);
+
+  useEffect(() => {
     if (!clubCreationFormFile) {
       setClubCreationFormPreviewUrl((previousUrl) => {
         if (previousUrl) {
