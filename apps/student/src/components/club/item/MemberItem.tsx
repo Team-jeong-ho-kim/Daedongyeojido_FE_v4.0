@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getMajorLabel } from "shared";
 import type { ClubMember } from "@/types";
 
 interface MemberItemProps extends ClubMember {
@@ -68,7 +69,7 @@ export default function MemberItem({
                 key={major}
                 className="inline-flex min-h-7 items-center rounded-full border border-gray-300 px-2.5 py-1 font-medium leading-none md:px-3"
               >
-                #{major}
+                #{getMajorLabel(major)}
               </span>
             ))
           ) : (

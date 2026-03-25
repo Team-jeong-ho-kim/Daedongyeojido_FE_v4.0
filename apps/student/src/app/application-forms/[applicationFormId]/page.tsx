@@ -5,7 +5,7 @@ export const runtime = "edge";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use, useState } from "react";
-import { useUserStore } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { Button } from "ui";
 import { useDeleteApplicationFormMutation } from "@/hooks/mutations/useApplicationForm";
 import { useGetApplicationFormDetailQuery } from "@/hooks/querys/useApplicationFormQuery";
@@ -117,7 +117,7 @@ export default function ApplicationFormDetailPage({
                   key={major}
                   className="rounded-full border border-primary-500 bg-primary-50 px-4 py-1.5 font-medium text-primary-500 text-sm"
                 >
-                  {major}
+                  {getMajorLabel(major)}
                 </span>
               ))}
             </div>

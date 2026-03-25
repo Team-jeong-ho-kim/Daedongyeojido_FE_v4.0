@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useId, useMemo, useState } from "react";
+import { getMajorLabel } from "shared";
 import {
   clearTokens,
   getAccessToken,
@@ -406,7 +407,7 @@ export default function TeacherClubCreationApplicationDetailPage() {
                   key={`${detail.applicationId}-${major}`}
                   className="rounded-full border border-primary-200 bg-primary-50 px-3 py-1 font-medium text-[12px] text-primary-700"
                 >
-                  {major}
+                  {getMajorLabel(major)}
                 </span>
               ))}
             </div>

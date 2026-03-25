@@ -5,7 +5,7 @@ export const runtime = "edge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type MouseEvent, use, useEffect, useState } from "react";
-import { useUserStore } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
 import { CalendarIcon, CheckIcon, InterviewIcon, NoteIcon } from "ui";
 import { getAccessToken } from "utils";
@@ -307,7 +307,7 @@ export default function AnnouncementDetailPage({
                     key={major}
                     className="rounded-full border border-red-300 px-3 py-1 text-[12px] text-red-500 md:text-[13px]"
                   >
-                    {major}
+                    {getMajorLabel(major)}
                   </span>
                 ))}
               </div>

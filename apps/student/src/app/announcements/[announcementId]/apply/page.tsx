@@ -4,6 +4,7 @@ export const runtime = "edge";
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useId, useRef, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
 import { ApiError } from "utils";
@@ -359,7 +360,7 @@ export default function ApplyDetailPage({
                       : "border-gray-400 bg-white text-gray-500 hover:bg-gray-50"
                   }`}
                 >
-                  {major}
+                  {getMajorLabel(major)}
                 </button>
               ))}
             </div>

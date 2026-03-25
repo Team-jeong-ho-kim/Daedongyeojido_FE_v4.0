@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { getMajorLabel } from "shared";
 import { Button, ManualPdfPreviewModal, MarkdownContent } from "ui";
 import type {
   ClubCreationApplicationReview,
@@ -452,7 +453,7 @@ export default function ClubCreationApplicationDetailPage() {
                           key={major}
                           className="rounded-full border border-gray-200 bg-white px-3 py-1 font-medium text-[12px] text-gray-700"
                         >
-                          {major}
+                          {getMajorLabel(major)}
                         </span>
                       ))}
                     </div>

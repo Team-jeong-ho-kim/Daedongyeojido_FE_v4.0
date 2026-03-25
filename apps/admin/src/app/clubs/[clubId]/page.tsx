@@ -5,6 +5,7 @@ export const runtime = "edge";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { getMajorLabel } from "shared";
 import { MarkdownContent } from "ui";
 import { JobPostingItem, MemberItem } from "@/components/club/item";
 import { ClubHeader, Pagination } from "@/components/common";
@@ -203,7 +204,7 @@ export default function AdminClubDetailPage() {
                     key={major}
                     className="rounded-full border border-primary-300 px-3 py-1 text-[12px] text-primary-500 md:text-[13px]"
                   >
-                    {major}
+                    {getMajorLabel(major)}
                   </span>
                 ))}
               </div>

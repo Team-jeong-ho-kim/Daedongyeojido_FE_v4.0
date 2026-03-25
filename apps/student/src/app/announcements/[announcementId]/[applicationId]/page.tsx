@@ -3,6 +3,7 @@
 export const runtime = "edge";
 
 import { useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import {
   ApplicationConfirmModal,
@@ -138,7 +139,7 @@ export default function ApplicationDetailPage() {
             <div className="flex flex-wrap gap-2 pt-1">
               {mockData.majors.map((major) => (
                 <Chip key={major} active={major === mockData.selectedMajor}>
-                  {major}
+                  {getMajorLabel(major)}
                 </Chip>
               ))}
             </div>

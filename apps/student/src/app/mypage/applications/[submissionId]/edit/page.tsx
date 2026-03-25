@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { TextArea, TextInput } from "ui";
 import {
@@ -286,7 +287,7 @@ export default function MySubmissionEditPage({
                     : "border-gray-400 bg-white text-gray-500 hover:bg-gray-50"
                 }`}
               >
-                {major}
+                {getMajorLabel(major)}
               </button>
             ))}
           </div>

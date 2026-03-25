@@ -1,3 +1,4 @@
+import { getMajorLabel } from "shared";
 import { Chip } from "../common";
 
 interface InterviewDetailModalProps {
@@ -41,7 +42,7 @@ export default function InterviewDetailModal({
               <span className="font-semibold">{applicant.studentId}</span>
             </span>
             <span className="text-gray-900">지원 전공:</span>
-            <Chip active>{applicant.major}</Chip>
+            <Chip active>{getMajorLabel(applicant.major)}</Chip>
           </div>
         </div>
 

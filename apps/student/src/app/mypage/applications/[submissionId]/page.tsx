@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use, useState } from "react";
+import { getMajorLabel } from "shared";
 import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmModal";
 import {
   useCancelMySubmissionMutation,
@@ -179,7 +180,7 @@ export default function MySubmissionDetailPage({
             <div className="flex items-center gap-4">
               <span className="w-24 text-gray-600 text-sm">지원 전공</span>
               <span className="rounded-full border border-primary-500 bg-primary-50 px-3 py-1 font-medium text-primary-500 text-sm">
-                {submission.major}
+                {getMajorLabel(submission.major)}
               </span>
             </div>
           </div>
