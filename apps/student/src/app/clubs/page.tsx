@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useUserStore } from "shared";
 import { Button, SkeletonClubCard, useDeferredLoading } from "ui";
 import { ClubItem, CTASection, Pagination } from "@/components";
 import { useGetAllClubsQuery } from "@/hooks/querys/useClubQuery";
@@ -9,6 +10,8 @@ import { useGetAllClubsQuery } from "@/hooks/querys/useClubQuery";
 export default function ClubsPage() {
   const [curPage, setCurPage] = useState(1);
   const limit = 8;
+  const role = useUserStore((state) => state.userInfo?.role);
+  const isClubAffiliated = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
   const { data: clubs, isPending } = useGetAllClubsQuery();
   const showSkeleton = useDeferredLoading(isPending);
@@ -18,14 +21,16 @@ export default function ClubsPage() {
       <div className="container mx-auto max-w-7xl px-6 py-12">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="font-bold text-3xl text-gray-900">동아리 전체 조회</h1>
-          <Link href="/clubs/create">
-            <Button
-              variant="ghost"
-              className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:text-white hover:shadow-lg"
-            >
-              동아리 개설 신청하기
-            </Button>
-          </Link>
+          {!isClubAffiliated ? (
+            <Link href="/clubs/create">
+              <Button
+                variant="ghost"
+                className="cursor-pointer rounded-xl bg-primary-500 p-6 text-white transition-all hover:bg-primary-600 hover:text-white hover:shadow-lg"
+              >
+                동아리 개설 신청하기
+              </Button>
+            </Link>
+          ) : null}
         </div>
 
         {/* 동아리 목록 */}
