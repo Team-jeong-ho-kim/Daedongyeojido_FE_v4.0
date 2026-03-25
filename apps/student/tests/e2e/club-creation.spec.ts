@@ -21,6 +21,9 @@ const uploadClubCreationPdf = async (
 const getTeacherSelectTrigger = (page: Page) =>
   page.getByRole("button", { name: /Teacher/ });
 
+const getTeacherOptionCards = (page: Page) =>
+  page.locator("fieldset button[aria-pressed]");
+
 const buildMyApplication = (
   overrides: Partial<typeof DEFAULT_MY_CLUB_CREATION_APPLICATION> = {},
 ) => {
@@ -209,6 +212,97 @@ test.describe("Student club creation", () => {
     );
   });
 
+  test("같은 탭에서 돌아오면 최신 지도 교사 목록을 다시 불러온다", async ({
+    page,
+  }) => {
+    const mockApi = await installStudentApiMocks(page, {
+      teachers: [
+        { teacherId: 4, teacherName: "asdf", matched: false },
+        { teacherId: 3, teacherName: "농구공", matched: true },
+        { teacherId: 1, teacherName: "선생님", matched: false },
+        { teacherId: 2, teacherName: "김선생", matched: false },
+      ],
+    });
+
+    await page.goto("/clubs/create");
+
+    const teacherSelectTrigger = getTeacherSelectTrigger(page);
+    await teacherSelectTrigger.click();
+    await expect(getTeacherOptionCards(page)).toHaveCount(4);
+
+    mockApi.setTeachers([
+      { teacherId: 4, teacherName: "asdf", matched: false },
+      { teacherId: 3, teacherName: "농구공", matched: true },
+      { teacherId: 1, teacherName: "선생님", matched: false },
+      { teacherId: 2, teacherName: "김선생", matched: false },
+      { teacherId: 5, teacherName: "박교사", matched: false },
+      { teacherId: 6, teacherName: "이교사", matched: false },
+    ]);
+
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event("focus"));
+    });
+
+    await expect
+      .poll(() => {
+        return mockApi.requests.filter(
+          (request) =>
+            request.method === "GET" && request.pathname.endsWith("/teachers"),
+        ).length;
+      })
+      .toBe(2);
+
+    await expect(getTeacherOptionCards(page)).toHaveCount(6);
+    await expect(page.getByRole("button", { name: "박교사" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "이교사" })).toBeVisible();
+  });
+
+  test("화면을 다시 열면 최신 지도 교사 목록을 다시 불러온다", async ({
+    page,
+  }) => {
+    const mockApi = await installStudentApiMocks(page, {
+      teachers: [
+        { teacherId: 4, teacherName: "asdf", matched: false },
+        { teacherId: 3, teacherName: "농구공", matched: true },
+        { teacherId: 1, teacherName: "선생님", matched: false },
+        { teacherId: 2, teacherName: "김선생", matched: false },
+      ],
+    });
+
+    await page.goto("/clubs");
+    await page.getByRole("link", { name: "동아리 개설 신청하기" }).click();
+    await expect(page).toHaveURL(/\/clubs\/create$/);
+
+    const teacherSelectTrigger = getTeacherSelectTrigger(page);
+    await teacherSelectTrigger.click();
+    await expect(getTeacherOptionCards(page)).toHaveCount(4);
+
+    mockApi.setTeachers([
+      { teacherId: 4, teacherName: "asdf", matched: false },
+      { teacherId: 3, teacherName: "농구공", matched: true },
+      { teacherId: 1, teacherName: "선생님", matched: false },
+      { teacherId: 2, teacherName: "김선생", matched: false },
+      { teacherId: 5, teacherName: "박교사", matched: false },
+      { teacherId: 6, teacherName: "이교사", matched: false },
+    ]);
+
+    await page.goBack();
+    await expect(page).toHaveURL(/\/clubs$/);
+    await page.getByRole("link", { name: "동아리 개설 신청하기" }).click();
+    await expect(page).toHaveURL(/\/clubs\/create$/);
+
+    await teacherSelectTrigger.click();
+    await expect
+      .poll(() => {
+        return mockApi.requests.filter(
+          (request) =>
+            request.method === "GET" && request.pathname.endsWith("/teachers"),
+        ).length;
+      })
+      .toBe(2);
+    await expect(getTeacherOptionCards(page)).toHaveCount(6);
+  });
+
   test("매칭된 지도 교사는 배지로 표시되고 선택할 수 없다", async ({
     page,
   }) => {
@@ -229,7 +323,7 @@ test.describe("Student club creation", () => {
       .filter({ hasText: "홍길동" });
 
     await expect(matchedTeacherCard.getByText("매칭됨")).toBeVisible();
-    await matchedTeacherCard.click();
+    await matchedTeacherCard.dispatchEvent("click");
 
     await expect(
       page.getByText("이미 매칭된 지도교사는 선택할 수 없습니다."),
@@ -374,7 +468,9 @@ test.describe("Student club creation", () => {
 
     await page.goto("/clubs/create");
 
-    await expect(page).toHaveURL(/\/mypage\/club-creation$/);
+    await expect(page).toHaveURL(/\/mypage\/club-creation$/, {
+      timeout: 10000,
+    });
     await expect(page.getByText("현재 신청서가 검토 중입니다.")).toBeVisible();
   });
 

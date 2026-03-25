@@ -170,6 +170,7 @@ export type StudentApiMockController = {
     matcher: RegExp | string,
     method?: string,
   ) => RecordedRequest | undefined;
+  setTeachers: (nextTeachers: MockTeacher[]) => void;
 };
 
 type StudentApiMockOptions = {
@@ -555,7 +556,7 @@ export async function installStudentApiMocks(
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
   const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
-  const teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
+  let teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
   const teachersStatus = options.teachersStatus ?? 200;
   let myClubCreationApplication =
     options.myClubCreationApplication === undefined
@@ -688,6 +689,8 @@ export async function installStudentApiMocks(
       await route.continue();
       return;
     }
+
+    recordRequest(route);
 
     if (teachersStatus >= 400) {
       const errorDescription =
@@ -983,6 +986,9 @@ export async function installStudentApiMocks(
 
         return methodMatches && pathMatches;
       });
+    },
+    setTeachers: (nextTeachers) => {
+      teachers = nextTeachers.slice();
     },
   };
 }
