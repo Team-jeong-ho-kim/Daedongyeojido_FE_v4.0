@@ -70,14 +70,14 @@ export default function AdminClubsPage() {
                     </span>
                   </div>
 
-                  <section className="absolute bottom-0 left-0 flex w-full flex-col gap-2 rounded-b-3xl bg-gray-50 px-6 py-4 transition-all duration-300 ease-out group-hover:py-5">
+                  <section className="absolute bottom-0 left-0 flex w-full flex-col gap-2 rounded-b-3xl bg-gray-50 px-6 py-4 transition-all duration-300 ease-out group-hover:min-h-[10rem] group-hover:py-5">
                     <h2 className="font-semibold text-2xl text-gray-900">
                       {club.clubName}
                     </h2>
                     <p className="text-[13px] text-gray-400">
                       동아리 ID: {club.clubId}
                     </p>
-                    <p className="line-clamp-1 text-gray-500 text-sm opacity-70 transition-opacity delay-150 duration-300 ease-out group-hover:line-clamp-none group-hover:opacity-100">
+                    <p className="line-clamp-1 overflow-hidden text-gray-500 text-sm leading-5 opacity-70 transition-opacity delay-150 duration-300 ease-out group-hover:line-clamp-4 group-hover:min-h-20 group-hover:opacity-100">
                       {stripMarkdownToPlainText(club.introduction)}
                     </p>
                   </section>
