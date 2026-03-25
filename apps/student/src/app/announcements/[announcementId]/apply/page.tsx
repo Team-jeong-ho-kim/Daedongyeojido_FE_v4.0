@@ -18,6 +18,14 @@ import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmMo
 import { hasAccessToken } from "@/lib/auth";
 import { useModalStore } from "@/stores/useModalStore";
 
+const INTRODUCTION_MAX_LENGTH = 300;
+const QUESTION_ANSWER_MAX_LENGTH = 200;
+const TEXTAREA_MAX_HEIGHT = 320;
+
+const showApiError = (error: unknown, fallbackMessage: string) => {
+  toast.error(error instanceof ApiError ? error.description : fallbackMessage);
+};
+
 export default function ApplyDetailPage({
   params,
 }: {
@@ -58,7 +66,18 @@ export default function ApplyDetailPage({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const nextValue =
+      name === "introduction" && value.length > INTRODUCTION_MAX_LENGTH
+        ? value.slice(0, INTRODUCTION_MAX_LENGTH)
+        : value;
+
+    if (name === "introduction" && value.length > INTRODUCTION_MAX_LENGTH) {
+      toast.warning("자기소개는 300자까지 입력 가능합니다", {
+        id: "application-introduction-length-limit",
+      });
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: nextValue }));
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -69,9 +88,20 @@ export default function ApplyDetailPage({
   };
 
   const handleAnswerChange = (questionId: number, value: string) => {
+    const nextValue =
+      value.length > QUESTION_ANSWER_MAX_LENGTH
+        ? value.slice(0, QUESTION_ANSWER_MAX_LENGTH)
+        : value;
+
+    if (value.length > QUESTION_ANSWER_MAX_LENGTH) {
+      toast.warning("질문 답변은 200자까지 입력 가능합니다", {
+        id: "application-answer-length-limit",
+      });
+    }
+
     setFormData((prev) => ({
       ...prev,
-      answers: { ...prev.answers, [questionId]: value },
+      answers: { ...prev.answers, [questionId]: nextValue },
     }));
     const errorKey = `answer_${questionId}`;
     if (errors[errorKey]) {
@@ -136,8 +166,7 @@ export default function ApplyDetailPage({
       return true;
     } catch (error) {
       console.error("제출 실패:", error);
-      const apiError = error as ApiError;
-      toast.error(apiError.description);
+      showApiError(error, "지원서 생성에 실패했습니다.");
       return false;
     } finally {
       setIsSubmitting(false);
@@ -221,11 +250,7 @@ export default function ApplyDetailPage({
         }
       } catch (error) {
         console.error("데이터 조회 실패:", error);
-        if (error instanceof ApiError) {
-          toast.error(error.description);
-        } else {
-          toast.error("데이터를 불러올 수 없습니다.");
-        }
+        showApiError(error, "데이터를 불러올 수 없습니다.");
         router.push(`/announcements/${announcementId}`);
       } finally {
         setIsLoading(false);
@@ -342,6 +367,9 @@ export default function ApplyDetailPage({
               } as React.ChangeEvent<HTMLTextAreaElement>)
             }
             error={errors.introduction}
+            helperText={`${formData.introduction.length}/${INTRODUCTION_MAX_LENGTH}`}
+            autoResize={true}
+            maxHeight={TEXTAREA_MAX_HEIGHT}
           />
 
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:gap-0">
@@ -374,6 +402,8 @@ export default function ApplyDetailPage({
           {applicationForm.content.map((question: any, index: number) => {
             const questionId = `${id}-answer-${question.applicationQuestionId}`;
             const errorKey = `answer_${question.applicationQuestionId}`;
+            const answerValue =
+              formData.answers[question.applicationQuestionId] || "";
             return (
               <div
                 key={question.applicationQuestionId}
@@ -388,11 +418,14 @@ export default function ApplyDetailPage({
                 <TextArea
                   id={questionId}
                   placeholder="질문의 답변을 작성해주세요."
-                  value={formData.answers[question.applicationQuestionId] || ""}
+                  value={answerValue}
                   onChange={(value) =>
                     handleAnswerChange(question.applicationQuestionId, value)
                   }
                   error={errors[errorKey]}
+                  helperText={`${answerValue.length}/${QUESTION_ANSWER_MAX_LENGTH}`}
+                  autoResize={true}
+                  maxHeight={TEXTAREA_MAX_HEIGHT}
                 />
               </div>
             );
