@@ -313,10 +313,10 @@ export default function AnnouncementDetailPage({
               </div>
             </section>
 
-            {/* 동아리 소개 */}
+            {/* 공고 소개 */}
             <section className="flex flex-col gap-2 md:flex-row md:gap-0">
               <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-                동아리 소개
+                공고 소개
               </h2>
               <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
                 {announcement.introduction}
