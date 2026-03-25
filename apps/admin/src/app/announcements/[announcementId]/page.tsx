@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { getMajorLabel } from "shared";
 import { toast } from "sonner";
+import { MarkdownContent } from "ui";
 import { ClubHeader } from "@/components/common";
 import {
   useGetAnnouncementDetailQuery,
@@ -293,11 +294,11 @@ export default function AdminAnnouncementDetailPage() {
 
           <section className="flex flex-col gap-2 md:flex-row md:gap-0">
             <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
-              동아리 소개
+              공고 소개
             </h2>
-            <p className="max-w-[700px] text-[14px] text-gray-700 md:text-[15px]">
-              {announcementDetail.introduction}
-            </p>
+            <div className="max-w-[700px]">
+              <MarkdownContent content={announcementDetail.introduction} />
+            </div>
           </section>
 
           <section className="flex flex-col gap-2 md:flex-row md:gap-0">
@@ -313,18 +314,18 @@ export default function AdminAnnouncementDetailPage() {
             <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
               인재상
             </h2>
-            <p className="text-[14px] text-gray-700 md:text-[15px]">
-              {announcementDetail.talentDescription}
-            </p>
+            <div className="max-w-[700px]">
+              <MarkdownContent content={announcementDetail.talentDescription} />
+            </div>
           </section>
 
           <section className="flex flex-col gap-2 md:flex-row md:gap-0">
             <h2 className="font-medium text-[14px] md:w-[140px] md:text-[15px]">
               과제
             </h2>
-            <p className="text-[14px] text-gray-700 md:text-[15px]">
-              {announcementDetail.assignment}
-            </p>
+            <div className="max-w-[700px]">
+              <MarkdownContent content={announcementDetail.assignment} />
+            </div>
           </section>
 
           <section className="flex flex-col gap-4 md:flex-row md:gap-0">

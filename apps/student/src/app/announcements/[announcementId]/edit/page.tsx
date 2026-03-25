@@ -181,6 +181,7 @@ export default function EditAnnouncementPage({
               placeholder="공고 소개글을 작성해주세요."
               rows={8}
               error={errors.introduction}
+              helperText="마크다운 문법을 사용할 수 있습니다. 저장 시 원문 그대로 반영됩니다."
             />
           </FormField>
 
@@ -191,6 +192,7 @@ export default function EditAnnouncementPage({
               placeholder="인재상을 작성해주세요. (ex. 1.~을 하는 사람)"
               rows={6}
               error={errors.idealCandidate}
+              helperText="마크다운 문법을 사용할 수 있습니다. 저장 시 원문 그대로 반영됩니다."
             />
           </FormField>
 
@@ -200,6 +202,7 @@ export default function EditAnnouncementPage({
               onChange={setAssignment}
               placeholder="부여할 과제를 작성해주세요."
               rows={6}
+              helperText="마크다운 문법을 사용할 수 있습니다. 저장 시 원문 그대로 반영됩니다."
             />
           </FormField>
 
