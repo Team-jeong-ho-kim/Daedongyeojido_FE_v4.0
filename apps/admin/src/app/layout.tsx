@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { CloudflareAnalytics } from "ui";
 import { AdminFooter, AdminLayoutContent } from "@/components/layout";
 import { AdminProviders } from "@/components/providers";
 import "./globals.css";
@@ -24,10 +25,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const analyticsToken =
+    process.env.NEXT_PUBLIC_CLOUDFLARE_ADMIN_ANALYTICS_TOKEN;
+
   return (
     <html lang="ko">
       <head>
         <link rel="icon" href="/daedong.svg" type="image/svg+xml" />
+        <CloudflareAnalytics token={analyticsToken} />
       </head>
       <body>
         <AdminProviders>

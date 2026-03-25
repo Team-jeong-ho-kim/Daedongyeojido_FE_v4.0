@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CloudflareAnalytics } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import { TeacherLayoutContent } from "@/components/layout";
 import "./globals.css";
@@ -25,8 +26,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const analyticsToken =
+    process.env.NEXT_PUBLIC_CLOUDFLARE_TEACHER_ANALYTICS_TOKEN;
+
   return (
     <html lang="ko">
+      <head>
+        <CloudflareAnalytics token={analyticsToken} />
+      </head>
       <body>
         <ChannelTalkProvider />
         <TeacherLayoutContent>{children}</TeacherLayoutContent>

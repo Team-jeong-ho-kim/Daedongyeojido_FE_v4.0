@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-import { Footer } from "ui";
+import { CloudflareAnalytics, Footer } from "ui";
 import LayoutContent from "@/components/layout/LayoutContent";
 import { QueryProvider, UserProvider } from "@/components/providers";
 import "./globals.css";
@@ -78,6 +78,8 @@ type RootLayoutProps = {
 
 export default function RootLayout(props: RootLayoutProps) {
   const { children } = props;
+  const analyticsToken =
+    process.env.NEXT_PUBLIC_CLOUDFLARE_USER_ANALYTICS_TOKEN;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -129,6 +131,9 @@ export default function RootLayout(props: RootLayoutProps) {
 
   return (
     <html lang="ko">
+      <head>
+        <CloudflareAnalytics token={analyticsToken} />
+      </head>
       <body>
         <script
           type="application/ld+json"

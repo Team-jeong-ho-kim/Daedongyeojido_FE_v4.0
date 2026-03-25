@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CloudflareAnalytics } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const analyticsToken = process.env.NEXT_PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN;
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -134,6 +136,7 @@ export default function RootLayout({
             __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
           }}
         />
+        <CloudflareAnalytics token={analyticsToken} />
       </head>
       <body>
         <ChannelTalkProvider />
