@@ -623,6 +623,7 @@ export default function ClubCreationPage() {
               placeholder="동아리 소개 문구를 작성해주세요."
               rows={8}
               error={errors.clubIntroDetail}
+              helperText="마크다운 문법을 사용할 수 있습니다. 저장 시 원문 그대로 반영됩니다."
             />
           </FormField>
 

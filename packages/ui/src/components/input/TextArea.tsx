@@ -12,6 +12,7 @@ interface TextAreaProps {
   name?: string;
   label?: string;
   error?: string;
+  helperText?: string;
   autoResize?: boolean;
   maxHeight?: number;
 }
@@ -25,6 +26,7 @@ export default function TextArea({
   name,
   label,
   error,
+  helperText,
   autoResize = false,
   maxHeight = 200,
 }: TextAreaProps) {
@@ -58,6 +60,9 @@ export default function TextArea({
             : "border-gray-200 focus:border-primary-500 focus:ring-primary-500"
         }`}
       />
+      {helperText ? (
+        <p className="mt-2 text-gray-500 text-xs leading-5">{helperText}</p>
+      ) : null}
       <ErrorMessage message={error} />
     </div>
   );

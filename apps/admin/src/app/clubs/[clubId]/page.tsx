@@ -5,6 +5,7 @@ export const runtime = "edge";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { MarkdownContent } from "ui";
 import { JobPostingItem, MemberItem } from "@/components/club/item";
 import { ClubHeader, Pagination } from "@/components/common";
 import {
@@ -213,9 +214,10 @@ export default function AdminClubDetailPage() {
                 동아리 소개
               </h2>
               <div className="flex flex-1 items-start rounded-lg border border-gray-100 bg-white p-4">
-                <p className="flex-1 text-[14px] text-gray-700 md:text-[15px]">
-                  {clubDetail.club.introduction}
-                </p>
+                <MarkdownContent
+                  content={clubDetail.club.introduction}
+                  className="flex-1"
+                />
               </div>
             </section>
 

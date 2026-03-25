@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { MarkdownContent } from "ui";
 import { FIELDS } from "@/constants/club";
 import type { ClubDetail } from "@/types";
 
@@ -337,9 +338,14 @@ export function ClubInfoEditSection({
                 className="min-h-[100px] w-full resize-none overflow-hidden bg-transparent text-[14px] text-gray-700 focus:outline-none md:text-[15px]"
               />
               <div className="flex items-center justify-between">
-                <span className="text-[12px] text-gray-400">
-                  {editIntroduction.length}/500
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[12px] text-gray-400">
+                    마크다운 문법을 사용할 수 있습니다.
+                  </span>
+                  <span className="text-[12px] text-gray-400">
+                    {editIntroduction.length}/500
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsEditingIntro(false)}
@@ -350,9 +356,10 @@ export function ClubInfoEditSection({
               </div>
             </div>
           ) : (
-            <p className="flex-1 text-[14px] text-gray-700 md:text-[15px]">
-              {isClubMember ? editIntroduction : club.introduction}
-            </p>
+            <MarkdownContent
+              content={isClubMember ? editIntroduction : club.introduction}
+              className="flex-1"
+            />
           )}
           {isClubMember && !isEditingIntro && (
             <button

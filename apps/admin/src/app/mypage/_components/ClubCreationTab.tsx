@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ManualPdfPreviewModal } from "ui";
+import { ManualPdfPreviewModal, MarkdownContent } from "ui";
 import {
   type ClubCreationApplicationReview,
   type ClubCreationReviewDecision,
@@ -663,9 +663,10 @@ export function ClubCreationTab() {
                         <h4 className="font-bold text-gray-900 text-lg">
                           동아리 소개
                         </h4>
-                        <p className="mt-4 text-gray-700 text-sm leading-7">
-                          {applicationDetail.introduction}
-                        </p>
+                        <MarkdownContent
+                          content={applicationDetail.introduction}
+                          className="mt-4 text-sm"
+                        />
                       </section>
 
                       <section className="rounded-2xl bg-white px-6 py-6 shadow-sm">
