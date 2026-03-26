@@ -1,5 +1,17 @@
 import { resolvePdfPreviewUrl } from "../resolvePdfPreviewUrl";
 
+const createMockResponse = (
+  response: {
+    blob?: () => Promise<Blob>;
+    headers?: {
+      get: (name: string) => string | null;
+    };
+    ok: boolean;
+  },
+) => {
+  return response as unknown as Response;
+};
+
 describe("resolvePdfPreviewUrl", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -19,9 +31,9 @@ describe("resolvePdfPreviewUrl", () => {
   });
 
   it("returns an error when the fetch response is not ok", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(createMockResponse({
       ok: false,
-    } as Response);
+    }));
 
     await expect(resolvePdfPreviewUrl("/documents/404.pdf")).resolves.toEqual({
       message: "PDF 미리보기를 불러오지 못했습니다.",
@@ -31,13 +43,13 @@ describe("resolvePdfPreviewUrl", () => {
   });
 
   it("validates the PDF signature before creating an object url", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(createMockResponse({
       blob: () => Promise.resolve(new Blob(["not a pdf"])),
       headers: {
         get: () => "application/pdf",
       },
       ok: true,
-    } as Response);
+    }));
 
     await expect(resolvePdfPreviewUrl("/documents/text.pdf")).resolves.toEqual({
       message: "PDF 미리보기를 불러오지 못했습니다.",
@@ -58,13 +70,13 @@ describe("resolvePdfPreviewUrl", () => {
       type: "application/pdf",
     } as unknown as Blob;
 
-    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(createMockResponse({
       blob: () => Promise.resolve(pdfBlob),
       headers: {
         get: () => "application/pdf",
       },
       ok: true,
-    } as Response);
+    }));
 
     const result = await resolvePdfPreviewUrl("/documents/form.pdf");
 

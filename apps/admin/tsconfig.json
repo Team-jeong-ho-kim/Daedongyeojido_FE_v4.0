@@ -17,6 +17,7 @@
         "name": "next"
       }
     ],
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "paths": {
       "@/*": ["./src/*"],
       "utils": ["../../packages/utils/src/index.ts"],
