@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
-import React from "react";
 import { cleanup } from "@testing-library/react";
+import type React from "react";
 import { afterAll, afterEach, beforeAll, vi } from "vitest";
 import { server } from "./server";
 
@@ -76,7 +76,9 @@ vi.mock("next/image", () => ({
     fill?: boolean;
     priority?: boolean;
     src: string;
-  }) => <img alt={alt} data-fill={fill ? "true" : undefined} src={src} {...props} />,
+  }) => (
+    <img alt={alt} data-fill={fill ? "true" : undefined} src={src} {...props} />
+  ),
 }));
 
 vi.mock("next/link", () => ({
@@ -87,7 +89,8 @@ vi.mock("next/link", () => ({
   }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     href: string | { pathname?: string };
   }) => {
-    const resolvedHref = typeof href === "string" ? href : href.pathname ?? "#";
+    const resolvedHref =
+      typeof href === "string" ? href : (href.pathname ?? "#");
     return (
       <a href={resolvedHref} {...props}>
         {children}
