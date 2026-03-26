@@ -1,5 +1,5 @@
 import { Cookies } from "react-cookie";
-import type { LoginResponse } from "./types";
+import type { LoginResponse } from "../types";
 
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";

@@ -1,4 +1,4 @@
-import { getDocumentPreviewPdfPath } from "./document-preview-registry";
+import { getDocumentPreviewPdfPath } from "../document-preview-registry";
 
 describe("document preview registry", () => {
   it("returns the registered preview path for known files", () => {

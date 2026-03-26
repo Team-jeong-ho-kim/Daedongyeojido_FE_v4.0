@@ -4,7 +4,7 @@ import {
   getAccessToken,
   getRefreshToken,
   saveTokens,
-} from "./auth-cookie";
+} from "./auth";
 import { BASE_URL } from "./env";
 import { ApiError, type ApiErrorResponse } from "./types/error";
 
