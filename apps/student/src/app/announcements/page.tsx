@@ -4,13 +4,20 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useUserStore } from "shared";
 import { Button, SkeletonAnnouncementCard, useDeferredLoading } from "ui";
-import { AnnouncementItem, CTASection, Pagination } from "@/components";
+import {
+  AnnouncementClubFilter,
+  type AnnouncementClubFilterOption,
+  AnnouncementItem,
+  CTASection,
+  Pagination,
+} from "@/components";
 import { useGetAllAnnouncementsQuery } from "@/hooks/querys/useAnnouncementQuery";
 import type { Announcement } from "@/types";
 
 export default function AnnouncementsPage() {
   const router = useRouter();
   const [curPage, setCurPage] = useState(1);
+  const [selectedClub, setSelectedClub] = useState("전체");
   const limit = 8;
 
   const { data: announcementsData, isPending } = useGetAllAnnouncementsQuery();
@@ -33,6 +40,38 @@ export default function AnnouncementsPage() {
       }))
       .sort((a, b) => b.announcement_id - a.announcement_id) || []; // 최신순 정렬
 
+  const clubOptions: AnnouncementClubFilterOption[] = [
+    { imageUrl: null, name: "전체" },
+    ...Array.from(
+      announcements.reduce((acc, item) => {
+        const imageUrl = item.club_image?.trim() ? item.club_image : null;
+        const currentImage = acc.get(item.club_name);
+
+        if (currentImage === undefined || (!currentImage && imageUrl)) {
+          acc.set(item.club_name, imageUrl);
+        }
+
+        return acc;
+      }, new Map<string, string | null>()),
+      ([name, imageUrl]) => ({
+        imageUrl,
+        name,
+      }),
+    ),
+  ];
+  const filteredAnnouncements =
+    selectedClub === "전체"
+      ? announcements
+      : announcements.filter((item) => item.club_name === selectedClub);
+  const pagedAnnouncements = filteredAnnouncements.slice(
+    (curPage - 1) * limit,
+    curPage * limit,
+  );
+  const emptyStateMessage =
+    announcements.length === 0
+      ? "공고가 없습니다."
+      : "선택한 동아리의 공고가 없습니다.";
+
   return (
     <main className="mt-10 flex min-h-screen justify-center bg-white">
       <div className="container mx-auto max-w-7xl px-6 py-12">
@@ -49,31 +88,40 @@ export default function AnnouncementsPage() {
           )}
         </div>
 
+        {!showSkeleton && announcements.length > 0 && (
+          <AnnouncementClubFilter
+            clubOptions={clubOptions}
+            selectedClub={selectedClub}
+            onSelectClub={(clubName) => {
+              setSelectedClub(clubName);
+              setCurPage(1);
+            }}
+          />
+        )}
+
         {/* 공고 목록 */}
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
           {showSkeleton ? (
             Array.from({ length: limit }, () => (
               <SkeletonAnnouncementCard key={crypto.randomUUID()} />
             ))
-          ) : announcements.length === 0 ? (
+          ) : filteredAnnouncements.length === 0 ? (
             <div className="flex w-full items-center justify-center py-20">
-              <p className="text-gray-400 text-lg">공고가 없습니다.</p>
+              <p className="text-gray-400 text-lg">{emptyStateMessage}</p>
             </div>
           ) : (
-            announcements
-              .slice((curPage - 1) * limit, curPage * limit)
-              .map((announcement) => (
-                <AnnouncementItem
-                  key={announcement.announcement_id}
-                  {...announcement}
-                />
-              ))
+            pagedAnnouncements.map((announcement) => (
+              <AnnouncementItem
+                key={announcement.announcement_id}
+                {...announcement}
+              />
+            ))
           )}
         </div>
 
         {/* 페이지네이션 */}
         <Pagination
-          listLen={announcements.length}
+          listLen={filteredAnnouncements.length}
           limit={limit}
           curPage={curPage}
           setCurPage={setCurPage}
