@@ -17,6 +17,7 @@ const loginPageMocks = vi.hoisted(() => ({
   apiPost: vi.fn(),
   saveSessionUser: vi.fn(),
   saveTokens: vi.fn(),
+  toastError: vi.fn(),
 }));
 
 vi.mock("utils", async () => {
@@ -29,6 +30,17 @@ vi.mock("utils", async () => {
     },
     saveSessionUser: loginPageMocks.saveSessionUser,
     saveTokens: loginPageMocks.saveTokens,
+  };
+});
+
+vi.mock("ui", async () => {
+  const actual = await vi.importActual<object>("ui");
+
+  return {
+    ...actual,
+    toast: {
+      error: loginPageMocks.toastError,
+    },
   };
 });
 
@@ -156,6 +168,34 @@ describe("LoginPage", () => {
     expect(
       await screen.findByText("계정 정보를 다시 확인해주세요."),
     ).toBeVisible();
+    expect(loginPageMocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it("shows a server error toast when login fails with status 500", async () => {
+    const user = userEvent.setup();
+
+    loginPageMocks.apiPost.mockRejectedValueOnce(
+      new ApiError(
+        "서버 내부 오류",
+        500,
+        "2026-03-26T00:00:00",
+        "Internal Server Error",
+      ),
+    );
+
+    render(<LoginPage />);
+
+    await user.type(screen.getByLabelText("DSM 계정 ID"), "student-account");
+    await user.type(screen.getByLabelText("비밀번호"), "password");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+
+    await waitFor(() => {
+      expect(loginPageMocks.toastError).toHaveBeenCalledWith(
+        "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+      );
+    });
+
+    expect(screen.queryByText("서버 내부 오류")).not.toBeInTheDocument();
   });
 
   it("shows a configuration error when a public url is missing", async () => {
