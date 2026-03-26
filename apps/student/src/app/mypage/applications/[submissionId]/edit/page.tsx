@@ -24,6 +24,9 @@ const hasQuestionId = (
   applicationQuestionId: number | undefined,
 ): applicationQuestionId is number => typeof applicationQuestionId === "number";
 
+const INTRODUCTION_MAX_LENGTH = 500;
+const QUESTION_ANSWER_MAX_LENGTH = 500;
+
 export default function MySubmissionEditPage({
   params,
 }: MySubmissionEditPageProps) {
@@ -83,7 +86,18 @@ export default function MySubmissionEditPage({
   };
 
   const handleFieldChange = (name: "introduction" | "major", value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const nextValue =
+      name === "introduction" && value.length > INTRODUCTION_MAX_LENGTH
+        ? value.slice(0, INTRODUCTION_MAX_LENGTH)
+        : value;
+
+    if (name === "introduction" && value.length > INTRODUCTION_MAX_LENGTH) {
+      toast.warning("자기소개는 500자까지 입력 가능합니다", {
+        id: "application-introduction-length-limit",
+      });
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: nextValue }));
     if (errors[name]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -94,9 +108,20 @@ export default function MySubmissionEditPage({
   };
 
   const handleAnswerChange = (questionId: number, value: string) => {
+    const nextValue =
+      value.length > QUESTION_ANSWER_MAX_LENGTH
+        ? value.slice(0, QUESTION_ANSWER_MAX_LENGTH)
+        : value;
+
+    if (value.length > QUESTION_ANSWER_MAX_LENGTH) {
+      toast.warning("질문 답변은 500자까지 입력 가능합니다", {
+        id: "application-answer-length-limit",
+      });
+    }
+
     setFormData((prev) => ({
       ...prev,
-      answers: { ...prev.answers, [questionId]: value },
+      answers: { ...prev.answers, [questionId]: nextValue },
     }));
     const errorKey = `answer_${questionId}`;
     if (errors[errorKey]) {
@@ -269,6 +294,7 @@ export default function MySubmissionEditPage({
             value={formData.introduction}
             onChange={(value) => handleFieldChange("introduction", value)}
             error={errors.introduction}
+            helperText={`${formData.introduction.length}/${INTRODUCTION_MAX_LENGTH}`}
           />
         </div>
 
@@ -332,6 +358,11 @@ export default function MySubmissionEditPage({
                         }
                       }}
                       error={errorKey ? errors[errorKey] : undefined}
+                      helperText={`${
+                        hasQuestionId(questionId)
+                          ? formData.answers[questionId]?.length || 0
+                          : (item.answer || "").length
+                      }/${QUESTION_ANSWER_MAX_LENGTH}`}
                     />
                   </div>
                 </div>

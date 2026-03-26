@@ -18,8 +18,8 @@ import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmMo
 import { hasAccessToken } from "@/lib/auth";
 import { useModalStore } from "@/stores/useModalStore";
 
-const INTRODUCTION_MAX_LENGTH = 300;
-const QUESTION_ANSWER_MAX_LENGTH = 200;
+const INTRODUCTION_MAX_LENGTH = 500;
+const QUESTION_ANSWER_MAX_LENGTH = 500;
 const TEXTAREA_MAX_HEIGHT = 320;
 
 const showApiError = (error: unknown, fallbackMessage: string) => {
@@ -75,7 +75,7 @@ export default function ApplyDetailPage({
         : value;
 
     if (name === "introduction" && value.length > INTRODUCTION_MAX_LENGTH) {
-      toast.warning("자기소개는 300자까지 입력 가능합니다", {
+      toast.warning("자기소개는 500자까지 입력 가능합니다", {
         id: "application-introduction-length-limit",
       });
     }
@@ -97,7 +97,7 @@ export default function ApplyDetailPage({
         : value;
 
     if (value.length > QUESTION_ANSWER_MAX_LENGTH) {
-      toast.warning("질문 답변은 200자까지 입력 가능합니다", {
+      toast.warning("질문 답변은 500자까지 입력 가능합니다", {
         id: "application-answer-length-limit",
       });
     }
