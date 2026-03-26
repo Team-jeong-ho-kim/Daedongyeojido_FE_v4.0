@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CloudflareAnalytics } from "ui";
+import { CloudflareAnalytics, Toaster } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import "./globals.css";
 
@@ -140,6 +140,7 @@ export default function RootLayout({
       </head>
       <body>
         <ChannelTalkProvider />
+        <Toaster />
         {children}
       </body>
     </html>

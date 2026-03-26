@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type FormEvent, useId, useState } from "react";
+import { toast } from "ui";
 import {
+  ApiError,
   apiClient,
   type LoginRequest,
   type LoginResponse,
@@ -88,6 +90,11 @@ export default function LoginPage() {
       saveSessionUser(response.data);
       window.location.href = redirectUrl;
     } catch (error) {
+      if (error instanceof ApiError && error.status === 500) {
+        toast.error("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+
       setErrorMessage(
         getErrorMessage(error, "로그인에 실패했습니다. 다시 시도해주세요."),
       );

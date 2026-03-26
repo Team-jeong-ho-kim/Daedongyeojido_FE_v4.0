@@ -174,12 +174,12 @@ export const buildInterviewSchedulePayload = ({
 };
 
 export const formatInterviewTimeForDisplay = (interviewTime: string) => {
-  const { period, hour } = parseInterviewScheduleFormValues(
+  const { period, hour, minute } = parseInterviewScheduleFormValues(
     "2000-01-01",
     interviewTime,
   );
 
-  return `${period} ${hour}시`;
+  return `${period} ${hour}시 ${minute}분`;
 };
 
 export const formatInterviewDateForDisplay = (interviewSchedule: string) => {
