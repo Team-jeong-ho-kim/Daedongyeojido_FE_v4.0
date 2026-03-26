@@ -1,4 +1,4 @@
-import { Spinner } from "./Spinner";
+import { Spinner } from "../loading";
 
 type DocumentPreviewLoadingStateProps = {
   message?: string;

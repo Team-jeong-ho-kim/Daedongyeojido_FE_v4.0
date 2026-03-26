@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { act } from "react";
-import { useHeaderVisibility } from "./useHeaderVisibility";
+import { useHeaderVisibility } from "../useHeaderVisibility";
 
 describe("useHeaderVisibility", () => {
   const setScrollY = (value: number) => {

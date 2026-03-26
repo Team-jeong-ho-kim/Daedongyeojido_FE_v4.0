@@ -1,19 +1,18 @@
 export { CloudflareAnalytics } from "./CloudflareAnalytics";
-export { DocumentPreviewFallbackPanel } from "./DocumentPreviewFallbackPanel";
-export { DocumentPreviewLoadingState } from "./DocumentPreviewLoadingState";
+export {
+  DocumentPreviewFallbackPanel,
+  DocumentPreviewLoadingState,
+} from "./document-preview";
 export {
   DocumentPreviewModal,
   type DocumentPreviewModalClassNames,
-} from "./DocumentPreviewModal";
-export { DocumentPreviewViewport } from "./DocumentPreviewViewport";
-export { default as Footer } from "./Footer";
-export { LandingHeader, StudentHeader } from "./Header";
-export { LoadingOverlay } from "./LoadingOverlay";
-export { LoadingState } from "./LoadingState";
-export {
+  DocumentPreviewViewport,
   ManualPdfPreviewModal,
   type ManualPdfPreviewModalProps,
-} from "./ManualPdfPreviewModal";
+} from "./document-preview";
+export { default as Footer } from "./Footer";
+export { LandingHeader, StudentHeader } from "./header";
+export { LoadingOverlay, LoadingState } from "./loading";
 export { MarkdownContent, stripMarkdownToPlainText } from "./MarkdownContent";
 export {
   Skeleton,
@@ -28,4 +27,4 @@ export {
   SpinnerButton,
   SpinnerCenter,
   SpinnerFullPage,
-} from "./Spinner";
+} from "./loading";

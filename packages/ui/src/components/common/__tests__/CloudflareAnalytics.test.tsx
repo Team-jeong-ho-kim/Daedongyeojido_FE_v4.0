@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import type { ScriptHTMLAttributes } from "react";
-import { CloudflareAnalytics } from "./CloudflareAnalytics";
+import { CloudflareAnalytics } from "../CloudflareAnalytics";
 
 vi.mock("next/script", () => ({
   default: (props: ScriptHTMLAttributes<HTMLScriptElement>) => (

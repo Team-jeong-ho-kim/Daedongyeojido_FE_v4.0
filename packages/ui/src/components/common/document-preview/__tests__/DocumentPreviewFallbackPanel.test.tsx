@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { DocumentPreviewFallbackPanel } from "./DocumentPreviewFallbackPanel";
+import { DocumentPreviewFallbackPanel } from "../DocumentPreviewFallbackPanel";
 
 describe("DocumentPreviewFallbackPanel", () => {
   it("renders the message and optional link", () => {

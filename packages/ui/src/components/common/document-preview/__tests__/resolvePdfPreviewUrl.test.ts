@@ -1,4 +1,4 @@
-import { resolvePdfPreviewUrl } from "./resolvePdfPreviewUrl";
+import { resolvePdfPreviewUrl } from "../resolvePdfPreviewUrl";
 
 describe("resolvePdfPreviewUrl", () => {
   afterEach(() => {
