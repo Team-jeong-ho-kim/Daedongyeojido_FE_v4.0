@@ -1,5 +1,5 @@
-import { resolveClubCreationApplicationStatus } from "./clubCreationStatus";
-import type { ClubCreationApplicationDetail } from "./types";
+import { resolveClubCreationApplicationStatus } from "../clubCreationStatus";
+import type { ClubCreationApplicationDetail } from "../../types";
 
 const createDetail = (
   overrides: Partial<ClubCreationApplicationDetail> = {},

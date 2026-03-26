@@ -2,7 +2,7 @@ import type {
   ClubCreationApplicationDetail,
   ClubCreationApplicationReview,
   ClubCreationReviewerType,
-} from "./types";
+} from "../types";
 
 type ReviewBuckets = {
   currentRevisionReviews: ClubCreationApplicationReview[];

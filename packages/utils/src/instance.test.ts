@@ -50,7 +50,7 @@ vi.mock("axios", () => ({
   },
 }));
 
-vi.mock("./auth-cookie", () => ({
+vi.mock("./auth", () => ({
   clearTokens: instanceMocks.clearTokens,
   getAccessToken: instanceMocks.getAccessToken,
   getRefreshToken: instanceMocks.getRefreshToken,

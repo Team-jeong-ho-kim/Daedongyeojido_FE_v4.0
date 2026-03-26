@@ -3,7 +3,7 @@ import type {
   ClubCreationApplicationDetail,
   ClubCreationApplicationStatus,
   ClubCreationReviewerType,
-} from "./types";
+} from "../types";
 
 const REVIEWER_TYPES: ClubCreationReviewerType[] = ["ADMIN", "TEACHER"];
 

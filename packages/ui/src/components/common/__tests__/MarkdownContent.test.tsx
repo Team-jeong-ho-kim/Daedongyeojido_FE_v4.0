@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { MarkdownContent, stripMarkdownToPlainText } from "./MarkdownContent";
+import { MarkdownContent, stripMarkdownToPlainText } from "../MarkdownContent";
 
 describe("MarkdownContent", () => {
   it("renders headings, emphasis, lists, links, and line breaks", () => {

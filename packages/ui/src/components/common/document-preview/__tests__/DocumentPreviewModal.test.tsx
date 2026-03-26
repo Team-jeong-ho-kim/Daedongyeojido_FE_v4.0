@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { DocumentPreviewModal } from "./DocumentPreviewModal";
+import { DocumentPreviewModal } from "../DocumentPreviewModal";
 
 describe("DocumentPreviewModal", () => {
   it("renders content only when open and closes on escape", () => {

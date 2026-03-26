@@ -1,7 +1,7 @@
 import {
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
-} from "./document-preview";
+} from "../document-preview";
 
 describe("document preview helpers", () => {
   it("keeps an explicit file extension from the file name", () => {

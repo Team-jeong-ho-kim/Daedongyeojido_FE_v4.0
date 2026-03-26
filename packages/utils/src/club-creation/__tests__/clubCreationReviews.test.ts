@@ -1,8 +1,8 @@
 import {
   getLatestClubCreationReviewsByReviewer,
   partitionClubCreationReviews,
-} from "./clubCreationReviews";
-import type { ClubCreationApplicationReview } from "./types";
+} from "../clubCreationReviews";
+import type { ClubCreationApplicationReview } from "../../types";
 
 const createReview = (
   overrides: Partial<ClubCreationApplicationReview> = {},

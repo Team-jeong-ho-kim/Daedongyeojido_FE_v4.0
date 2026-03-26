@@ -38,7 +38,7 @@ describe("auth-cookie helpers", () => {
       value: new URL("https://student.daedongyeojido.site/mypage"),
     });
 
-    const { saveTokens } = await import("./auth-cookie");
+    const { saveTokens } = await import("../auth-cookie");
 
     saveTokens({
       accessToken: "access-token",
@@ -70,7 +70,7 @@ describe("auth-cookie helpers", () => {
     });
 
     const { clearTokens, getSessionUser, saveSessionUser } = await import(
-      "./auth-cookie"
+      "../auth-cookie"
     );
 
     saveSessionUser({
