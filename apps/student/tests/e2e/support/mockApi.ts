@@ -89,6 +89,23 @@ type MockApplicant = {
   major: string;
 };
 
+type MockMySubmissionDetail = {
+  clubName: string;
+  clubImage?: string;
+  userName: string;
+  classNumber: string;
+  introduction: string;
+  major: string;
+  availableMajors?: string[];
+  contents: Array<{
+    question: string;
+    answer: string;
+    applicationQuestionId?: number;
+    applicationAnswerId?: number;
+  }>;
+  submissionDuration: string | [number, number, number];
+};
+
 type MockAlarm = {
   id: number;
   title: string;
@@ -187,6 +204,7 @@ type StudentApiMockOptions = {
   clubAlarms?: MockAlarm[];
   clubAnnouncements?: MockAnnouncementListItem[];
   documentFiles?: MockDocumentFile[];
+  mySubmissionDetail?: MockMySubmissionDetail;
   teachers?: MockTeacher[];
   teachersStatus?: number;
   myClubCreationApplication?: MockClubCreationApplicationDetail | null;
@@ -317,6 +335,25 @@ const DEFAULT_DOCUMENT_FILES: MockDocumentFile[] = [
     fileUrl: "https://files.test/club-creation-form.hwp",
   },
 ];
+
+const DEFAULT_MY_SUBMISSION_DETAIL: MockMySubmissionDetail = {
+  clubName: "테스트동아리",
+  clubImage: "/images/icons/profile.svg",
+  userName: "테스트유저",
+  classNumber: "2301",
+  introduction: "짧은 자기소개입니다.",
+  major: "BE",
+  availableMajors: ["BE", "FE"],
+  contents: [
+    {
+      question: "지원 동기를 작성해주세요.",
+      answer: "짧은 답변입니다.",
+      applicationQuestionId: 1,
+      applicationAnswerId: 101,
+    },
+  ],
+  submissionDuration: "2026-12-31",
+};
 
 const DEFAULT_TEACHERS: MockTeacher[] = [
   {
@@ -556,6 +593,16 @@ export async function installStudentApiMocks(
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
   const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
+  let mySubmissionDetail = {
+    ...DEFAULT_MY_SUBMISSION_DETAIL,
+    ...options.mySubmissionDetail,
+    contents:
+      options.mySubmissionDetail?.contents ??
+      DEFAULT_MY_SUBMISSION_DETAIL.contents.map((content) => ({ ...content })),
+    availableMajors:
+      options.mySubmissionDetail?.availableMajors ??
+      DEFAULT_MY_SUBMISSION_DETAIL.availableMajors?.slice(),
+  };
   let teachers = options.teachers ?? DEFAULT_TEACHERS.slice();
   const teachersStatus = options.teachersStatus ?? 200;
   let myClubCreationApplication =
@@ -925,13 +972,56 @@ export async function installStudentApiMocks(
 
   await page.route(/.*\/applications\/\d+$/, async (route) => {
     if (await handleApiFallback(route)) return;
-    if (route.request().method() !== "POST") {
-      await route.continue();
+    const method = route.request().method();
+
+    if (method === "GET") {
+      recordRequest(route);
+      await createJsonResponse(route, mySubmissionDetail);
       return;
     }
 
-    recordRequest(route);
-    await route.fulfill({ status: 204, body: "" });
+    if (method === "PATCH") {
+      recordRequest(route);
+      const payload = parseRequestBody(route).body as {
+        introduction?: string;
+        major?: string;
+        answer?: Array<{
+          applicationQuestionId: number;
+          answer: string;
+        }>;
+      } | null;
+
+      mySubmissionDetail = {
+        ...mySubmissionDetail,
+        introduction: payload?.introduction ?? mySubmissionDetail.introduction,
+        major: payload?.major ?? mySubmissionDetail.major,
+        contents:
+          payload?.answer?.map((item) => {
+            const existingContent = mySubmissionDetail.contents.find(
+              (content) =>
+                content.applicationQuestionId === item.applicationQuestionId,
+            );
+
+            return {
+              question: existingContent?.question ?? "질문",
+              applicationQuestionId: item.applicationQuestionId,
+              applicationAnswerId: existingContent?.applicationAnswerId,
+              answer: item.answer,
+            };
+          }) ?? mySubmissionDetail.contents,
+      };
+
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+
+    if (method === "POST") {
+      recordRequest(route);
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+
+    await route.continue();
   });
 
   await page.route(/.*\/alarms\/users$/, async (route) => {

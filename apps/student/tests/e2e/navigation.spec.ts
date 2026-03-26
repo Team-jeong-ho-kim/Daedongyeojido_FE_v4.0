@@ -223,8 +223,12 @@ test.describe("Student discovery flows", () => {
     await expect(page).toHaveURL(/\/clubs\/1$/);
 
     await page.goto("/announcements/1");
-    await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
-    await expect(page).toHaveURL(/\/clubs\/1$/);
+    await Promise.all([
+      page.waitForURL(/\/clubs\/1$/),
+      page
+        .getByRole("link", { name: "동아리 소개 보러가기" })
+        .click({ force: true }),
+    ]);
   });
 
   test("학생은 공고 지원서 페이지 헤더와 CTA로 동아리 상세로 이동할 수 있다", async ({
@@ -245,8 +249,12 @@ test.describe("Student discovery flows", () => {
     await expect(page).toHaveURL(/\/clubs\/1$/);
 
     await page.goto("/announcements/1/apply");
-    await page.getByRole("link", { name: "동아리 소개 보러가기" }).click();
-    await expect(page).toHaveURL(/\/clubs\/1$/);
+    await Promise.all([
+      page.waitForURL(/\/clubs\/1$/),
+      page
+        .getByRole("link", { name: "동아리 소개 보러가기" })
+        .click({ force: true }),
+    ]);
   });
 
   test("동아리 소속 사용자는 지원서 작성 페이지에서 지원하기 버튼을 보지 않는다", async ({
@@ -281,15 +289,15 @@ test.describe("Student discovery flows", () => {
     });
 
     const shortAnswer = "짧은 답변입니다.";
-    const longAnswer = "가".repeat(210);
-    const limitedAnswer = longAnswer.slice(0, 200);
+    const longAnswer = "가".repeat(520);
+    const limitedAnswer = longAnswer.slice(0, 500);
     const multilineAnswer = Array.from(
       { length: 8 },
       (_, index) => `답변 ${index + 1}줄`,
     ).join("\n");
     const shortIntroduction = "짧은 자기소개입니다.";
-    const longIntroduction = "나".repeat(320);
-    const limitedIntroduction = longIntroduction.slice(0, 300);
+    const longIntroduction = "나".repeat(520);
+    const limitedIntroduction = longIntroduction.slice(0, 500);
     const multilineIntroduction = Array.from(
       { length: 10 },
       (_, index) => `자기소개 ${index + 1}줄`,
@@ -311,14 +319,14 @@ test.describe("Student discovery flows", () => {
     await introductionField.fill(shortIntroduction);
     await expect(introductionField).toHaveValue(shortIntroduction);
     await expect(
-      page.getByText(`${shortIntroduction.length}/300`, { exact: true }),
+      page.getByText(`${shortIntroduction.length}/500`, { exact: true }),
     ).toBeVisible();
 
     await introductionField.fill(longIntroduction);
     await expect(introductionField).toHaveValue(limitedIntroduction);
-    await expect(page.getByText("300/300", { exact: true })).toBeVisible();
+    await expect(page.getByText("500/500", { exact: true })).toBeVisible();
     await expect(
-      page.getByText("자기소개는 300자까지 입력 가능합니다"),
+      page.getByText("자기소개는 500자까지 입력 가능합니다"),
     ).toBeVisible();
 
     const answerInitialHeight = await answerField.evaluate(
@@ -333,14 +341,14 @@ test.describe("Student discovery flows", () => {
     await answerField.fill(shortAnswer);
     await expect(answerField).toHaveValue(shortAnswer);
     await expect(
-      page.getByText(`${shortAnswer.length}/200`, { exact: true }),
+      page.getByText(`${shortAnswer.length}/500`, { exact: true }),
     ).toBeVisible();
 
     await answerField.fill(longAnswer);
     await expect(answerField).toHaveValue(limitedAnswer);
-    await expect(page.getByText("200/200", { exact: true })).toBeVisible();
+    await expect(page.getByText("500/500", { exact: true })).toHaveCount(2);
     await expect(
-      page.getByText("질문 답변은 200자까지 입력 가능합니다"),
+      page.getByText("질문 답변은 500자까지 입력 가능합니다"),
     ).toBeVisible();
 
     await page.getByLabel("이름").fill("홍길동");
@@ -361,11 +369,70 @@ test.describe("Student discovery flows", () => {
       | undefined;
 
     expect(submitBody?.introduction).toBe(limitedIntroduction);
-    expect(submitBody?.introduction).toHaveLength(300);
+    expect(submitBody?.introduction).toHaveLength(500);
     expect(submitBody?.answer?.[0]).toEqual({
       applicationQuestionId: 1,
       answer: limitedAnswer,
     });
-    expect(submitBody?.answer?.[0]?.answer).toHaveLength(200);
+    expect(submitBody?.answer?.[0]?.answer).toHaveLength(500);
+  });
+
+  test("학생은 지원서 수정 화면에서도 자기소개와 질문 답변을 500자 내로만 수정할 수 있다", async ({
+    page,
+  }) => {
+    await setAuthSession(page);
+    const mockApi = await installStudentApiMocks(page);
+
+    const longIntroduction = "자".repeat(520);
+    const limitedIntroduction = longIntroduction.slice(0, 500);
+    const longAnswer = "답".repeat(520);
+    const limitedAnswer = longAnswer.slice(0, 500);
+    const introductionField = page.getByPlaceholder("자기소개를 작성해주세요.");
+    const answerField = page.getByPlaceholder("질문의 답변을 작성해주세요.");
+
+    await page.goto("/mypage/applications/501/edit");
+
+    await expect(page.getByText("지원서 수정", { exact: true })).toBeVisible();
+
+    await introductionField.fill(longIntroduction);
+    await expect(introductionField).toHaveValue(limitedIntroduction);
+    await expect(page.getByText("500/500", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("자기소개는 500자까지 입력 가능합니다"),
+    ).toBeVisible();
+
+    await answerField.fill(longAnswer);
+    await expect(answerField).toHaveValue(limitedAnswer);
+    await expect(page.getByText("500/500", { exact: true })).toHaveCount(2);
+    await expect(
+      page.getByText("질문 답변은 500자까지 입력 가능합니다"),
+    ).toBeVisible();
+
+    await Promise.all([
+      page.waitForURL(/\/mypage\/applications\/501$/),
+      page.getByRole("button", { name: "수정 완료" }).click(),
+    ]);
+
+    const updateRequest = mockApi.getLastRequest(
+      /\/applications\/501$/,
+      "PATCH",
+    );
+    const updateBody = updateRequest?.body as
+      | {
+          introduction?: string;
+          answer?: Array<{
+            applicationQuestionId: number;
+            answer: string;
+          }>;
+        }
+      | undefined;
+
+    expect(updateBody?.introduction).toBe(limitedIntroduction);
+    expect(updateBody?.introduction).toHaveLength(500);
+    expect(updateBody?.answer?.[0]).toEqual({
+      applicationQuestionId: 1,
+      answer: limitedAnswer,
+    });
+    expect(updateBody?.answer?.[0]?.answer).toHaveLength(500);
   });
 });
