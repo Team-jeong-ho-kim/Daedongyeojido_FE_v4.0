@@ -2,9 +2,48 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getAccessToken } from "utils";
+import { useUserStore } from "shared";
+import { clearTokens, getAccessToken, getSessionUser } from "utils";
 import { useMyInfoQuery } from "@/hooks/querys";
 import { isOnboardingRequired } from "@/lib";
+
+const normalizeUrl = (value: string) => value.trim().replace(/\/+$/, "");
+
+const resolveWebLoginUrl = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const envWebUrl = process.env.NEXT_PUBLIC_WEB_URL?.trim();
+
+  if (!envWebUrl) {
+    return null;
+  }
+
+  const webUrl = normalizeUrl(envWebUrl);
+
+  try {
+    new URL(webUrl);
+  } catch {
+    return null;
+  }
+
+  return `${webUrl}/login`;
+};
+
+const moveToWebLogin = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const loginUrl = resolveWebLoginUrl();
+
+  if (!loginUrl) {
+    return;
+  }
+
+  window.location.href = loginUrl;
+};
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [hasToken, setHasToken] = useState(false);
@@ -15,6 +54,34 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const accessToken = getAccessToken();
     setHasToken(!!accessToken);
   }, []);
+
+  useEffect(() => {
+    const verifySession = () => {
+      const accessToken = getAccessToken();
+      const sessionUser = getSessionUser();
+
+      if (!accessToken || !sessionUser) {
+        clearTokens();
+        useUserStore.getState().clearUser();
+        setHasToken(false);
+        moveToWebLogin();
+        return;
+      }
+
+      setHasToken(true);
+    };
+
+    const handleFocus = () => {
+      verifySession();
+    };
+
+    verifySession();
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [pathname]);
 
   const myInfoQuery = useMyInfoQuery({
     enabled: hasToken,
