@@ -6,6 +6,7 @@ import { useHeaderVisibility } from "./useHeaderVisibility";
 
 export function LandingHeader() {
   const isVisible = useHeaderVisibility();
+  const userUrl = process.env.NEXT_PUBLIC_USER_URL?.trim() || "/login";
 
   return (
     <header
@@ -26,7 +27,7 @@ export function LandingHeader() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/login"
+            href={userUrl}
             className="rounded-lg bg-[#F45F5F] px-6 py-2.5 font-medium text-[15px] text-white transition-opacity hover:opacity-80"
           >
             시작하기
