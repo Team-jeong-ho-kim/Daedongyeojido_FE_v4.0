@@ -21,7 +21,8 @@
 
 ## Testing Guidelines
 - Root `test` script currently placeholder; no automated suite is wired yet.
-- When adding tests, place unit/component specs beside code as `*.test.ts(x)`; consider React Testing Library for components and Playwright for e2e.
+- Place unit/component tests in the nearest `__tests__` folder for the feature or component they cover; keep e2e tests under each app's `tests/e2e`.
+- Use `*.test.ts(x)` naming for unit/component tests; consider React Testing Library for components and Playwright for e2e.
 - Keep mock data in `src/__mocks__` per app; ensure new commands are added to Turbo/pnpm scripts for consistency.
 
 ## Commit & Pull Request Guidelines
