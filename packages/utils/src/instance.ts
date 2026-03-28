@@ -16,6 +16,12 @@ export const apiClient = axios.create({
   },
 });
 
+const isAuthBypassRequest = (url?: string) =>
+  url?.includes("/auth/login") || url?.includes("/auth/signup");
+
+const isAuthErrorBypassRequest = (url?: string) =>
+  isAuthBypassRequest(url) || url?.includes("/auth/reissue");
+
 const normalizeUrl = (value: string) => value.trim().replace(/\/+$/, "");
 
 const resolveWebLoginUrl = () => {
@@ -52,9 +58,14 @@ const redirectToWebLogin = () => {
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (isAuthBypassRequest(config.url)) {
+      config.withCredentials = false;
+      delete config.headers.Authorization;
+    } else {
+      const token = getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     if (config.data instanceof FormData) {
@@ -92,11 +103,7 @@ apiClient.interceptors.response.use(
     };
 
     // 로그인, 회원가입, 토큰 재발급 요청은 401 인터셉터를 건너뜀
-    if (
-      originalRequest.url?.includes("/auth/login") ||
-      originalRequest.url?.includes("/auth/signup") ||
-      originalRequest.url?.includes("/auth/reissue")
-    ) {
+    if (isAuthErrorBypassRequest(originalRequest.url)) {
       return Promise.reject(createApiError(error));
     }
 
