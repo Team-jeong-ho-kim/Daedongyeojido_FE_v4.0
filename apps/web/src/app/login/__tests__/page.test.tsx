@@ -15,6 +15,7 @@ vi.mock("next/image", () => ({
 
 const loginPageMocks = vi.hoisted(() => ({
   apiPost: vi.fn(),
+  clearTokens: vi.fn(),
   saveSessionUser: vi.fn(),
   saveTokens: vi.fn(),
   toastError: vi.fn(),
@@ -28,6 +29,7 @@ vi.mock("utils", async () => {
     apiClient: {
       post: loginPageMocks.apiPost,
     },
+    clearTokens: loginPageMocks.clearTokens,
     saveSessionUser: loginPageMocks.saveSessionUser,
     saveTokens: loginPageMocks.saveTokens,
   };
@@ -77,6 +79,12 @@ describe("LoginPage", () => {
     expect(
       screen.getByText("계정과 비밀번호를 모두 입력해주세요."),
     ).toBeVisible();
+  });
+
+  it("clears stale tokens when the page mounts", () => {
+    render(<LoginPage />);
+
+    expect(loginPageMocks.clearTokens).toHaveBeenCalledTimes(1);
   });
 
   it("logs in teachers and redirects to the teacher app", async () => {

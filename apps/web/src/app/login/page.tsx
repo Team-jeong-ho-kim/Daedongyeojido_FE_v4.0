@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useEffect, useId, useState } from "react";
 import { toast } from "ui";
 import {
   ApiError,
   apiClient,
+  clearTokens,
   type LoginRequest,
   type LoginResponse,
   saveSessionUser,
@@ -54,6 +55,10 @@ export default function LoginPage() {
   const accountPlaceholder = isTeacherLogin
     ? "교사용 계정 ID를 입력해주세요."
     : "계정 ID를 입력해주세요.";
+
+  useEffect(() => {
+    clearTokens();
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

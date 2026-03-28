@@ -99,6 +99,24 @@ describe("apiClient interceptors", () => {
     expect(config.headers["Content-Type"]).toBeUndefined();
   });
 
+  it("does not attach auth headers or cookies to login requests", async () => {
+    instanceMocks.getAccessToken.mockReturnValue("stale-access-token");
+
+    await import("../instance");
+
+    const config = instanceMocks.requestHandlers[0]?.({
+      headers: {
+        Authorization: "Bearer old-token",
+        "Content-Type": "application/json",
+      },
+      url: "/auth/login",
+      withCredentials: true,
+    });
+
+    expect(config.headers.Authorization).toBeUndefined();
+    expect(config.withCredentials).toBe(false);
+  });
+
   it("reissues tokens on 401 and retries the original request", async () => {
     instanceMocks.getRefreshToken.mockReturnValue("refresh-token");
     instanceMocks.patch.mockResolvedValue({
