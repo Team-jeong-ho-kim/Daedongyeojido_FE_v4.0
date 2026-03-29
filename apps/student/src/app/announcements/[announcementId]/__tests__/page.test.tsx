@@ -12,6 +12,14 @@ const studentPageMocks = vi.hoisted(() => ({
   useUserStore: vi.fn(),
 }));
 
+const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 vi.mock("react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("react")>();
 
@@ -94,6 +102,29 @@ vi.mock("sonner", () => ({
 
 vi.mock("utils", () => ({
   getAccessToken: vi.fn(() => null),
+  getAnnouncementDeadlineEnd: vi.fn(
+    (deadline: string | [number, number, number]) => {
+      if (Array.isArray(deadline)) {
+        return new Date(
+          deadline[0],
+          deadline[1] - 1,
+          deadline[2],
+          23,
+          59,
+          59,
+          999,
+        );
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+        const [year, month, day] = deadline.split("-").map(Number);
+        return new Date(year, month - 1, day, 23, 59, 59, 999);
+      }
+
+      const parsedDate = new Date(deadline);
+      return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+    },
+  ),
 }));
 
 describe("AnnouncementDetailPage", () => {
@@ -103,6 +134,8 @@ describe("AnnouncementDetailPage", () => {
     ).forEach((mock) => {
       mock.mockReset();
     });
+
+    const todayDeadline = formatLocalDate(new Date());
 
     studentPageMocks.useRouter.mockReturnValue({
       push: vi.fn(),
@@ -129,7 +162,7 @@ describe("AnnouncementDetailPage", () => {
         applicationFormId: null,
         assignment: "1. [과제 링크](https://example.com)\n2. 제출 기한 확인",
         clubId: 1,
-        deadline: "2026-03-31",
+        deadline: todayDeadline,
         introduction: "## 공고 소개\n\n- React\n- Next.js",
         major: ["FRONTEND"],
         phoneNumber: "01012345678",
@@ -164,5 +197,50 @@ describe("AnnouncementDetailPage", () => {
       "https://example.com",
     );
     expect(screen.getByText("제출 기한 확인")).toBeVisible();
+  });
+
+  it("keeps the apply button enabled until the end of the deadline date", async () => {
+    render(
+      <AnnouncementDetailPage
+        params={Promise.resolve({ announcementId: "1" })}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("link", { name: "지원서 작성하기" }),
+    ).toBeVisible();
+    expect(
+      screen.queryByText("지원서 작성하기 (종료)"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the expired apply button after the deadline date has passed", async () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    studentPageMocks.useGetDetailAnnounceQuery.mockReturnValue({
+      data: {
+        applicationFormId: null,
+        assignment: "1. [과제 링크](https://example.com)\n2. 제출 기한 확인",
+        clubId: 1,
+        deadline: formatLocalDate(yesterday),
+        introduction: "## 공고 소개\n\n- React\n- Next.js",
+        major: ["FRONTEND"],
+        phoneNumber: "01012345678",
+        talentDescription: "**꾸준히** 학습하는 사람",
+        title: "프론트 모집",
+      },
+      refetch: vi.fn(),
+    });
+
+    render(
+      <AnnouncementDetailPage
+        params={Promise.resolve({ announcementId: "1" })}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("button", { name: "지원서 작성하기 (종료)" }),
+    ).toBeVisible();
   });
 });
