@@ -7,6 +7,7 @@ import { use, useEffect, useId, useState } from "react";
 import { useUserStore } from "shared";
 import { toast } from "sonner";
 import { Button } from "ui";
+import { getAnnouncementDeadlineEnd } from "utils";
 import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
@@ -176,7 +177,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
         typeof announcement.deadline === "string"
           ? announcement.deadline
           : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
-      const deadlineDate = new Date(dateString);
+      const deadlineEnd = getAnnouncementDeadlineEnd(announcement.deadline);
       const today = new Date();
 
       // 서버의 status가 CLOSED면 "준비중", OPEN이면 마감일 기준으로 "진행중"/"종료됨"
@@ -184,7 +185,7 @@ export default function ClubDetailPage({ params }: ClubDetailPageProps) {
       if (announcement.status === "CLOSED") {
         status = "준비중";
       } else {
-        status = deadlineDate < today ? "종료됨" : "진행중";
+        status = deadlineEnd && deadlineEnd < today ? "종료됨" : "진행중";
       }
 
       return {

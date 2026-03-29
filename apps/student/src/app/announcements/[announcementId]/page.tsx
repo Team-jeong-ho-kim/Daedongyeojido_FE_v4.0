@@ -14,7 +14,7 @@ import {
   MarkdownContent,
   NoteIcon,
 } from "ui";
-import { getAccessToken } from "utils";
+import { getAccessToken, getAnnouncementDeadlineEnd } from "utils";
 import { getApplicationSubmissions } from "@/api/applicationForm";
 import {
   ApplicantCard,
@@ -140,9 +140,8 @@ export default function AnnouncementDetailPage({
   );
 
   // 공고 종료 여부 확인
-  const isExpired = formattedDeadline
-    ? new Date(formattedDeadline) < new Date()
-    : false;
+  const deadlineEnd = getAnnouncementDeadlineEnd(announcement?.deadline);
+  const isExpired = deadlineEnd ? deadlineEnd < new Date() : false;
 
   // 공고 삭제 핸들러
   const handleDeleteAnnouncement = () => {

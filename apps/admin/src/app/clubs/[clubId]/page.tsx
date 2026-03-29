@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { getMajorLabel } from "shared";
 import { MarkdownContent } from "ui";
+import { getAnnouncementDeadlineEnd } from "utils";
 import { JobPostingItem, MemberItem } from "@/components/club/item";
 import { ClubHeader, Pagination } from "@/components/common";
 import {
@@ -58,13 +59,15 @@ export default function AdminClubDetailPage() {
         typeof announcement.deadline === "string"
           ? announcement.deadline
           : `${announcement.deadline[0]}-${String(announcement.deadline[1]).padStart(2, "0")}-${String(announcement.deadline[2]).padStart(2, "0")}`;
-      const deadlineDate = new Date(dateString);
+      const deadlineEnd = getAnnouncementDeadlineEnd(announcement.deadline);
       const today = new Date();
 
       return {
         id: announcement.announcementId,
         status:
-          deadlineDate < today ? ("종료됨" as const) : ("진행중" as const),
+          deadlineEnd && deadlineEnd < today
+            ? ("종료됨" as const)
+            : ("진행중" as const),
         title: announcement.title,
         date: dateString,
       };

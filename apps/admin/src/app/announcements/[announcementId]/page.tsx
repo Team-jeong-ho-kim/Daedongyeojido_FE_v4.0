@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { getMajorLabel } from "shared";
 import { toast } from "sonner";
 import { MarkdownContent } from "ui";
+import { getAnnouncementDeadlineEnd } from "utils";
 import { ClubHeader } from "@/components/common";
 import {
   useGetAnnouncementDetailQuery,
@@ -230,9 +231,8 @@ export default function AdminAnnouncementDetailPage() {
   const formattedPhoneNumber = formatPhoneNumber(
     announcementDetail.phoneNumber,
   );
-  const isExpired = formattedDeadline
-    ? new Date(formattedDeadline) < new Date()
-    : false;
+  const deadlineEnd = getAnnouncementDeadlineEnd(announcementDetail.deadline);
+  const isExpired = deadlineEnd ? deadlineEnd < new Date() : false;
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
