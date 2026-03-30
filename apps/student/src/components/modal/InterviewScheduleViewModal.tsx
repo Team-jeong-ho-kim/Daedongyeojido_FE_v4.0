@@ -27,7 +27,7 @@ interface InterviewScheduleViewModalProps {
   onBackdropClick: () => void;
   schedule: InterviewScheduleDetail | null;
   onUpdate?: () => void;
-  isClubLeader?: boolean;
+  canEditInterviewSchedule?: boolean;
 }
 
 export function InterviewScheduleViewModal({
@@ -36,7 +36,7 @@ export function InterviewScheduleViewModal({
   onBackdropClick,
   schedule,
   onUpdate,
-  isClubLeader = false,
+  canEditInterviewSchedule = false,
 }: InterviewScheduleViewModalProps) {
   const titleId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -373,7 +373,7 @@ export function InterviewScheduleViewModal({
             >
               닫기
             </button>
-            {isClubLeader && (
+            {canEditInterviewSchedule && (
               <button
                 type="button"
                 onClick={handleEdit}
