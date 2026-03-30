@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
-import { getMajorLabel, useUserStore } from "shared";
+import { getMajorLabel, type UserRole, useUserStore } from "shared";
 import { toast } from "sonner";
 import { ApiError } from "utils";
 import {
@@ -40,6 +40,9 @@ const resolveInterviewStatus = (submission: SubmissionDetail) => {
   return "NOT_SCHEDULED" as const;
 };
 
+export const canEditInterviewScheduleForRole = (role?: UserRole) =>
+  role === "CLUB_MEMBER" || role === "CLUB_LEADER";
+
 export default function SubmissionDetailPage({
   params,
 }: SubmissionDetailPageProps) {
@@ -64,6 +67,7 @@ export default function SubmissionDetailPage({
   const role = useUserStore((state) => state.userInfo?.role);
   const isClubMember = role === "CLUB_MEMBER" || role === "CLUB_LEADER";
   const isClubLeader = role === "CLUB_LEADER";
+  const canEditInterviewSchedule = canEditInterviewScheduleForRole(role);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -447,7 +451,7 @@ export default function SubmissionDetailPage({
         onBackdropClick={() => setShowViewScheduleModal(false)}
         schedule={scheduleDetail}
         onUpdate={handleScheduleUpdate}
-        isClubLeader={isClubLeader}
+        canEditInterviewSchedule={canEditInterviewSchedule}
       />
 
       <ApplicationConfirmModal
