@@ -8,8 +8,15 @@ import {
 import { BASE_URL } from "./env";
 import { ApiError, type ApiErrorResponse } from "./types/error";
 
+const normalizeApiBaseUrl = (value?: string) =>
+  value?.trim().replace(/\/+$/, "");
+
+const normalizeRequestUrl = (value?: string) => value?.trim();
+
+const apiBaseUrl = normalizeApiBaseUrl(BASE_URL);
+
 export const apiClient = axios.create({
-  baseURL: BASE_URL,
+  baseURL: apiBaseUrl,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -58,6 +65,8 @@ const redirectToWebLogin = () => {
 
 apiClient.interceptors.request.use(
   (config) => {
+    config.url = normalizeRequestUrl(config.url);
+
     if (isAuthBypassRequest(config.url)) {
       config.withCredentials = false;
       delete config.headers.Authorization;
@@ -120,7 +129,7 @@ apiClient.interceptors.response.use(
         }
 
         const response = await axios.patch(
-          `${BASE_URL}/auth/reissue`,
+          `${apiBaseUrl}/auth/reissue`,
           {},
           {
             headers: {
