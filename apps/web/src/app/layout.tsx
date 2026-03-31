@@ -3,6 +3,7 @@ import { CloudflareAnalytics, Toaster } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import "./globals.css";
 
+// Cache-bust commit marker for xquare rebuild.
 const siteUrl = (
   process.env.NEXT_PUBLIC_WEB_URL || "http://localhost:3000"
 ).trim();
