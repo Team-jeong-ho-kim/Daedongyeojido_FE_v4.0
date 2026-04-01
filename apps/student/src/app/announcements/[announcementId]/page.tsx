@@ -30,6 +30,7 @@ import {
 import { useGetDetailAnnounceQuery } from "@/hooks/querys/useAnnouncementQuery";
 import { useGetClubApplicationFormsQuery } from "@/hooks/querys/useApplicationFormQuery";
 import { useGetDetailClubQuery } from "@/hooks/querys/useClubQuery";
+import { formatPhoneNumber } from "@/lib";
 import type { ApplicationSubmission } from "@/types";
 
 interface AnnouncementDetailPageProps {
@@ -86,20 +87,6 @@ const formatDeadline = (deadline: string | [number, number, number]) => {
   }
 
   return deadline;
-};
-
-const formatPhoneNumber = (phoneNumber: string) => {
-  if (!phoneNumber) return phoneNumber;
-  const digits = phoneNumber.replace(/\D/g, "");
-
-  if (digits.length === 11) {
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
-  }
-  if (digits.length === 10) {
-    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
-  }
-
-  return phoneNumber;
 };
 
 export default function AnnouncementDetailPage({

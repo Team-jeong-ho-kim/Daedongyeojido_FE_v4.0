@@ -85,8 +85,26 @@ type MockApplicant = {
   submissionId: number;
   userName: string;
   classNumber: string;
+  phoneNumber?: string;
   profileImage: string | null;
   major: string;
+};
+
+type MockClubSubmissionDetail = {
+  userName: string;
+  classNumber: string;
+  phoneNumber: string;
+  introduction: string;
+  major: string;
+  answers: Array<{
+    questionId: number;
+    questionContent: string;
+    content: string;
+  }>;
+  applicantId: number;
+  hasInterviewSchedule: boolean;
+  clubApplicationStatus: "WRITING" | "SUBMITTED" | "ACCEPTED" | "REJECTED";
+  isInterviewCompleted: boolean;
 };
 
 type MockMySubmissionDetail = {
@@ -200,6 +218,7 @@ type StudentApiMockOptions = {
   applicationForms?: MockApplicationForm[];
   applicationFormDetail?: Partial<MockApplicationFormDetail>;
   applicants?: MockApplicant[];
+  submissionDetail?: MockClubSubmissionDetail;
   userAlarms?: MockAlarm[];
   clubAlarms?: MockAlarm[];
   clubAnnouncements?: MockAnnouncementListItem[];
@@ -304,10 +323,30 @@ const DEFAULT_APPLICANTS: MockApplicant[] = [
     submissionId: 501,
     userName: "김지원",
     classNumber: "2401",
+    phoneNumber: "01012345678",
     profileImage: "/images/icons/profile.svg",
     major: "BE",
   },
 ];
+
+const DEFAULT_SUBMISSION_DETAIL: MockClubSubmissionDetail = {
+  userName: "김지원",
+  classNumber: "2401",
+  phoneNumber: "01012345678",
+  introduction: "백엔드 개발을 좋아합니다.",
+  major: "BE",
+  answers: [
+    {
+      questionId: 1,
+      questionContent: "지원 동기를 작성해주세요.",
+      content: "동아리 활동을 통해 더 성장하고 싶습니다.",
+    },
+  ],
+  applicantId: 701,
+  hasInterviewSchedule: false,
+  clubApplicationStatus: "SUBMITTED",
+  isInterviewCompleted: false,
+};
 
 const DEFAULT_USER_ALARMS: MockAlarm[] = [
   {
@@ -590,6 +629,8 @@ export async function installStudentApiMocks(
     ...options.applicationFormDetail,
   };
   const applicants = options.applicants ?? DEFAULT_APPLICANTS.slice();
+  const submissionDetail =
+    options.submissionDetail ?? DEFAULT_SUBMISSION_DETAIL;
   let userAlarms = options.userAlarms ?? DEFAULT_USER_ALARMS.slice();
   let clubAlarms = options.clubAlarms ?? DEFAULT_CLUB_ALARMS.slice();
   const documentFiles = options.documentFiles ?? DEFAULT_DOCUMENT_FILES.slice();
@@ -835,6 +876,16 @@ export async function installStudentApiMocks(
     await createJsonResponse(route, {
       applicants,
     });
+  });
+
+  await page.route(/.*\/clubs\/submissions\/\d+$/, async (route) => {
+    if (await handleApiFallback(route)) return;
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+
+    await createJsonResponse(route, submissionDetail);
   });
 
   await page.route(/.*\/clubs\/\d+$/, async (route) => {

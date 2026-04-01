@@ -1,7 +1,9 @@
 import { apiClient } from "utils";
 import {
+  getApplicationSubmissions,
   getMySubmissionDetail,
   getMySubmissionHistory,
+  getSubmissionDetail,
 } from "../applicationForm";
 
 vi.mock("utils", () => ({
@@ -76,6 +78,78 @@ describe("getMySubmissionDetail", () => {
       submissionDuration: "2026-03-30",
       userName: "홍길동",
       userApplicationStatus: "SUBMITTED",
+    });
+  });
+});
+
+describe("getApplicationSubmissions", () => {
+  it("keeps applicant phoneNumber from the server response", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: {
+        applicants: [
+          {
+            classNumber: "2101",
+            major: "BACKEND",
+            phoneNumber: "01012345678",
+            submissionId: 308,
+            userName: "홍길동",
+          },
+        ],
+      },
+    });
+
+    await expect(getApplicationSubmissions("11")).resolves.toEqual([
+      {
+        classNumber: "2101",
+        major: "BACKEND",
+        phoneNumber: "01012345678",
+        submissionId: 308,
+        userName: "홍길동",
+      },
+    ]);
+  });
+});
+
+describe("getSubmissionDetail", () => {
+  it("keeps phoneNumber from the server response", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({
+      data: {
+        answers: [
+          {
+            content: "안녕하세요",
+            questionContent: "자기소개",
+            questionId: 1,
+          },
+        ],
+        applicantId: 141,
+        classNumber: "2101",
+        clubApplicationStatus: "SUBMITTED",
+        hasInterviewSchedule: true,
+        introduction: "...",
+        isInterviewCompleted: false,
+        major: "BACKEND",
+        phoneNumber: "01012345678",
+        userName: "홍길동",
+      },
+    });
+
+    await expect(getSubmissionDetail("308")).resolves.toEqual({
+      answers: [
+        {
+          content: "안녕하세요",
+          questionContent: "자기소개",
+          questionId: 1,
+        },
+      ],
+      applicantId: 141,
+      classNumber: "2101",
+      clubApplicationStatus: "SUBMITTED",
+      hasInterviewSchedule: true,
+      introduction: "...",
+      isInterviewCompleted: false,
+      major: "BACKEND",
+      phoneNumber: "01012345678",
+      userName: "홍길동",
     });
   });
 });

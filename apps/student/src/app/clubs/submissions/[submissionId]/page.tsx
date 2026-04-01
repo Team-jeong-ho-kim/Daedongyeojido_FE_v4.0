@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
-import { getMajorLabel, type UserRole, useUserStore } from "shared";
+import { getMajorLabel, useUserStore } from "shared";
 import { toast } from "sonner";
 import { ApiError } from "utils";
 import {
@@ -18,7 +18,9 @@ import { ApplicationConfirmModal } from "@/components/modal/ApplicationConfirmMo
 import { InterviewScheduleSetModal } from "@/components/modal/InterviewScheduleSetModal";
 import { InterviewScheduleViewModal } from "@/components/modal/InterviewScheduleViewModal";
 import { getErrorMessage } from "@/lib/error";
+import { formatPhoneNumber } from "@/lib/phone";
 import type { InterviewScheduleDetail, SubmissionDetail } from "@/types";
+import { canEditInterviewScheduleForRole } from "./permissions";
 
 interface SubmissionDetailPageProps {
   params: Promise<{ submissionId: string }>;
@@ -39,9 +41,6 @@ const resolveInterviewStatus = (submission: SubmissionDetail) => {
 
   return "NOT_SCHEDULED" as const;
 };
-
-export const canEditInterviewScheduleForRole = (role?: UserRole) =>
-  role === "CLUB_MEMBER" || role === "CLUB_LEADER";
 
 export default function SubmissionDetailPage({
   params,
@@ -264,6 +263,7 @@ export default function SubmissionDetailPage({
       ? submission.major.split(",").map((m) => m.trim())
       : [submission.major];
   const interviewStatus = resolveInterviewStatus(submission);
+  const formattedPhoneNumber = formatPhoneNumber(submission.phoneNumber);
 
   return (
     <main className="min-h-screen bg-white">
@@ -302,6 +302,16 @@ export default function SubmissionDetailPage({
               {submission.classNumber}
             </div>
           </div>
+
+          {/* 전화번호 */}
+          {formattedPhoneNumber && (
+            <div className="mb-6">
+              <p className="mb-3 text-gray-900 text-sm">전화번호</p>
+              <div className="rounded-lg bg-gray-100 px-5 py-4 text-base text-gray-900">
+                {formattedPhoneNumber}
+              </div>
+            </div>
+          )}
 
           {/* 자기소개 */}
           <div>

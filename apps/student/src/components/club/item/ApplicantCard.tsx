@@ -1,12 +1,14 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatMajorList, getMajorLabel } from "shared";
+import { formatPhoneNumber } from "@/lib";
 import { Chip } from "../../common/Chip";
 
 interface Applicant {
   submissionId?: number;
   userName?: string;
   classNumber?: string;
+  phoneNumber?: string;
   major?: string[] | string;
   // 하위 호환성 유지
   name?: string;
@@ -37,6 +39,7 @@ export default function ApplicantCard({
       ? formatMajorList(applicant.major)
       : getMajorLabel(String(applicant.major))
     : applicant.position || "전공 없음";
+  const displayPhoneNumber = formatPhoneNumber(applicant.phoneNumber);
   const displayInterviewDate = applicant.interviewDate || "-";
   const hasNavigationData =
     applicant.submissionId ||
@@ -79,7 +82,7 @@ export default function ApplicantCard({
       </div>
 
       {/* 정보 섹션 */}
-      <div className="flex items-center gap-6 text-sm">
+      <div className="flex flex-wrap items-center gap-4 text-sm md:gap-6">
         {/* 학번 */}
         <div className="flex items-center gap-2">
           <span className="text-gray-600">학번 :</span>
@@ -87,6 +90,16 @@ export default function ApplicantCard({
             {displayStudentId}
           </span>
         </div>
+
+        {/* 전화번호 */}
+        {displayPhoneNumber && (
+          <div className="flex items-center gap-2">
+            <span className="text-gray-600">전화번호 :</span>
+            <span className="font-semibold text-gray-900">
+              {displayPhoneNumber}
+            </span>
+          </div>
+        )}
 
         {/* 지원 전공 */}
         <div className="flex items-center gap-2">
