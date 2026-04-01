@@ -79,6 +79,7 @@ export interface ApplicationSubmission {
   submissionId: number;
   userName: string;
   classNumber: string;
+  phoneNumber?: string;
   major: string[] | string;
   clubApplicationStatus?: ApplicationStatus;
 }
@@ -97,6 +98,7 @@ export interface SubmissionDetail {
   applicantId: number;
   userName: string;
   classNumber: string;
+  phoneNumber?: string;
   introduction: string;
   major: string;
   answers: SubmissionAnswer[];
