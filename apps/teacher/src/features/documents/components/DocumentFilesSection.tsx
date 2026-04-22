@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   clearTokens,
   getAccessToken,
@@ -89,7 +90,7 @@ export function DocumentFilesSection() {
     try {
       await downloadFileFromUrl(file.fileUrl, file.fileName);
     } catch {
-      setErrorMessage("양식 다운로드에 실패했습니다. 다시 시도해주세요.");
+      toast.error("양식 다운로드에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setDownloadingFileId(null);
     }
