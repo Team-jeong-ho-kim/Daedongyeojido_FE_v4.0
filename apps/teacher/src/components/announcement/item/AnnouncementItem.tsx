@@ -24,7 +24,7 @@ export default function AnnouncementItem({
     <article className="group relative h-[310px] w-[280px] cursor-default select-none overflow-hidden rounded-3xl">
       <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 group-hover:h-[200px]">
         {hasRenderableImage ? (
-          <Image src={clubImage} alt={title} fill className="object-cover" />
+          <Image src={clubImage} alt={clubName} fill className="object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl text-white/80">
             {clubName.slice(0, 1)}
