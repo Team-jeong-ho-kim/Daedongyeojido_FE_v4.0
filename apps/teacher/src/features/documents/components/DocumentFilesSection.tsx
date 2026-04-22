@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ManualPdfPreviewModal } from "ui";
 import {
   clearTokens,
   getAccessToken,
   getDocumentDownloadFileName,
   getDocumentFileExtensionLabel,
-  getDocumentPreviewPdfPath,
   getSessionUser,
 } from "utils";
 import { getTeacherDocumentFiles } from "@/api/teacher";
@@ -23,11 +21,6 @@ export function DocumentFilesSection() {
   const [downloadingFileId, setDownloadingFileId] = useState<number | null>(
     null,
   );
-  const [previewFile, setPreviewFile] =
-    useState<TeacherDocumentFileItem | null>(null);
-  const previewPdfPath = previewFile
-    ? getDocumentPreviewPdfPath(previewFile.fileId)
-    : null;
 
   useEffect(() => {
     let isMounted = true;
@@ -67,25 +60,6 @@ export function DocumentFilesSection() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!previewFile) {
-      return;
-    }
-
-    const exists = documentFiles.some(
-      (file) => file.fileId === previewFile.fileId,
-    );
-    if (!exists) {
-      setPreviewFile(null);
-    }
-  }, [documentFiles, previewFile]);
-
-  useEffect(() => {
-    if (previewFile && !previewPdfPath) {
-      setPreviewFile(null);
-    }
-  }, [previewFile, previewPdfPath]);
-
   const downloadFileFromUrl = async (fileUrl: string, fileName: string) => {
     const response = await fetch(fileUrl);
     if (!response.ok) {
@@ -119,14 +93,6 @@ export function DocumentFilesSection() {
     } finally {
       setDownloadingFileId(null);
     }
-  };
-
-  const closePreview = () => {
-    setPreviewFile(null);
-  };
-
-  const openPreview = (file: TeacherDocumentFileItem) => {
-    setPreviewFile(file);
   };
 
   return (
@@ -175,7 +141,6 @@ export function DocumentFilesSection() {
                 file.fileUrl,
               );
               const isDownloading = downloadingFileId === file.fileId;
-              const previewPath = getDocumentPreviewPdfPath(file.fileId);
 
               return (
                 <article
@@ -211,20 +176,6 @@ export function DocumentFilesSection() {
           </div>
         ) : null}
       </div>
-
-      <ManualPdfPreviewModal
-        fileName={
-          previewFile
-            ? getDocumentDownloadFileName(
-                previewFile.fileName,
-                previewFile.fileUrl,
-              )
-            : ""
-        }
-        isOpen={previewFile !== null}
-        onClose={closePreview}
-        pdfPath={previewPdfPath}
-      />
     </div>
   );
 }
