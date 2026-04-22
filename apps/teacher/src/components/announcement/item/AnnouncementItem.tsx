@@ -1,11 +1,11 @@
 import Image from "next/image";
 
 interface AnnouncementItemProps {
-  announcement_id: number;
+  announcementId: number;
   title: string;
-  club_name: string;
+  clubName: string;
   deadline: string;
-  club_image?: string;
+  clubImage?: string;
 }
 
 const ALLOWED_IMAGE_HOSTS = new Set([
@@ -29,25 +29,25 @@ const isRenderableImageSrc = (value: string) => {
 };
 
 export default function AnnouncementItem({
-  announcement_id,
+  announcementId,
   title,
-  club_name,
+  clubName,
   deadline,
-  club_image,
+  clubImage,
 }: AnnouncementItemProps) {
   const hasRenderableImage =
-    typeof club_image === "string" &&
-    club_image.trim().length > 0 &&
-    isRenderableImageSrc(club_image);
+    typeof clubImage === "string" &&
+    clubImage.trim().length > 0 &&
+    isRenderableImageSrc(clubImage);
 
   return (
     <article className="group relative h-[310px] w-[280px] cursor-default select-none overflow-hidden rounded-3xl">
       <div className="absolute top-0 left-0 h-[268px] w-full bg-[#355849] transition-all duration-300 group-hover:h-[200px]">
         {hasRenderableImage ? (
-          <Image src={club_image} alt={title} fill className="object-cover" />
+          <Image src={clubImage} alt={title} fill className="object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl text-white/80">
-            {club_name.slice(0, 1)}
+            {clubName.slice(0, 1)}
           </div>
         )}
       </div>
@@ -56,7 +56,7 @@ export default function AnnouncementItem({
         <h2 className="line-clamp-1 font-semibold text-base text-gray-900 group-hover:line-clamp-none">
           {title}
         </h2>
-        <p className="text-gray-600 text-sm">{club_name}</p>
+        <p className="text-gray-600 text-sm">{clubName}</p>
         <p className="text-gray-500 text-xs">모집 기한: {deadline}</p>
       </section>
     </article>

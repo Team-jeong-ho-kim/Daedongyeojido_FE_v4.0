@@ -14,11 +14,11 @@ import { moveToWebLogin } from "@/lib/auth";
 import type { TeacherAnnouncementListItem } from "@/types/teacher";
 
 interface TeacherAnnouncementCard {
-  announcement_id: number;
+  announcementId: number;
   title: string;
-  club_name: string;
+  clubName: string;
   deadline: string;
-  club_image?: string;
+  clubImage?: string;
 }
 
 const PAGE_SIZE = 8;
@@ -90,13 +90,13 @@ export default function TeacherAnnouncementsPage() {
   const announcements = useMemo<TeacherAnnouncementCard[]>(() => {
     return announcementsData
       .map((item) => ({
-        announcement_id: item.announcementId,
+        announcementId: item.announcementId,
         title: item.title,
-        club_name: item.clubName,
+        clubName: item.clubName,
         deadline: toDeadlineText(item.deadline),
-        club_image: item.clubImage,
+        clubImage: item.clubImage,
       }))
-      .sort((a, b) => b.announcement_id - a.announcement_id);
+      .sort((a, b) => b.announcementId - a.announcementId);
   }, [announcementsData]);
 
   const clubOptions = useMemo<AnnouncementClubFilterOption[]>(() => {
@@ -104,19 +104,14 @@ export default function TeacherAnnouncementsPage() {
       { imageUrl: null, name: "전체" },
       ...Array.from(
         announcements.reduce((acc, item) => {
-          const imageUrl = item.club_image?.trim() ? item.club_image : null;
-          const currentImage = acc.get(item.club_name);
-
+          const imageUrl = item.clubImage?.trim() ? item.clubImage : null;
+          const currentImage = acc.get(item.clubName);
           if (currentImage === undefined || (!currentImage && imageUrl)) {
-            acc.set(item.club_name, imageUrl);
+            acc.set(item.clubName, imageUrl);
           }
-
           return acc;
         }, new Map<string, string | null>()),
-        ([name, imageUrl]) => ({
-          imageUrl,
-          name,
-        }),
+        ([name, imageUrl]) => ({ imageUrl, name }),
       ),
     ];
   }, [announcements]);
@@ -124,7 +119,7 @@ export default function TeacherAnnouncementsPage() {
   const filteredAnnouncements =
     selectedClub === "전체"
       ? announcements
-      : announcements.filter((item) => item.club_name === selectedClub);
+      : announcements.filter((item) => item.clubName === selectedClub);
 
   const pagedAnnouncements = filteredAnnouncements.slice(
     (curPage - 1) * PAGE_SIZE,
@@ -143,11 +138,11 @@ export default function TeacherAnnouncementsPage() {
           <h1 className="font-bold text-3xl text-gray-900">공고 전체 조회</h1>
         </div>
 
-        {errorMessage ? (
+        {errorMessage && (
           <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-4 text-red-700 text-sm">
             {errorMessage}
           </div>
-        ) : null}
+        )}
 
         {!errorMessage && !showSkeleton && announcements.length > 0 && (
           <AnnouncementClubFilter
@@ -172,7 +167,7 @@ export default function TeacherAnnouncementsPage() {
           ) : (
             pagedAnnouncements.map((announcement) => (
               <AnnouncementItem
-                key={announcement.announcement_id}
+                key={announcement.announcementId}
                 {...announcement}
               />
             ))
