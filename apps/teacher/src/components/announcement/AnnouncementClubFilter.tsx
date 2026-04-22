@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { isRenderableImageSrc } from "@/constants";
 
 export interface AnnouncementClubFilterOption {
   imageUrl: string | null;
@@ -13,26 +14,6 @@ interface AnnouncementClubFilterProps {
   selectedClub: string;
   onSelectClub: (clubName: string) => void;
 }
-
-const ALLOWED_IMAGE_HOSTS = new Set([
-  "dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com",
-  "daedong-bucket.s3.ap-northeast-2.amazonaws.com",
-]);
-
-const isRenderableImageSrc = (value: string) => {
-  if (value.startsWith("/") && !value.startsWith("//")) {
-    return true;
-  }
-
-  try {
-    const parsed = new URL(value);
-    return (
-      parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.has(parsed.hostname)
-    );
-  } catch {
-    return false;
-  }
-};
 
 export function AnnouncementClubFilter({
   clubOptions,

@@ -1,21 +1,6 @@
 import Image from "next/image";
+import { isRenderableImageSrc } from "@/constants";
 import type { TeacherClubSummary } from "@/types/teacher";
-
-const ALLOWED_IMAGE_HOSTS = new Set([
-  "dsm-s3-bucket-entry.s3.ap-northeast-2.amazonaws.com",
-  "daedong-bucket.s3.ap-northeast-2.amazonaws.com",
-]);
-
-const isAllowedRemoteImage = (value: string) => {
-  try {
-    const parsed = new URL(value);
-    return (
-      parsed.protocol === "https:" && ALLOWED_IMAGE_HOSTS.has(parsed.hostname)
-    );
-  } catch {
-    return false;
-  }
-};
 
 type TeacherClubItemProps = Pick<
   TeacherClubSummary,
@@ -27,7 +12,7 @@ export default function ClubItem({
   clubImage,
   introduction,
 }: TeacherClubItemProps) {
-  const hasImage = clubImage?.trim() && isAllowedRemoteImage(clubImage);
+  const hasImage = clubImage?.trim() && isRenderableImageSrc(clubImage);
 
   return (
     <article className="group relative block h-[310px] w-[280px] cursor-default select-none overflow-hidden rounded-3xl text-left">
