@@ -29,7 +29,6 @@ const isRenderableImageSrc = (value: string) => {
 };
 
 export default function AnnouncementItem({
-  announcementId,
   title,
   clubName,
   deadline,
