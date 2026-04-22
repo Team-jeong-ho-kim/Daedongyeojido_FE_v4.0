@@ -127,7 +127,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/daedong.svg" type="image/svg+xml" />
         <script
