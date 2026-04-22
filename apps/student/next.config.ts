@@ -23,10 +23,6 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "daedong-bucket.s3.ap-northeast-2.amazonaws.com",
       },
-      {
-        protocol: "https",
-        hostname: "example.com",
-      },
     ],
   },
 };
