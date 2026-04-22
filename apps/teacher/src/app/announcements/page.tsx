@@ -23,11 +23,12 @@ interface TeacherAnnouncementCard {
 
 const PAGE_SIZE = 8;
 
+const SKELETON_KEYS = Array.from({ length: PAGE_SIZE }, (_, i) => i + 1);
+
 const toDeadlineText = (deadline: [number, number, number] | string) => {
   if (typeof deadline === "string") {
     return deadline;
   }
-
   return `${deadline[0]}-${String(deadline[1]).padStart(2, "0")}-${String(deadline[2]).padStart(2, "0")}`;
 };
 
@@ -57,7 +58,6 @@ export default function TeacherAnnouncementsPage() {
 
   useEffect(() => {
     let isMounted = true;
-
     const loadAnnouncements = async () => {
       const accessToken = getAccessToken();
       const sessionUser = getSessionUser();
@@ -70,28 +70,18 @@ export default function TeacherAnnouncementsPage() {
 
       try {
         const response = await getTeacherAnnouncements();
-
-        if (!isMounted) {
-          return;
-        }
-
+        if (!isMounted) return;
         setAnnouncementsData(response);
         setErrorMessage("");
       } catch {
-        if (!isMounted) {
-          return;
-        }
-
+        if (!isMounted) return;
         setErrorMessage("공고 목록을 불러오지 못했습니다.");
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
 
     void loadAnnouncements();
-
     return () => {
       isMounted = false;
     };
@@ -172,8 +162,8 @@ export default function TeacherAnnouncementsPage() {
 
         <div className="mb-10 flex min-h-[660px] flex-wrap gap-7">
           {errorMessage ? null : showSkeleton ? (
-            Array.from({ length: PAGE_SIZE }, () => (
-              <TeacherAnnouncementSkeletonCard key={crypto.randomUUID()} />
+            SKELETON_KEYS.map((key) => (
+              <TeacherAnnouncementSkeletonCard key={key} />
             ))
           ) : filteredAnnouncements.length === 0 ? (
             <div className="flex w-full items-center justify-center py-20">
