@@ -20,7 +20,7 @@ const ALLOWED_IMAGE_HOSTS = new Set([
 ]);
 
 const isRenderableImageSrc = (value: string) => {
-  if (value.startsWith("/")) {
+  if (value.startsWith("/") && !value.startsWith("//")) {
     return true;
   }
 
