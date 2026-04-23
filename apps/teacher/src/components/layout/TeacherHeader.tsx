@@ -5,6 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// TODO: UI 패키지로 헤더 공통으로 빼야 됨
+const teacherNavItems = [
+  { href: "/clubs", label: "동아리" },
+  { href: "/announcements", label: "공고" },
+  { href: "/documents", label: "양식" },
+];
+
 export function TeacherHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -46,6 +53,8 @@ export function TeacherHeader() {
     setIsMobileMenuOpen(false);
   };
 
+  const isActivePath = (href: string) => pathname?.startsWith(href);
+
   return (
     <>
       <header
@@ -64,6 +73,21 @@ export function TeacherHeader() {
                 className="h-6"
               />
             </Link>
+            <nav className="hidden items-center gap-10 md:flex">
+              {teacherNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-[15px] transition-colors ${
+                    isActivePath(item.href)
+                      ? "font-semibold text-gray-900"
+                      : "font-normal text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
 
           <div className="relative hidden items-center gap-3 md:flex">
@@ -140,16 +164,29 @@ export function TeacherHeader() {
         }`}
       >
         <nav className="flex flex-col p-6">
+          {teacherNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={handleLinkClick}
+              className={`border-gray-100 border-b py-4 text-[15px] transition-colors ${
+                isActivePath(item.href)
+                  ? "font-semibold text-gray-900"
+                  : "font-normal text-gray-600"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+
           <Link
             href="/mypage"
             onClick={handleLinkClick}
-            className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-3 transition-colors hover:bg-gray-200"
+            className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-gray-100 py-3 transition-colors hover:bg-gray-200"
           >
             <span
               className={`font-medium text-[15px] ${
-                pathname?.startsWith("/mypage")
-                  ? "text-gray-900"
-                  : "text-gray-600"
+                isActivePath("/mypage") ? "text-gray-900" : "text-gray-600"
               }`}
             >
               마이페이지
