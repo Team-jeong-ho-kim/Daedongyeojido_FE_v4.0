@@ -71,7 +71,7 @@ export function DocumentCreationForm() {
           </div>
         </div>
 
-        <div className="flex cursor-pointer flex-col gap-2 md:flex-row">
+        <div className="flex flex-col gap-2 md:flex-row">
           <div
             id={fileUrlLabelId}
             className="w-full shrink-0 pt-2.5 font-medium text-[15px] text-gray-900 md:w-[140px]"
