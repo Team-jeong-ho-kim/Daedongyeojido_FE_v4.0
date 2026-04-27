@@ -179,7 +179,7 @@ export function DocumentCreationForm() {
             <div className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5">
               <input
                 id={deadlineId}
-                type="text"
+                type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 placeholder="마감기한을 설정해주세요."
