@@ -79,7 +79,10 @@ export function DocumentCreationForm() {
             <span className="mr-1 text-[#f45f5f]">*</span>파일 선택/URL 첨부
           </div>
 
-          <fieldset className="flex flex-1 flex-col gap-4">
+          <fieldset
+            aria-labelledby={fileUrlLabelId}
+            className="flex flex-1 flex-col gap-4"
+          >
             <div className="flex rounded-lg border border-gray-100 bg-gray-50 p-1">
               <button
                 type="button"
