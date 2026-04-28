@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CloudflareAnalytics } from "ui";
+import { CloudflareAnalytics, Footer } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import { TeacherLayoutContent } from "@/components/layout";
 import "./globals.css";
@@ -37,6 +37,7 @@ export default function RootLayout({
       <body>
         <ChannelTalkProvider />
         <TeacherLayoutContent>{children}</TeacherLayoutContent>
+        <Footer />
       </body>
     </html>
   );
