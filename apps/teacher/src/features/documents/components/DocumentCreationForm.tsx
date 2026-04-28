@@ -122,33 +122,35 @@ export function DocumentCreationForm() {
                   <button
                     type="button"
                     onClick={() => setFile(null)}
-                    className="text-[14px] text-red-500"
+                    className="cursor-pointer text-[14px] text-red-500 hover:text-red-600"
                   >
                     삭제
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-gray-200 border-dashed bg-white text-gray-400 hover:bg-gray-50"
-                >
+                <>
                   <input
                     ref={fileInputRef}
                     type="file"
                     className="hidden"
                     onChange={handleFileChange}
                   />
-                  <span className="flex items-center gap-2 text-[14px]">
-                    파일을 업로드 해주세요.
-                    <Image
-                      src="/images/icons/fileupload.svg"
-                      alt="업로드"
-                      width={12}
-                      height={12}
-                    />
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-gray-200 border-dashed bg-white text-gray-400 hover:bg-gray-50"
+                  >
+                    <span className="flex items-center gap-2 text-[14px]">
+                      파일을 업로드 해주세요.
+                      <Image
+                        src="/images/icons/fileupload.svg"
+                        alt="업로드"
+                        width={12}
+                        height={12}
+                      />
+                    </span>
+                  </button>
+                </>
               )
             ) : (
               <div className="rounded-lg border border-gray-100 bg-white p-2.5">
