@@ -147,7 +147,7 @@ export default function TeacherDocumentDetailPage() {
   );
 
   const [curPage, setCurPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 2;
   const currentSubmissions = submissions.slice(
     (curPage - 1) * itemsPerPage,
     curPage * itemsPerPage,
