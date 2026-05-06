@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import {
   DEFAULT_ONE_PAGER_FILE_STATUS,
   type OnePagerCommentItem,
@@ -15,6 +14,14 @@ import type { TeacherOnePagerSubmission } from "@/components/onepager/types";
 const DEFAULT_TITLE = "원페이저 제목";
 const DEFAULT_DESCRIPTION =
   "현재는 동아리 개설 신청 양식을 제공합니다. 등록된 양식은 다운로드할 수 있고, 미리보기 PDF가 준비된 양식은 브라우저에서 바로 확인한 뒤 작성 완료 후 개설 신청 페이지에서 업로드해 제출할 수 있습니다.";
+
+const STATUS_STYLES: Record<string, { border: string; text: string }> = {
+  제출됨: { border: "border-blue-500", text: "text-blue-500" },
+  승인됨: { border: "border-green-500", text: "text-green-500" },
+  반려됨: { border: "border-yellow-500", text: "text-yellow-500" },
+  거절됨: { border: "border-primary-500", text: "text-primary-500" },
+  취소됨: { border: "border-gray-500", text: "text-gray-500" },
+};
 
 const normalizeSubmissionLabel = (sourceType: string, source: string) => {
   if (!source) return "Document.pdf";
@@ -211,7 +218,9 @@ export default function TeacherDocumentDetailPage() {
     if (!modalSubmissionId) return;
     setSubmissions((prev) =>
       prev.map((sub) =>
-        sub.id === modalSubmissionId ? { ...sub, status: pendingStatus } : sub,
+        sub.id === modalSubmissionId
+          ? { ...sub, status: pendingStatus || "제출됨" }
+          : sub,
       ),
     );
     setModalSubmissionId(null);
@@ -283,19 +292,13 @@ export default function TeacherDocumentDetailPage() {
                   <h2 className="font-bold text-[22px] text-gray-800">
                     {sub.clubName || "자료 제출"}
                   </h2>
-                  {sub.status === "반려됨" ? (
+                  {sub.status ? (
                     <button
                       type="button"
                       onClick={() => openStatusModal(sub.id)}
-                      className="rounded-full border border-yellow-400 px-5 py-1.5 font-bold text-[15px] text-yellow-500"
-                    >
-                      반려됨
-                    </button>
-                  ) : sub.status ? (
-                    <button
-                      type="button"
-                      onClick={() => openStatusModal(sub.id)}
-                      className="rounded-full border border-gray-300 px-5 py-1.5 font-bold text-[15px] text-gray-600"
+                      className={`rounded-full border px-5 py-1.5 font-bold text-[15px] ${
+                        STATUS_STYLES[sub.status]?.border || "border-gray-300"
+                      } ${STATUS_STYLES[sub.status]?.text || "text-gray-600"}`}
                     >
                       {sub.status}
                     </button>
