@@ -15,10 +15,11 @@ export { LandingHeader, StudentHeader } from "./header";
 export { LoadingOverlay, LoadingState } from "./loading";
 export { MarkdownContent, stripMarkdownToPlainText } from "./MarkdownContent";
 export {
-  OnePagerDetailView,
+  BaseOnePagerDetailView,
   type OnePagerCommentItem,
-  type OnePagerSubmissionItem,
-} from "./OnePagerDetailView";
+} from "./BaseOnePagerDetailView";
+export { OnePagerCommentSection } from "./OnePagerCommentSection";
+export { OnePagerSubmissionItem } from "./OnePagerSubmissionItem";
 export {
   DEFAULT_ONE_PAGER_FILE_STATUS,
   isOnePagerFileStatus,
