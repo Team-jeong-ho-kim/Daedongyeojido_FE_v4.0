@@ -38,7 +38,44 @@ const createDefaultSubmissions = ({
   source: string;
   sourceName: string;
 }): TeacherOnePagerSubmission[] => {
-  return [];
+  return [
+    {
+      id: "club-submission-1",
+      clubName: "DMS",
+      sourceType,
+      source,
+      sourceName,
+      submittedAt: "2026-05-05",
+      status: "반려됨",
+      comments: [
+        {
+          id: "seed-comment-1",
+          author: "김현태",
+          content: "빨리하고자고싶다.빨리하고자고싶다.",
+        },
+      ],
+    },
+    {
+      id: "club-submission-2",
+      clubName: "DOT",
+      sourceType,
+      source,
+      sourceName,
+      submittedAt: "2026-05-05",
+      status: null,
+      comments: [],
+    },
+    {
+      id: "club-submission-2",
+      clubName: "DOT",
+      sourceType,
+      source,
+      sourceName,
+      submittedAt: "2026-05-05",
+      status: null,
+      comments: [],
+    },
+  ];
 };
 
 function StatusModal({
@@ -213,9 +250,9 @@ export default function TeacherDocumentDetailPage() {
 
             <button
               type="button"
-              className="flex items-center gap-2 rounded-xl border border-[#E56D6D] bg-white px-5 py-2.5 text-[#E56D6D] transition-colors hover:bg-red-50"
+              className="flex items-center gap-2 rounded-xl border border-primary-400 bg-white px-5 py-2.5 text-gray-800 transition-colors hover:bg-red-50"
             >
-              <span className="font-semibold text-[18px]">{sourceName}</span>
+              <span className="font-medium text-[16px]">{sourceName}</span>
               <svg
                 width="20"
                 height="20"
@@ -280,24 +317,25 @@ export default function TeacherDocumentDetailPage() {
                     </span>
                     <button
                       type="button"
-                      className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
-                      aria-label="삭제"
+                      className="flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
+                      aria-label="다운로드"
                     >
                       <svg
-                        width="10"
-                        height="10"
+                        width="12"
+                        height="12"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="3"
+                        strokeWidth="2.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         role="img"
-                        aria-label="삭제 아이콘"
+                        aria-label="다운로드 아이콘"
                       >
-                        <title>삭제 아이콘</title>
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                        <title>다운로드 아이콘</title>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                     </button>
                   </div>
@@ -306,10 +344,10 @@ export default function TeacherDocumentDetailPage() {
                   제출일 {sub.submittedAt}
                 </p>
 
-                <div className="my-6 h-px w-full bg-gray-100" />
+                <div className="my-4 h-px w-full bg-gray-100" />
 
                 <div>
-                  <h3 className="mb-4 font-bold text-[18px] text-gray-800">
+                  <h3 className="mb-4 font-semibold text-[18px] text-gray-800">
                     댓글{" "}
                     <span className="text-[#D66A6A]">
                       {sub.comments.length}
@@ -335,22 +373,22 @@ export default function TeacherDocumentDetailPage() {
                   )}
 
                   <div className="flex flex-col">
-                    <textarea
-                      placeholder="내용을 입력하세요."
-                      value={commentInputs[sub.id] || ""}
-                      onChange={(e) =>
-                        setCommentInputs((prev) => ({
-                          ...prev,
-                          [sub.id]: e.target.value,
-                        }))
-                      }
-                      className="h-[80px] w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-[14px] outline-none placeholder:text-gray-400 focus:border-[#D66A6A]"
-                    />
-                    <div className="mt-3 flex justify-end">
+                    <div className="flex items-stretch gap-2">
+                      <textarea
+                        placeholder="내용을 입력하세요."
+                        value={commentInputs[sub.id] || ""}
+                        onChange={(e) =>
+                          setCommentInputs((prev) => ({
+                            ...prev,
+                            [sub.id]: e.target.value,
+                          }))
+                        }
+                        className="h-[44px] w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-[14px] leading-[1.6] outline-none placeholder:text-gray-400 focus:border-[#D66A6A]"
+                      />
                       <button
                         type="button"
                         onClick={() => handleAddComment(sub.id)}
-                        className="rounded-lg bg-[#D66A6A] px-6 py-2 font-bold text-[14px] text-white hover:bg-[#c25e5e]"
+                        className="h-[44px] shrink-0 cursor-pointer rounded-xl bg-primary-500 px-6 text-[14px] text-white hover:bg-primary-600"
                       >
                         등록
                       </button>
