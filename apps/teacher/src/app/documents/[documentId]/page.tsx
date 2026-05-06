@@ -1,45 +1,20 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import {
   DEFAULT_ONE_PAGER_FILE_STATUS,
-  ONE_PAGER_FILE_STATUS_OPTIONS,
   type OnePagerCommentItem,
   type OnePagerFileStatus,
 } from "ui";
-import { getDocumentDownloadFileName, getSessionUser } from "utils";
+import { getDocumentDownloadFileName } from "utils";
+import { Pagination } from "@/components";
+import type { TeacherOnePagerSubmission } from "@/components/onepager/types";
 
 const DEFAULT_TITLE = "원페이저 제목";
 const DEFAULT_DESCRIPTION =
   "현재는 동아리 개설 신청 양식을 제공합니다. 등록된 양식은 다운로드할 수 있고, 미리보기 PDF가 준비된 양식은 브라우저에서 바로 확인한 뒤 작성 완료 후 개설 신청 페이지에서 업로드해 제출할 수 있습니다.";
-
-const STATUS_META: Record<
-  OnePagerFileStatus,
-  { dotClassName: string; badgeClassName: string }
-> = {
-  제출됨: {
-    dotClassName: "bg-[#2f80ed]",
-    badgeClassName: "border-[#2f80ed] text-[#2f80ed]",
-  },
-  승인됨: {
-    dotClassName: "bg-[#40EA45]",
-    badgeClassName: "border-[#40EA45] text-[#40EA45]",
-  },
-  반려됨: {
-    dotClassName: "bg-[#FFB915]",
-    badgeClassName: "border-[#FFB915] text-[#FFB915]",
-  },
-  거절됨: {
-    dotClassName: "bg-[#F45F5F]",
-    badgeClassName: "border-[#F45F5F] text-[#F45F5F]",
-  },
-  취소됨: {
-    dotClassName: "bg-[#524E4E]",
-    badgeClassName: "border-[#524E4E] text-[#524E4E]",
-  },
-};
 
 const normalizeSubmissionLabel = (sourceType: string, source: string) => {
   if (!source) return "Document.pdf";
@@ -54,18 +29,105 @@ const normalizeSubmissionLabel = (sourceType: string, source: string) => {
   return source;
 };
 
-const isValidHttpUrl = (value: string) => {
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
+const createDefaultSubmissions = ({
+  sourceType,
+  source,
+  sourceName,
+}: {
+  sourceType: "file" | "url";
+  source: string;
+  sourceName: string;
+}): TeacherOnePagerSubmission[] => {
+  return [];
 };
 
-type TeacherCommentItem = OnePagerCommentItem & {
-  profileImage?: string | null;
-};
+function StatusModal({
+  isOpen,
+  onClose,
+  selectedStatus,
+  onChangeStatus,
+  onSave,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedStatus: OnePagerFileStatus;
+  onChangeStatus: (status: OnePagerFileStatus) => void;
+  onSave: () => void;
+}) {
+  if (!isOpen) return null;
+
+  const statuses: { label: OnePagerFileStatus; color: string }[] = [
+    { label: "제출됨", color: "bg-blue-500" },
+    { label: "승인됨", color: "bg-green-500" },
+    { label: "반려됨", color: "bg-yellow-400" },
+    { label: "거절됨", color: "bg-red-500" },
+    { label: "취소됨", color: "bg-gray-500" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="w-[400px] rounded-3xl bg-white p-8 shadow-xl">
+        <h3 className="mb-6 text-center font-bold text-[22px] text-gray-800">
+          상태 추가
+        </h3>
+
+        <div className="mb-8 space-y-4">
+          {statuses.map(({ label, color }) => (
+            <label
+              key={label}
+              className={`flex cursor-pointer items-center justify-between rounded-xl p-4 transition-colors ${
+                selectedStatus === label ? "bg-red-50/50" : "hover:bg-gray-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="status"
+                value={label}
+                checked={selectedStatus === label}
+                onChange={() => onChangeStatus(label)}
+                className="sr-only"
+              />
+              <div className="flex items-center gap-3">
+                <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
+                <span className="font-semibold text-[16px] text-gray-700">
+                  {label}
+                </span>
+              </div>
+              <div
+                className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                  selectedStatus === label
+                    ? "border-[#D66A6A]"
+                    : "border-gray-300"
+                }`}
+              >
+                {selectedStatus === label && (
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#D66A6A]" />
+                )}
+              </div>
+            </label>
+          ))}
+        </div>
+
+        <div className="flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl bg-[#989898] px-8 py-2.5 font-bold text-[15px] text-white hover:bg-gray-500"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            className="rounded-xl bg-[#D66A6A] px-8 py-2.5 font-bold text-[15px] text-white hover:bg-[#c25e5e]"
+          >
+            저장
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function TeacherDocumentDetailPage() {
   const searchParams = useSearchParams();
@@ -73,318 +135,252 @@ export default function TeacherDocumentDetailPage() {
   const title = searchParams.get("title")?.trim() || DEFAULT_TITLE;
   const description =
     searchParams.get("description")?.trim() || DEFAULT_DESCRIPTION;
-  const sourceType = searchParams.get("sourceType")?.trim() || "file";
+  const sourceTypeParam = searchParams.get("sourceType")?.trim() || "file";
+  const sourceType = sourceTypeParam === "url" ? "url" : "file";
   const source = searchParams.get("source")?.trim() || "";
-  const sourceName = searchParams.get("sourceName")?.trim() || "";
-  const profileImage = searchParams.get("profileImage")?.trim() || "";
-  const isFileSubmission = sourceType === "file";
-  const teacherName = getSessionUser()?.userName ?? "선생님";
-  const teacherProfileImage = profileImage || "/admin-profile-default.svg";
+  const sourceName =
+    searchParams.get("sourceName")?.trim() ||
+    normalizeSubmissionLabel(sourceType, source);
 
-  const [comments, setComments] = useState<TeacherCommentItem[]>([]);
-  const [commentInput, setCommentInput] = useState("");
+  const [submissions, setSubmissions] = useState<TeacherOnePagerSubmission[]>(
+    () => createDefaultSubmissions({ sourceType, source, sourceName }),
+  );
 
-  const [status, setStatus] = useState<OnePagerFileStatus | null>(null);
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [curPage, setCurPage] = useState(1);
+  const itemsPerPage = 8;
+  const currentSubmissions = submissions.slice(
+    (curPage - 1) * itemsPerPage,
+    curPage * itemsPerPage,
+  );
+
+  const [modalSubmissionId, setModalSubmissionId] = useState<string | null>(
+    null,
+  );
   const [pendingStatus, setPendingStatus] = useState<OnePagerFileStatus>(
     DEFAULT_ONE_PAGER_FILE_STATUS,
   );
-
-  const statusMeta = useMemo(
-    () => (status ? STATUS_META[status] : null),
-    [status],
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>(
+    {},
   );
 
-  const handleSubmitComment = () => {
-    const value = commentInput.trim();
-    if (!value) return;
-
-    const nextComment: TeacherCommentItem = {
-      id: `teacher-comment-${Date.now()}`,
-      author: teacherName,
-      content: value,
-      profileImage: teacherProfileImage,
-    };
-
-    if (isFileSubmission) {
-      if (status === "거절됨") {
-        nextComment.type = "REJECTION_REASON";
-      } else if (status && status !== "취소됨") {
-        setStatus("반려됨");
-      }
-    }
-
-    setComments((prev) => [...prev, nextComment]);
-    setCommentInput("");
+  const openStatusModal = (submissionId: string) => {
+    const target = submissions.find((sub) => sub.id === submissionId);
+    if (!target) return;
+    setModalSubmissionId(submissionId);
+    setPendingStatus(target.status || DEFAULT_ONE_PAGER_FILE_STATUS);
   };
 
-  const openStatusModal = () => {
-    setPendingStatus(status || DEFAULT_ONE_PAGER_FILE_STATUS);
-    setIsStatusModalOpen(true);
+  const saveStatus = () => {
+    if (!modalSubmissionId) return;
+    setSubmissions((prev) =>
+      prev.map((sub) =>
+        sub.id === modalSubmissionId ? { ...sub, status: pendingStatus } : sub,
+      ),
+    );
+    setModalSubmissionId(null);
   };
 
-  const submissionLabel =
-    sourceName || normalizeSubmissionLabel(sourceType, source);
+  const handleAddComment = (submissionId: string) => {
+    const content = commentInputs[submissionId]?.trim();
+    if (!content) return;
 
-  const handleDownloadSubmission = async () => {
-    if (!isFileSubmission) {
-      return;
-    }
-
-    if (!source) {
-      toast.error("다운로드할 파일이 없습니다.");
-      return;
-    }
-
-    try {
-      const response = await fetch(source);
-      if (!response.ok) {
-        throw new Error("파일 다운로드 응답이 올바르지 않습니다.");
-      }
-
-      const blob = await response.blob();
-      if (blob.size === 0) {
-        throw new Error("다운로드한 파일이 비어 있습니다.");
-      }
-
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = getDocumentDownloadFileName(
-        submissionLabel,
-        source,
-        blob.type,
-      );
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      window.setTimeout(() => {
-        URL.revokeObjectURL(objectUrl);
-      }, 1000);
-    } catch {
-      toast.error("파일 다운로드에 실패했습니다. 다시 시도해주세요.");
-    }
+    setSubmissions((prev) =>
+      prev.map((sub) => {
+        if (sub.id !== submissionId) return sub;
+        const newComment: OnePagerCommentItem = {
+          id: `comment-${Date.now()}`,
+          author: "선생님",
+          content,
+        };
+        return { ...sub, comments: [...sub.comments, newComment] };
+      }),
+    );
+    setCommentInputs((prev) => ({ ...prev, [submissionId]: "" }));
   };
 
   return (
-    <main className="min-h-screen bg-white pt-20 pb-32">
-      <div className="mx-auto flex w-full max-w-[1100px] flex-col items-start gap-16 px-6 lg:flex-row">
-        <div className="flex-1">
-          <h1 className="font-bold text-[22px] text-gray-900">{title}</h1>
-          <p className="mt-4 break-keep text-[15px] text-gray-600 leading-relaxed">
-            {description}
-          </p>
-          <hr className="mt-8 border-gray-100 border-t" />
-        </div>
+    <main className="min-h-screen bg-[#F8F9FA] pt-16 pb-32">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid gap-14 lg:grid-cols-[1fr_480px]">
+          <section className="pt-4">
+            <h1 className="font-bold text-[28px] text-gray-800 leading-none">
+              {title}
+            </h1>
+            <p className="mt-[26px] max-w-3xl text-[16px] text-gray-600 leading-[1.6]">
+              {description}
+            </p>
+            <div className="mt-8 mb-8 h-px w-full bg-gray-200" />
 
-        <div className="flex w-full flex-col gap-10 lg:max-w-[420px]">
-          <div className="rounded-[20px] border border-gray-50 bg-white p-6 shadow-[0_2px_16px_rgba(0,0,0,0.04)]">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-[17px] text-gray-900">자료 제출</h2>
-
-              {isFileSubmission &&
-                (status ? (
-                  <button
-                    type="button"
-                    onClick={openStatusModal}
-                    className={`rounded-full border px-4 py-1 font-semibold text-[13px] transition-opacity hover:opacity-80 ${statusMeta?.badgeClassName}`}
-                  >
-                    {status}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={openStatusModal}
-                    className="flex items-center gap-1 rounded-full bg-gray-50 px-3 py-1.5 font-semibold text-gray-500 text-xs transition-colors hover:bg-gray-100"
-                  >
-                    <svg
-                      role="img"
-                      aria-label="상태 추가 아이콘"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <title>상태 추가</title>
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
-                    상태 추가
-                  </button>
-                ))}
-            </div>
-
-            <div className="mt-6">
-              {isFileSubmission ? (
-                <button
-                  type="button"
-                  onClick={handleDownloadSubmission}
-                  className="inline-flex items-center gap-3 rounded-full border border-red-200 bg-white px-4 py-2"
-                >
-                  <span className="font-medium text-gray-800 text-sm">
-                    {submissionLabel}
-                  </span>
-                  <span className="flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-full bg-gray-300 text-white">
-                    <svg
-                      role="img"
-                      aria-label="다운로드 아이콘"
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <title>다운로드</title>
-                      <path d="M12 5v10" />
-                      <path d="M8 11l4 4 4-4" />
-                      <path d="M5 19h14" />
-                    </svg>
-                  </span>
-                </button>
-              ) : isValidHttpUrl(source) ? (
-                <a
-                  href={source}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-3 rounded-full border border-red-200 bg-white px-4 py-2"
-                >
-                  <span className="font-medium text-gray-800 text-sm">
-                    {submissionLabel}
-                  </span>
-                </a>
-              ) : (
-                <span className="inline-flex items-center rounded-full border border-red-200 bg-white px-4 py-2 font-medium text-gray-800 text-sm">
-                  {submissionLabel}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="mb-3 font-bold text-[17px] text-gray-900">
-              댓글 <span className="text-[#E56D6D]">{comments.length}</span>
-            </h2>
-            <textarea
-              value={commentInput}
-              onChange={(e) => setCommentInput(e.target.value)}
-              placeholder="내용을 입력하세요."
-              className="h-[70px] w-full resize-none rounded-xl border border-gray-200 p-4 text-gray-800 text-sm placeholder:text-gray-400 focus:border-[#E56D6D] focus:outline-none focus:ring-1 focus:ring-[#E56D6D]"
-            />
-            <div className="mt-3 flex justify-end">
-              <button
-                type="button"
-                onClick={handleSubmitComment}
-                className="rounded-lg bg-[#E56D6D] px-6 py-2 font-bold text-sm text-white transition-colors hover:bg-[#d65f5f]"
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-xl border border-[#E56D6D] bg-white px-5 py-2.5 text-[#E56D6D] transition-colors hover:bg-red-50"
+            >
+              <span className="font-semibold text-[18px]">{sourceName}</span>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                role="img"
+                aria-label="다운로드 아이콘"
               >
-                등록
-              </button>
-            </div>
+                <title>다운로드 아이콘</title>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
+          </section>
 
-            {comments.length > 0 && (
-              <div className="mt-8 flex flex-col gap-6">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="flex items-start gap-3.5">
-                    <div className="mt-1 h-[42px] w-[42px] shrink-0 overflow-hidden rounded-full border border-gray-100 bg-[#ECA8A8]">
-                      <img
-                        src={
-                          comment.profileImage || "/admin-profile-default.svg"
-                        }
-                        alt={`${comment.author} 프로필`}
-                        className="h-full w-full object-cover"
-                        onError={(event) => {
-                          event.currentTarget.src =
-                            "/admin-profile-default.svg";
-                        }}
-                      />
-                    </div>
+          <section className="flex flex-col gap-6">
+            {currentSubmissions.map((sub) => (
+              <article
+                key={sub.id}
+                className="rounded-[24px] bg-white p-7 shadow-[0_2px_16px_rgba(0,0,0,0.04)]"
+              >
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="font-bold text-[22px] text-gray-800">
+                    {sub.clubName || "자료 제출"}
+                  </h2>
+                  {sub.status === "반려됨" ? (
+                    <button
+                      type="button"
+                      onClick={() => openStatusModal(sub.id)}
+                      className="rounded-full border border-yellow-400 px-5 py-1.5 font-bold text-[15px] text-yellow-500"
+                    >
+                      반려됨
+                    </button>
+                  ) : sub.status ? (
+                    <button
+                      type="button"
+                      onClick={() => openStatusModal(sub.id)}
+                      className="rounded-full border border-gray-300 px-5 py-1.5 font-bold text-[15px] text-gray-600"
+                    >
+                      {sub.status}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openStatusModal(sub.id)}
+                      className="flex items-center gap-1.5 rounded-full bg-gray-100 px-4 py-1.5 font-semibold text-[14px] text-gray-600 hover:bg-gray-200"
+                    >
+                      <span className="text-lg leading-none">+</span> 상태 추가
+                    </button>
+                  )}
+                </div>
 
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <div className="font-bold text-[16px] text-gray-800">
-                        {comment.author}
-                      </div>
+                <div className="mb-2 flex items-center">
+                  <div className="flex items-center gap-2 rounded-full border border-[#D66A6A] bg-white px-4 py-2 text-gray-800">
+                    <span className="font-medium text-[15px]">
+                      {sub.sourceName}
+                    </span>
+                    <button
+                      type="button"
+                      className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
+                      aria-label="삭제"
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        role="img"
+                        aria-label="삭제 아이콘"
+                      >
+                        <title>삭제 아이콘</title>
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p className="ml-1 font-medium text-[13px] text-gray-400">
+                  제출일 {sub.submittedAt}
+                </p>
 
-                      {comment.type === "REJECTION_REASON" && (
-                        <div className="mt-1 font-semibold text-[#e45d5d] text-[12px]">
-                          거절됨 사유
+                <div className="my-6 h-px w-full bg-gray-100" />
+
+                <div>
+                  <h3 className="mb-4 font-bold text-[18px] text-gray-800">
+                    댓글{" "}
+                    <span className="text-[#D66A6A]">
+                      {sub.comments.length}
+                    </span>
+                  </h3>
+
+                  {sub.comments.length > 0 && (
+                    <div className="mb-5 space-y-4">
+                      {sub.comments.map((comment) => (
+                        <div key={comment.id} className="flex gap-3">
+                          <div className="mt-1 h-11 w-11 shrink-0 rounded-full bg-[#EBA4A4]" />
+                          <div>
+                            <p className="font-bold text-[#4B4B4B] text-[16px]">
+                              {comment.author}
+                            </p>
+                            <p className="text-[#4B4B4B] text-[15px]">
+                              {comment.content}
+                            </p>
+                          </div>
                         </div>
-                      )}
+                      ))}
+                    </div>
+                  )}
 
-                      <div className="mt-1.5 whitespace-pre-wrap break-words text-[15px] text-gray-800 leading-relaxed">
-                        {comment.content}
-                      </div>
+                  <div className="flex flex-col">
+                    <textarea
+                      placeholder="내용을 입력하세요."
+                      value={commentInputs[sub.id] || ""}
+                      onChange={(e) =>
+                        setCommentInputs((prev) => ({
+                          ...prev,
+                          [sub.id]: e.target.value,
+                        }))
+                      }
+                      className="h-[80px] w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-[14px] outline-none placeholder:text-gray-400 focus:border-[#D66A6A]"
+                    />
+                    <div className="mt-3 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleAddComment(sub.id)}
+                        className="rounded-lg bg-[#D66A6A] px-6 py-2 font-bold text-[14px] text-white hover:bg-[#c25e5e]"
+                      >
+                        등록
+                      </button>
                     </div>
                   </div>
-                ))}
+                </div>
+              </article>
+            ))}
+
+            {submissions.length > itemsPerPage && (
+              <div className="mt-4">
+                <Pagination
+                  listLen={submissions.length}
+                  limit={itemsPerPage}
+                  curPage={curPage}
+                  setCurPage={setCurPage}
+                />
               </div>
             )}
-          </div>
+          </section>
         </div>
       </div>
 
-      {isStatusModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-4">
-          <div className="w-full max-w-[374px] rounded-[20px] bg-white px-9 pt-8 pb-7 shadow-xl">
-            <h3 className="text-center font-bold text-[22px] text-gray-900">
-              상태 추가
-            </h3>
-
-            <div className="mt-8 flex flex-col gap-5">
-              {ONE_PAGER_FILE_STATUS_OPTIONS.map((option) => {
-                const selected = pendingStatus === option;
-                const meta = STATUS_META[option];
-
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setPendingStatus(option)}
-                    className="group flex items-center justify-between text-left"
-                  >
-                    <span className="flex items-center gap-4 font-medium text-[16px] text-gray-700">
-                      <span
-                        className={`h-3 w-3 rounded-full ${meta.dotClassName}`}
-                      />
-                      {option}
-                    </span>
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[#f3a4a4]">
-                      {selected && (
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#f17373]" />
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-10 flex justify-center gap-6">
-              <button
-                type="button"
-                onClick={() => setIsStatusModalOpen(false)}
-                className="h-[38px] min-w-[72px] rounded-[10px] bg-[#9b9698] px-6 font-semibold text-[14px] text-white transition-colors hover:bg-gray-500"
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setStatus(pendingStatus);
-                  setIsStatusModalOpen(false);
-                }}
-                className="h-[38px] min-w-[72px] rounded-[10px] bg-[#f56565] px-6 font-semibold text-[14px] text-white transition-colors hover:bg-red-600"
-              >
-                저장
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <StatusModal
+        isOpen={modalSubmissionId !== null}
+        selectedStatus={pendingStatus}
+        onClose={() => setModalSubmissionId(null)}
+        onChangeStatus={setPendingStatus}
+        onSave={saveStatus}
+      />
     </main>
   );
 }
