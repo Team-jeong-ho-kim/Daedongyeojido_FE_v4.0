@@ -33,8 +33,9 @@ export function OnePagerSubmissionItem({
   const className = "inline-flex items-center gap-3 rounded-full border border-red-200 bg-white px-4 py-2 transition-colors hover:bg-gray-50";
 
   if (href) {
+    const safeRel = rel ?? (target === "_blank" ? "noopener noreferrer" : undefined);
     return (
-      <a href={href} target={target} rel={rel} className={className}>
+      <a href={href} target={target} rel={safeRel} className={className}>
         {content}
       </a>
     );
