@@ -37,53 +37,8 @@ const normalizeSubmissionLabel = (sourceType: string, source: string) => {
   return source;
 };
 
-const createDefaultSubmissions = ({
-  sourceType,
-  source,
-  sourceName,
-}: {
-  sourceType: "file" | "url";
-  source: string;
-  sourceName: string;
-}): TeacherOnePagerSubmission[] => {
-  return [
-    {
-      id: "club-submission-1",
-      clubName: "DMS",
-      sourceType,
-      source,
-      sourceName,
-      submittedAt: "2026-05-05",
-      status: "반려됨",
-      comments: [
-        {
-          id: "seed-comment-1",
-          author: "김현태",
-          content: "빨리하고자고싶다.빨리하고자고싶다.",
-        },
-      ],
-    },
-    {
-      id: "club-submission-2",
-      clubName: "DOT",
-      sourceType,
-      source,
-      sourceName,
-      submittedAt: "2026-05-05",
-      status: null,
-      comments: [],
-    },
-    {
-      id: "club-submission-2",
-      clubName: "DOT",
-      sourceType,
-      source,
-      sourceName,
-      submittedAt: "2026-05-05",
-      status: null,
-      comments: [],
-    },
-  ];
+const createDefaultSubmissions = (): TeacherOnePagerSubmission[] => {
+  return [];
 };
 
 function StatusModal({
