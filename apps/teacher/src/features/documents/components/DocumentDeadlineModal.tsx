@@ -43,9 +43,12 @@ const to24HourTime = (
   hour: string,
   minute: string,
 ) => {
+  if (!hour.trim() || !minute.trim()) return "";
   const h = Number(hour);
   const m = Number(minute);
-  if (Number.isNaN(h) || Number.isNaN(m)) return "";
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return "";
+  if (h < 1 || h > 12 || m < 0 || m > 59) return "";
+
   const h24 = period === "오후" ? (h === 12 ? 12 : h + 12) : h === 12 ? 0 : h;
   return `${String(h24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
