@@ -1,13 +1,14 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUserStore } from "shared";
 import {
   DEFAULT_ONE_PAGER_FILE_STATUS,
   type OnePagerCommentItem,
   type OnePagerFileStatus,
 } from "ui";
-import { getDocumentDownloadFileName } from "utils";
+import { getSessionUser } from "utils";
 import { Pagination } from "@/components";
 import type { TeacherOnePagerSubmission } from "@/components/onepager/types";
 
@@ -186,6 +187,8 @@ export default function TeacherDocumentDetailPage() {
     searchParams.get("sourceName")?.trim() ||
     normalizeSubmissionLabel(sourceType, source);
 
+  const { userInfo } = useUserStore();
+
   const [submissions, setSubmissions] = useState<TeacherOnePagerSubmission[]>(
     () => createDefaultSubmissions({ sourceType, source, sourceName }),
   );
@@ -196,6 +199,8 @@ export default function TeacherDocumentDetailPage() {
     (curPage - 1) * itemsPerPage,
     curPage * itemsPerPage,
   );
+
+  const authorName = userInfo?.userName || getSessionUser()?.userName || "익명";
 
   const [modalSubmissionId, setModalSubmissionId] = useState<string | null>(
     null,
@@ -218,9 +223,7 @@ export default function TeacherDocumentDetailPage() {
     if (!modalSubmissionId) return;
     setSubmissions((prev) =>
       prev.map((sub) =>
-        sub.id === modalSubmissionId
-          ? { ...sub, status: pendingStatus || "제출됨" }
-          : sub,
+        sub.id === modalSubmissionId ? { ...sub, status: pendingStatus } : sub,
       ),
     );
     setModalSubmissionId(null);
