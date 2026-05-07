@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-export interface OnePagerCommentItem {
-  id: string;
-  author: string;
-  content: string;
-  profileImage?: string | null;
-  type?: "GENERAL" | "REJECTION_REASON";
-}
+import type { OnePagerCommentItem } from "./types";
 
 interface OnePagerCommentSectionProps {
   comments: OnePagerCommentItem[];

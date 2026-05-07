@@ -1,14 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { OnePagerCommentItem } from "./types";
 
-export interface OnePagerCommentItem {
-  id: string;
-  author: string;
-  content: string;
-  profileImage?: string | null;
-  type?: "GENERAL" | "REJECTION_REASON";
-}
+export type { OnePagerCommentItem };
 
 interface BaseOnePagerDetailViewProps {
   title: string;
