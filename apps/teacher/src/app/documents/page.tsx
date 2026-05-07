@@ -23,8 +23,8 @@ export default function DocumentsPage() {
               <Image
                 src="/images/icons/plus.svg"
                 alt="작성하기"
-                width={20}
-                height={20}
+                width={16}
+                height={16}
               />
               작성하기
             </Link>
