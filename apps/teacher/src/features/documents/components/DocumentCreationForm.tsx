@@ -131,33 +131,33 @@ export function DocumentCreationForm() {
       </h1>
 
       <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-2 md:flex-row">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start">
           <label
             htmlFor={titleId}
             className="w-full font-medium text-[15px] text-gray-900 md:w-[140px] md:pt-2.5"
           >
             <span className="mr-1 text-[#f45f5f]">*</span>제목
           </label>
-          <div className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5">
-            <input
-              id={titleId}
-              type="text"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                if (e.target.value.trim() && errors.title) {
-                  setErrors((prev) => ({ ...prev, title: undefined }));
-                }
-              }}
-              placeholder="제목을 작성해주세요."
-              className="w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
-            />
+          <div className="flex flex-1 flex-col gap-1">
+            <div className="rounded-lg border border-gray-100 bg-white p-2.5">
+              <input
+                id={titleId}
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (e.target.value.trim() && errors.title) {
+                    setErrors((prev) => ({ ...prev, title: undefined }));
+                  }
+                }}
+                placeholder="제목을 작성해주세요."
+                className="w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
+              />
+            </div>
+            {errors.title ? (
+              <p className="text-[#f45f5f] text-[13px]">{errors.title}</p>
+            ) : null}
           </div>
-          {errors.title ? (
-            <p className="text-[#f45f5f] text-[13px] md:ml-[140px]">
-              {errors.title}
-            </p>
-          ) : null}
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row">
@@ -287,7 +287,7 @@ export function DocumentCreationForm() {
           </fieldset>
         </div>
 
-        <div className="flex flex-col gap-2 md:flex-row">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start">
           <label
             htmlFor={deadlineDisplayId}
             className="w-full font-medium text-[15px] text-gray-900 md:w-[140px] md:pt-2.5"
@@ -295,30 +295,30 @@ export function DocumentCreationForm() {
             <span className="mr-1 text-[#f45f5f]">*</span>마감기한 설정
           </label>
 
-          <div className="flex flex-1 items-center gap-2">
-            <div className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5">
-              <input
-                id={deadlineDisplayId}
-                type="text"
-                value={deadlineDisplayText}
-                readOnly
-                className="w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
-              />
-            </div>
+          <div className="flex flex-1 flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5">
+                <input
+                  id={deadlineDisplayId}
+                  type="text"
+                  value={deadlineDisplayText}
+                  readOnly
+                  className="w-full bg-transparent text-[15px] text-gray-900 outline-none placeholder:text-gray-400"
+                />
+              </div>
 
-            <button
-              type="button"
-              onClick={() => setIsDeadlineModalOpen(true)}
-              className="cursor-pointer rounded-md bg-[#06070c] px-4 py-2 font-medium text-sm text-white hover:bg-[#06070c]/90"
-            >
-              일정 지정하기
-            </button>
+              <button
+                type="button"
+                onClick={() => setIsDeadlineModalOpen(true)}
+                className="cursor-pointer rounded-md bg-[#06070c] px-4 py-2 font-medium text-sm text-white hover:bg-[#06070c]/90"
+              >
+                일정 지정하기
+              </button>
+            </div>
+            {errors.deadline ? (
+              <p className="text-[#f45f5f] text-[13px]">{errors.deadline}</p>
+            ) : null}
           </div>
-          {errors.deadline ? (
-            <p className="text-[#f45f5f] text-[13px] md:ml-[140px]">
-              {errors.deadline}
-            </p>
-          ) : null}
         </div>
       </div>
 
