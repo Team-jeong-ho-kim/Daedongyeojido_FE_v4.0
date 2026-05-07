@@ -145,7 +145,7 @@ export default function TeacherDocumentDetailPage() {
   const { userInfo } = useUserStore();
 
   const [submissions, setSubmissions] = useState<TeacherOnePagerSubmission[]>(
-    () => createDefaultSubmissions({ sourceType, source, sourceName }),
+    () => createDefaultSubmissions(),
   );
 
   const [curPage, setCurPage] = useState(1);
@@ -224,30 +224,49 @@ export default function TeacherDocumentDetailPage() {
             </p>
             <div className="mt-8 mb-8 h-px w-full bg-gray-200" />
 
-            <button
-              type="button"
-              onClick={() => handleDownload(source, sourceName)}
-              className="flex items-center gap-2 rounded-xl border border-primary-400 bg-white px-5 py-2.5 text-gray-800 transition-colors hover:bg-red-50"
-            >
-              <span className="font-medium text-[16px]">{sourceName}</span>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                role="img"
-                aria-label="다운로드 아이콘"
+            {sourceType === "file" ? (
+              <button
+                type="button"
+                onClick={() => handleDownload(source, sourceName)}
+                className="flex items-center gap-2 rounded-xl border border-primary-400 bg-white px-5 py-2.5 text-gray-800 transition-colors hover:bg-red-50"
               >
-                <title>다운로드 아이콘</title>
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            </button>
+                <span className="font-medium text-[16px]">{sourceName}</span>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  role="img"
+                  aria-label="다운로드 아이콘"
+                >
+                  <title>다운로드 아이콘</title>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </button>
+            ) : (
+              <a
+                href={source.startsWith("http") ? source : `https://${source}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex w-[400px] overflow-hidden rounded-[16px] border border-gray-200 bg-white shadow-sm transition-colors hover:border-red-200"
+              >
+                <div className="flex flex-1 flex-col justify-center px-5 py-4">
+                  <span className="mb-1 font-bold text-[16px] text-gray-800 underline decoration-gray-400 underline-offset-4">
+                    {sourceName}
+                  </span>
+                  <span className="text-[13px] text-gray-500 truncate">
+                    {source}
+                  </span>
+                </div>
+                <div className="w-[100px] bg-red-100/50" />
+              </a>
+            )}
           </section>
 
           <section className="flex flex-col gap-6">
@@ -260,41 +279,73 @@ export default function TeacherDocumentDetailPage() {
                   <h2 className="font-bold text-[22px] text-gray-800">
                     {sub.clubName || "자료 제출"}
                   </h2>
-                  {sub.status ? (
-                    <button
-                      type="button"
-                      onClick={() => openStatusModal(sub.id)}
-                      className={`rounded-full border px-5 py-1.5 font-bold text-[15px] ${
-                        STATUS_STYLES[sub.status]?.border || "border-gray-300"
-                      } ${STATUS_STYLES[sub.status]?.text || "text-gray-600"}`}
-                    >
-                      {sub.status}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => openStatusModal(sub.id)}
-                      className="flex items-center gap-1.5 rounded-full bg-gray-100 px-4 py-1.5 font-semibold text-[14px] text-gray-600 hover:bg-gray-200"
-                    >
-                      <span className="text-lg leading-none">+</span> 상태 추가
-                    </button>
+                  {sourceType === "file" && (
+                    <>
+                      {sub.status ? (
+                        <button
+                          type="button"
+                          onClick={() => openStatusModal(sub.id)}
+                          className={`rounded-full border px-5 py-1.5 font-bold text-[15px] ${
+                            STATUS_STYLES[sub.status]?.border || "border-gray-300"
+                          } ${STATUS_STYLES[sub.status]?.text || "text-gray-600"}`}
+                        >
+                          {sub.status}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openStatusModal(sub.id)}
+                          className="flex items-center gap-1.5 rounded-full bg-gray-100 px-4 py-1.5 font-semibold text-[14px] text-gray-600 hover:bg-gray-200"
+                        >
+                          <span className="text-lg leading-none">+</span> 상태 추가
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
 
                 <div className="mb-2 flex items-center">
-                  <div className="flex items-center gap-2 rounded-full border border-[#D66A6A] bg-white px-4 py-2 text-gray-800">
-                    <span className="font-medium text-[15px]">
-                      {sub.sourceName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleDownload(sub.source, sub.sourceName)}
-                      className="flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
-                      aria-label="다운로드"
+                  {sourceType === "file" ? (
+                    <div className="flex items-center gap-2 rounded-full border border-[#D66A6A] bg-white px-4 py-2 text-gray-800">
+                      <span className="font-medium text-[15px]">
+                        {sub.sourceName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDownload(sub.source, sub.sourceName)}
+                        className="flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
+                        aria-label="다운로드"
+                      >
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          role="img"
+                          aria-label="다운로드 아이콘"
+                        >
+                          <title>다운로드 아이콘</title>
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" />
+                          <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <a
+                      href={sub.source.startsWith("http") ? sub.source : `https://${sub.source}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-[#D66A6A] bg-white px-4 py-2 text-gray-800 transition-colors hover:bg-red-50"
                     >
+                      <span className="font-medium text-[15px]">링크 방문하기</span>
                       <svg
-                        width="12"
-                        height="12"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -302,15 +353,15 @@ export default function TeacherDocumentDetailPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         role="img"
-                        aria-label="다운로드 아이콘"
+                        aria-label="링크 아이콘"
                       >
-                        <title>다운로드 아이콘</title>
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
+                        <title>링크 아이콘</title>
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
                       </svg>
-                    </button>
-                  </div>
+                    </a>
+                  )}
                 </div>
                 <p className="ml-1 font-medium text-[13px] text-gray-400">
                   제출일 {sub.submittedAt}
@@ -318,55 +369,57 @@ export default function TeacherDocumentDetailPage() {
 
                 <div className="my-4 h-px w-full bg-gray-100" />
 
-                <div>
-                  <h3 className="mb-4 font-semibold text-[18px] text-gray-800">
-                    댓글{" "}
-                    <span className="text-[#D66A6A]">
-                      {sub.comments.length}
-                    </span>
-                  </h3>
+                {sourceType === "file" && (
+                  <div>
+                    <h3 className="mb-4 font-semibold text-[18px] text-gray-800">
+                      댓글{" "}
+                      <span className="text-[#D66A6A]">
+                        {sub.comments.length}
+                      </span>
+                    </h3>
 
-                  {sub.comments.length > 0 && (
-                    <div className="mb-5 space-y-4">
-                      {sub.comments.map((comment) => (
-                        <div key={comment.id} className="flex gap-3">
-                          <div className="mt-1 h-11 w-11 shrink-0 rounded-full bg-[#EBA4A4]" />
-                          <div>
-                            <p className="font-bold text-[#4B4B4B] text-[16px]">
-                              {comment.author}
-                            </p>
-                            <p className="text-[#4B4B4B] text-[15px]">
-                              {comment.content}
-                            </p>
+                    {sub.comments.length > 0 && (
+                      <div className="mb-5 space-y-4">
+                        {sub.comments.map((comment) => (
+                          <div key={comment.id} className="flex gap-3">
+                            <div className="mt-1 h-11 w-11 shrink-0 rounded-full bg-[#EBA4A4]" />
+                            <div>
+                              <p className="font-bold text-[#4B4B4B] text-[16px]">
+                                {comment.author}
+                              </p>
+                              <p className="text-[#4B4B4B] text-[15px]">
+                                {comment.content}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
 
-                  <div className="flex flex-col">
-                    <div className="flex items-stretch gap-2">
-                      <textarea
-                        placeholder="내용을 입력하세요."
-                        value={commentInputs[sub.id] || ""}
-                        onChange={(e) =>
-                          setCommentInputs((prev) => ({
-                            ...prev,
-                            [sub.id]: e.target.value,
-                          }))
-                        }
-                        className="h-[44px] w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-[14px] leading-[1.6] outline-none placeholder:text-gray-400 focus:border-[#D66A6A]"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleAddComment(sub.id)}
-                        className="h-[44px] shrink-0 cursor-pointer rounded-xl bg-primary-500 px-6 text-[14px] text-white hover:bg-primary-600"
-                      >
-                        등록
-                      </button>
+                    <div className="flex flex-col">
+                      <div className="flex items-stretch gap-2">
+                        <textarea
+                          placeholder="내용을 입력하세요."
+                          value={commentInputs[sub.id] || ""}
+                          onChange={(e) =>
+                            setCommentInputs((prev) => ({
+                              ...prev,
+                              [sub.id]: e.target.value,
+                            }))
+                          }
+                          className="h-[44px] w-full resize-none rounded-xl border border-gray-200 px-3 py-2.5 text-[14px] leading-[1.6] outline-none placeholder:text-gray-400 focus:border-[#D66A6A]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddComment(sub.id)}
+                          className="h-[44px] shrink-0 cursor-pointer rounded-xl bg-primary-500 px-6 text-[14px] text-white hover:bg-primary-600"
+                        >
+                          등록
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </article>
             ))}
 
