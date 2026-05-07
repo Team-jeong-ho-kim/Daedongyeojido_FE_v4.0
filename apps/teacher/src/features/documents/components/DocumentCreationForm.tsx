@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { DEFAULT_ONE_PAGER_FILE_STATUS } from "ui";
 import { DocumentDeadlineModal } from "./DocumentDeadlineModal";
 
@@ -22,6 +22,16 @@ export function DocumentCreationForm() {
     source?: string;
     deadline?: string;
   }>({});
+
+  useEffect(() => {
+    return () => {
+      const pendingUrl = sessionStorage.getItem("pendingBlobUrl");
+      if (pendingUrl) {
+        URL.revokeObjectURL(pendingUrl);
+        sessionStorage.removeItem("pendingBlobUrl");
+      }
+    };
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -93,6 +103,7 @@ export function DocumentCreationForm() {
 
     if (uploadType === "file" && file) {
       const objectUrl = URL.createObjectURL(file);
+      sessionStorage.setItem("pendingBlobUrl", objectUrl);
       query.set("source", objectUrl);
       query.set("sourceName", file.name);
     } else {
