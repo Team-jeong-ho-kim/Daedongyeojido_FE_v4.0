@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface DocumentDeadlineModalProps {
   isOpen: boolean;
@@ -101,12 +102,12 @@ export function DocumentDeadlineModal({
       return;
     }
     if (!isValidDate(year, month, day)) {
-      alert("올바른 날짜를 입력해주세요.");
+      toast.error("올바른 날짜를 입력해주세요.");
       return;
     }
     const deadlineTime = to24HourTime(period, hour, minute);
     if (!deadlineTime) {
-      alert("올바른 시간을 입력해주세요.");
+      toast.error("올바른 시간을 입력해주세요.");
       return;
     }
     onSave({
