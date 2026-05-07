@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUserStore } from "shared";
@@ -260,7 +262,7 @@ export default function TeacherDocumentDetailPage() {
                   <span className="mb-1 font-bold text-[16px] text-gray-800 underline decoration-gray-400 underline-offset-4">
                     {sourceName}
                   </span>
-                  <span className="text-[13px] text-gray-500 truncate">
+                  <span className="truncate text-[13px] text-gray-500">
                     {source}
                   </span>
                 </div>
@@ -286,7 +288,8 @@ export default function TeacherDocumentDetailPage() {
                           type="button"
                           onClick={() => openStatusModal(sub.id)}
                           className={`rounded-full border px-5 py-1.5 font-bold text-[15px] ${
-                            STATUS_STYLES[sub.status]?.border || "border-gray-300"
+                            STATUS_STYLES[sub.status]?.border ||
+                            "border-gray-300"
                           } ${STATUS_STYLES[sub.status]?.text || "text-gray-600"}`}
                         >
                           {sub.status}
@@ -297,7 +300,8 @@ export default function TeacherDocumentDetailPage() {
                           onClick={() => openStatusModal(sub.id)}
                           className="flex items-center gap-1.5 rounded-full bg-gray-100 px-4 py-1.5 font-semibold text-[14px] text-gray-600 hover:bg-gray-200"
                         >
-                          <span className="text-lg leading-none">+</span> 상태 추가
+                          <span className="text-lg leading-none">+</span> 상태
+                          추가
                         </button>
                       )}
                     </>
@@ -312,7 +316,9 @@ export default function TeacherDocumentDetailPage() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleDownload(sub.source, sub.sourceName)}
+                        onClick={() =>
+                          handleDownload(sub.source, sub.sourceName)
+                        }
                         className="flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
                         aria-label="다운로드"
                       >
@@ -337,12 +343,18 @@ export default function TeacherDocumentDetailPage() {
                     </div>
                   ) : (
                     <a
-                      href={sub.source.startsWith("http") ? sub.source : `https://${sub.source}`}
+                      href={
+                        sub.source.startsWith("http")
+                          ? sub.source
+                          : `https://${sub.source}`
+                      }
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 rounded-full border border-[#D66A6A] bg-white px-4 py-2 text-gray-800 transition-colors hover:bg-red-50"
                     >
-                      <span className="font-medium text-[15px]">링크 방문하기</span>
+                      <span className="font-medium text-[15px]">
+                        링크 방문하기
+                      </span>
                       <svg
                         width="16"
                         height="16"
