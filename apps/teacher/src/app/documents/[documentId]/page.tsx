@@ -235,13 +235,22 @@ export default function TeacherDocumentDetailPage() {
         if (sub.id !== submissionId) return sub;
         const newComment: OnePagerCommentItem = {
           id: `comment-${Date.now()}`,
-          author: "선생님",
+          author: authorName,
           content,
         };
         return { ...sub, comments: [...sub.comments, newComment] };
       }),
     );
     setCommentInputs((prev) => ({ ...prev, [submissionId]: "" }));
+  };
+
+  const handleDownload = (url: string, fileName: string) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -259,6 +268,7 @@ export default function TeacherDocumentDetailPage() {
 
             <button
               type="button"
+              onClick={() => handleDownload(source, sourceName)}
               className="flex items-center gap-2 rounded-xl border border-primary-400 bg-white px-5 py-2.5 text-gray-800 transition-colors hover:bg-red-50"
             >
               <span className="font-medium text-[16px]">{sourceName}</span>
@@ -320,6 +330,7 @@ export default function TeacherDocumentDetailPage() {
                     </span>
                     <button
                       type="button"
+                      onClick={() => handleDownload(sub.source, sub.sourceName)}
                       className="flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-full bg-[#C4C4C4] text-white hover:bg-gray-400"
                       aria-label="다운로드"
                     >
