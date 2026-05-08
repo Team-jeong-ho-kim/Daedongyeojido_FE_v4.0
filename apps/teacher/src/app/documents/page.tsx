@@ -30,7 +30,6 @@ export default function DocumentsPage() {
             </Link>
           </div>
         </div>
-        <DocumentFilesSection />
         <OnePagerSection />
       </div>
     </main>
