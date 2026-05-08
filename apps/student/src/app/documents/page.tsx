@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   ClubCreationApplyCta,
   ClubCreationFormSection,
+  OnePagerSection,
 } from "@/features/documents";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function DocumentPage() {
         </div>
 
         <ClubCreationFormSection embedded />
+        <OnePagerSection />
       </div>
     </main>
   );
