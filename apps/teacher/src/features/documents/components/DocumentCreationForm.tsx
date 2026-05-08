@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
-import { DEFAULT_ONE_PAGER_FILE_STATUS } from "ui";
+import { toast } from "sonner";
+import { getTeacherMyInfo } from "@/api/teacher";
 import { DocumentDeadlineModal } from "./DocumentDeadlineModal";
 
 export function DocumentCreationForm() {
@@ -17,6 +18,7 @@ export function DocumentCreationForm() {
   const [isDeadlineModalOpen, setIsDeadlineModalOpen] = useState(false);
   const [links, setLinks] = useState<{ id: string; url: string }[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [teacherName, setTeacherName] = useState("");
   const [errors, setErrors] = useState<{
     title?: string;
     source?: string;
@@ -24,13 +26,15 @@ export function DocumentCreationForm() {
   }>({});
 
   useEffect(() => {
-    return () => {
-      const pendingUrl = sessionStorage.getItem("pendingBlobUrl");
-      if (pendingUrl) {
-        URL.revokeObjectURL(pendingUrl);
-        sessionStorage.removeItem("pendingBlobUrl");
+    const fetchTeacherInfo = async () => {
+      try {
+        const info = await getTeacherMyInfo();
+        setTeacherName(info.name);
+      } catch (error) {
+        console.error("Failed to fetch teacher info:", error);
       }
     };
+    void fetchTeacherInfo();
   }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
