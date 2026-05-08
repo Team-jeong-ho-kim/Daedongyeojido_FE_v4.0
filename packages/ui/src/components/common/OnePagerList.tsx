@@ -44,7 +44,7 @@ export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
             onClick={() => onItemClick?.(item.onePagerFormId)}
           >
             <div className="flex flex-col items-start gap-2">
-              <h3 className="font-semibold text-gray-800 text-mi">
+              <h3 className="font-semibold text-gray-800 text-lg">
                 {item.title}
               </h3>
               <div className="flex items-center gap-4 text-sm">
