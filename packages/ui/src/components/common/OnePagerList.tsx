@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pagination } from "./Pagination";
 
 export interface OnePagerItem {
@@ -18,6 +18,9 @@ interface OnePagerListProps {
 
 export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
   const [curPage, setCurPage] = useState(1);
+  useEffect(() => {
+    setCurPage(1);
+  }, [items]);
   const limit = 5;
 
   const paginatedItems = items.slice((curPage - 1) * limit, curPage * limit);
@@ -32,7 +35,7 @@ export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4 min-h-[544px]">
+      <div className="flex min-h-[544px] flex-col gap-4">
         {paginatedItems.map((item) => (
           <button
             key={item.onePagerFormId}
