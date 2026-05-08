@@ -96,7 +96,8 @@ export function DocumentCreationForm() {
 
       let response: { onePagerFormId: number };
 
-      if (uploadType === "file" && file) {
+      if (uploadType === "file") {
+        if (!file) throw new Error("File is required for file upload type");
         response = await createFileOnePager({
           title: title.trim(),
           formFile: file,
@@ -105,9 +106,11 @@ export function DocumentCreationForm() {
           description: description.trim(),
         });
       } else {
+        const formUrl = links[0]?.url?.trim() ?? "";
+        if (!formUrl) throw new Error("URL is required for url upload type");
         response = await createUrlOnePager({
           title: title.trim(),
-          formUrl: links[0]?.url?.trim() ?? "",
+          formUrl,
           onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
           onePagerDuration,
           description: description.trim(),
