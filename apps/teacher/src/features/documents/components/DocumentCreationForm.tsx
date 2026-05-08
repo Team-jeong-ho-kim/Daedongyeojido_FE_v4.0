@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
-import { getTeacherMyInfo } from "@/api/teacher";
+import { createFileOnePager, createUrlOnePager } from "utils";
 import { DocumentDeadlineModal } from "./DocumentDeadlineModal";
 
 export function DocumentCreationForm() {
@@ -18,24 +18,12 @@ export function DocumentCreationForm() {
   const [isDeadlineModalOpen, setIsDeadlineModalOpen] = useState(false);
   const [links, setLinks] = useState<{ id: string; url: string }[]>([]);
   const [file, setFile] = useState<File | null>(null);
-  const [teacherName, setTeacherName] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
   const [errors, setErrors] = useState<{
     title?: string;
     source?: string;
     deadline?: string;
   }>({});
-
-  useEffect(() => {
-    const fetchTeacherInfo = async () => {
-      try {
-        const info = await getTeacherMyInfo();
-        setTeacherName(info.name);
-      } catch (error) {
-        console.error("Failed to fetch teacher info:", error);
-      }
-    };
-    void fetchTeacherInfo();
-  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -93,39 +81,52 @@ export function DocumentCreationForm() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handlePublish = () => {
-    if (!validateForm()) {
+  const handlePublish = async () => {
+    if (!validateForm() || isPublishing) {
       return;
     }
 
-    const documentId = `draft-${Date.now()}`;
-    const query = new URLSearchParams({
-      title: title.trim(),
-      description: description.trim(),
-      sourceType: uploadType,
-    });
+    setIsPublishing(true);
+    const toastId = toast.loading("원페이저 양식을 게시 중입니다...");
 
-    if (uploadType === "file" && file) {
-      const objectUrl = URL.createObjectURL(file);
-      sessionStorage.setItem("pendingBlobUrl", objectUrl);
-      query.set("source", objectUrl);
-      query.set("sourceName", file.name);
-    } else {
-      query.set("source", links[0]?.url?.trim() ?? "");
+    try {
+      const onePagerDuration = isNoDeadline
+        ? undefined
+        : `${deadlineDate}T${deadlineTime}:00`;
+
+      let response: { onePagerFormId: number };
+
+      if (uploadType === "file" && file) {
+        response = await createFileOnePager({
+          title: title.trim(),
+          formFile: file,
+          onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+          onePagerDuration,
+          description: description.trim(),
+        });
+      } else {
+        response = await createUrlOnePager({
+          title: title.trim(),
+          formUrl: links[0]?.url?.trim() ?? "",
+          onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+          onePagerDuration,
+          description: description.trim(),
+        });
+      }
+
+      toast.success("원페이저 양식이 성공적으로 게시되었습니다.", {
+        id: toastId,
+      });
+      router.push(`/documents/${response.onePagerFormId}`);
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to publish one-pager:", error);
+      toast.error("원페이저 양식 게시 중 오류가 발생했습니다.", {
+        id: toastId,
+      });
+    } finally {
+      setIsPublishing(false);
     }
-
-    if (uploadType === "file") {
-      query.set("status", DEFAULT_ONE_PAGER_FILE_STATUS);
-    }
-
-    if (isNoDeadline) {
-      query.set("noDeadline", "true");
-    } else {
-      query.set("deadlineDate", deadlineDate);
-      query.set("deadlineTime", deadlineTime);
-    }
-
-    router.push(`/documents/${documentId}?${query.toString()}`);
   };
 
   return (
@@ -330,9 +331,14 @@ export function DocumentCreationForm() {
         <button
           type="button"
           onClick={handlePublish}
-          className="h-12 w-full max-w-sm cursor-pointer rounded-lg bg-[#f45f5f] font-medium text-white text-xl hover:bg-[#f45f5f]/90 md:w-80"
+          disabled={isPublishing}
+          className={`h-12 w-full max-w-sm rounded-lg font-medium text-white text-xl md:w-80 ${
+            isPublishing
+              ? "cursor-not-allowed bg-gray-400"
+              : "cursor-pointer bg-[#f45f5f] hover:bg-[#f45f5f]/90"
+          }`}
         >
-          게시하기
+          {isPublishing ? "게시 중..." : "게시하기"}
         </button>
       </div>
 
