@@ -1,28 +1,29 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
-import { type OnePagerItem, OnePagerList } from "ui";
+import { OnePagerList } from "ui";
 import { getOnePagers } from "utils";
 
 export function OnePagerSection() {
-  const [onePagers, setOnePagers] = useState<OnePagerItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const {
+    data: onePagers = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["one-pagers"],
+    queryFn: getOnePagers,
+  });
+
   useEffect(() => {
-    const loadOnePagers = async () => {
-      try {
-        const data = await getOnePagers();
-        setOnePagers(data);
-      } catch {
-        toast.error("원페이저 목록을 불러오지 못했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void loadOnePagers();
-  }, []);
+    if (isError) {
+      toast.error("원페이저 목록을 불러오지 못했습니다.");
+    }
+  }, [isError]);
+
   if (isLoading) {
     return <div className="text-center">로딩 중...</div>;
   }
