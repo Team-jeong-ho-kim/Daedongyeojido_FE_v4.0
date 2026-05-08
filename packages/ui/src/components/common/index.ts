@@ -19,7 +19,9 @@ export {
   type OnePagerCommentItem,
 } from "./BaseOnePagerDetailView";
 export { OnePagerCommentSection } from "./OnePagerCommentSection";
+export { OnePagerList, type OnePagerItem } from "./OnePagerList";
 export { OnePagerSubmissionItem } from "./OnePagerSubmissionItem";
+export { Pagination } from "./Pagination";
 export {
   DEFAULT_ONE_PAGER_FILE_STATUS,
   isOnePagerFileStatus,
