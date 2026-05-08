@@ -70,6 +70,9 @@ logs
 # Vercel
 .vercel
 
+# Sisyphus
+.sisyphus/
+
 # Temporary folders
 tmp/
 temp/

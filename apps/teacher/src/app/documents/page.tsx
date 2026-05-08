@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { DocumentFilesSection } from "@/features/documents";
+import { DocumentFilesSection, OnePagerSection } from "@/features/documents";
 
 export const metadata: Metadata = {
   title: "양식 조회",
@@ -30,7 +30,7 @@ export default function DocumentsPage() {
             </Link>
           </div>
         </div>
-        <DocumentFilesSection />
+        <OnePagerSection />
       </div>
     </main>
   );

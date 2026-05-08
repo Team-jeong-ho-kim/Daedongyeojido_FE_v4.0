@@ -5,3 +5,10 @@ export interface OnePagerCommentItem {
   profileImage?: string | null;
   type?: "GENERAL" | "REJECTION_REASON";
 }
+
+export type PaginationProps = {
+  listLen: number;
+  limit: number;
+  curPage: number;
+  setCurPage: (page: number) => void;
+};

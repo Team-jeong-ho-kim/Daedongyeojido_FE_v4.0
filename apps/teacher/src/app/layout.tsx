@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CloudflareAnalytics, Footer } from "ui";
 import { ChannelTalkProvider } from "@/components/channelTalk/ChannelTalkProvider";
 import { TeacherLayoutContent } from "@/components/layout";
+import { QueryProvider } from "@/components/providers";
 import "./globals.css";
 
 const siteUrl = (
@@ -36,7 +37,9 @@ export default function RootLayout({
       </head>
       <body>
         <ChannelTalkProvider />
-        <TeacherLayoutContent>{children}</TeacherLayoutContent>
+        <QueryProvider>
+          <TeacherLayoutContent>{children}</TeacherLayoutContent>
+        </QueryProvider>
         <Footer />
       </body>
     </html>
