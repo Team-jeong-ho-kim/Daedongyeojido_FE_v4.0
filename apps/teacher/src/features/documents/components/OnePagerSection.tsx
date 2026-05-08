@@ -28,7 +28,6 @@ export function OnePagerSection() {
   }
   return (
     <div className="mt-12">
-      <h2 className="mb-6 font-bold text-2xl text-gray-900">원페이저 조회</h2>
       <OnePagerList
         items={onePagers}
         onItemClick={(id) => router.push(`/documents/${id}`)}
