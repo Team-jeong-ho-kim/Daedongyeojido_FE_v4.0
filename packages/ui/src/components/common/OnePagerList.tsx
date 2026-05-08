@@ -6,7 +6,7 @@ import { Pagination } from "./Pagination";
 export interface OnePagerItem {
   onePagerFormId: number;
   title: string;
-  teacher: string;
+  teacherName: string;
   onePagerDurationType: "INFINITY" | "DATE";
   onePagerDuration: string | null;
 }
@@ -18,7 +18,7 @@ interface OnePagerListProps {
 
 export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
   const [curPage, setCurPage] = useState(1);
-  const limit = 4;
+  const limit = 5;
 
   const paginatedItems = items.slice((curPage - 1) * limit, curPage * limit);
 
@@ -31,64 +31,70 @@ export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {paginatedItems.map((item) => (
-        <button
-          key={item.onePagerFormId}
-          type="button"
-          className="flex w-full cursor-pointer items-center justify-between rounded-[24px] border border-gray-100 bg-gray-50 p-6"
-          onClick={() => onItemClick?.(item.onePagerFormId)}
-        >
-          <div className="flex flex-col items-start gap-2">
-            <h3 className="font-semibold text-gray-800 text-mi">
-              {item.title}
-            </h3>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1">
-                <span className="text-gray-500">지원 마감일 :</span>
-                {(() => {
-                  if (item.onePagerDurationType === "INFINITY") {
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4 min-h-[544px]">
+        {paginatedItems.map((item) => (
+          <button
+            key={item.onePagerFormId}
+            type="button"
+            className="flex w-full cursor-pointer items-center justify-between rounded-[24px] border border-gray-100 bg-gray-50 p-6"
+            onClick={() => onItemClick?.(item.onePagerFormId)}
+          >
+            <div className="flex flex-col items-start gap-2">
+              <h3 className="font-semibold text-gray-800 text-mi">
+                {item.title}
+              </h3>
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-1">
+                  {(() => {
+                    if (item.onePagerDurationType === "INFINITY") {
+                      return (
+                        <>
+                          <span className="text-gray-500">지원 마감일 :</span>
+                          <span className="font-semibold text-gray-800">
+                            상시
+                          </span>
+                        </>
+                      );
+                    }
+                    const deadline = new Date(item.onePagerDuration ?? 0);
+                    const now = new Date();
+                    if (deadline < now) {
+                      return (
+                        <span className="font-semibold text-primary-500">
+                          마감됨
+                        </span>
+                      );
+                    }
                     return (
-                      <span className="font-semibold text-gray-800">상시</span>
+                      <>
+                        <span className="text-gray-500">지원 마감일 :</span>
+                        <span className="font-semibold text-gray-800">
+                          {item.onePagerDuration?.split("T")[0] ?? "없음"}
+                        </span>
+                      </>
                     );
-                  }
-                  const deadline = new Date(item.onePagerDuration ?? 0);
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  if (deadline < today) {
-                    return (
-                      <span className="font-semibold text-primary-500">
-                        마감됨
-                      </span>
-                    );
-                  }
-                  return (
-                    <span className="font-semibold text-gray-800">
-                      {item.onePagerDuration?.split("T")[0] ?? "없음"}
-                    </span>
-                  );
-                })()}
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-500">작성자 :</span>
-                <span className="font-semibold text-gray-800">
-                  {item.teacher}
-                </span>
+                  })()}
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-500">작성자 :</span>
+                  <span className="font-semibold text-gray-800">
+                    {item.teacherName}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        </button>
-      ))}
+          </button>
+        ))}
+      </div>
 
       {items.length > limit && (
-        <div className="mt-8">
-          <Pagination
-            listLen={items.length}
-            limit={limit}
-            curPage={curPage}
-            setCurPage={setCurPage}
-          />
-        </div>
+        <Pagination
+          listLen={items.length}
+          limit={limit}
+          curPage={curPage}
+          setCurPage={setCurPage}
+        />
       )}
     </div>
   );
