@@ -60,7 +60,14 @@ export function OnePagerList({ items, onItemClick }: OnePagerListProps) {
                         </>
                       );
                     }
-                    const deadline = new Date(item.onePagerDuration ?? 0);
+                    if (!item.onePagerDuration) {
+                      return (
+                        <span className="font-semibold text-gray-500">
+                          마감일 미정
+                        </span>
+                      );
+                    }
+                    const deadline = new Date(item.onePagerDuration);
                     const now = new Date();
                     if (deadline < now) {
                       return (
