@@ -47,11 +47,6 @@ export const createFileOnePager = async (
   const response = await apiClient.post<{ onePagerFormId: number }>(
     "/teachers/onepager/forms-file",
     formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
   );
   return response.data;
 };
