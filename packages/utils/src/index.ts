@@ -20,6 +20,9 @@ export {
 } from "./document-preview";
 export { apiClient } from "./instance";
 export { getOnePagers, type OnePager } from "./one-pager";
+  getOnePagers,
+  type OnePager,
+} from "./one-pager";
 export type {
   ClubCreationApplicationDetail,
   ClubCreationApplicationListItem,
