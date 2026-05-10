@@ -44,19 +44,19 @@ export const createFileOnePager = async (
   }
   formData.append("description", payload.description);
 
-  const response = await apiClient.post<{ onePagerFormId: number }>(
+  const response = await apiClient.post<{ id: number }>(
     "/teachers/onepager/forms-file",
     formData,
   );
-  return response.data;
+  return { onePagerFormId: response.data.id };
 };
 
 export const createUrlOnePager = async (
   payload: CreateUrlOnePagerRequest,
 ): Promise<{ onePagerFormId: number }> => {
-  const response = await apiClient.post<{ onePagerFormId: number }>(
+  const response = await apiClient.post<{ id: number }>(
     "/teachers/onepager/forms-url",
     payload,
   );
-  return response.data;
+  return { onePagerFormId: response.data.id };
 };
