@@ -122,9 +122,10 @@ export function DocumentCreationForm() {
       });
       router.push(`/documents/${response.onePagerFormId}`);
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to publish one-pager:", error);
-      toast.error("원페이저 양식 게시 중 오류가 발생했습니다.", {
+      const errorMessage = error?.response?.data?.message || error?.description || "원페이저 양식 게시 중 오류가 발생했습니다.";
+      toast.error(errorMessage, {
         id: toastId,
       });
     } finally {
