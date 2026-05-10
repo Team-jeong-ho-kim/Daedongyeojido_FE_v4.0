@@ -116,3 +116,34 @@ export interface TeacherDocumentFileItem {
 export interface TeacherDocumentFilesResponse {
   fileResponses: TeacherDocumentFileItem[];
 }
+
+export interface TeacherOnePagerComment {
+  commentWriter: string;
+  comment: string;
+}
+
+export interface TeacherOnePagerSubmissionItem {
+  clubName: string;
+  onePagerState: "SUBMITTED" | "APPROVED" | "REJECTED" | "CHANGES_REQUESTED" | "CANCELED";
+  submitFileUrl: string;
+  submitDate: string;
+  submitComments: TeacherOnePagerComment[];
+}
+
+export interface TeacherOnePagerDetailResponse {
+  title: string;
+  description: string;
+  onePagerDuration: string;
+  fileUrl?: string;
+  formUrl?: string;
+  submitOnePagers: TeacherOnePagerSubmissionItem[];
+}
+
+export interface TeacherOnePagerFormResponse {
+  title: string;
+  fileUrl: string | null;
+  formUrl: string | null;
+  onePagerDurationType: "INFINITY" | "DATE";
+  onePagerDuration: string | null;
+  description: string;
+}
