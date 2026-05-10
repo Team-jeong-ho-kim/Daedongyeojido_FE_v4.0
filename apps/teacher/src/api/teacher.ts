@@ -15,6 +15,7 @@ import type {
   TeacherDocumentFileItem,
   TeacherDocumentFilesResponse,
   TeacherMyInfoResponse,
+  TeacherOnePagerDetailResponse,
 } from "@/types/teacher";
 
 export const getTeacherMyInfo = async () => {
@@ -96,4 +97,11 @@ export const getTeacherDocumentFiles = async (): Promise<
 > => {
   const response = await apiClient.get<TeacherDocumentFilesResponse>("/files");
   return response.data.fileResponses ?? [];
+};
+
+export const getTeacherOnePagerDetail = async (formId: string) => {
+  const response = await apiClient.get<TeacherOnePagerDetailResponse>(
+    `/teachers/onepager/my/${formId}`,
+  );
+  return response.data;
 };
