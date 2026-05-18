@@ -102,7 +102,7 @@ export const getTeacherDocumentFiles = async (): Promise<
 
 export const getTeacherOnePagerDetail = async (formId: string) => {
   const response = await apiClient.get<TeacherOnePagerDetailResponse>(
-    `/teachers/onepager/my/${formId}`,
+    `/teachers/onepager/form/${formId}`,
   );
   return response.data;
 };
