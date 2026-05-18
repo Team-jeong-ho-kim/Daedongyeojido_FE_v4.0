@@ -133,17 +133,17 @@ export interface TeacherOnePagerSubmissionItem {
 export interface TeacherOnePagerDetailResponse {
   title: string;
   description: string;
-  onePagerDuration: string;
-  fileUrl?: string;
-  formUrl?: string;
+  onePagerDuration: string | null;
+  fileUrl: string | null;
+  formUrl: string | null;
   submitOnePagers: TeacherOnePagerSubmissionItem[];
 }
 
 export interface TeacherOnePagerFormResponse {
   title: string;
+  description: string;
+  onePagerDuration: string | null;
   fileUrl: string | null;
   formUrl: string | null;
-  onePagerDurationType: "INFINITY" | "DATE";
-  onePagerDuration: string | null;
-  description: string;
+  submitOnePagers: TeacherOnePagerSubmissionItem[];
 }
