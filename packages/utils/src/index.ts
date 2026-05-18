@@ -22,6 +22,8 @@ export { apiClient } from "./instance";
 export {
   createFileOnePager,
   createUrlOnePager,
+  updateFileOnePager,
+  updateUrlOnePager,
   getOnePagers,
   type OnePager,
 } from "./one-pager";

@@ -1,24 +1,46 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useId, useRef, useState } from "react";
+import { useId, useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
-import { createFileOnePager, createUrlOnePager } from "utils";
+import { createFileOnePager, createUrlOnePager, updateFileOnePager, updateUrlOnePager } from "utils";
 import { DocumentDeadlineModal } from "./DocumentDeadlineModal";
+import { getSessionUser } from "utils";
 
-export function DocumentCreationForm() {
-  const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [uploadType, setUploadType] = useState<"file" | "url">("file");
-  const [deadlineDate, setDeadlineDate] = useState("");
-  const [deadlineTime, setDeadlineTime] = useState("");
-  const [isNoDeadline, setIsNoDeadline] = useState(false);
+interface OnePagerFormProps {
+  mode?: "create" | "edit";
+  initialData?: {
+    id: string;
+    title: string;
+    description: string;
+    fileUrl?: string | null;
+    formUrl?: string | null;
+    onePagerDuration?: string | null;
+  };
+  onSuccess?: (id?: number) => void;
+  onCancel?: () => void;
+}
+
+export function DocumentCreationForm({ mode = "create", initialData, onSuccess, onCancel }: OnePagerFormProps) {
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [uploadType, setUploadType] = useState<"file" | "url">(
+    initialData?.formUrl ? "url" : "file"
+  );
+  
+  // Parse initial duration
+  const initialDate = initialData?.onePagerDuration?.split("T")[0] || "";
+  const initialTime = initialData?.onePagerDuration?.split("T")[1]?.substring(0, 5) || "";
+  
+  const [deadlineDate, setDeadlineDate] = useState(initialDate);
+  const [deadlineTime, setDeadlineTime] = useState(initialTime);
+  const [isNoDeadline, setIsNoDeadline] = useState(!initialData?.onePagerDuration && mode === "edit");
   const [isDeadlineModalOpen, setIsDeadlineModalOpen] = useState(false);
-  const [links, setLinks] = useState<{ id: string; url: string }[]>([]);
+  const [links, setLinks] = useState<{ id: string; url: string }[]>(
+    initialData?.formUrl ? [{ id: "default", url: initialData.formUrl }] : []
+  );
   const [file, setFile] = useState<File | null>(null);
-  const [isPublishing, setIsPublishing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{
     title?: string;
     source?: string;
@@ -65,12 +87,15 @@ export function DocumentCreationForm() {
 
     const urlValue = links[0]?.url?.trim() ?? "";
 
-    if (uploadType === "file" && !file) {
-      nextErrors.source = "파일 업로드는 필수 입력 항목입니다.";
-    }
-
-    if (uploadType === "url" && !urlValue) {
-      nextErrors.source = "URL 첨부는 필수 입력 항목입니다.";
+    if (mode === "create") {
+      if (uploadType === "file" && !file) {
+        nextErrors.source = "파일 업로드는 필수 입력 항목입니다.";
+      }
+      if (uploadType === "url" && !urlValue) {
+        nextErrors.source = "URL 첨부는 필수 입력 항목입니다.";
+      }
+    } else if (mode === "edit" && uploadType === "url" && !urlValue) {
+       nextErrors.source = "URL 첨부는 필수 입력 항목입니다.";
     }
 
     if (!isNoDeadline && (!deadlineDate || !deadlineTime)) {
@@ -81,61 +106,83 @@ export function DocumentCreationForm() {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handlePublish = async () => {
-    if (!validateForm() || isPublishing) {
+  const handleSubmit = async () => {
+    if (!validateForm() || isSubmitting) {
       return;
     }
 
-    setIsPublishing(true);
-    const toastId = toast.loading("원페이저 양식을 게시 중입니다...");
+    setIsSubmitting(true);
+    const toastId = toast.loading(mode === "create" ? "원페이저 양식을 게시 중입니다..." : "원페이저 양식을 수정 중입니다...");
 
     try {
       const onePagerDuration = isNoDeadline
         ? undefined
         : `${deadlineDate}T${deadlineTime}:00`;
+      
+      const teacherName = getSessionUser()?.userName || "담당교사";
 
-      let response: { onePagerFormId: number };
-
-      if (uploadType === "file") {
-        if (!file) throw new Error("File is required for file upload type");
-        response = await createFileOnePager({
-          title: title.trim(),
-          formFile: file,
-          onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
-          onePagerDuration,
-          description: description.trim(),
-        });
+      if (mode === "create") {
+        let response: { onePagerId: number };
+        if (uploadType === "file") {
+          if (!file) throw new Error("File is required for file upload type");
+          response = await createFileOnePager({
+            title: title.trim(),
+            formFile: file,
+            onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+            onePagerDuration,
+            description: description.trim(),
+          });
+        } else {
+          const formUrl = links[0]?.url?.trim() ?? "";
+          response = await createUrlOnePager({
+            title: title.trim(),
+            formUrl,
+            onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+            onePagerDuration,
+            description: description.trim(),
+          });
+        }
+        toast.success("원페이저 양식이 성공적으로 게시되었습니다.", { id: toastId });
+        if (onSuccess) onSuccess(response.onePagerId);
       } else {
-        const formUrl = links[0]?.url?.trim() ?? "";
-        if (!formUrl) throw new Error("URL is required for url upload type");
-        response = await createUrlOnePager({
-          title: title.trim(),
-          formUrl,
-          onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
-          onePagerDuration,
-          description: description.trim(),
-        });
+        // Edit Mode
+        if (uploadType === "file") {
+          if (!file) throw new Error("File is required to update as file type");
+          await updateFileOnePager(initialData!.id, {
+            title: title.trim(),
+            teacherName,
+            formFile: file,
+            onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+            onePagerDuration,
+            description: description.trim(),
+          });
+        } else {
+          const formUrl = links[0]?.url?.trim() ?? "";
+          await updateUrlOnePager(initialData!.id, {
+            title: title.trim(),
+            teacherName,
+            formUrl,
+            onePagerDurationType: isNoDeadline ? "INFINITY" : "DATE",
+            onePagerDuration,
+            description: description.trim(),
+          });
+        }
+        toast.success("원페이저 양식이 성공적으로 수정되었습니다.", { id: toastId });
+        if (onSuccess) onSuccess();
       }
-
-      toast.success("원페이저 양식이 성공적으로 게시되었습니다.", {
-        id: toastId,
-      });
-      router.push(`/documents/${response.onePagerFormId}`);
-      router.refresh();
-    } catch (error) {
-      console.error("Failed to publish one-pager:", error);
-      toast.error("원페이저 양식 게시 중 오류가 발생했습니다.", {
-        id: toastId,
-      });
+    } catch (error: any) {
+      console.error("Failed to submit one-pager:", error);
+      const errorMessage = error?.response?.data?.message || error?.description || "오류가 발생했습니다.";
+      toast.error(errorMessage, { id: toastId });
     } finally {
-      setIsPublishing(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl rounded-[10px] border border-gray-100 bg-gray-50 p-8 md:p-12">
+    <div className={`mx-auto w-full ${mode === "create" ? "max-w-5xl" : ""} rounded-[10px] border border-gray-100 bg-gray-50 p-8 md:p-12`}>
       <h1 className="mb-12 text-center font-bold text-2xl text-gray-900">
-        원페이저 양식
+        {mode === "create" ? "원페이저 양식 게시" : "원페이저 양식 수정"}
       </h1>
 
       <div className="flex flex-col gap-8">
@@ -258,7 +305,7 @@ export function DocumentCreationForm() {
                     className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-gray-200 border-dashed bg-white text-gray-400 hover:bg-gray-50"
                   >
                     <span className="flex items-center gap-2 text-[14px]">
-                      파일을 업로드 해주세요.
+                      {mode === "edit" ? "새로운 파일을 업로드하려면 클릭하세요." : "파일을 업로드 해주세요."}
                       <Image
                         src="/images/icons/fileupload.svg"
                         alt="업로드"
@@ -267,6 +314,9 @@ export function DocumentCreationForm() {
                       />
                     </span>
                   </button>
+                  {mode === "edit" && initialData?.fileUrl && !initialData.fileUrl.startsWith("http") && (
+                    <p className="text-[13px] text-gray-500 italic">기존 파일이 등록되어 있습니다. 변경 시에만 업로드하세요.</p>
+                  )}
                 </>
               )
             ) : (
@@ -330,18 +380,27 @@ export function DocumentCreationForm() {
         </div>
       </div>
 
-      <div className="mt-16 flex justify-center">
+      <div className="mt-16 flex justify-center gap-4">
+        {mode === "edit" && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="h-12 w-full max-w-[160px] rounded-lg border border-gray-200 bg-white font-medium text-gray-600 text-xl hover:bg-gray-50"
+          >
+            취소
+          </button>
+        )}
         <button
           type="button"
-          onClick={handlePublish}
-          disabled={isPublishing}
-          className={`h-12 w-full max-w-sm rounded-lg font-medium text-white text-xl md:w-80 ${
-            isPublishing
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className={`h-12 w-full ${mode === "create" ? "max-w-sm" : "max-w-[160px]"} rounded-lg font-medium text-white text-xl ${
+            isSubmitting
               ? "cursor-not-allowed bg-gray-400"
               : "cursor-pointer bg-[#f45f5f] hover:bg-[#f45f5f]/90"
           }`}
         >
-          {isPublishing ? "게시 중..." : "게시하기"}
+          {isSubmitting ? "처리 중..." : mode === "create" ? "게시하기" : "수정하기"}
         </button>
       </div>
 

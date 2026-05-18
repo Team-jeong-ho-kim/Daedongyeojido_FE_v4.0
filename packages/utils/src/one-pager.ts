@@ -16,13 +16,37 @@ export interface CreateFileOnePagerRequest {
   description: string;
 }
 
-export interface CreateUrlOnePagerRequest {
-  title: string;
-  formUrl: string;
-  onePagerDurationType: "INFINITY" | "DATE";
-  onePagerDuration?: string;
-  description: string;
+export interface UpdateFileOnePagerRequest extends CreateFileOnePagerRequest {
+  teacherName: string;
 }
+
+export interface UpdateUrlOnePagerRequest extends CreateUrlOnePagerRequest {
+  teacherName: string;
+}
+
+export const updateFileOnePager = async (
+  formId: string,
+  payload: UpdateFileOnePagerRequest,
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("teacherName", payload.teacherName);
+  formData.append("formFile", payload.formFile);
+  formData.append("onePagerDurationType", payload.onePagerDurationType);
+  if (payload.onePagerDuration) {
+    formData.append("onePagerDuration", payload.onePagerDuration);
+  }
+  formData.append("description", payload.description);
+
+  await apiClient.patch(`/teachers/onepager/forms-file/${formId}`, formData);
+};
+
+export const updateUrlOnePager = async (
+  formId: string,
+  payload: UpdateUrlOnePagerRequest,
+): Promise<void> => {
+  await apiClient.patch(`/teachers/onepager/forms-url/${formId}`, payload);
+};
 
 export interface OnePagerListResponse {
   onePagers: OnePager[];
@@ -34,7 +58,7 @@ export const getOnePagers = async (): Promise<OnePager[]> => {
 };
 export const createFileOnePager = async (
   payload: CreateFileOnePagerRequest,
-): Promise<{ onePagerFormId: number }> => {
+): Promise<{ onePagerId: number }> => {
   const formData = new FormData();
   formData.append("title", payload.title);
   formData.append("formFile", payload.formFile);
@@ -44,19 +68,19 @@ export const createFileOnePager = async (
   }
   formData.append("description", payload.description);
 
-  const response = await apiClient.post<{ onePagerFormId: number }>(
+  const response = await apiClient.post<{ onePagerId: number }>(
     "/teachers/onepager/forms-file",
     formData,
   );
-  return response.data;
+  return { onePagerId: response.data.onePagerId };
 };
 
 export const createUrlOnePager = async (
   payload: CreateUrlOnePagerRequest,
-): Promise<{ onePagerFormId: number }> => {
-  const response = await apiClient.post<{ onePagerFormId: number }>(
+): Promise<{ onePagerId: number }> => {
+  const response = await apiClient.post<{ onePagerId: number }>(
     "/teachers/onepager/forms-url",
     payload,
   );
-  return response.data;
+  return { onePagerId: response.data.onePagerId };
 };
